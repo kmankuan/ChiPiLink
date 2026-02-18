@@ -920,92 +920,62 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Compact toolbar */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
-            <Warehouse className="h-4 w-4 text-white" />
-          </div>
-          <h3 className="text-sm font-bold tracking-tight">Inventory</h3>
-          <span className="text-[10px] text-muted-foreground hidden sm:inline">Unified product & textbook management</span>
-        </div>
-        <div className="flex gap-1.5 flex-wrap">
-          <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')} className="gap-1 h-7 text-xs" data-testid="view-table">
-            <BarChart3 className="h-3 w-3" /> Products
-          </Button>
-          <Button variant={viewMode === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('history')} className="gap-1 h-7 text-xs" data-testid="view-history">
-            <History className="h-3 w-3" /> Movements
-          </Button>
-          <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading} className="h-7 text-xs">
-            <RefreshCw className={`h-3 w-3 mr-1 ${loading ? 'animate-spin' : ''}`} /> {translate('common.refresh', 'Refresh')}
-          </Button>
+    <div className="space-y-3">
+      {/* Unified Board Header */}
+      <BoardHeader
+        title="Inventory"
+        icon={Warehouse}
+        subtitle="Unified product & textbook management"
+        tabs={[
+          { value: 'all', label: 'All' },
+          { value: 'pca', label: 'Textbooks', icon: BookOpen },
+          { value: 'public', label: 'Public', icon: Store },
+          { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
+        ]}
+        activeTab={catalogType}
+        onTabChange={(v) => { setCatalogType(v); setSelectedIds(new Set()); }}
+        search={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search by name, code, publisher..."
+        filters={[
+          {
+            value: selectedGrade, onChange: setSelectedGrade, placeholder: 'All grades', testId: 'pca-filter-grade',
+            options: filters.grades.map(g => ({ value: g, label: g })),
+          },
+          {
+            value: selectedSubject, onChange: setSelectedSubject, placeholder: 'All subjects', testId: 'pca-filter-subject',
+            options: filters.subjects.map(s => ({ value: s, label: s })),
+          },
+          {
+            value: statusFilter, onChange: setStatusFilter, placeholder: 'All status', testId: 'pca-filter-status',
+            options: [{ value: 'active', label: 'Active only' }, { value: 'inactive', label: 'Inactive only' }],
+          },
+        ]}
+        hasActiveFilters={!!(searchTerm || selectedGrade || selectedSubject || statusFilter !== 'all')}
+        onClearFilters={() => { setSearchTerm(''); setSelectedGrade(''); setSelectedSubject(''); setStatusFilter('all'); }}
+        stats={[
+          { label: 'total', value: products.length, color: 'default' },
+          { label: 'active', value: products.filter(p => p.active !== false).length, color: 'default' },
+          { label: 'stock', value: totalStock, color: 'green' },
+          ...(lowStockCount > 0 ? [{ label: 'low stock', value: lowStockCount, color: 'amber', highlight: true }] : []),
+          ...(outOfStockCount > 0 ? [{ label: 'out of stock', value: outOfStockCount, color: 'red', highlight: true }] : []),
+          { label: 'grades', value: filters.grades.length, color: 'default' },
+        ]}
+        viewModes={[
+          { value: 'table', label: 'Products', icon: BarChart3 },
+          { value: 'history', label: 'Movements', icon: History },
+        ]}
+        activeView={viewMode}
+        onViewChange={setViewMode}
+        loading={loading}
+        onRefresh={fetchProducts}
+        actions={<>
           <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} />
-          <Button onClick={() => handleOpenForm()} size="sm" className="gap-1 h-7 text-xs"><Plus className="h-3 w-3" /> {translate('store.addBook', 'Add Product')}</Button>
-        </div>
-      </div>
-
-      {/* Filters row */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <div className="flex rounded-md border overflow-hidden" data-testid="catalog-type-filter">
-          {[
-            { value: 'all', label: 'All' },
-            { value: 'pca', label: 'School Textbooks' },
-            { value: 'public', label: 'Public Store' },
-            { value: 'archived', label: 'Archived' },
-          ].map(opt => (
-            <button key={opt.value} onClick={() => { setCatalogType(opt.value); setSelectedIds(new Set()); }}
-              className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                catalogType === opt.value
-                  ? opt.value === 'archived' ? 'bg-amber-500 text-white' : 'bg-primary text-primary-foreground'
-                  : 'bg-background hover:bg-muted'
-              }`}
-              data-testid={`catalog-${opt.value}`}>
-              {opt.value === 'archived' && <Archive className="h-3 w-3 inline mr-0.5" />}
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex-1 min-w-[180px] max-w-sm">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input placeholder="Search by name, code, publisher..." value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="pca-search" />
-          </div>
-        </div>
-        <select value={selectedGrade} onChange={(e) => setSelectedGrade(e.target.value)}
-          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-grade">
-          <option value="">All grades</option>
-          {filters.grades.map(g => <option key={g} value={g}>{g}</option>)}
-        </select>
-        <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
-          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-subject">
-          <option value="">All subjects</option>
-          {filters.subjects.map(m => <option key={m} value={m}>{m}</option>)}
-        </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-status">
-          <option value="all">All status</option>
-          <option value="active">Active only</option>
-          <option value="inactive">Inactive only</option>
-        </select>
-        {(searchTerm || selectedGrade || selectedSubject || statusFilter !== 'all') && (
-          <Button variant="ghost" size="sm" className="gap-1 text-[10px] h-7" data-testid="pca-clear-filters"
-            onClick={() => { setSearchTerm(''); setSelectedGrade(''); setSelectedSubject(''); setStatusFilter('all'); }}>
-            <X className="h-3 w-3" /> Clear
+          <Button onClick={() => handleOpenForm()} size="sm" className="gap-1 h-7 text-xs" data-testid="add-product-btn">
+            <Plus className="h-3 w-3" /> <span className="hidden sm:inline">{translate('store.addBook', 'Add Product')}</span><span className="sm:hidden">Add</span>
           </Button>
-        )}
-      </div>
-
-      {/* Compact inline stats */}
-      <div className="flex flex-wrap gap-2 text-xs" data-testid="inventory-stats">
-        <span className="px-2 py-1 rounded bg-muted font-medium">{products.length} <span className="text-muted-foreground">total</span></span>
-        <span className="px-2 py-1 rounded bg-muted font-medium">{products.filter(p => p.active !== false).length} <span className="text-muted-foreground">active</span></span>
-        <span className="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium">{totalStock} <span className="opacity-70">stock</span></span>
-        {lowStockCount > 0 && <span className="px-2 py-1 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-bold">{lowStockCount} <span className="opacity-70">low stock</span></span>}
-        {outOfStockCount > 0 && <span className="px-2 py-1 rounded bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 font-bold">{outOfStockCount} <span className="opacity-70">out of stock</span></span>}
-        <span className="px-2 py-1 rounded bg-muted font-medium">{filters.grades.length} <span className="text-muted-foreground">grades</span></span>
-      </div>
+        </>}
+      />
 
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
