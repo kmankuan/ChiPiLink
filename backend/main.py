@@ -159,6 +159,7 @@ api_router.include_router(monday_webhook_router)  # Universal webhook endpoint
 api_router.include_router(monday_widget_router)  # Public board widget
 api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
+api_router.include_router(cleanup_router)
 api_router.include_router(seed_demo_router)  # Demo data seeding
 api_router.include_router(migrations_router)  # Database migrations
 api_router.include_router(privacy_router)  # Privacy settings
