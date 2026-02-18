@@ -418,7 +418,7 @@ function TextbookOrdersView({ token, students }) {
                     {isInCart && <CheckCircle className="h-3.5 w-3.5 text-primary-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{item.book_name}</p>
+                    <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
                     {item.book_code && <p className="text-[10px] text-muted-foreground">{item.book_code}</p>}
                   </div>
                   <span className="text-xs font-semibold text-primary ml-1 shrink-0">${item.price?.toFixed(2)}</span>
@@ -437,7 +437,7 @@ function TextbookOrdersView({ token, students }) {
             <Card key={item.book_id} className="p-2.5 opacity-60" data-testid={`widget-ordered-${item.book_id}`}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{item.book_name}</p>
+                  <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
                   <p className="text-[10px] text-muted-foreground">{item.book_code}</p>
                 </div>
                 <Badge className="text-[9px] bg-green-100 text-green-700">Ordered</Badge>
@@ -455,7 +455,7 @@ function TextbookOrdersView({ token, students }) {
             <Card key={item.book_id} className="p-2.5 opacity-40" data-testid={`widget-oos-${item.book_id}`}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{item.book_name}</p>
+                  <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
                   <p className="text-[10px] text-muted-foreground">{item.book_code}</p>
                 </div>
                 <Badge className="text-[9px] bg-red-100 text-red-700">Out of Stock</Badge>
@@ -570,7 +570,7 @@ function OrdersView({ token, students }) {
                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Ordered</p>
                   {orderedItems.map(item => (
                     <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-green-50 dark:bg-green-900/10">
-                      <span className="text-[11px] truncate flex-1">{item.book_name}</span>
+                      <span className="text-[11px] line-clamp-2 flex-1">{item.book_name}</span>
                       <span className="text-[10px] font-medium text-green-700">${item.price?.toFixed(2)}</span>
                     </div>
                   ))}
@@ -581,7 +581,7 @@ function OrdersView({ token, students }) {
                   <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-1">Pending Selection</p>
                   {availableItems.map(item => (
                     <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-muted/30">
-                      <span className="text-[11px] truncate flex-1">{item.book_name}</span>
+                      <span className="text-[11px] line-clamp-2 flex-1">{item.book_name}</span>
                       <span className="text-[10px] font-medium">${item.price?.toFixed(2)}</span>
                     </div>
                   ))}
