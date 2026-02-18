@@ -321,6 +321,7 @@ export default function TextbookOrdersAdminTab() {
                       <TableHead className="hidden md:table-cell">Grade</TableHead>
                       <TableHead className="hidden md:table-cell">Items</TableHead>
                       <TableHead>Total</TableHead>
+                      <TableHead className="hidden lg:table-cell">Last Submitted</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
