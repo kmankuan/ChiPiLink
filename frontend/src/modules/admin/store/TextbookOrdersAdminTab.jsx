@@ -346,9 +346,6 @@ export default function TextbookOrdersAdminTab() {
                         <TableCell className="hidden md:table-cell">{order.grade}</TableCell>
                         <TableCell className="hidden md:table-cell">
                           {order.items?.filter(i => i.quantity_ordered > 0).length || 0}
-                          {(order.submissions?.length > 1) && (
-                            <span className="ml-1 text-[10px] text-amber-600 font-medium">({order.submissions.length} submissions)</span>
-                          )}
                         </TableCell>
                         <TableCell className="font-semibold">
                           ${order.total_amount?.toFixed(2) || '0.00'}
