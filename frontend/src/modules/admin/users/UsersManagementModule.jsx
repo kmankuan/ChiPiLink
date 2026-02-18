@@ -33,8 +33,15 @@ import AllStudentsTab from './components/AllStudentsTab';
 import { useTranslation } from 'react-i18next';
 
 export default function UsersManagementModule() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('student-requests');
+
+  const lang = i18n.language || 'en';
+  const labels = {
+    en: { requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' },
+    es: { requests: 'Solicitudes Vinculación', students: 'Todos los Estudiantes', connections: 'Conexiones', schools: 'Escuelas', formConfig: 'Config. Formularios' },
+    zh: { requests: '访问请求', students: '所有学生', connections: '连接', schools: '学校', formConfig: '表单配置' },
+  }[lang] || { requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' };
 
   return (
     <div className="space-y-4">
@@ -42,23 +49,23 @@ export default function UsersManagementModule() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="student-requests" className="gap-2">
             <ClipboardList className="h-4 w-4" />
-            Solicitudes Vinculación
+            {labels.requests}
           </TabsTrigger>
           <TabsTrigger value="all-students" className="gap-2">
             <UserCheck className="h-4 w-4" />
-            Todos los Estudiantes
+            {labels.students}
           </TabsTrigger>
           <TabsTrigger value="conexiones" className="gap-2">
             <Link2 className="h-4 w-4" />
-            Conexiones
+            {labels.connections}
           </TabsTrigger>
           <TabsTrigger value="schools" className="gap-2">
             <School className="h-4 w-4" />
-            Escuelas
+            {labels.schools}
           </TabsTrigger>
           <TabsTrigger value="form-config" className="gap-2">
             <Settings2 className="h-4 w-4" />
-            Config. Formularios
+            {labels.formConfig}
           </TabsTrigger>
         </TabsList>
 
