@@ -65,6 +65,7 @@ from modules.integrations.sheets.routes import router as sheets_router
 from modules.admin.routes import router as admin_router
 from modules.admin.seed_demo import router as seed_demo_router
 from modules.admin.privacy_routes import router as privacy_router, public_router as privacy_public_router
+from modules.admin.cleanup_routes import router as cleanup_router
 
 # Translation Dictionary Module (core feature)
 from modules.translations.routes import router as translation_dict_router
