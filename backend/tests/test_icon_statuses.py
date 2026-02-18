@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://admin-ui-fixes-4.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://separate-orders.preview.emergentagent.com')
 
 class TestIconStatusesPublic:
     """Public icon statuses endpoint tests"""

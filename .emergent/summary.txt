@@ -1,82 +1,80 @@
 <analysis>**original_problem_statement:**
-The user initially requested to improve mobile responsiveness and add admin-level customization for the login page. This evolved into fixing critical bugs related to student linking and a broken school selection dropdown.
+The initial scope involved mobile responsiveness and UI customizations. This evolved into fixing critical bugs, a major UI/UX overhaul of the admin section using a reusable  component for a unified Monday.com board look and feel, and implementing a consistent tap-to-expand text component.
 
-Following those fixes, the user requested a significant UI/UX overhaul for the admin section, including responsive tables, mobile card views, a floating action bar, and merging the Students and Access Requests tabs.
+The focus then shifted to the backend. The user raised questions about how the CRM linking worked, leading to a new feature that automatically links/creates a customer on Monday.com and starts a conversation thread upon the first order.
 
-After the tab merge, a regression bug appeared where Approve/Reject buttons for access requests stopped working. While the agent couldn't reproduce this specific bug, they refactored the oversized component () at the user's request.
-
-Subsequent user requests focused on:
-1.  A full end-to-end test due to concerns about an infinite loop with Monday.com presale order syncing (no issue was found).
-2.  Fixing a critical bug where presale items were incorrectly shown as Out of Stock.
-3.  Removing a duplicate Add Student UI element.
-4.  Implementing text wrapping for long book titles in the UI.
-5.  Creating a fully dynamic UI for mapping order data to Monday.com columns.
-6.  Currently, the user has requested several follow-up UI fixes related to the text wrapping and a cut-off menu.
+A subsequent bug report about a missing second order from a student revealed a fundamental misunderstanding of the core business logic. The system was built to merge all purchases from a student within a year into a single order record with multiple submissions. The user has now clarified that this is incorrect. The final and most critical requirement is that **every single order submission must create a new, separate order record** in the admin panel.
 
 **User's preferred language**: English
 
 **what currently exists?**
-- A full-stack application with a React frontend, FastAPI backend, and MongoDB.
-- A CRM chat system integrated with a Monday.com board.
-- A responsive and configurable login page.
-- A refactored Unatienda admin module with a unified  for managing students and access requests.
-- A functional presale flow where items are correctly shown as available for presale-enabled students, even with zero physical stock.
-- A fully dynamic admin UI under Integrations that allows an administrator to add, remove, and map any order data field (e.g., Order ID, Parent Name) to specific columns on a Monday.com board.
-- A text wrap with tap-to-expand feature implemented for book names in  and .
+- A full-stack application (React/FastAPI/MongoDB).
+- A unified admin UI using a reusable  component across all major management tabs (Inventory, Students, Orders, etc.).
+- An automated CRM linking feature that creates a customer and starts a conversation on Monday.com upon order submission.
+- An order submission system that incorrectly **merges** all purchases from the same student/year into a single order document. The UI was recently modified to show a history of these submissions, but this functionality is now obsolete and needs to be removed.
+- Data persistence for , , and  was recently added to the order submission flow.
 
 **Last working item**:
--   **Last item agent was working:** The agent was starting to investigate three UI fixes requested by the user.
-    1.  A horizontal menu in the Monday.com integration settings is cut off on smaller screens.
-    2.  The recently implemented text wrap for book names needs to be applied to all other relevant parts of the UI.
-    3.  The order summary modal/dialog also needs the text wrap feature for book names.
--   **Status:** IN PROGRESS
+-   **Last item agent was working:** The agent had just received the critical user requirement that each textbook order submission must create a **separate order document**, not merge into an existing one. The agent acknowledged this and was about to start refactoring the core backend logic.
+-   **Status:** NOT STARTED
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. Use the screenshot tool to verify the UI fixes visually on mobile viewports. The testing agent should then be used for regression testing to ensure these UI changes haven't broken other functionalities, particularly in the order and admin flows.
+-   **Which testing method agent to use?** both. This is a major architectural change. The backend logic will need thorough testing (============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: /app
+plugins: asyncio-1.3.0, anyio-4.12.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1589 items / 4 errors
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting backend/tests/test_chat_updates.py ______________
+backend/tests/test_chat_updates.py:18: in <module>
+    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'rstrip'
+____________ ERROR collecting backend/tests/test_sync_dashboard.py _____________
+backend/tests/test_sync_dashboard.py:11: in <module>
+    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'rstrip'
+________ ERROR collecting backend/tests/test_txb_create_item_webhook.py ________
+backend/tests/test_txb_create_item_webhook.py:19: in <module>
+    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'rstrip'
+___________ ERROR collecting tests/test_push_notifications_wallet.py ___________
+tests/test_push_notifications_wallet.py:12: in <module>
+    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'rstrip'
+=========================== short test summary info ============================
+ERROR backend/tests/test_chat_updates.py - AttributeError: 'NoneType' object ...
+ERROR backend/tests/test_sync_dashboard.py - AttributeError: 'NoneType' objec...
+ERROR backend/tests/test_txb_create_item_webhook.py - AttributeError: 'NoneTy...
+ERROR tests/test_push_notifications_wallet.py - AttributeError: 'NoneType' ob...
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
+============================== 4 errors in 1.10s =============================== or ) to ensure new, separate orders are created correctly. The frontend testing agent will then be needed to verify that the admin UI correctly displays these separate orders and that the now-obsolete submission history UI has been removed.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Cut-off horizontal menu in admin settings (P0)**
--   **Issue 2: Inconsistent book name display (P1)**
--   **Issue 3: Truncated book names in order summary modal (P1)**
+-   **Issue 1: Each submission must create a separate order (P0)**
 
 **Issues Detail:**
 -   **Issue 1:**
-    -   **Description:** In the Monday.com integration settings page (), the horizontal menu with Settings and Order Columns tabs is cut off on smaller screens.
-    -   **Attempted fixes:** None yet. Agent has just started investigating.
+    -   **Description:** The current order submission logic in  is designed to find an existing order for a student/year and append new submissions to it. This is incorrect. The requirement is for every submission to generate a new, distinct order document in the  collection.
+    -   **Attempted fixes:** None. The previous work was based on the merge logic, which is now invalidated.
     -   **Next debug checklist:**
-        1.  **File:** .
-        2.  Inspect the container holding the tabs.
-        3.  Apply responsive styles (e.g., , flex-wrap, or a scrollbar utility) to make the menu scrollable or wrap on mobile.
-    -   **Why fix this issue and what will be achieved with the fix?** To ensure all admin settings are accessible and usable on mobile devices, improving the admin experience.
+        1.  **File:** 
+        2.  **Method:** .
+        3.  Modify the logic to **always** create a new order document upon every call, instead of using  to find and update an existing one.
+        4.  The concept of a  array within an order document is now obsolete and should be removed. The new model is one document per submission.
+        5.  **File:** 
+        6.  Remove the Last Submitted column, as it's no longer relevant. The table should simply display multiple distinct order rows for the same student.
+        7.  **File:** 
+        8.  Remove the Submission History section from the dialog.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a critical correction to align the application's core business logic with the user's required workflow. It will allow admins to track each purchase as a separate, manageable order.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** No.
-
--   **Issue 2:**
-    -   **Description:** The text wrap with tap-to-expand feature was implemented for book names in  and , but other parts of the application still use simple truncation. This needs to be standardized.
-    -   **Attempted fixes:** None yet.
-    -   **Next debug checklist:**
-        1.  Search the codebase for other components that render book lists or book names (e.g., order summary modals, admin order views).
-        2.  Identify all instances where book titles might be truncated.
-        3.  Refactor these instances to use the same stateful  and tap-to-expand logic implemented in .
-    -   **Why fix this issue and what will be achieved with the fix?** To create a consistent and readable user experience across the entire application, ensuring users can always see full item names.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** No.
-
--   **Issue 3:**
-    -   **Description:** This is a specific instance of Issue 2. The modal dialog that shows the order summary before submission truncates long book names.
-    -   **Attempted fixes:** None yet.
-    -   **Next debug checklist:**
-        1.  **File:** .
-        2.  Locate the code for the order confirmation/summary modal.
-        3.  Apply the same text wrap with tap-to-expand logic to the list of book names within this modal.
-    -   **Why fix this issue and what will be achieved with the fix?** To allow users to verify the full names of all items in their cart before finalizing an order, preventing potential mistakes.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** No.
 
 **In progress Task List**:
@@ -84,21 +82,20 @@ None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **(P1)** Make the progress icon system a truly global resource by fully abstracting it.
+    -   **(P1)** Abstract the progress icon system into a global resource.
     -   **(P2)** Implement a Stop button for the full Monday.com sync operation.
 -   **Future Tasks:**
-    -   **(P3)** Build an on-demand landing page redesign tool in the admin panel.
-    -   **(P4)** Extend the Monday.com synchronization to the general product inventory.
-    -   **(P5)** Expand the global design configuration system to other parts of the application.
-    -   **(P5)** Implement actual push notifications for student access request status changes (currently a  in the backend).
+    -   **(P3)** Build an on-demand landing page redesign tool.
+    -   **(P4)** Extend Monday.com synchronization to the general product inventory.
+    -   **(P5)** Implement push notifications for student access requests.
 
 **Completed work in this session**
--   **Refactor - Admin Students Tab (DONE):** Rewrote  from scratch, reducing its line count by 18% and improving maintainability.
--   **Bug Fix - Critical Presale Logic (DONE):** Fixed the core logic in  that incorrectly marked presale items as Out of Stock. The fix ensures availability is correctly determined based on the student's .
--   **UI Fix - Removed Duplicate Element (DONE):** Removed a redundant Add Student card from the UI in .
--   **Feature - Text Wrapping for Book Names (DONE):** Implemented a wrap to 2 lines with tap-to-expand feature for long book titles in  and .
--   **Feature - Dynamic Monday.com Mapping (DONE):** Replaced a static column mapping UI with a fully dynamic system in , allowing admins to add/remove/map any order field to their Monday board.
--   **Testing - E2E Flow Verification (DONE):** Conducted a full end-to-end test of all major application flows and confirmed there is no risk of an infinite loop between the application and Monday.com for presale orders.
+-   **Feature - CRM Auto-Linking & Conversation Starter (DONE):** On first order, a student is now automatically linked to a Monday.com CRM item (or a new one is created), and a New Order Received message is posted.
+-   **Bug Fix - Order Data Persistence (DONE):** Ensured , , and  are correctly persisted with each order.
+-   **Feature - Reusable  Component (DONE):** Created a unified, Monday.com-style header component ().
+-   **Refactor - Global Admin UI Unification (DONE):** Refactored 7 major admin tabs to use the new  for a consistent look and feel.
+-   **Feature - Reusable  Component (DONE):** Created a component for consistent tap-to-expand text-wrapping.
+-   **UI Fix - Multiple UI Cleanups (DONE):** Fixed a cut-off admin menu and standardized text wrapping across modals and views.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -110,54 +107,52 @@ None.
 
 
 **Key Technical Concepts**
--   **Dynamic Component Rendering:** A static list of form fields was replaced with a dynamic system where the user can add/remove mapping rows, managed via React state.
--   **Conditional CSS Class Application:** Using  for truncation and dynamically removing it based on a state array () to implement the tap-to-expand feature.
--   **Backend Business Logic:** The core presale logic was corrected by incorporating a check for a boolean flag () from a related data model () when calculating product availability.
+-   **Component-Driven Refactoring:** The admin UI was successfully unified by abstracting logic into a reusable  component.
+-   **Incorrect Business Logic Assumption:** The primary blocker is that the core order logic was built on the incorrect assumption of merging orders. The next agent must pivot to a one submission, one order model.
+-   **API-Driven Backend:** The application heavily relies on backend services to interact with the database and external APIs like Monday.com.
 
 **key DB schema**
-No changes in this session.
+-   **:** The  array field is now obsolete and the logic supporting it must be removed. The schema will be simplified to one document per order submission.
 
 **changes in tech stack**
 None.
 
 **All files of reference**
--   **Under Investigation (for current issues):**
+-   **Critical for Next Task:**
     -   
     -   
     -   
--   **Recently Modified/Fixed:**
+    -   
+-   **Recently Created/Refactored (for context):**
     -   
     -   
 
 **Areas that need refactoring**:
--   The text wrap logic needs to be abstracted into a reusable component or hook instead of being re-implemented in every view that displays a book name. This is part of the current pending tasks.
+-   The entire order submission flow in the backend needs to be refactored to create a new order for each submission.
+-   The frontend components for displaying orders (, ) must be refactored to remove the now-obsolete submission history UI.
 
 **key api endpoints**
--   : This is the primary endpoint for fetching available books for a student. Its logic was fixed to correctly handle presale mode.
+-   : This endpoint's implementation must be completely changed from update-or-create (merge) to always create.
 
 **Critical Info for New Agent**
--   Your immediate priority is to address the three UI issues reported by the user in message #405: the cut-off admin menu, and applying the text-wrap feature to the order summary modal and any other remaining parts of the app.
--   The text-wrap logic is already implemented in  and . Use this as a template. Consider creating a reusable component to avoid duplicating the state and JSX logic.
--   For the cut-off menu in , a simple CSS fix like adding  to the tab container on mobile viewports is likely sufficient.
+-   **Your immediate and highest priority task is to re-architect the order submission process.** The user has explicitly stated that the current logic of merging multiple submissions into a single order per student/year is incorrect. **Each submission must create a new, separate order.**
+-   You must modify  to stop looking for existing orders and instead always create a new one.
+-   The  array within an order document is now obsolete and should be removed.
+-   You must revert the recent UI changes in  and  that were built to show submission history. The UI should now simply display multiple distinct orders from the same student.
+-   This is a fundamental change to the business logic. Test thoroughly after implementation.
 
 **documents and test reports created in this job**
 -   
--   
--   
--   
+-   Numerous test reports in  (e.g., )
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User #343 & #348:** Asks to add an Order ID mapping to the Monday.com integration and requests the ability to dynamically add or remove any column mappings. (COMPLETE)
-- **Agent #347 & #351:** Confirms the backend supports this and implements a fully dynamic UI for the mapping. (COMPLETE)
-- **User #405:** Reports three new UI issues: a cut-off horizontal menu, and requests that the new text wrap feature be applied to other parts of the app, including the order summary modal. (PENDING - CURRENT TASK)
-- **Agent #406:** Acknowledges the three issues and begins investigation. (IN PROGRESS)
-- **User #279:** Points out that long item names are truncated on mobile and suggests a fix. (COMPLETE)
-- **Agent #282 & #284:** Recommends a better UX (text wrap with tap-to-expand) which the user approves. (COMPLETE)
-- **User #285:** Approves the agent's recommended approach. (COMPLETE)
-- **Agent #286 - #341:** Implements and verifies the text-wrap feature. (COMPLETE)
+-   **User #476:** Clarified that a student can order multiple times per year, questioning the 1 order per year logic. (PENDING - Led to current task)
+-   **Agent #477 - #516:** Investigated and fixed related data persistence issues but continued operating under the incorrect merge-on-submit model. (COMPLETE, but based on wrong premise)
+-   **User #517:** Stated the final, critical requirement: each order sent should be generate an order in the Order section. This is the core of the current task. (PENDING)
+-   **Agent #518-521:** Acknowledged understanding of the new one submission = one new order requirement and was preparing to implement the fix. (IN PROGRESS)
 
 **Project Health Check:**
--   **Broken:** Minor UI/UX issues are present (cut-off menu, inconsistent text wrapping). Core functionality is stable.
+-   **Broken:** The core business logic for order creation is fundamentally incorrect according to the user's latest clarification. The application will not function as required until this is fixed.
 -   **Mocked:** None.
 
 **3rd Party Integrations**
@@ -169,14 +164,14 @@ None.
 -    (for fuzzy string matching)
 
 **Testing status**
--   **Testing agent used after significant changes:** YES. The agent has consistently used the testing agent after major bug fixes and feature implementations.
+-   **Testing agent used after significant changes:** YES
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** None. The last known regression (broken approve/reject buttons) could not be reproduced and the relevant component has since been refactored.
+-   **Known regressions:** The UI for displaying submission history (, ) is now a regression because the underlying business logic is incorrect. It needs to be removed.
 
 **Credentials to test flow:**
 -   **Email:** 
 -   **Password:** 
 
 **What agent forgot to execute**
-The agent has been diligent in addressing user requests. No planned tasks or user requests have been forgotten.</analysis>
+The agent operated on a fundamental misunderstanding of the core business logic for order creation. The user's latest message has corrected this, and the required refactoring is now the top priority.</analysis>
