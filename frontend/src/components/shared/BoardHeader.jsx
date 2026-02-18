@@ -70,7 +70,7 @@ function StatChip({ label, value, color = 'default', highlight, onClick }) {
       onClick={onClick}
       className={`
         inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] tabular-nums
-        transition-all duration-150
+        transition-all duration-150 whitespace-nowrap shrink-0
         ${colorCls}
         ${highlight ? 'font-bold' : 'font-medium'}
         ${onClick ? 'cursor-pointer hover:ring-1 hover:ring-foreground/20' : 'cursor-default'}
