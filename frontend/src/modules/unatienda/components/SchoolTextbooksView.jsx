@@ -702,8 +702,8 @@ export default function SchoolTextbooksView({
                               </div>
                               
                               {/* Book info */}
-                              <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${isOrdered ? 'text-muted-foreground' : ''}`}>
+                              <div className="flex-1 min-w-0" onClick={(e) => { e.stopPropagation(); toggleNameExpand(item.book_id); }}>
+                                <p className={`text-sm font-medium ${expandedNames.has(item.book_id) ? '' : 'line-clamp-2'} ${isOrdered ? 'text-muted-foreground' : ''}`}>
                                   {item.book_name}
                                 </p>
                                 <p className="text-xs text-muted-foreground truncate">{item.book_code}</p>
