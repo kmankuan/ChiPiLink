@@ -400,10 +400,12 @@ export default function TextbookOrdersAdminTab() {
               />
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Statistics Tab */}
-        <TabsContent value="stats" className="space-y-4">
+      {/* Statistics Tab */}
+      {subTab === 'stats' && (
+        <div className="space-y-3">
           {stats && (
             <>
               {/* Summary Cards */}
