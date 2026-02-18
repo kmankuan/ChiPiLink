@@ -742,7 +742,7 @@ export default function StockOrdersTab({ token }) {
             <p className="text-xs font-medium text-amber-800 dark:text-amber-300">{pendingCount} order{pendingCount > 1 ? 's' : ''} pending action</p>
           </CardContent>
         </Card>
-      )
+      )}
 
       {/* Orders List */}
       {orders.length === 0 ? (
