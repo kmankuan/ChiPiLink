@@ -248,79 +248,56 @@ export default function TextbookOrdersAdminTab() {
   // Get unique grades from orders
   const grades = [...new Set(orders.map(o => o.grade).filter(Boolean))].sort();
 
+  const [subTab, setSubTab] = useState('orders');
+
   return (
-    <div className="space-y-6" data-testid="textbook-orders-admin">
-      <Tabs defaultValue="orders">
-        <TabsList>
-          <TabsTrigger value="orders" className="gap-2">
-            <Package className="h-4 w-4" />
-            Orders
-          </TabsTrigger>
-          <TabsTrigger value="stats" className="gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Statistics
-          </TabsTrigger>
-          <TabsTrigger value="reorders" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Reorder Requests
-            {pendingReorders.length > 0 && (
-              <Badge variant="destructive" className="ml-1">{pendingReorders.length}</Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
+    <div className="space-y-3" data-testid="textbook-orders-admin">
+      <BoardHeader
+        title="Textbook Orders"
+        icon={Package}
+        subtitle="Manage orders, statistics, and reorder requests"
+        tabs={[
+          { value: 'orders', label: 'Orders', icon: Package },
+          { value: 'stats', label: 'Statistics', icon: BarChart3 },
+          { value: 'reorders', label: 'Reorders', icon: RefreshCw },
+        ]}
+        activeTab={subTab}
+        onTabChange={setSubTab}
+        search={subTab === 'orders' ? searchTerm : undefined}
+        onSearchChange={subTab === 'orders' ? setSearchTerm : undefined}
+        searchPlaceholder="Search by student, user, or order ID..."
+        filters={subTab === 'orders' ? [
+          {
+            value: filterStatus, onChange: setFilterStatus, placeholder: 'All Status', testId: 'txo-filter-status',
+            options: ORDER_STATUSES.map(s => ({ value: s.value, label: s.label })),
+          },
+          {
+            value: filterGrade, onChange: setFilterGrade, placeholder: 'All Grades', testId: 'txo-filter-grade',
+            options: grades.map(g => ({ value: g, label: `Grade ${g}` })),
+          },
+        ] : []}
+        hasActiveFilters={!!(searchTerm || filterStatus !== 'all' || filterGrade !== 'all' || showArchived)}
+        onClearFilters={() => { setSearchTerm(''); setFilterStatus('all'); setFilterGrade('all'); setShowArchived(false); }}
+        stats={stats ? [
+          { label: 'total', value: stats.total || orders.length, color: 'blue' },
+          ...(stats.by_status?.submitted > 0 ? [{ label: 'submitted', value: stats.by_status.submitted, color: 'amber', highlight: true }] : []),
+          ...(stats.by_status?.processing > 0 ? [{ label: 'processing', value: stats.by_status.processing, color: 'purple' }] : []),
+          ...(stats.by_status?.delivered > 0 ? [{ label: 'delivered', value: stats.by_status.delivered, color: 'green' }] : []),
+          ...(pendingReorders.length > 0 ? [{ label: 'reorders', value: pendingReorders.length, color: 'red', highlight: true }] : []),
+        ] : [{ label: 'orders', value: orders.length, color: 'blue' }]}
+        loading={loading}
+        onRefresh={fetchData}
+        actions={subTab === 'orders' ? (
+          <Button variant={showArchived ? "default" : "ghost"} size="sm" className="gap-1 h-7 text-xs"
+            onClick={() => setShowArchived(!showArchived)} data-testid="toggle-archived-btn">
+            <Archive className="h-3 w-3" /> {showArchived ? 'Hide' : 'Show'} Archived
+          </Button>
+        ) : null}
+      />
 
-        {/* Orders Tab */}
-        <TabsContent value="orders" className="space-y-4">
-          {/* Filters */}
-          <Card>
-            <CardContent className="py-4">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex-1 min-w-[200px]">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search by student, user, or order ID..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9"
-                    />
-                  </div>
-                </div>
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    {ORDER_STATUSES.map(s => (
-                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={filterGrade} onValueChange={setFilterGrade}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Grade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Grades</SelectItem>
-                    {grades.map(g => (
-                      <SelectItem key={g} value={g}>Grade {g}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button variant="outline" onClick={fetchData} disabled={loading}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-                <Button variant={showArchived ? "default" : "outline"} size="sm" className="gap-1.5"
-                  onClick={() => setShowArchived(!showArchived)}>
-                  <Archive className="h-3.5 w-3.5" /> {showArchived ? 'Hide' : 'Show'} Archived
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Orders Table */}
+      {/* Orders Tab */}
+      {subTab === 'orders' && (
+        <div className="space-y-3">
           <Card>
             <CardContent className="p-0">
               {loading ? (
