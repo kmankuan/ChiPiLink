@@ -74,6 +74,10 @@ function PreviewPanel({ preview, loading }) {
     { key: 'crm_notifications', label: 'Notifications', icon: AlertTriangle, color: 'text-amber-600' },
     { key: 'students', label: 'Students', icon: Users, color: 'text-rose-600' },
     { key: 'order_messages', label: 'Order Messages', icon: Package, color: 'text-cyan-600' },
+    { key: 'wallets', label: 'Wallets', icon: Wallet, color: 'text-emerald-600' },
+    { key: 'wallet_transactions', label: 'Wallet Txns', icon: CreditCard, color: 'text-emerald-600' },
+    { key: 'wallet_alerts', label: 'Wallet Alerts', icon: AlertTriangle, color: 'text-orange-600' },
+    { key: 'users', label: 'Users', icon: Users, color: 'text-indigo-600' },
   ];
 
   const totalRecords = sections.reduce((sum, s) => sum + (preview[s.key]?.count || 0), 0);
