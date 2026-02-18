@@ -40,7 +40,8 @@ class TextbookMondayAdapter(BaseMondayAdapter):
             raise ValueError("Monday.com textbook orders board not configured")
 
         total = submission_total if submission_total is not None else order.get("total_amount", 0)
-        item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f}"
+        order_ref = order['order_id'][-8:]
+        item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f} ({order_ref})"
         items_text = ", ".join([f"{i['book_name']} (x{i['quantity_ordered']})" for i in selected_items])
 
         # Grade → Monday.com status label

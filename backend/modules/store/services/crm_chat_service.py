@@ -106,16 +106,16 @@ class CrmChatService:
                 f"  - {it.get('book_name', it.get('book_id', '?'))} (x{it.get('quantity_ordered', 1)}) — ${it.get('price', 0):.2f}"
                 for it in items_list
             )
-            total = order_summary.get("total", 0)
             order_id = order_summary.get("order_id", "")
+            order_ref = order_id[-8:] if order_id else ""
             grade = order_summary.get("grade", "")
             is_presale = order_summary.get("is_presale", False)
 
             body = (
-                f"[New Order Submitted]\n\n"
+                f"[New Order - {order_ref}]\n\n"
                 f"Student: {student_name}\n"
                 f"Grade: {grade}\n"
-                f"Order: {order_id}\n"
+                f"Order ID: {order_id}\n"
                 f"{'(Pre-sale)' if is_presale else ''}\n\n"
                 f"Items:\n{items_text}\n\n"
                 f"Total: ${total:.2f}\n\n"
