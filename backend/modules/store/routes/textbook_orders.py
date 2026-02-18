@@ -119,7 +119,8 @@ async def submit_order_direct(
             result = await textbook_order_service.submit_order(
                 user_id=user_id,
                 order_id=order_id,
-                notes=request.form_data.get("notes") if request.form_data else None
+                notes=request.form_data.get("notes") if request.form_data else None,
+                form_data=request.form_data
             )
         except Exception as submit_error:
             # If order submission fails after wallet charge, refund
