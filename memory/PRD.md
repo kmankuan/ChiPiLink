@@ -202,7 +202,9 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Added "Last Submitted" column to TextbookOrdersAdminTab orders table — shows exact date/time of latest submission
 - Added Submission History section to order detail dialog — shows all submissions with date, items count, and subtotal
 - Added "(X submissions)" badge on Items column when an order has multiple partial submissions
-- Root cause: system uses 1 order per student/year with partial submissions — admin couldn't distinguish between first and subsequent submissions. Now all submissions are tracked and visible.
+- Fixed: `form_data` (parent email, phone, etc.) now stored per-submission and on the order document for audit
+- Fixed: `user_name` and `user_email` now persisted on order document (previously only looked up at display time)
+- Architecture: 1 order document per student/year supports unlimited partial submissions. Each submission records items, total, user info, form data, and Monday.com item reference
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
