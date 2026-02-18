@@ -198,13 +198,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - The CRM linking is non-blocking — if Monday.com API fails, the order still succeeds
 - Files modified: `monday_crm_adapter.py` (create_crm_item), `crm_chat_service.py` (link_student_on_order_submit), `textbook_order_service.py` (calls it after submit)
 
-### Phase 5n - Order Submission Tracking in Admin (Complete - Feb 2026)
-- Added "Last Submitted" column to TextbookOrdersAdminTab orders table — shows exact date/time of latest submission
-- Added Submission History section to order detail dialog — shows all submissions with date, items count, and subtotal
-- Added "(X submissions)" badge on Items column when an order has multiple partial submissions
-- Fixed: `form_data` (parent email, phone, etc.) now stored per-submission and on the order document for audit
-- Fixed: `user_name` and `user_email` now persisted on order document (previously only looked up at display time)
-- Architecture: 1 order document per student/year supports unlimited partial submissions. Each submission records items, total, user info, form data, and Monday.com item reference
+### Phase 5n - Separate Orders per Submission (Complete - Feb 2026)
+- **CRITICAL ARCHITECTURAL FIX**: Each textbook order submission now creates a NEW, SEPARATE order document
+- Previously: all purchases for the same student/year were merged into a single order with a `submissions` array — this was incorrect
+- Now: every POST to `/api/store/textbook-orders/submit` creates a brand new order record with its own `order_id`
+- New method `create_and_submit_order` in `textbook_order_service.py` handles the entire flow atomically
+- Repository `get_by_student` now only returns draft orders (for browsing), not submitted ones
+- Frontend `TextbookOrdersAdminTab.jsx` cleaned up: removed "Last Submitted" column (replaced with "Date"), removed submission count display, removed "Submission History" from order detail dialog
+- Admin can now see multiple distinct order rows for the same student
+- Wallet payment, Monday.com sync, CRM auto-link all preserved in the new flow
+- Testing agent verified 100% pass rate (backend + frontend)
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
