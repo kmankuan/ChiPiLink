@@ -475,8 +475,8 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                     >
                       <div className="flex items-start gap-3 min-w-0 flex-1">
                         <Lock className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-                        <div className="min-w-0" onClick={() => toggleNameExpand(book.book_id)}>
-                          <p className={`font-medium ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
+                        <div className="min-w-0">
+                          <ExpandableText className="font-medium">{book.name || book.book_name}</ExpandableText>
                           <p className="text-sm text-muted-foreground">{book.subject}</p>
                           {book.reorder_pending && (
                             <p className="text-xs text-amber-600">{te.reorderPending}</p>
@@ -535,8 +535,8 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                             <Check className="h-3 w-3 text-white" />
                           )}
                         </div>
-                        <div className="min-w-0" onClick={(e) => { e.stopPropagation(); toggleNameExpand(book.book_id); }}>
-                          <p className={`font-medium ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
+                        <div className="min-w-0">
+                          <ExpandableText className="font-medium">{book.name || book.book_name}</ExpandableText>
                           <p className="text-sm text-muted-foreground">{book.subject}</p>
                         </div>
                       </div>
@@ -560,8 +560,8 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                         >
                           <div className="flex items-start gap-3 min-w-0 flex-1">
                             <div className="w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center opacity-50 mt-0.5 shrink-0" />
-                            <div className="min-w-0" onClick={() => toggleNameExpand(book.book_id)}>
-                              <p className={`font-medium text-muted-foreground ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
+                            <div className="min-w-0">
+                              <ExpandableText className="font-medium text-muted-foreground">{book.name || book.book_name}</ExpandableText>
                               <p className="text-sm text-muted-foreground">{book.subject}</p>
                             </div>
                           </div>
