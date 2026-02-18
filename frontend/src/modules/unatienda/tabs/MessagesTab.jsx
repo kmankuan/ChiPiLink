@@ -14,6 +14,7 @@ import {
   ChevronRight, RefreshCw, Settings, Bell
 } from 'lucide-react';
 import CrmChat from '@/components/chat/CrmChat';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
