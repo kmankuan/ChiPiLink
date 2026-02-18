@@ -456,6 +456,7 @@ export default function CrmChat({ studentId, studentName, orderId, isOpen, onClo
               topics={topics}
               loading={loading}
               studentName={studentName}
+              highlightOrderId={orderId}
               onSelect={(topic) => {
                 setSelectedTopic(topic);
                 setView('thread');
