@@ -175,8 +175,7 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Created reusable `<ExpandableText>` component at `/components/ui/expandable-text.jsx`
 - Refactored 3 files (TextbookOrderView, SchoolTextbooksView, OrderSummaryModal) to use `<ExpandableText>` instead of inline `expandedNames` state + `line-clamp-2` logic
 
-### Phase 5l - Monday.com-inspired BoardHeader Component (Complete - Feb 2026)
-- Created reusable `<BoardHeader>` at `/components/shared/BoardHeader.jsx`
+### Phase 5l - Monday.com-inspired BoardHeader Component (Complete - Feb 2026)- Created reusable `<BoardHeader>` at `/components/shared/BoardHeader.jsx`
 - Consolidates title, tabs, search, filters, stats, and actions into a single unified card
 - Sub-components: TabSegment (segmented pill control), StatChip (colored stat badges), FilterDropdown (compact selects)
 - Mobile responsive: filters collapse behind toggle button, tabs scroll horizontally, stats don't wrap
