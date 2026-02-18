@@ -168,6 +168,11 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Added missing suggested fields: order_id, guardian, total, books (previously hardcoded)
 - Backend already reads mappings dynamically — no backend changes needed
 
+### Phase 5k - UI Fixes: Tab Scroll & Text Wrap Consistency (Complete - Feb 2026)
+- Fixed Monday.com integration tab list cut-off on mobile — added horizontal scroll with `overflow-x-auto scrollbar-hide`
+- Applied `line-clamp-2` text wrap to book names in: OrderSummaryModal (with tap-to-expand), TextbookOrderPage, EmbedWidget (5 locations)
+- Standardized book name display across the entire application
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
