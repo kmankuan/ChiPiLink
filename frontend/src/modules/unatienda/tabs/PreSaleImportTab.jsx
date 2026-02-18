@@ -292,34 +292,39 @@ export default function PreSaleImportTab({ token: propToken }) {
 
   return (
     <div className="space-y-3" data-testid="presale-import-tab">
-      {/* Stats & Actions */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap" data-testid="presale-stats">
-          <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-blue-50 dark:bg-blue-950/40 text-blue-600 text-xs font-medium">
-            <Package className="h-3.5 w-3.5" /> <span className="text-base font-bold">{orders.length}</span> total
-          </span>
-          <span className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${unlinkedCount > 0 ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/40 text-orange-600' : 'border-border/50 bg-muted/50 text-muted-foreground'}`}>
-            <Unlink className="h-3.5 w-3.5" /> <span className="text-base font-bold">{unlinkedCount}</span> unlinked
-          </span>
-          <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-green-50 dark:bg-green-950/40 text-green-600 text-xs font-medium">
-            <Link2 className="h-3.5 w-3.5" /> <span className="text-base font-bold">{linkedCount}</span> linked
-          </span>
-          {suggestions.length > 0 && (
-            <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-xs font-medium animate-pulse">
-              <AlertTriangle className="h-3.5 w-3.5" /> <span className="text-base font-bold">{suggestions.length}</span> to review
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5">
+      <BoardHeader
+        title="Pre-Sale Import"
+        icon={ShoppingCart}
+        subtitle="Import and link pre-sale orders from Monday.com"
+        search={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search by student, parent, order ID..."
+        filters={[
+          {
+            value: statusFilter, onChange: setStatusFilter, placeholder: 'All Status', testId: 'psi-status-filter',
+            options: [
+              { value: 'linked', label: 'Linked' },
+              { value: 'unlinked', label: 'Unlinked' },
+            ],
+          },
+        ]}
+        hasActiveFilters={!!(searchTerm || statusFilter !== 'all')}
+        onClearFilters={() => { setSearchTerm(''); setStatusFilter('all'); }}
+        stats={[
+          { label: 'total', value: orders.length, color: 'blue' },
+          ...(unlinkedCount > 0 ? [{ label: 'unlinked', value: unlinkedCount, color: 'amber', highlight: true }] : []),
+          { label: 'linked', value: linkedCount, color: 'green' },
+          ...(suggestions.length > 0 ? [{ label: 'to review', value: suggestions.length, color: 'red', highlight: true }] : []),
+        ]}
+        loading={loading}
+        onRefresh={fetchOrders}
+        actions={
           <Button variant="outline" size="sm" onClick={handlePreview} disabled={previewing} className="gap-1 h-7 text-xs" data-testid="preview-import-btn">
             {previewing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
             Preview Import
           </Button>
-          <Button variant="outline" size="sm" onClick={fetchOrders} className="gap-1 h-7 text-xs">
-            <RefreshCw className="h-3 w-3" /> Refresh
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Pending Suggestions */}
       {suggestions.length > 0 && (
