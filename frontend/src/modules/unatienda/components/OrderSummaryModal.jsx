@@ -29,6 +29,10 @@ export function OrderSummaryModal({
   getLocalizedText,
 }) {
   const [config, setConfig] = useState(null);
+  const [expandedNames, setExpandedNames] = useState(new Set());
+  const toggleNameExpand = (id) => {
+    setExpandedNames(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  };
 
   useEffect(() => {
     if (open && !config) {
@@ -119,10 +123,14 @@ export function OrderSummaryModal({
                 </div>
                 <div className="rounded-lg border border-border bg-muted/30 divide-y divide-border">
                   {selectedBooks.map((book, i) => (
-                    <div key={book.book_id || i} className="flex items-center justify-between px-3 py-2" data-testid={`summary-book-${i}`}>
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <Check className="h-3 w-3 text-purple-600 shrink-0" />
-                        <span className="text-sm truncate">{book.book_name || book.name || book.book_id}</span>
+                    <div key={book.book_id || i} className="flex items-start justify-between px-3 py-2" data-testid={`summary-book-${i}`}>
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
+                        <Check className="h-3 w-3 text-purple-600 shrink-0 mt-0.5" />
+                        <span
+                          className={`text-sm ${expandedNames.has(book.book_id || i) ? '' : 'line-clamp-2'}`}
+                          onClick={() => toggleNameExpand(book.book_id || i)}
+                          data-testid={`summary-book-name-${i}`}
+                        >{book.book_name || book.name || book.book_id}</span>
                       </div>
                       <span className="text-sm font-semibold text-purple-700 dark:text-purple-400 ml-2 shrink-0">
                         ${(book.price || 0).toFixed(2)}

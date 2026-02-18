@@ -439,7 +439,7 @@ export default function TextbookOrderPage({ embedded = false }) {
                           {/* Book Info */}
                           <div className="flex-grow min-w-0">
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium truncate">{item.book_name}</h4>
+                              <h4 className="font-medium line-clamp-2">{item.book_name}</h4>
                               <Badge variant="outline" className={statusConfig.color}>
                                 <StatusIcon className="h-3 w-3 mr-1" />
                                 {statusConfig.label}

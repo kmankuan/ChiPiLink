@@ -421,7 +421,7 @@ export default function MondayModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="flex flex-wrap gap-1 h-auto p-1">
+        <TabsList className="flex gap-1 h-auto p-1 overflow-x-auto scrollbar-hide w-full justify-start">
           <TabsTrigger value="workspaces" className="gap-1.5 text-xs">
             <Building2 className="h-3.5 w-3.5" />
             Workspaces
