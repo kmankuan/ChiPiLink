@@ -7,7 +7,7 @@ def test_architectural_reorganization():
     """Test the architectural reorganization - CRITICAL REVIEW REQUEST"""
     print("🏗️ Testing Architectural Reorganization (CRITICAL)...")
     
-    base_url = "https://students-tab-debug.preview.emergentagent.com"
+    base_url = "https://admin-ui-fixes-4.preview.emergentagent.com"
     
     # 1. Health Check - Should return all 12 modules
     print("\n1. Testing Health Check...")

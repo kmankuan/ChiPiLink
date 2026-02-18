@@ -1,74 +1,104 @@
 <analysis>**original_problem_statement:**
-The user initiated this session with a request to improve the mobile responsiveness of the application, starting with the login page. They also requested the ability to customize the login page's design from the admin panel, with the potential to apply this design system globally in the future.
+The user initially requested to improve mobile responsiveness and add admin-level customization for the login page. This evolved into fixing critical bugs related to student linking and a broken school selection dropdown.
 
-After the agent began this work, the user reported two critical bugs:
-1.  When an admin tries to link a student in Unatienda/School Textbooks, the submission fails with an error message on the first few attempts but succeeds after about three clicks.
-2.  Following a successful (multi-click) submission, attempting to link another student results in the school selection dropdown being empty, blocking further linking.
+Following those fixes, the user requested a significant UI/UX overhaul for the admin section, including responsive tables, mobile card views, a floating action bar, and merging the Students and Access Requests tabs.
 
-The agent has since completed the mobile design updates and is now investigating these two bugs.
+After the tab merge, a regression bug appeared where Approve/Reject buttons for access requests stopped working. While the agent couldn't reproduce this specific bug, they refactored the oversized component () at the user's request.
+
+Subsequent user requests focused on:
+1.  A full end-to-end test due to concerns about an infinite loop with Monday.com presale order syncing (no issue was found).
+2.  Fixing a critical bug where presale items were incorrectly shown as Out of Stock.
+3.  Removing a duplicate Add Student UI element.
+4.  Implementing text wrapping for long book titles in the UI.
+5.  Creating a fully dynamic UI for mapping order data to Monday.com columns.
+6.  Currently, the user has requested several follow-up UI fixes related to the text wrapping and a cut-off menu.
 
 **User's preferred language**: English
 
 **what currently exists?**
-- A full-stack application with a React frontend and a FastAPI backend.
-- A fully implemented CRM chat system powered by a Monday.com board, allowing multi-topic conversations between clients and admins. This includes a central Messages Hub for admins and integrated chat buttons in various admin and client views.
-- A push notification system for the CRM chat, using Monday.com webhooks to provide real-time unread message counts and badges.
-- The login and registration pages have been refactored to be fully mobile-responsive.
-- A new Login Page Design section in the admin panel allows administrators to customize the login page's layout, background image, overlay, text, and logo size.
-- The Link Student functionality in the School Textbooks admin view is currently buggy.
+- A full-stack application with a React frontend, FastAPI backend, and MongoDB.
+- A CRM chat system integrated with a Monday.com board.
+- A responsive and configurable login page.
+- A refactored Unatienda admin module with a unified  for managing students and access requests.
+- A functional presale flow where items are correctly shown as available for presale-enabled students, even with zero physical stock.
+- A fully dynamic admin UI under Integrations that allows an administrator to add, remove, and map any order data field (e.g., Order ID, Parent Name) to specific columns on a Monday.com board.
+- A text wrap with tap-to-expand feature implemented for book names in  and .
 
 **Last working item**:
--   **Last item agent was working:** The agent began investigating two user-reported bugs related to the Link Student form located in . The bugs are an intermittent submission error and a subsequent issue where the school selection dropdown becomes empty.
+-   **Last item agent was working:** The agent was starting to investigate three UI fixes requested by the user.
+    1.  A horizontal menu in the Monday.com integration settings is cut off on smaller screens.
+    2.  The recently implemented text wrap for book names needs to be applied to all other relevant parts of the UI.
+    3.  The order summary modal/dialog also needs the text wrap feature for book names.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. The intermittent nature of the first bug suggests a potential race condition or state issue. The agent should first attempt to reproduce the error using the screenshot tool to confirm the UI behavior. Then,  should be used to test the backend endpoint ( or similar in ) for consistency and potential errors. Once a fix is implemented, the testing agent should be used to run a full regression test on the Link Student flow.
+-   **Which testing method agent to use?** both. Use the screenshot tool to verify the UI fixes visually on mobile viewports. The testing agent should then be used for regression testing to ensure these UI changes haven't broken other functionalities, particularly in the order and admin flows.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Intermittent Link Student submission error (P0)**
-    -   **Description:** The Link Student form in the School Textbooks view fails on the first few submit attempts but succeeds eventually. This is a blocker for the user's workflow.
--   **Issue 2: School selection dropdown empties after linking (P0)**
-    -   **Description:** After a student is successfully linked, the form for the next student fails to display the list of schools, preventing further linking. This is also a blocker.
+-   **Issue 1: Cut-off horizontal menu in admin settings (P0)**
+-   **Issue 2: Inconsistent book name display (P1)**
+-   **Issue 3: Truncated book names in order summary modal (P1)**
 
-    **Issues Detail:**
-    -   **Issue 1 & 2:**
-        -   **Attempted fixes:** None yet. The agent was in the initial investigation phase.
-        -   **Next debug checklist:**
-            1.  **Frontend:** Examine .
-                -   Review the  function within the  component. Check how the form state is managed, especially during submission and reset.
-                -   Inspect the network requests in the browser developer tools to see the exact error response from the server on the failed attempts.
-                -   For Issue 2, check how the  data is fetched and stored. It appears the state is not being preserved or re-fetched correctly after a successful submission.
-            2.  **Backend:** Examine .
-                -   Analyze the endpoint that handles student linking. Add logging to trace the request data and identify why it might fail intermittently. Check for authentication/token validation logic that might be causing issues.
-        -   **Why fix this issue and what will be achieved with the fix?** Fixing these bugs will restore a critical administrative workflow, allowing admins to correctly link students to parents and schools.
-        -   **Status:** IN PROGRESS
-        -   **Is recurring issue?** N
-        -   **Should Test frontend/backend/both after fix?** both
-        -   **Blocked on other issue:** No.
+**Issues Detail:**
+-   **Issue 1:**
+    -   **Description:** In the Monday.com integration settings page (), the horizontal menu with Settings and Order Columns tabs is cut off on smaller screens.
+    -   **Attempted fixes:** None yet. Agent has just started investigating.
+    -   **Next debug checklist:**
+        1.  **File:** .
+        2.  Inspect the container holding the tabs.
+        3.  Apply responsive styles (e.g., , flex-wrap, or a scrollbar utility) to make the menu scrollable or wrap on mobile.
+    -   **Why fix this issue and what will be achieved with the fix?** To ensure all admin settings are accessible and usable on mobile devices, improving the admin experience.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on other issue:** No.
+
+-   **Issue 2:**
+    -   **Description:** The text wrap with tap-to-expand feature was implemented for book names in  and , but other parts of the application still use simple truncation. This needs to be standardized.
+    -   **Attempted fixes:** None yet.
+    -   **Next debug checklist:**
+        1.  Search the codebase for other components that render book lists or book names (e.g., order summary modals, admin order views).
+        2.  Identify all instances where book titles might be truncated.
+        3.  Refactor these instances to use the same stateful  and tap-to-expand logic implemented in .
+    -   **Why fix this issue and what will be achieved with the fix?** To create a consistent and readable user experience across the entire application, ensuring users can always see full item names.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on other issue:** No.
+
+-   **Issue 3:**
+    -   **Description:** This is a specific instance of Issue 2. The modal dialog that shows the order summary before submission truncates long book names.
+    -   **Attempted fixes:** None yet.
+    -   **Next debug checklist:**
+        1.  **File:** .
+        2.  Locate the code for the order confirmation/summary modal.
+        3.  Apply the same text wrap with tap-to-expand logic to the list of book names within this modal.
+    -   **Why fix this issue and what will be achieved with the fix?** To allow users to verify the full names of all items in their cart before finalizing an order, preventing potential mistakes.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** frontend
+    -   **Blocked on other issue:** No.
 
 **In progress Task List**:
 None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **(P1)** Make the progress icon system a truly global resource by fully abstracting it from landing page-specific components.
-    -   **(P2)** Implement a Stop button for the full Monday.com sync operation, making it a cancellable background task.
+    -   **(P1)** Make the progress icon system a truly global resource by fully abstracting it.
+    -   **(P2)** Implement a Stop button for the full Monday.com sync operation.
 -   **Future Tasks:**
     -   **(P3)** Build an on-demand landing page redesign tool in the admin panel.
     -   **(P4)** Extend the Monday.com synchronization to the general product inventory.
-    -   **(P5)** Expand the global design configuration system (started with the login page) to other parts of the application.
+    -   **(P5)** Expand the global design configuration system to other parts of the application.
+    -   **(P5)** Implement actual push notifications for student access request status changes (currently a  in the backend).
 
 **Completed work in this session**
--   **Feature - Full CRM Chat System (DONE):**
-    -   Implemented a complete, multi-topic chat system using a Monday.com board as the backend.
-    -   Integrated chat access points for admins (, , central ) and clients ( page).
--   **Feature - Push Notifications for CRM Chat (DONE):**
-    -   Created backend webhooks and services to process Monday.com updates for real-time unread message notifications.
-    -   Added unread count badges to the UI for both clients and admins.
--   **Feature - Configurable & Mobile-Responsive Login Page (DONE):**
-    -   Refactored  and  to be mobile-first and responsive.
-    -   Added an admin module () for customizing the login page's background, layout, text, and logo.
--   **Testing:** All completed features were successfully validated with the .
+-   **Refactor - Admin Students Tab (DONE):** Rewrote  from scratch, reducing its line count by 18% and improving maintainability.
+-   **Bug Fix - Critical Presale Logic (DONE):** Fixed the core logic in  that incorrectly marked presale items as Out of Stock. The fix ensures availability is correctly determined based on the student's .
+-   **UI Fix - Removed Duplicate Element (DONE):** Removed a redundant Add Student card from the UI in .
+-   **Feature - Text Wrapping for Book Names (DONE):** Implemented a wrap to 2 lines with tap-to-expand feature for long book titles in  and .
+-   **Feature - Dynamic Monday.com Mapping (DONE):** Replaced a static column mapping UI with a fully dynamic system in , allowing admins to add/remove/map any order field to their Monday board.
+-   **Testing - E2E Flow Verification (DONE):** Conducted a full end-to-end test of all major application flows and confirmed there is no risk of an infinite loop between the application and Monday.com for presale orders.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -80,80 +110,58 @@ None.
 
 
 **Key Technical Concepts**
--   **Dynamic UI Configuration:** Storing UI design parameters (colors, text, images, layout choices) in a database and fetching them via an API to allow administrators to customize the application's appearance without code changes.
--   **Mobile-First Responsive Design:** Utilizing TailwindCSS responsive prefixes (, , , etc.) to build layouts that adapt gracefully from small mobile screens to large desktop monitors.
--   **Webhook-based Real-Time Updates:** Leveraging third-party webhooks (from Monday.com) to push data to the application in real-time, enabling features like live chat notifications without the need for constant polling.
--   **State Management for Reusable Forms:** The current bugs highlight the challenge of managing local component state (like form data and related dropdown options) when a component is reused multiple times on a single page view.
+-   **Dynamic Component Rendering:** A static list of form fields was replaced with a dynamic system where the user can add/remove mapping rows, managed via React state.
+-   **Conditional CSS Class Application:** Using  for truncation and dynamically removing it based on a state array () to implement the tap-to-expand feature.
+-   **Backend Business Logic:** The core presale logic was corrected by incorporating a check for a boolean flag () from a related data model () when calculating product availability.
 
 **key DB schema**
--   **:** The single document in this collection was extended with new fields for login page customization:
-    -   , , , , , , .
--   **:** A new collection was added to track unread counts per user.
-    -   Fields: , .
+No changes in this session.
 
 **changes in tech stack**
 None.
 
 **All files of reference**
--   **Under Investigation (for current bugs):**
-    -   
-    -   
--   **Recently Completed/Modified:**
+-   **Under Investigation (for current issues):**
     -   
     -   
     -   
-    -   
-    -   
-    -   
+-   **Recently Modified/Fixed:**
     -   
     -   
 
 **Areas that need refactoring**:
-None.
+-   The text wrap logic needs to be abstracted into a reusable component or hook instead of being re-implemented in every view that displays a book name. This is part of the current pending tasks.
 
 **key api endpoints**
--   **CRM Chat & Notifications:**
-    -   : Configure the CRM board ID and columns.
-    -   : Fetch chat topics for a specific student.
-    -   : Create a new chat topic.
-    -   : Send a reply in a topic.
-    -   : Get all conversations for the admin view.
-    -   : Webhook endpoint to receive updates from Monday.com.
-    -   : Register the webhook with Monday.com.
-    -   : Get the current user's unread message count.
-    -   : Reset the unread count.
--   **Site Configuration:**
-    -   : Endpoint was updated to handle the new login page design fields.
+-   : This is the primary endpoint for fetching available books for a student. Its logic was fixed to correctly handle presale mode.
 
 **Critical Info for New Agent**
--   Your immediate and highest priority is to fix the two bugs in the Link Student workflow. The user is currently blocked by them.
--   **Bug 1 (Intermittent Submit):** Focus on the  logic in  and the corresponding backend route in . Look for race conditions, state management issues on the client, or inconsistent API responses.
--   **Bug 2 (Empty School Dropdown):** Investigate how the  data is fetched and managed in . The state is likely not being correctly reset or preserved between linking operations.
--   Do not move on to any other tasks until these two P0 bugs are resolved and verified.
+-   Your immediate priority is to address the three UI issues reported by the user in message #405: the cut-off admin menu, and applying the text-wrap feature to the order summary modal and any other remaining parts of the app.
+-   The text-wrap logic is already implemented in  and . Use this as a template. Consider creating a reusable component to avoid duplicating the state and JSX logic.
+-   For the cut-off menu in , a simple CSS fix like adding  to the tab container on mobile viewports is likely sufficient.
 
 **documents and test reports created in this job**
 -   
 -   
 -   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requests mobile responsiveness fixes, starting with the login page, and asks for a way to manage its design from the admin panel. (COMPLETE)
-2.  **Agent:** Acknowledges the request and proposes a plan to fix the login page, audit other pages, and build the admin configuration UI. (COMPLETE)
-3.  **User:** Approves the plan. (COMPLETE)
-4.  *(Agent implements the mobile fixes and design configuration feature.)*
-5.  **Agent:** Informs the user that the mobile UI improvements and login page design configuration are complete, tested, and working. (COMPLETE)
-6.  **User:** Reports two new bugs: an intermittent error when linking students and the school dropdown becoming empty afterward. (PENDING)
-7.  **Agent:** Acknowledges the critical bugs and begins investigation, identifying the relevant files for the Link Student flow. (COMPLETE)
-8.  **Agent:** Continues investigation by viewing the frontend component (). (COMPLETE)
-9.  **Agent:** Continues investigation by viewing the backend route for student linking. (COMPLETE)
-10. **Agent:** Acknowledges understanding of the code and is ready to debug. (PENDING - This is the current state).
+- **User #343 & #348:** Asks to add an Order ID mapping to the Monday.com integration and requests the ability to dynamically add or remove any column mappings. (COMPLETE)
+- **Agent #347 & #351:** Confirms the backend supports this and implements a fully dynamic UI for the mapping. (COMPLETE)
+- **User #405:** Reports three new UI issues: a cut-off horizontal menu, and requests that the new text wrap feature be applied to other parts of the app, including the order summary modal. (PENDING - CURRENT TASK)
+- **Agent #406:** Acknowledges the three issues and begins investigation. (IN PROGRESS)
+- **User #279:** Points out that long item names are truncated on mobile and suggests a fix. (COMPLETE)
+- **Agent #282 & #284:** Recommends a better UX (text wrap with tap-to-expand) which the user approves. (COMPLETE)
+- **User #285:** Approves the agent's recommended approach. (COMPLETE)
+- **Agent #286 - #341:** Implements and verifies the text-wrap feature. (COMPLETE)
 
 **Project Health Check:**
--   **Broken:** The Link Student functionality is currently broken and is a high-priority issue.
+-   **Broken:** Minor UI/UX issues are present (cut-off menu, inconsistent text wrapping). Core functionality is stable.
 -   **Mocked:** None.
 
 **3rd Party Integrations**
--   **Monday.com API v2:** Used for inventory sync, pre-sale order import, and the CRM chat system.
+-   Monday.com API v2
 -   Google Photos, Gmail (IMAP)
 -   Telegram Bot API
 -   OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation
@@ -161,14 +169,14 @@ None.
 -    (for fuzzy string matching)
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (For CRM chat and login page features).
+-   **Testing agent used after significant changes:** YES. The agent has consistently used the testing agent after major bug fixes and feature implementations.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** The Link Student bugs are new regressions reported by the user.
+-   **Known regressions:** None. The last known regression (broken approve/reject buttons) could not be reproduced and the relevant component has since been refactored.
 
 **Credentials to test flow:**
 -   **Email:** 
 -   **Password:** 
 
 **What agent forgot to execute**
-Nothing was forgotten. The agent correctly prioritized the user's new feature request and then immediately pivoted to the critical bugs once they were reported.</analysis>
+The agent has been diligent in addressing user requests. No planned tasks or user requests have been forgotten.</analysis>
