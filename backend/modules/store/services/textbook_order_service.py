@@ -563,6 +563,242 @@ class TextbookOrderService(BaseService):
         
         return order
     
+    async def create_and_submit_order(
+        self,
+        user_id: str,
+        student_id: str,
+        items: List[Dict],
+        form_data: Optional[Dict] = None,
+        notes: Optional[str] = None,
+        payment_method: Optional[str] = None
+    ) -> Dict:
+        """Create a NEW order and submit it in one atomic step.
+        Every call creates a separate order document — no merging.
+        """
+        # 1. Verify student belongs to user and has approved enrollment
+        student = await self.student_repo.get_by_id(student_id)
+        if not student:
+            raise ValueError("Student not found")
+        if student.get("user_id") != user_id:
+            raise ValueError("Access denied")
+
+        current_year = self.get_current_year()
+        enrollments = student.get("enrollments", [])
+        current_enrollment = next(
+            (e for e in enrollments if e.get("year") == current_year and e.get("status") == "approved"),
+            None
+        )
+        if not current_enrollment:
+            raise ValueError("Student must have approved enrollment to order textbooks")
+
+        grade = current_enrollment.get("grade", "")
+        is_presale = student.get("presale_mode", False)
+
+        # 2. Look up book details from catalog
+        books = await self.get_books_for_grade(grade)
+        books_dict = {b["book_id"]: b for b in books}
+
+        # 3. Build order items from request
+        now = datetime.now(timezone.utc).isoformat()
+        order_items = []
+
+        for req_item in items:
+            book_id = req_item.get("book_id")
+            quantity = req_item.get("quantity") or req_item.get("quantity_ordered") or 1
+            if not book_id or quantity <= 0:
+                continue
+
+            book = books_dict.get(book_id)
+            if not book:
+                logger.warning(f"[create_and_submit_order] Book {book_id} not in catalog for grade {grade}")
+                continue
+
+            inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
+            if inventory <= 0 and not is_presale:
+                logger.warning(f"[create_and_submit_order] Book {book_id} out of stock, skipping")
+                continue
+
+            order_items.append({
+                "book_id": book_id,
+                "book_code": book.get("code", ""),
+                "book_name": book["name"],
+                "price": float(book.get("price", 0)),
+                "quantity_ordered": quantity,
+                "max_quantity": 1,
+                "status": OrderItemStatus.ORDERED.value,
+                "ordered_at": now,
+                "is_presale": is_presale,
+                "notes": None
+            })
+
+        if not order_items:
+            raise ValueError("No valid items to order")
+
+        # 4. Calculate total
+        total_amount = sum(item["price"] * item["quantity_ordered"] for item in order_items)
+
+        # 5. Get user info
+        user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0})
+        user_name = user.get("name", "") if user else ""
+        user_email = user.get("email", "") if user else ""
+
+        # 6. Wallet payment: charge before creating order
+        wallet_transaction = None
+        if payment_method == "wallet" and total_amount > 0:
+            from modules.users.services.wallet_service import wallet_service
+            from modules.users.models.wallet_models import Currency
+
+            wallet = await wallet_service.get_wallet(user_id)
+            if not wallet:
+                raise ValueError("No wallet found. Please contact support.")
+            balance = wallet.get("balance_usd", 0)
+            if balance < total_amount:
+                raise ValueError(
+                    f"Insufficient wallet balance. Available: ${balance:.2f}, Required: ${total_amount:.2f}"
+                )
+            wallet_transaction = await wallet_service.charge(
+                user_id=user_id,
+                amount=total_amount,
+                currency=Currency.USD,
+                description=f"Textbook order for student {student.get('full_name', student_id)}",
+                reference_type="textbook_order",
+                reference_id=f"pending_{student_id}"
+            )
+            logger.info(f"[create_and_submit_order] Wallet charged: ${total_amount:.2f}")
+
+        # 7. Create order document
+        try:
+            order_data = {
+                "user_id": user_id,
+                "student_id": student_id,
+                "student_name": student.get("full_name", ""),
+                "school_id": student.get("school_id", ""),
+                "grade": grade,
+                "year": current_year,
+                "items": order_items,
+                "total_amount": total_amount,
+                "status": OrderStatus.SUBMITTED.value,
+                "submitted_at": now,
+                "user_name": user_name,
+                "user_email": user_email,
+                "monday_item_id": None,
+                "monday_item_ids": [],
+                "monday_subitems": []
+            }
+            if form_data:
+                order_data["form_data"] = form_data
+            if notes:
+                order_data["notes"] = notes
+            if is_presale:
+                order_data["is_presale"] = True
+
+            order = await self.order_repo.create(order_data)
+            order_id = order.get("order_id")
+        except Exception as create_err:
+            # Refund wallet if order creation fails
+            if wallet_transaction:
+                await self._refund_wallet(user_id, total_amount, wallet_transaction)
+            raise create_err
+
+        # 8. Deduct stock
+        for item in order_items:
+            qty = item.get("quantity_ordered", 1)
+            if is_presale:
+                await db.store_products.update_one(
+                    {"book_id": item["book_id"]},
+                    {"$inc": {"reserved_quantity": qty}}
+                )
+            else:
+                await db.store_products.update_one(
+                    {"book_id": item["book_id"]},
+                    {"$inc": {"inventory_quantity": -qty}}
+                )
+
+        # 9. Send to Monday.com
+        monday_item_id = None
+        monday_subitems = []
+        try:
+            monday_result = await self._send_to_monday(
+                order=order,
+                selected_items=order_items,
+                user_name=user_name,
+                user_email=user_email,
+                submission_total=total_amount
+            )
+            monday_item_id = monday_result.get("item_id")
+            monday_subitems = monday_result.get("subitems", [])
+        except Exception as e:
+            logger.error(f"[create_and_submit_order] Monday.com sync failed (non-blocking): {e}")
+
+        # 10. Link monday subitems to items
+        if monday_subitems:
+            subitem_map = {s["book_id"]: s["monday_subitem_id"] for s in monday_subitems}
+            for item in order_items:
+                if item["book_id"] in subitem_map:
+                    item["monday_subitem_id"] = subitem_map[item["book_id"]]
+
+        # Update order with Monday.com info
+        update_data = {"items": order_items}
+        if monday_item_id:
+            update_data["monday_item_ids"] = [monday_item_id]
+        await self.order_repo.update_order(order_id, update_data)
+
+        # 11. Send notification
+        await self._notify_order_submitted(order, user_name, user_email)
+
+        # 12. CRM auto-link
+        try:
+            from ..services.crm_chat_service import crm_chat_service
+            await crm_chat_service.link_student_on_order_submit(
+                student_id=student_id,
+                student_name=order.get("student_name", ""),
+                user_id=user_id,
+                user_email=user_email,
+                user_name=user_name,
+                order_summary={
+                    "order_id": order_id,
+                    "grade": grade,
+                    "items": order_items,
+                    "total": total_amount,
+                    "is_presale": is_presale,
+                },
+            )
+        except Exception as crm_err:
+            logger.error(f"[create_and_submit_order] CRM auto-link failed (non-blocking): {crm_err}")
+
+        # 13. Build response
+        order["items"] = order_items
+        order["submission_total"] = total_amount
+        order["items_ordered_now"] = len(order_items)
+        if is_presale:
+            order["is_presale"] = True
+        if wallet_transaction:
+            order["payment"] = {
+                "method": "wallet",
+                "transaction_id": wallet_transaction.get("transaction_id"),
+                "amount_charged": total_amount
+            }
+
+        self.log_info(f"New order {order_id} created for student {student_id}: {len(order_items)} items, ${total_amount:.2f}")
+        return order
+
+    async def _refund_wallet(self, user_id: str, amount: float, wallet_transaction: Dict):
+        """Refund wallet on failed order creation"""
+        try:
+            from modules.users.services.wallet_service import wallet_service
+            from modules.users.models.wallet_models import Currency, PaymentMethod as WalletPaymentMethod
+            await wallet_service.deposit(
+                user_id=user_id,
+                amount=amount,
+                currency=Currency.USD,
+                payment_method=WalletPaymentMethod.WALLET,
+                description=f"Refund: order creation failed",
+                reference=wallet_transaction.get("transaction_id")
+            )
+            logger.info(f"[_refund_wallet] Wallet refunded ${amount:.2f} for user {user_id}")
+        except Exception as refund_error:
+            logger.error(f"[_refund_wallet] CRITICAL: Refund failed: {refund_error}")
+
     async def _send_to_monday(
         self,
         order: Dict,
