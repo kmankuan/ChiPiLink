@@ -510,10 +510,12 @@ export default function TextbookOrdersAdminTab() {
               </Card>
             </>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Reorder Requests Tab */}
-        <TabsContent value="reorders" className="space-y-4">
+      {/* Reorder Requests Tab */}
+      {subTab === 'reorders' && (
+        <div className="space-y-3">
           <Card>
             <CardHeader>
               <CardTitle>Pending Reorder Requests</CardTitle>
