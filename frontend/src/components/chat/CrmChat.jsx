@@ -16,7 +16,7 @@ import {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-function TopicList({ topics, onSelect, onNewTopic, studentName, loading }) {
+function TopicList({ topics, onSelect, onNewTopic, studentName, loading, highlightOrderId }) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -24,6 +24,15 @@ function TopicList({ topics, onSelect, onNewTopic, studentName, loading }) {
       </div>
     );
   }
+
+  // Sort: highlighted order topic first
+  const sortedTopics = highlightOrderId
+    ? [...topics].sort((a, b) => {
+        const aMatch = a.body?.includes(highlightOrderId) ? 1 : 0;
+        const bMatch = b.body?.includes(highlightOrderId) ? 1 : 0;
+        return bMatch - aMatch;
+      })
+    : topics;
 
   return (
     <div className="flex flex-col h-full">
@@ -38,7 +47,7 @@ function TopicList({ topics, onSelect, onNewTopic, studentName, loading }) {
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto px-2" data-testid="topic-list">
-        {topics.length === 0 ? (
+        {sortedTopics.length === 0 ? (
           <div className="text-center py-8 px-4">
             <Headphones className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
             <p className="text-xs text-muted-foreground">
@@ -47,24 +56,38 @@ function TopicList({ topics, onSelect, onNewTopic, studentName, loading }) {
           </div>
         ) : (
           <div className="space-y-1">
-            {topics.map((topic) => {
+            {sortedTopics.map((topic) => {
               const preview = topic.body?.slice(0, 80) || '';
               const subject = preview.match(/^\[(.+?)\]/)?.[1] || 'Message';
               const bodyPreview = preview.replace(/^\[.+?\]\s*/, '').replace(/^From:.*\n?/, '').trim();
+              const isHighlighted = highlightOrderId && topic.body?.includes(highlightOrderId);
               return (
                 <button
                   key={topic.id}
                   onClick={() => onSelect(topic)}
-                  className="w-full text-left p-3 rounded-lg hover:bg-muted/60 transition-colors group"
+                  className={`w-full text-left p-3 rounded-lg transition-colors group ${
+                    isHighlighted
+                      ? 'bg-purple-50 dark:bg-purple-900/20 ring-1 ring-purple-300 dark:ring-purple-700'
+                      : 'hover:bg-muted/60'
+                  }`}
                   data-testid={`topic-${topic.id}`}
                 >
                   <div className="flex items-start gap-2">
-                    <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                      isHighlighted
+                        ? 'bg-purple-200 dark:bg-purple-800/60'
+                        : 'bg-purple-100 dark:bg-purple-900/40'
+                    }`}>
                       <MessageCircle className="h-3.5 w-3.5 text-purple-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-semibold truncate">{subject}</span>
+                        {isHighlighted && (
+                          <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-purple-300 text-purple-600 shrink-0">
+                            This order
+                          </Badge>
+                        )}
                         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 shrink-0" />
                       </div>
                       <p className="text-[11px] text-muted-foreground truncate">{bodyPreview || '...'}</p>
