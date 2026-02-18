@@ -47,6 +47,11 @@ function StudentRow({ student, selected, onToggle }) {
           {student.monday_item_count} Mon
         </Badge>
       )}
+      {student.wallet_txn_count > 0 && (
+        <Badge variant="secondary" className="text-[10px] shrink-0 bg-emerald-50 text-emerald-700 border-emerald-200">
+          {student.wallet_txn_count} txns
+        </Badge>
+      )}
     </div>
   );
 }
