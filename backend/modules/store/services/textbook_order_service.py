@@ -488,9 +488,13 @@ class TextbookOrderService(BaseService):
         submissions = order.get("submissions", [])
         submissions.append({
             "submitted_at": now,
-            "items": [{"book_id": i["book_id"], "book_name": i["book_name"], "price": i["price"]} for i in new_selected_items],
+            "items": [{"book_id": i["book_id"], "book_name": i.get("book_name", ""), "price": i["price"]} for i in new_selected_items],
+            "items_count": len(new_selected_items),
             "total": submission_total,
-            "monday_item_id": monday_item_id
+            "monday_item_id": monday_item_id,
+            "user_name": user_name,
+            "user_email": user_email,
+            "form_data": form_data,
         })
         
         # Recalculate overall total (all ordered items)
