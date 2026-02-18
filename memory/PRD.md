@@ -229,6 +229,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Frontend: `DataCleanupModule` with student selection, "Select Demo"/"Select All"/"Clear" buttons, preview panel with record counts per collection (10 categories), sample orders, protected admin notice
 - Located under Developer section in admin sidebar
 
+### Phase 5q - Data Cleanup Completeness + Users Module i18n + BoardHeader Refactor (Complete - Feb 2026)
+- **Backend Fix**: `GET /api/cleanup/students` now queries `store_students` collection directly, returning ALL 59 students including 41 with 0 orders but with pending enrollment/access requests
+- **i18n Fix**: `UsersManagementModule.jsx` tab labels properly translated via `labels` object with en/es/zh support (Access Requests, All Students, Connections, Schools, Form Config)
+- **UI Refactor**: `StudentRequestsTab.jsx` refactored to use reusable `BoardHeader` component — consistent with all other 7 admin tabs
+  - Segmented tab pills (Pending/In Review/All) with counts
+  - Native select filter dropdowns (School, Year)
+  - Stat chips showing pending/in-review/total counts
+  - Refresh button, clear filters, mobile-responsive filters
+- Testing agent verified 100% pass rate (backend + frontend)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
