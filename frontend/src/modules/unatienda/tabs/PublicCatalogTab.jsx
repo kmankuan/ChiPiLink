@@ -22,6 +22,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
