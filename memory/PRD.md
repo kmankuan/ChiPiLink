@@ -217,12 +217,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 
 ### Phase 5p - Admin Data Cleanup Tool (Complete - Feb 2026)
 - **Hybrid approach**: Backend API endpoints + Admin UI panel
-- Backend: `GET /api/cleanup/students` — lists all students with order counts, Monday item counts, CRM link status, demo flags
+- Backend: `GET /api/cleanup/students` — lists all students with order counts, Monday item counts, CRM link status, demo flags, **wallet balance, wallet transaction counts**
 - Backend: `POST /api/cleanup/preview` — dry-run showing what would be deleted across all collections
-- Backend: `POST /api/cleanup/execute` — permanently deletes selected data (orders, CRM links, CRM messages, notifications, students, Monday.com items)
-- Monday.com: `delete_item` added to core client — deletes board items and subitems from Monday.com when cleaning up
-- Frontend: `DataCleanupModule` — admin panel with student selection, "Select Demo"/"Select All"/"Clear" buttons, preview panel with record counts per collection, and "Delete Selected Data" button (disabled until preview is run)
-- Safety: requires at least one filter (student_ids, order_ids, or demo_only); delete button disabled until preview; admin auth required
+- Backend: `POST /api/cleanup/execute` — permanently deletes selected data:
+  - **Store**: orders, order messages, students
+  - **CRM**: links, messages, notifications, Monday.com CRM items
+  - **Wallets**: wallet accounts (`chipi_wallets`), transactions (`chipi_transactions`, `wallet_transactions`), alerts (`alertas_wallet`)
+  - **Users**: user accounts (`users` collection)
+  - **Monday.com**: board items deleted via API
+- **Admin protection**: Admin user accounts are NEVER deleted; `protected_user_ids` shown in preview
+- Frontend: `DataCleanupModule` with student selection, "Select Demo"/"Select All"/"Clear" buttons, preview panel with record counts per collection (10 categories), sample orders, protected admin notice
 - Located under Developer section in admin sidebar
 
 ### P1 - Global Progress Icon System
