@@ -146,6 +146,14 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - All data-testid attributes and functionality preserved
 - Testing agent verified 100% pass rate (backend + frontend, desktop + mobile)
 
+### Phase 5h - Presale Fix + UI Cleanup (Feb 2026)
+- **Critical Bug Fix**: Presale students were seeing all items as "Agotado" (out of stock) even with presale mode ON
+  - Root cause: `get_or_create_order()` and `_refresh_order_items()` in `textbook_order_service.py` only checked `inventory_quantity - reserved_quantity > 0`, ignoring student's `presale_mode`
+  - Fix: Added `is_presale` check — when `presale_mode=True`, items show as "available" regardless of stock level
+  - Presale orders correctly increment `reserved_quantity` on submission (existing logic was fine)
+- **UI Fix**: Removed duplicate "Agregar estudiante" (Add Student) card from bottom of student grid in `SchoolTextbooksView.jsx` — header already has the + button
+- Testing agent verified 100% pass rate
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
