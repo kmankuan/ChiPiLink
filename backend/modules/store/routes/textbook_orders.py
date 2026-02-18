@@ -22,141 +22,33 @@ async def submit_order_direct(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Submit order directly with student_id and items.
-    This endpoint handles the complete submission flow from Unatienda.
-    Supports wallet payment: if payment_method="wallet", charges wallet first.
+    Submit order — creates a NEW order document for each submission.
+    Each call generates a separate order record (no merging).
     """
     import logging
     logger = logging.getLogger(__name__)
     
     try:
         user_id = current_user["user_id"]
-        student_id = request.student_id
-        payment_method = request.payment_method
         
-        logger.info(f"[submit_order_direct] user_id={user_id}, student_id={student_id}, payment={payment_method}")
-        logger.info(f"[submit_order_direct] Request items count: {len(request.items)}")
-        for item in request.items:
-            logger.info(f"[submit_order_direct] Request item: book_id={item.book_id}, qty={item.get_quantity()}")
+        logger.info(f"[submit_order_direct] user_id={user_id}, student_id={request.student_id}, items={len(request.items)}")
         
-        # Get or create the order for this student
-        order = await textbook_order_service.get_or_create_order(
-            user_id=user_id,
-            student_id=student_id
-        )
-        
-        order_id = order.get("order_id")
-        logger.info(f"[submit_order_direct] Got order: {order_id}")
-        
-        # Update selections based on submitted items
-        update_count = 0
-        update_errors = []
-        for item in request.items:
-            book_id = item.book_id
-            quantity = item.get_quantity()
-            if book_id and quantity > 0:
-                try:
-                    await textbook_order_service.update_item_selection(
-                        user_id=user_id,
-                        order_id=order_id,
-                        book_id=book_id,
-                        quantity=quantity
-                    )
-                    update_count += 1
-                except ValueError as e:
-                    error_msg = f"Could not update item {book_id}: {str(e)}"
-                    update_errors.append(error_msg)
-                    logger.warning(f"[submit_order_direct] {error_msg}")
-        
-        if update_count == 0:
-            error_detail = "No items could be updated. "
-            if update_errors:
-                error_detail += "Errors: " + "; ".join(update_errors[:3])
-            raise ValueError(error_detail)
-        
-        # Refresh order to get updated items
-        order = await textbook_order_service.order_repo.get_by_id(order_id)
-        
-        # Calculate total for the items being submitted now
-        items = order.get("items", [])
-        submission_items = [
-            i for i in items 
-            if i.get("quantity_ordered", 0) > 0 and i.get("status") != "ordered"
+        # Convert request items to dicts
+        items = [
+            {"book_id": item.book_id, "quantity": item.get_quantity()}
+            for item in request.items
         ]
-        submission_total = sum(
-            i["price"] * i.get("quantity_ordered", 1) for i in submission_items
+        
+        result = await textbook_order_service.create_and_submit_order(
+            user_id=user_id,
+            student_id=request.student_id,
+            items=items,
+            form_data=request.form_data,
+            notes=request.notes or (request.form_data.get("notes") if request.form_data else None),
+            payment_method=request.payment_method
         )
         
-        # Wallet payment: charge wallet before creating the order
-        wallet_transaction = None
-        if payment_method == "wallet" and submission_total > 0:
-            from modules.users.services.wallet_service import wallet_service
-            from modules.users.models.wallet_models import Currency
-            
-            wallet = await wallet_service.get_wallet(user_id)
-            if not wallet:
-                raise ValueError("No wallet found. Please contact support.")
-            
-            balance = wallet.get("balance_usd", 0)
-            if balance < submission_total:
-                raise ValueError(
-                    f"Insufficient wallet balance. Available: ${balance:.2f}, Required: ${submission_total:.2f}"
-                )
-            
-            # Charge wallet
-            wallet_transaction = await wallet_service.charge(
-                user_id=user_id,
-                amount=submission_total,
-                currency=Currency.USD,
-                description=f"Textbook order for student {order.get('student_name', student_id)}",
-                reference_type="textbook_order",
-                reference_id=order_id
-            )
-            logger.info(f"[submit_order_direct] Wallet charged: ${submission_total:.2f}, txn={wallet_transaction.get('transaction_id')}")
-        
-        # Submit the order
-        try:
-            result = await textbook_order_service.submit_order(
-                user_id=user_id,
-                order_id=order_id,
-                notes=request.form_data.get("notes") if request.form_data else None,
-                form_data=request.form_data
-            )
-        except Exception as submit_error:
-            # If order submission fails after wallet charge, refund
-            if wallet_transaction:
-                from modules.users.services.wallet_service import wallet_service
-                from modules.users.models.wallet_models import Currency, PaymentMethod as WalletPaymentMethod
-                try:
-                    await wallet_service.deposit(
-                        user_id=user_id,
-                        amount=submission_total,
-                        currency=Currency.USD,
-                        payment_method=WalletPaymentMethod.WALLET,
-                        description=f"Refund: order submission failed for {order_id}",
-                        reference=wallet_transaction.get("transaction_id")
-                    )
-                    logger.info("[submit_order_direct] Wallet refunded after order failure")
-                except Exception as refund_error:
-                    logger.error(f"[submit_order_direct] CRITICAL: Refund failed: {refund_error}")
-            raise submit_error
-        
-        # Add payment info to result
-        if wallet_transaction:
-            result["payment"] = {
-                "method": "wallet",
-                "transaction_id": wallet_transaction.get("transaction_id"),
-                "amount_charged": submission_total
-            }
-        
-        logger.info(f"[submit_order_direct] Order submitted successfully: {result.get('order_id')}")
-        
-        # Include warnings for partially failed items
-        if update_errors:
-            result["warnings"] = update_errors
-            result["items_failed"] = len(update_errors)
-            result["items_succeeded"] = update_count
-        
+        logger.info(f"[submit_order_direct] Order created: {result.get('order_id')}")
         return result
     except ValueError as e:
         logger.error(f"[submit_order_direct] ValueError: {e}")
