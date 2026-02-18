@@ -25,6 +25,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -227,41 +228,42 @@ export default function InventoryTab({ token }) {
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (
-    <div className="space-y-4">
-      {/* Stats Row */}
-      <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
-        <StatsCard icon={Package} label="Total Products" value={dashboard?.total_products ?? 0} color="bg-blue-100 text-blue-600 dark:bg-blue-900/30" />
-        <StatsCard icon={BarChart3} label="Total Stock" value={dashboard?.total_stock ?? 0} color="bg-green-100 text-green-600 dark:bg-green-900/30" />
-        <StatsCard icon={DollarSign} label="Stock Value" value={`$${(dashboard?.total_value ?? 0).toLocaleString('en', { minimumFractionDigits: 2 })}`} color="bg-purple-100 text-purple-600 dark:bg-purple-900/30" />
-        <StatsCard icon={AlertTriangle} label="Low Stock" value={dashboard?.low_stock ?? 0} color="bg-amber-100 text-amber-600 dark:bg-amber-900/30" />
-        <StatsCard icon={AlertTriangle} label="Out of Stock" value={dashboard?.out_of_stock ?? 0} color="bg-red-100 text-red-600 dark:bg-red-900/30" />
-      </div>
-
-      {/* View Toggle + Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex gap-1">
-          <Button variant={view === 'overview' ? 'default' : 'outline'} size="sm" onClick={() => setView('overview')}>
-            <Package className="h-3.5 w-3.5 mr-1" /> Products
-          </Button>
-          <Button variant={view === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setView('history')}>
-            <History className="h-3.5 w-3.5 mr-1" /> History
-          </Button>
-        </div>
-        {view === 'overview' && (
-          <>
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products..." className="h-8 pl-8 text-xs" />
-            </div>
-            <select value={stockFilter} onChange={(e) => setStockFilter(e.target.value)} className="h-8 px-2 text-xs border rounded-md bg-background">
-              <option value="all">All Stock</option>
-              <option value="in">In Stock (&gt;10)</option>
-              <option value="low">Low Stock (1-10)</option>
-              <option value="out">Out of Stock</option>
-            </select>
-          </>
-        )}
-      </div>
+    <div className="space-y-3">
+      <BoardHeader
+        title="Stock Dashboard"
+        icon={Package}
+        subtitle="Quick stock overview and adjustments"
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search products..."
+        filters={[
+          {
+            value: stockFilter, onChange: setStockFilter, placeholder: 'All Stock', testId: 'inv-stock-filter',
+            options: [
+              { value: 'in', label: 'In Stock (>10)' },
+              { value: 'low', label: 'Low Stock (1-10)' },
+              { value: 'out', label: 'Out of Stock' },
+            ],
+          },
+        ]}
+        hasActiveFilters={!!(search || stockFilter !== 'all')}
+        onClearFilters={() => { setSearch(''); setStockFilter('all'); }}
+        stats={[
+          { label: 'products', value: dashboard?.total_products ?? 0, color: 'blue' },
+          { label: 'stock', value: dashboard?.total_stock ?? 0, color: 'green' },
+          { label: 'value', value: `$${(dashboard?.total_value ?? 0).toLocaleString('en', { minimumFractionDigits: 2 })}`, color: 'purple' },
+          ...(dashboard?.low_stock > 0 ? [{ label: 'low stock', value: dashboard.low_stock, color: 'amber', highlight: true }] : []),
+          ...(dashboard?.out_of_stock > 0 ? [{ label: 'out of stock', value: dashboard.out_of_stock, color: 'red', highlight: true }] : []),
+        ]}
+        viewModes={[
+          { value: 'overview', label: 'Products', icon: Package },
+          { value: 'history', label: 'History', icon: History },
+        ]}
+        activeView={view}
+        onViewChange={setView}
+        loading={loading}
+        onRefresh={() => { fetchDashboard(); fetchProducts(); }}
+      />
 
       {/* Product List or History */}
       {view === 'overview' ? (
