@@ -524,14 +524,14 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                     <div 
                       key={book.book_id}
                       onClick={() => handleToggleBook(book.book_id)}
-                      className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
+                      className={`flex items-start justify-between p-3 rounded-lg border cursor-pointer transition-colors gap-3 ${
                         selectedBooks[book.book_id]
                           ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-700'
                           : 'bg-card hover:bg-muted/50 border-border'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 shrink-0 ${
                           selectedBooks[book.book_id]
                             ? 'bg-purple-600 border-purple-600'
                             : 'border-gray-300'
@@ -540,12 +540,12 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                             <Check className="h-3 w-3 text-white" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-medium">{book.name || book.book_name}</p>
+                        <div className="min-w-0" onClick={(e) => { e.stopPropagation(); toggleNameExpand(book.book_id); }}>
+                          <p className={`font-medium ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
                           <p className="text-sm text-muted-foreground">{book.subject}</p>
                         </div>
                       </div>
-                      <span className="font-semibold">${book.price?.toFixed(2)}</span>
+                      <span className="font-semibold shrink-0">${book.price?.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
