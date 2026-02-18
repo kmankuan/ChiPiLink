@@ -437,20 +437,12 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             title="Delete Selected Products" description={`Permanently delete ${productSelection.count} product(s)?`}
             confirmLabel="Delete" variant="destructive" onConfirm={handleBulkDelete}
           />
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Categories Tab */}
-        <TabsContent value="categories" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold">Product Categories</h3>
-              <p className="text-sm text-muted-foreground">Manage public catalog categories</p>
-            </div>
-            <Button onClick={() => openCategoryDialog()} className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Category
-            </Button>
-          </div>
+      {/* Categories Tab */}
+      {subTab === 'categories' && (
+        <div className="space-y-3">
 
           <div className="grid gap-3">
             {categories.map((cat) => (
