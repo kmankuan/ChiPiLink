@@ -189,6 +189,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - **MessagesTab** (Messages): search, stats with unread count, settings toggle
 - 100% test pass rate across all 7 tabs on desktop and mobile
 
+### Phase 5m - CRM Auto-Link + Order Topic on Submit (Complete - Feb 2026)
+- When a textbook order is submitted, the student is now auto-linked to the CRM Monday.com board (board 5931665026)
+- Uses the parent's login email (from auth_users) to search for an existing CRM item
+- If no CRM item exists, creates a new one with student name + parent email/name
+- Auto-creates an order notification Update (topic) on the CRM item with order details (items, total, grade)
+- This gives the parent a conversation thread they can use to chat with admin
+- The CRM linking is non-blocking — if Monday.com API fails, the order still succeeds
+- Files modified: `monday_crm_adapter.py` (create_crm_item), `crm_chat_service.py` (link_student_on_order_submit), `textbook_order_service.py` (calls it after submit)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
