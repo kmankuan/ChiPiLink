@@ -240,7 +240,6 @@ class TextbookOrderService(BaseService):
         logger.info(f"[_refresh_order_items] Student {student_id} presale_mode={is_presale}")
         
         existing_items = order.get("items", [])
-        existing_by_id = {item["book_id"]: item for item in existing_items}
         logger.info(f"[_refresh_order_items] Existing items count: {len(existing_items)}")
         
         updated_items = []
