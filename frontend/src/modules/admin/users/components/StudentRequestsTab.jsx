@@ -701,10 +701,8 @@ export default function TextbookAccessAdminTab({ token }) {
                 pageSize={requestsPagination.pageSize} onPageChange={requestsPagination.setPage} onPageSizeChange={requestsPagination.setPageSize}
                 canPrev={requestsPagination.canPrev} canNext={requestsPagination.canNext}
               />
-            </>
-          )}
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
 
       {/* Action Dialog */}
       <Dialog open={!!actionDialog} onOpenChange={() => setActionDialog(null)}>
