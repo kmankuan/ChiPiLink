@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { ExpandableText } from '../../../components/ui/expandable-text';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -42,12 +43,6 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   const [formData, setFormData] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadingFile, setUploadingFile] = useState(null);
-  const [expandedNames, setExpandedNames] = useState(new Set());
-  
-  const toggleNameExpand = (bookId) => {
-    setExpandedNames(prev => { const n = new Set(prev); n.has(bookId) ? n.delete(bookId) : n.add(bookId); return n; });
-  };
-  
   // Wallet state
   const [walletBalance, setWalletBalance] = useState(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
