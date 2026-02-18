@@ -91,9 +91,8 @@ export default function MessagesTab({ token }) {
           </Button>
         }
       />
-          />
-        </div>
-      )}
+      {/* Config panel */}
+      {showConfig && <CrmConfigPanel token={token} />}
 
       {/* Conversation list */}
       {filtered.length === 0 ? (
