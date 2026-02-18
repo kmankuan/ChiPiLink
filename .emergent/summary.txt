@@ -1,84 +1,58 @@
 <analysis>**original_problem_statement:**
-The initial scope involved mobile responsiveness and UI customizations. This evolved into fixing critical bugs, a major UI/UX overhaul of the admin section using a reusable  component for a unified Monday.com board look and feel, and implementing a consistent tap-to-expand text component.
+The user requested a feature to clean up test data. This was initially implemented for orders and linked CRM data. The user then noted that test data in the Wallet and Users departments were not being included.
 
-The focus then shifted to the backend. The user raised questions about how the CRM linking worked, leading to a new feature that automatically links/creates a customer on Monday.com and starts a conversation thread upon the first order.
+In a subsequent message, the user provided a screenshot of the Access Requests tab and asked why this data was also not being cleaned. They expanded the request to include User/ Solicitudes Vinculación (Linking Requests) and Todos los Estudiantes (All Students). The user also pointed out that some UI elements were displaying in Spanish even when the application language was set to English.
 
-A subsequent bug report about a missing second order from a student revealed a fundamental misunderstanding of the core business logic. The system was built to merge all purchases from a student within a year into a single order record with multiple submissions. The user has now clarified that this is incorrect. The final and most critical requirement is that **every single order submission must create a new, separate order record** in the admin panel.
+The agent investigated and found three key issues:
+1.  The cleanup service only identified students who had placed an order, ignoring students who only had access/enrollment requests.
+2.  The Users admin module contained hardcoded Spanish labels instead of using the internationalization (i18n) framework.
+3.  The Access Requests tab did not use the common  component, leading to an inconsistent UI.
+
+The agent was in the process of fixing all three issues when the session ended.
 
 **User's preferred language**: English
 
 **what currently exists?**
 - A full-stack application (React/FastAPI/MongoDB).
-- A unified admin UI using a reusable  component across all major management tabs (Inventory, Students, Orders, etc.).
-- An automated CRM linking feature that creates a customer and starts a conversation on Monday.com upon order submission.
-- An order submission system that incorrectly **merges** all purchases from the same student/year into a single order document. The UI was recently modified to show a history of these submissions, but this functionality is now obsolete and needs to be removed.
-- Data persistence for , , and  was recently added to the order submission flow.
+- A Data Cleanup feature in the admin panel designed to reset test data.
+- The cleanup feature is currently incomplete: it only finds students who have placed an order, missing those who only have access/linking requests.
+- The Users section of the admin panel has UI/UX issues: hardcoded Spanish labels and an inconsistent header on the Access Requests tab.
 
 **Last working item**:
--   **Last item agent was working:** The agent had just received the critical user requirement that each textbook order submission must create a **separate order document**, not merge into an existing one. The agent acknowledged this and was about to start refactoring the core backend logic.
--   **Status:** NOT STARTED
+-   **Last item agent was working:** The agent was performing a multi-part fix to enhance the Data Cleanup module and resolve UI issues in the Users admin section. The plan was to:
+    1.  Modify the backend cleanup service to find *all* students, including those without orders.
+    2.  Replace hardcoded Spanish labels in the Users admin module with translation keys.
+    3.  Refactor the Access Requests tab to use the standard  for UI consistency.
+-   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. This is a major architectural change. The backend logic will need thorough testing (============================= test session starts ==============================
-platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
-rootdir: /app
-plugins: asyncio-1.3.0, anyio-4.12.0
-asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 1589 items / 4 errors
-
-==================================== ERRORS ====================================
-_____________ ERROR collecting backend/tests/test_chat_updates.py ______________
-backend/tests/test_chat_updates.py:18: in <module>
-    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'NoneType' object has no attribute 'rstrip'
-____________ ERROR collecting backend/tests/test_sync_dashboard.py _____________
-backend/tests/test_sync_dashboard.py:11: in <module>
-    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'NoneType' object has no attribute 'rstrip'
-________ ERROR collecting backend/tests/test_txb_create_item_webhook.py ________
-backend/tests/test_txb_create_item_webhook.py:19: in <module>
-    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'NoneType' object has no attribute 'rstrip'
-___________ ERROR collecting tests/test_push_notifications_wallet.py ___________
-tests/test_push_notifications_wallet.py:12: in <module>
-    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'NoneType' object has no attribute 'rstrip'
-=========================== short test summary info ============================
-ERROR backend/tests/test_chat_updates.py - AttributeError: 'NoneType' object ...
-ERROR backend/tests/test_sync_dashboard.py - AttributeError: 'NoneType' objec...
-ERROR backend/tests/test_txb_create_item_webhook.py - AttributeError: 'NoneTy...
-ERROR tests/test_push_notifications_wallet.py - AttributeError: 'NoneType' ob...
-!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
-============================== 4 errors in 1.10s =============================== or ) to ensure new, separate orders are created correctly. The frontend testing agent will then be needed to verify that the admin UI correctly displays these separate orders and that the now-obsolete submission history UI has been removed.
+-   **Which testing method agent to use?** both. The backend change requires  or testing agent verification to ensure all students are now found. The frontend changes require  or the frontend testing agent to confirm UI consistency and correct language display.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Each submission must create a separate order (P0)**
+-   **Issue 1: Incomplete Data Cleanup and UI/i18n Bugs in Users Module (P0)**
 
 **Issues Detail:**
 -   **Issue 1:**
-    -   **Description:** The current order submission logic in  is designed to find an existing order for a student/year and append new submissions to it. This is incorrect. The requirement is for every submission to generate a new, distinct order document in the  collection.
-    -   **Attempted fixes:** None. The previous work was based on the merge logic, which is now invalidated.
+    -   **Description:** The data cleanup feature is not comprehensive, as it fails to list students who have only made access/linking requests but have never placed an order. Concurrently, the Users management section suffers from UI defects, including hardcoded Spanish text and inconsistent component usage.
+    -   **Attempted fixes:** The agent identified the root causes by reviewing , , and . An initial  command was executed to start fixing the backend service logic.
     -   **Next debug checklist:**
-        1.  **File:** 
-        2.  **Method:** .
-        3.  Modify the logic to **always** create a new order document upon every call, instead of using  to find and update an existing one.
-        4.  The concept of a  array within an order document is now obsolete and should be removed. The new model is one document per submission.
-        5.  **File:** 
-        6.  Remove the Last Submitted column, as it's no longer relevant. The table should simply display multiple distinct order rows for the same student.
-        7.  **File:** 
-        8.  Remove the Submission History section from the dialog.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a critical correction to align the application's core business logic with the user's required workflow. It will allow admins to track each purchase as a separate, manageable order.
-    -   **Status:** NOT STARTED
+        1.  Verify the backend fix in  was successful. The  method should now query the  collection directly to fetch all students, not just those linked to orders.
+        2.  Apply the frontend fix in  by replacing hardcoded Spanish strings (Solicitudes Vinculación, Todos los Estudiantes) with translation keys (e.g., ).
+        3.  Refactor  to implement the reusable  component, unifying the UI.
+        4.  Test the complete flow: confirm the Data Cleanup preview now lists all test students (with and without orders) and that the Users admin UI displays correct English labels and a consistent header.
+    -   **Why fix this issue and what will be achieved with the fix?** This will deliver a complete data reset tool as requested by the user, significantly improving the efficiency of their testing workflow. It also resolves critical UI and internationalization bugs, enhancing the overall quality of the admin panel.
+    -   **Status:** IN PROGRESS
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** No.
 
 **In progress Task List**:
-None.
+-   **Task 1: Complete Users Module Cleanup and Refactor (P0)**
+    -   **Where to resume:** The agent has already initiated the backend fix. The next step is to execute the planned changes on the frontend, starting with replacing the hardcoded Spanish labels in .
+    -   **What will be achieved with this?** A fully functional and comprehensive data cleanup tool and a consistent, properly translated Users admin section.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
@@ -90,12 +64,10 @@ None.
     -   **(P5)** Implement push notifications for student access requests.
 
 **Completed work in this session**
--   **Feature - CRM Auto-Linking & Conversation Starter (DONE):** On first order, a student is now automatically linked to a Monday.com CRM item (or a new one is created), and a New Order Received message is posted.
--   **Bug Fix - Order Data Persistence (DONE):** Ensured , , and  are correctly persisted with each order.
--   **Feature - Reusable  Component (DONE):** Created a unified, Monday.com-style header component ().
--   **Refactor - Global Admin UI Unification (DONE):** Refactored 7 major admin tabs to use the new  for a consistent look and feel.
--   **Feature - Reusable  Component (DONE):** Created a component for consistent tap-to-expand text-wrapping.
--   **UI Fix - Multiple UI Cleanups (DONE):** Fixed a cut-off admin menu and standardized text wrapping across modals and views.
+-   **Feature - Comprehensive Data Cleanup Module (DONE):** Built a backend service and frontend UI to preview and delete test data, including orders, students, CRM data, wallets, and users. Implemented safety checks to protect admin accounts.
+-   **Feature - Monday.com Integration Enhancement (DONE):** Refactored the Monday.com integration to handle the one order per submission logic, add  to CRM messages for better tracking, and allow the admin chat to highlight the specific order topic.
+-   **Bug Fix - Monday.com Label Mapping (DONE):** Corrected incorrect label mappings for grades and order statuses sent to the Monday.com API.
+-   **Core Refactor - One Submission, One Order (DONE):** Re-architected the order submission workflow to create a new, separate order for every submission, correcting a fundamental business logic flaw. This included major changes to the backend and removing obsolete UI from the frontend.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -107,52 +79,56 @@ None.
 
 
 **Key Technical Concepts**
--   **Component-Driven Refactoring:** The admin UI was successfully unified by abstracting logic into a reusable  component.
--   **Incorrect Business Logic Assumption:** The primary blocker is that the core order logic was built on the incorrect assumption of merging orders. The next agent must pivot to a one submission, one order model.
--   **API-Driven Backend:** The application heavily relies on backend services to interact with the database and external APIs like Monday.com.
+-   **Selective Data Deletion:** The  identifies interconnected test data across multiple MongoDB collections (, , , ) and deletes them, while programmatically protecting essential data like admin user accounts.
+-   **Internationalization (i18n):** The current task involves fixing hardcoded text by replacing it with keys for a translation library (  function) to enable proper language switching.
+-   **Component Reuse:** The task includes refactoring a UI tab to use the existing  component to enforce design consistency across the admin panel.
 
 **key DB schema**
--   **:** The  array field is now obsolete and the logic supporting it must be removed. The schema will be simplified to one document per order submission.
-
-**changes in tech stack**
-None.
+-   ****: Contains user enrollment and access requests. The cleanup tool is being modified to scan this collection directly to find all students, not just those with orders.
+-   ****: Contains user accounts, targeted for deletion by the cleanup service.
+-   ****, ****: Related to user balances, also targeted for cleanup.
 
 **All files of reference**
 -   **Critical for Next Task:**
-    -   
-    -   
-    -   
-    -   
--   **Recently Created/Refactored (for context):**
-    -   
-    -   
+    -    (Backend logic to fix)
+    -    (UI with hardcoded labels to fix)
+    -    (UI to refactor with )
+-   **For Context:**
+    -    (The main UI for the cleanup feature)
 
 **Areas that need refactoring**:
--   The entire order submission flow in the backend needs to be refactored to create a new order for each submission.
--   The frontend components for displaying orders (, ) must be refactored to remove the now-obsolete submission history UI.
+-   : Needs i18n refactoring to remove hardcoded Spanish.
+-   : Needs UI refactoring to incorporate the  component.
 
 **key api endpoints**
--   : This endpoint's implementation must be completely changed from update-or-create (merge) to always create.
+-   : Previews all data entities that will be deleted.
+-   : Executes the deletion of the selected data.
+-   : Fetches the list of all students for the cleanup UI. The service logic for this endpoint is currently being fixed.
 
 **Critical Info for New Agent**
--   **Your immediate and highest priority task is to re-architect the order submission process.** The user has explicitly stated that the current logic of merging multiple submissions into a single order per student/year is incorrect. **Each submission must create a new, separate order.**
--   You must modify  to stop looking for existing orders and instead always create a new one.
--   The  array within an order document is now obsolete and should be removed.
--   You must revert the recent UI changes in  and  that were built to show submission history. The UI should now simply display multiple distinct orders from the same student.
--   This is a fundamental change to the business logic. Test thoroughly after implementation.
+-   Your immediate priority is to complete the in-progress fix for the **Users & Data Cleanup Module**.
+-   The previous agent had already analyzed the problem and started the implementation. You need to pick up where they left off.
+-   **Resume the plan:**
+    1.  Ensure the backend change in  is correctly applied to find *all* students.
+    2.  Proceed with the two frontend fixes: replacing hardcoded Spanish labels in  and applying the  to .
+-   After implementing all three parts, perform a full end-to-end test to verify that the cleanup tool is comprehensive and the Users UI is correct.
 
 **documents and test reports created in this job**
 -   
--   Numerous test reports in  (e.g., )
+-   Test reports are available in , such as .
 
 **Last 10 User Messages and any pending HUMAN messages**
--   **User #476:** Clarified that a student can order multiple times per year, questioning the 1 order per year logic. (PENDING - Led to current task)
--   **Agent #477 - #516:** Investigated and fixed related data persistence issues but continued operating under the incorrect merge-on-submit model. (COMPLETE, but based on wrong premise)
--   **User #517:** Stated the final, critical requirement: each order sent should be generate an order in the Order section. This is the core of the current task. (PENDING)
--   **Agent #518-521:** Acknowledged understanding of the new one submission = one new order requirement and was preparing to implement the fix. (IN PROGRESS)
+-   **User:** Asked why wallet and user test data were not included in the cleanup.
+-   **Agent:** Agreed to extend the feature.
+-   **User:** Provided a screenshot of Access Requests and asked why they weren't being cleaned up.
+-   **User:** Pointed out that Spanish text was appearing in the UI.
+-   **User:** Clarified that Solicitudes Vinculación and Todos los Estudiantes should also be part of the cleanup.
+-   **Agent:** Confirmed understanding and began a thorough review of the Users module.
+-   **Agent:** Identified the root causes: the cleanup service was only looking at students with orders, and the UI had hardcoded Spanish labels.
+-   **Agent:** Began implementing the multi-part fix to address all identified issues.
 
 **Project Health Check:**
--   **Broken:** The core business logic for order creation is fundamentally incorrect according to the user's latest clarification. The application will not function as required until this is fixed.
+-   **Broken:** The Data Cleanup feature is functionally incomplete as it misses a significant portion of test data. The Users admin section has UI bugs (hardcoded Spanish text and inconsistent styling).
 -   **Mocked:** None.
 
 **3rd Party Integrations**
@@ -164,14 +140,14 @@ None.
 -    (for fuzzy string matching)
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
+-   **Testing agent used after significant changes:** YES (on previous features)
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** The UI for displaying submission history (, ) is now a regression because the underlying business logic is incorrect. It needs to be removed.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
 -   **Email:** 
 -   **Password:** 
 
 **What agent forgot to execute**
-The agent operated on a fundamental misunderstanding of the core business logic for order creation. The user's latest message has corrected this, and the required refactoring is now the top priority.</analysis>
+The previous agent correctly identified all aspects of the user's latest request and was actively implementing a comprehensive solution when the session ended. No tasks were forgotten.</analysis>
