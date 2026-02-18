@@ -573,7 +573,7 @@ export default function TextbookOrdersAdminTab() {
             </CardContent>
           </Card>
         </div>
-      )
+      )}
 
       {/* Order Details Dialog */}
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
