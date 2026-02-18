@@ -161,6 +161,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Changed flex alignment from `items-center` to `items-start` so multi-line text aligns with checkbox
 - Added `min-w-0` + `shrink-0` to prevent flex overflow
 
+### Phase 5j - Dynamic Monday.com Column Mapping (Feb 2026)
+- Rewrote `BookOrdersMondayTab.jsx` with fully dynamic column mapping system
+- Admin can: add/remove any field mapping, use quick-add suggestions, create custom field keys
+- Covers 4 mapping sections: Orders columns, Order subitems, Textbooks columns, Textbook subitems
+- Added missing suggested fields: order_id, guardian, total, books (previously hardcoded)
+- Backend already reads mappings dynamically — no backend changes needed
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
