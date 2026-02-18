@@ -120,12 +120,15 @@ async def list_students_for_cleanup(admin: dict = Depends(get_admin_user)):
             "student_id": sid,
             "student_name": stat.get("student_name") or s.get("full_name", "Unknown"),
             "is_demo": s.get("is_demo", False),
+            "user_id": s.get("user_id", ""),
             "order_count": stat["order_count"],
             "total_amount": stat.get("total_amount", 0),
             "last_order": stat.get("last_order"),
             "monday_item_count": len(monday_ids),
             "crm_linked": sid in link_map,
             "crm_monday_item_id": link_map.get(sid),
+            "wallet_balance": wallet_counts.get(s.get("user_id")),
+            "wallet_txn_count": txn_counts.get(s.get("user_id"), 0),
         })
 
     return {"students": result}
