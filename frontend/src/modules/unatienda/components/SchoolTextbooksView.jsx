@@ -779,10 +779,6 @@ export default function SchoolTextbooksView({
           );
         })}
 
-        {/* Add student card */}
-        {!showLinkForm && (
-          <EmptyStudentCard onClick={() => setShowLinkForm(true)} lang={lang} />
-        )}
       </div>
       
       {/* Reorder Request Dialog */}
