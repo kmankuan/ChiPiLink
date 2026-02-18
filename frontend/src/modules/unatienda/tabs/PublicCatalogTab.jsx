@@ -485,11 +485,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {productos.filter(p => p.inventory_quantity < 10).length === 0 ? (
+              {lowStockProducts.length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">No products with low stock</p>
               ) : (
                 <div className="space-y-2">
-                  {productos.filter(p => p.inventory_quantity < 10).map((item) => (
+                  {lowStockProducts.map((item) => (
                     <div key={item.book_id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                       <div>
                         <p className="font-medium">{item.name}</p>
