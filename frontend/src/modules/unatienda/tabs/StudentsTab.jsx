@@ -479,53 +479,19 @@ export default function StudentsTab({ token }) {
       {/* ═══ STUDENTS SECTION ═══ */}
       {section === 'students' && (
         <div className="space-y-3">
-          {/* Stats */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1" data-testid="student-stats">
-            {[
-              { icon: Users, val: students.length, label: 'students', cls: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600' },
-              { icon: Lock, val: stats.locked, label: 'locked', cls: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600' },
-              { icon: ShoppingCart, val: stats.presale, label: 'pre-sale', cls: stats.presale > 0 ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/40 text-orange-600' : 'bg-muted/50 text-muted-foreground' },
-              { icon: GraduationCap, val: stats.grades, label: 'grades', cls: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600' },
-            ].map(({ icon: Ic, val, label, cls }) => (
-              <span key={label} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 text-xs font-medium shrink-0 ${cls}`}>
-                <Ic className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{val}</span> {label}
-              </span>
-            ))}
-          </div>
-
-          {/* Toolbar */}
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-3">
-            <div className="relative flex-1 min-w-0 sm:max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <Input placeholder="Search by name or student ID..." value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="student-search" />
-            </div>
+          {/* Bulk actions row */}
+          {selectedIds.size > 0 && (
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-              {selectedIds.size > 0 && (
-                <>
-                  <span className="text-[11px] text-muted-foreground font-medium shrink-0">{selectedIds.size} sel.</span>
-                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
-                    className="gap-1 h-7 text-[11px] border-orange-300 text-orange-700 hover:bg-orange-50 shrink-0" data-testid="bulk-presale-on">
-                    <ShoppingCart className="h-3 w-3" /> Pre-sale On
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
-                    className="gap-1 h-7 text-[11px] shrink-0" data-testid="bulk-presale-off">Pre-sale Off</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px] shrink-0">Clear</Button>
-                </>
-              )}
-              <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-1 h-7 text-xs shrink-0">
-                <RefreshCw className="h-3 w-3" /> Refresh
+              <span className="text-[11px] text-muted-foreground font-medium shrink-0">{selectedIds.size} sel.</span>
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
+                className="gap-1 h-7 text-[11px] border-orange-300 text-orange-700 hover:bg-orange-50 shrink-0" data-testid="bulk-presale-on">
+                <ShoppingCart className="h-3 w-3" /> Pre-sale On
               </Button>
-              <div className="flex items-center border rounded-md overflow-hidden shrink-0" data-testid="view-mode-toggle">
-                {[{ mode: 'card', Icon: LayoutGrid }, { mode: 'table', Icon: List }].map(({ mode, Icon }) => (
-                  <button key={mode} onClick={() => setViewMode(mode)} data-testid={`view-mode-${mode}`}
-                    className={`p-1.5 transition-colors ${viewMode === mode ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}>
-                    <Icon className="h-3.5 w-3.5" />
-                  </button>
-                ))}
-              </div>
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
+                className="gap-1 h-7 text-[11px] shrink-0" data-testid="bulk-presale-off">Pre-sale Off</Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px] shrink-0">Clear</Button>
             </div>
-          </div>
+          )}
 
           <div className="text-[11px] text-muted-foreground">
             Showing {studentsPag.paginated.length} of {sortedStudents.length} students
