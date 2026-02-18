@@ -561,16 +561,16 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                       {outOfStockBooks.map(book => (
                         <div
                           key={book.book_id}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 border-border opacity-60"
+                          className="flex items-start justify-between p-3 rounded-lg border bg-muted/30 border-border opacity-60 gap-3"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center opacity-50" />
-                            <div>
-                              <p className="font-medium text-muted-foreground">{book.name || book.book_name}</p>
+                          <div className="flex items-start gap-3 min-w-0 flex-1">
+                            <div className="w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center opacity-50 mt-0.5 shrink-0" />
+                            <div className="min-w-0" onClick={() => toggleNameExpand(book.book_id)}>
+                              <p className={`font-medium text-muted-foreground ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
                               <p className="text-sm text-muted-foreground">{book.subject}</p>
                             </div>
                           </div>
-                          <span className="font-semibold text-muted-foreground">${book.price?.toFixed(2)}</span>
+                          <span className="font-semibold text-muted-foreground shrink-0">${book.price?.toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
