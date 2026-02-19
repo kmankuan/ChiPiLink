@@ -41,6 +41,7 @@ const TAB_GROUPS = [
     label: 'School',
     tabs: [
       { id: 'students', label: 'Students', icon: Users },
+      { id: 'schools', label: 'Schools', icon: School, testId: 'schools-tab-trigger' },
       { id: 'school-year', label: 'School Year', icon: Calendar },
     ],
   },
@@ -48,6 +49,7 @@ const TAB_GROUPS = [
     label: 'Settings',
     tabs: [
       { id: 'form-config', label: 'Order Form', icon: FileText },
+      { id: 'enrollment-form', label: 'Enrollment Form', icon: ClipboardList, testId: 'enrollment-form-tab-trigger' },
       { id: 'configuration', label: 'Config', icon: Settings },
       { id: 'demo', label: 'Demo Data', icon: Database },
     ],
