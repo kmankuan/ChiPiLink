@@ -332,6 +332,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Features**: User table with search, role filters (All/Admin/Regular), stats bar, edit dialog, pagination, **CSV export**
 - Testing agent verified 100% pass rate (14/14 backend + frontend)
 
+### Phase 5w - Order Submission Timeout Fix (Complete - Feb 2026)
+- **Bug**: Order submission stuck on "Procesando..." indefinitely when submitting 7+ books
+- **Root cause**: Monday.com sync (16+ sequential API calls) + CRM auto-link + notifications were all blocking the response
+- **Backend fix**: Added `asyncio.wait_for()` timeouts:
+  - Monday.com sync: 15s timeout (was unbounded)
+  - Notification: 10s timeout
+  - CRM auto-link: 10s timeout
+  - All gracefully degrade — order is saved even if integrations timeout
+- **Frontend fix**: Added 30s axios timeout to prevent infinite "Procesando..." spinner
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
