@@ -161,7 +161,7 @@ export default function RegisteredUsersTab() {
     return true;
   });
 
-  const { paginatedItems, currentPage, totalPages, setCurrentPage } = usePagination(filtered, 15);
+  const { paginated: paginatedItems, page: currentPage, totalPages, setPage: setCurrentPage } = usePagination(filtered, 15);
   const activeCount = users.filter(u => u.is_active !== false).length;
 
   const handleSaveEdit = async () => {
