@@ -91,6 +91,10 @@ class UserService(BaseService):
             "regular_users": total - admins
         }
 
+    async def delete_user(self, user_id: str) -> bool:
+        """Delete a user"""
+        return await self.repository.delete_user(user_id)
+
 
 # Singleton service instance
 user_service = UserService()
