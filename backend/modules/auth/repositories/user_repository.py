@@ -95,3 +95,8 @@ class UserRepository(BaseRepository):
     async def deactivate(self, user_id: str) -> bool:
         """Deactivate user"""
         return await self.update_user(user_id, {"is_active": False})
+
+    async def delete_user(self, user_id: str) -> bool:
+        """Delete user by user_id"""
+        result = await self.collection.delete_one({"user_id": user_id})
+        return result.deleted_count > 0
