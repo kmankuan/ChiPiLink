@@ -75,6 +75,21 @@ async def create_student(
         except Exception as e:
             import logging
             logging.getLogger(__name__).warning(f"Pre-sale link suggestion failed (non-blocking): {e}")
+
+        # Broadcast real-time event to admin
+        try:
+            from modules.realtime.events import emit_access_request_created
+            student_name = f"{data.first_name} {data.last_name}".strip()
+            await emit_access_request_created(
+                student_id=result.get("student_id", ""),
+                student_name=student_name,
+                grade=str(data.grade or ""),
+                school_name=data.school_name or "",
+                user_id=current_user["user_id"],
+            )
+        except Exception:
+            pass  # Non-blocking
+
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
