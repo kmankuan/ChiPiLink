@@ -35,14 +35,14 @@ import { useTranslation } from 'react-i18next';
 
 export default function UsersManagementModule() {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('student-requests');
+  const [activeTab, setActiveTab] = useState('registered-users');
 
   const lang = i18n.language || 'en';
   const labels = {
-    en: { requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' },
-    es: { requests: 'Solicitudes Vinculación', students: 'Todos los Estudiantes', connections: 'Conexiones', schools: 'Escuelas', formConfig: 'Config. Formularios' },
-    zh: { requests: '访问请求', students: '所有学生', connections: '连接', schools: '学校', formConfig: '表单配置' },
-  }[lang] || { requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' };
+    en: { users: 'Accounts', requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' },
+    es: { users: 'Cuentas', requests: 'Solicitudes Vinculación', students: 'Todos los Estudiantes', connections: 'Conexiones', schools: 'Escuelas', formConfig: 'Config. Formularios' },
+    zh: { users: '账户', requests: '访问请求', students: '所有学生', connections: '连接', schools: '学校', formConfig: '表单配置' },
+  }[lang] || { users: 'Accounts', requests: 'Access Requests', students: 'All Students', connections: 'Connections', schools: 'Schools', formConfig: 'Form Config' };
 
   return (
     <div className="space-y-4">
