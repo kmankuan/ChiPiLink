@@ -198,7 +198,6 @@ async def approve_request(
     admin: dict = Depends(get_admin_user)
 ):
     """Process approval action on an enrollment request"""
-    # TODO: Check for textbook_access.approve permission for moderators
     try:
         result = await textbook_access_service.process_approval(
             student_id=student_id,
@@ -206,6 +205,25 @@ async def approve_request(
             action=action,
             admin_id=admin["user_id"]
         )
+
+        # Broadcast real-time event
+        try:
+            from modules.realtime.events import emit_access_request_updated
+            from core.database import db
+            student = await db.store_students.find_one(
+                {"student_id": student_id}, {"_id": 0, "full_name": 1, "user_id": 1}
+            )
+            if student:
+                await emit_access_request_updated(
+                    student_id=student_id,
+                    student_name=student.get("full_name", ""),
+                    new_status=action.status,
+                    user_id=student.get("user_id", ""),
+                    admin_name=admin.get("nombre", admin.get("email", "")),
+                )
+        except Exception:
+            pass  # Non-blocking
+
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
