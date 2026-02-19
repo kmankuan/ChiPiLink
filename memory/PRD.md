@@ -329,7 +329,7 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Frontend fix**: Fixed `RegisteredUsersTab.jsx`:
   - Corrected `usePagination` hook destructuring (paginated/page/setPage vs paginatedItems/currentPage/setCurrentPage)
   - Fixed `TablePagination` props to match component interface
-- **Features**: User table with search, role filters (All/Admin/Regular), stats bar, edit dialog, pagination
+- **Features**: User table with search, role filters (All/Admin/Regular), stats bar, edit dialog, pagination, **CSV export**
 - Testing agent verified 100% pass rate (14/14 backend + frontend)
 
 ### P1 - Global Progress Icon System
