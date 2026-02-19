@@ -120,21 +120,27 @@ export default function RegisteredUsersTab() {
     if (!token) return;
     setLoading(true);
     try {
-      const [usersRes, statsRes] = await Promise.all([
-        fetch(`${API}/api/auth-v2/users?limit=500`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/api/auth-v2/users/stats`, { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
+      const usersRes = await fetch(`${API}/api/auth-v2/users?limit=500`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (usersRes.ok) {
         const data = await usersRes.json();
-        setUsers(Array.isArray(data) ? data : data.users || []);
+        setUsers(Array.isArray(data) ? data : []);
       }
-      if (statsRes.ok) setStats(await statsRes.json());
     } catch (err) {
-      console.error('RegisteredUsersTab fetch error:', err);
-      toast.error('Failed to load users');
-    } finally {
-      setLoading(false);
+      console.error('Users fetch error:', err);
     }
+    try {
+      const statsRes = await fetch(`${API}/api/auth-v2/users/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (statsRes.ok) {
+        setStats(await statsRes.json());
+      }
+    } catch (err) {
+      console.error('Stats fetch error:', err);
+    }
+    setLoading(false);
   }, [token]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
