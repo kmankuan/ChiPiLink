@@ -235,6 +235,29 @@ export default function RegisteredUsersTab() {
     toast.success(t.exported.replace('{count}', filtered.length));
   };
 
+  const handleDelete = async () => {
+    if (!deleteDialog) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`${API}/api/auth-v2/users/${deleteDialog.user_id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success(t.deleted);
+        setDeleteDialog(null);
+        fetchUsers();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Delete failed');
+      }
+    } catch {
+      toast.error('Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-3" data-testid="registered-users-tab">
       <BoardHeader
