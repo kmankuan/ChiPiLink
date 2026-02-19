@@ -351,6 +351,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - Removed duplicate All Students + Access Requests tabs from Users (already unified in Unatienda's StudentsTab)
 - Updated module descriptions in i18n (en/es) and dashboard header
 
+### Phase 5y - Textbook Order "Already Ordered" Fix (Complete - Feb 2026)
+- **Bug**: After submitting a textbook order, all items still appeared purchasable. The "1 per student" workflow was broken.
+- **Root cause**: `create_and_submit_order` created a new submitted order but never updated the draft order's item statuses. `get_or_create_order` only looks at draft orders, so it always saw items as `available`.
+- **Backend fix**: Added step 8b in `create_and_submit_order` to update draft order items to `ordered` status after submission
+- **Data fix**: Ran one-time script to sync all existing draft orders with their submitted counterparts (fixed 1 draft, marked 4 items as ordered)
+- **Result**: Ordered items now show as "Comprado · Solicitar Reorden" with green checkmarks, unordered items remain selectable
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
