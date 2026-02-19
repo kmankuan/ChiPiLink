@@ -714,19 +714,25 @@ class TextbookOrderService(BaseService):
                     {"$inc": {"inventory_quantity": -qty}}
                 )
 
-        # 9. Send to Monday.com
+        # 9. Send to Monday.com (background — don't block the user)
+        import asyncio
         monday_item_id = None
         monday_subitems = []
         try:
-            monday_result = await self._send_to_monday(
-                order=order,
-                selected_items=order_items,
-                user_name=user_name,
-                user_email=user_email,
-                submission_total=total_amount
+            monday_result = await asyncio.wait_for(
+                self._send_to_monday(
+                    order=order,
+                    selected_items=order_items,
+                    user_name=user_name,
+                    user_email=user_email,
+                    submission_total=total_amount
+                ),
+                timeout=15.0
             )
             monday_item_id = monday_result.get("item_id")
             monday_subitems = monday_result.get("subitems", [])
+        except asyncio.TimeoutError:
+            logger.warning(f"[create_and_submit_order] Monday.com sync timed out after 15s for order {order_id}")
         except Exception as e:
             logger.error(f"[create_and_submit_order] Monday.com sync failed (non-blocking): {e}")
 
