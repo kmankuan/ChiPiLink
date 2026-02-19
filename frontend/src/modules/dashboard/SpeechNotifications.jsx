@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRealtime, useRealtimeEvent } from '@/contexts/RealtimeContext';
+import { useRealtimeEvent } from '@/contexts/RealtimeContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,7 +23,7 @@ import { Volume2, VolumeX, Settings2, Loader2 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-const VOICES = [
+const OPENAI_VOICES = [
   { value: 'nova', label: 'Nova (Energetic)' },
   { value: 'coral', label: 'Coral (Warm)' },
   { value: 'alloy', label: 'Alloy (Neutral)' },
@@ -55,37 +55,43 @@ const EVENT_LABELS = {
 
 export default function SpeechNotifications() {
   const { token, user } = useAuth();
-  const realtime = useRealtime();
-  const [muted, setMuted] = useState(() => {
-    const saved = localStorage.getItem('tts_muted');
-    return saved === 'true';
-  });
+  const [muted, setMuted] = useState(() => localStorage.getItem('tts_muted') === 'true');
   const [settings, setSettings] = useState(null);
   const [speaking, setSpeaking] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [providers, setProviders] = useState({});
+  const [elVoices, setElVoices] = useState([]);
   const queueRef = useRef([]);
   const processingRef = useRef(false);
   const audioRef = useRef(null);
 
   const isAdmin = user?.is_admin;
 
-  // Load settings
+  // Load settings + providers
   useEffect(() => {
     if (!token || !isAdmin) return;
-    fetch(`${API}/api/admin/tts/settings`, {
+    Promise.all([
+      fetch(`${API}/api/admin/tts/settings`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : null),
+      fetch(`${API}/api/admin/tts/providers`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : null),
+    ]).then(([s, p]) => {
+      if (s) setSettings(s);
+      if (p) setProviders(p);
+    }).catch(() => {});
+  }, [token, isAdmin]);
+
+  // Load ElevenLabs voices when provider is elevenlabs
+  useEffect(() => {
+    if (!token || !isAdmin || settings?.provider !== 'elevenlabs') return;
+    fetch(`${API}/api/admin/tts/elevenlabs/voices`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setSettings(data); })
+      .then(data => { if (data?.voices) setElVoices(data.voices); })
       .catch(() => {});
-  }, [token, isAdmin]);
+  }, [token, isAdmin, settings?.provider]);
 
-  // Save mute state
-  useEffect(() => {
-    localStorage.setItem('tts_muted', String(muted));
-  }, [muted]);
+  useEffect(() => { localStorage.setItem('tts_muted', String(muted)); }, [muted]);
 
-  // Process queue
   const processQueue = useCallback(async () => {
     if (processingRef.current || queueRef.current.length === 0 || muted) return;
     processingRef.current = true;
@@ -94,24 +100,27 @@ export default function SpeechNotifications() {
     while (queueRef.current.length > 0 && !muted) {
       const text = queueRef.current.shift();
       try {
+        const body = { text };
+        if (settings?.provider === 'elevenlabs') {
+          body.provider = 'elevenlabs';
+          body.voice_id = settings?.elevenlabs_voice_id;
+          body.stability = settings?.elevenlabs_stability;
+          body.similarity_boost = settings?.elevenlabs_similarity;
+        } else {
+          body.provider = 'openai';
+          body.voice = settings?.voice || 'nova';
+          body.speed = settings?.speed || 1.0;
+        }
+
         const res = await fetch(`${API}/api/admin/tts/speak`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            text,
-            voice: settings?.voice || 'nova',
-            speed: settings?.speed || 1.0,
-          }),
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body),
         });
 
         if (res.ok) {
           const data = await res.json();
-          if (data.audio) {
-            await playAudio(data.audio, settings?.volume ?? 0.8);
-          }
+          if (data.audio) await playAudio(data.audio, settings?.volume ?? 0.8);
         }
       } catch {}
     }
@@ -129,22 +138,16 @@ export default function SpeechNotifications() {
         audio.onended = resolve;
         audio.onerror = resolve;
         audio.play().catch(resolve);
-      } catch {
-        resolve();
-      }
+      } catch { resolve(); }
     });
   };
 
   // Listen to all realtime events
   useRealtimeEvent('*', useCallback((data) => {
     if (muted || !settings?.enabled || !isAdmin) return;
-
-    // Check if this event type is enabled
     const enabledEvents = settings?.enabled_events || [];
-    const eventType = data.type;
-    if (!enabledEvents.includes(eventType) && enabledEvents.length > 0) return;
+    if (!enabledEvents.includes(data.type) && enabledEvents.length > 0) return;
 
-    // Extract message in configured language
     const lang = settings?.language || 'es';
     let text = '';
     if (data.message && typeof data.message === 'object') {
@@ -152,41 +155,35 @@ export default function SpeechNotifications() {
     } else if (typeof data.message === 'string') {
       text = data.message;
     }
-
     if (!text) return;
 
     queueRef.current.push(text);
     processQueue();
   }, [muted, settings, isAdmin, processQueue]));
 
-  // Save settings to backend
   const saveSettings = useCallback(async (newSettings) => {
     setSettings(newSettings);
     try {
       await fetch(`${API}/api/admin/tts/settings`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(newSettings),
       });
     } catch {}
   }, [token]);
 
-  const updateSetting = (key, value) => {
-    const updated = { ...settings, [key]: value };
-    saveSettings(updated);
-  };
+  const updateSetting = (key, value) => saveSettings({ ...settings, [key]: value });
 
-  // Only render for admins
   if (!isAdmin || !settings) return null;
+
+  const activeProvider = settings.provider || 'openai';
+  const elAvailable = providers?.elevenlabs?.available;
 
   return (
     <div className="flex items-center gap-1" data-testid="speech-notifications">
-      {/* Mute/Unmute toggle */}
+      {/* Mute/Unmute */}
       <Button
-        variant={muted ? 'ghost' : 'ghost'}
+        variant="ghost"
         size="sm"
         className={`h-8 w-8 p-0 relative ${!muted ? 'text-primary' : 'text-muted-foreground'}`}
         onClick={() => {
@@ -201,11 +198,7 @@ export default function SpeechNotifications() {
         title={muted ? 'Enable speech notifications' : 'Mute speech notifications'}
         data-testid="tts-mute-btn"
       >
-        {muted ? (
-          <VolumeX className="h-4 w-4" />
-        ) : (
-          <Volume2 className={`h-4 w-4 ${speaking ? 'animate-pulse' : ''}`} />
-        )}
+        {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className={`h-4 w-4 ${speaking ? 'animate-pulse' : ''}`} />}
         {speaking && !muted && (
           <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
@@ -214,18 +207,18 @@ export default function SpeechNotifications() {
         )}
       </Button>
 
-      {/* Settings dropdown */}
+      {/* Settings */}
       <DropdownMenu open={showSettings} onOpenChange={setShowSettings}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0" data-testid="tts-settings-btn">
             <Settings2 className="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-72 p-3" side="bottom">
+        <DropdownMenuContent align="end" className="w-72 p-3 max-h-[80vh] overflow-y-auto" side="bottom">
           <DropdownMenuLabel className="text-xs font-semibold px-0">Speech Settings</DropdownMenuLabel>
           <DropdownMenuSeparator />
 
-          {/* Enabled toggle */}
+          {/* Enabled */}
           <div className="flex items-center justify-between py-2">
             <span className="text-xs font-medium">Speech Enabled</span>
             <Button
@@ -238,6 +231,28 @@ export default function SpeechNotifications() {
               {settings.enabled ? 'ON' : 'OFF'}
             </Button>
           </div>
+
+          {/* Provider */}
+          <div className="flex items-center justify-between py-2">
+            <span className="text-xs font-medium">Provider</span>
+            <Select value={activeProvider} onValueChange={(v) => updateSetting('provider', v)}>
+              <SelectTrigger className="h-7 w-36 text-xs" data-testid="tts-provider-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="openai" className="text-xs">OpenAI TTS</SelectItem>
+                <SelectItem value="elevenlabs" className="text-xs" disabled={!elAvailable}>
+                  ElevenLabs {!elAvailable && '(no key)'}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {!elAvailable && activeProvider === 'openai' && (
+            <p className="text-[10px] text-muted-foreground pb-1">
+              Add ELEVENLABS_API_KEY to enable ElevenLabs
+            </p>
+          )}
 
           {/* Language */}
           <div className="flex items-center justify-between py-2">
@@ -254,37 +269,97 @@ export default function SpeechNotifications() {
             </Select>
           </div>
 
-          {/* Voice */}
-          <div className="flex items-center justify-between py-2">
-            <span className="text-xs font-medium">Voice</span>
-            <Select value={settings.voice} onValueChange={(v) => updateSetting('voice', v)}>
-              <SelectTrigger className="h-7 w-36 text-xs" data-testid="tts-voice-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {VOICES.map(v => (
-                  <SelectItem key={v.value} value={v.value} className="text-xs">{v.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Speed */}
-          <div className="py-2">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium">Speed</span>
-              <span className="text-[10px] text-muted-foreground">{settings.speed}x</span>
+          {/* OpenAI Voice (when provider = openai) */}
+          {activeProvider === 'openai' && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-xs font-medium">Voice</span>
+              <Select value={settings.voice} onValueChange={(v) => updateSetting('voice', v)}>
+                <SelectTrigger className="h-7 w-36 text-xs" data-testid="tts-voice-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OPENAI_VOICES.map(v => (
+                    <SelectItem key={v.value} value={v.value} className="text-xs">{v.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Slider
-              value={[settings.speed]}
-              min={0.5}
-              max={2.0}
-              step={0.25}
-              onValueChange={([v]) => updateSetting('speed', v)}
-              className="w-full"
-              data-testid="tts-speed-slider"
-            />
-          </div>
+          )}
+
+          {/* ElevenLabs Voice (when provider = elevenlabs) */}
+          {activeProvider === 'elevenlabs' && (
+            <>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-xs font-medium">Voice</span>
+                <Select
+                  value={settings.elevenlabs_voice_id}
+                  onValueChange={(v) => updateSetting('elevenlabs_voice_id', v)}
+                >
+                  <SelectTrigger className="h-7 w-36 text-xs" data-testid="tts-el-voice-select">
+                    <SelectValue placeholder="Select voice" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {elVoices.map(v => (
+                      <SelectItem key={v.id} value={v.id} className="text-xs">{v.label || v.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Stability */}
+              <div className="py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">Stability</span>
+                  <span className="text-[10px] text-muted-foreground">{(settings.elevenlabs_stability * 100).toFixed(0)}%</span>
+                </div>
+                <Slider
+                  value={[settings.elevenlabs_stability]}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  onValueChange={([v]) => updateSetting('elevenlabs_stability', v)}
+                  className="w-full"
+                  data-testid="tts-el-stability-slider"
+                />
+              </div>
+
+              {/* Similarity */}
+              <div className="py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">Similarity</span>
+                  <span className="text-[10px] text-muted-foreground">{(settings.elevenlabs_similarity * 100).toFixed(0)}%</span>
+                </div>
+                <Slider
+                  value={[settings.elevenlabs_similarity]}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  onValueChange={([v]) => updateSetting('elevenlabs_similarity', v)}
+                  className="w-full"
+                  data-testid="tts-el-similarity-slider"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Speed (OpenAI only) */}
+          {activeProvider === 'openai' && (
+            <div className="py-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium">Speed</span>
+                <span className="text-[10px] text-muted-foreground">{settings.speed}x</span>
+              </div>
+              <Slider
+                value={[settings.speed]}
+                min={0.5}
+                max={2.0}
+                step={0.25}
+                onValueChange={([v]) => updateSetting('speed', v)}
+                className="w-full"
+                data-testid="tts-speed-slider"
+              />
+            </div>
+          )}
 
           {/* Volume */}
           <div className="py-2">
@@ -305,7 +380,7 @@ export default function SpeechNotifications() {
 
           <DropdownMenuSeparator />
 
-          {/* Event type toggles */}
+          {/* Event toggles */}
           <DropdownMenuLabel className="text-[10px] font-semibold px-0 text-muted-foreground uppercase tracking-wide">
             Announce Events
           </DropdownMenuLabel>
@@ -315,10 +390,7 @@ export default function SpeechNotifications() {
               checked={(settings.enabled_events || []).includes(key)}
               onCheckedChange={(checked) => {
                 const current = settings.enabled_events || [];
-                const next = checked
-                  ? [...current, key]
-                  : current.filter(e => e !== key);
-                updateSetting('enabled_events', next);
+                updateSetting('enabled_events', checked ? [...current, key] : current.filter(e => e !== key));
               }}
               className="text-xs"
             >
@@ -338,8 +410,7 @@ export default function SpeechNotifications() {
                 en: 'Test notification. The speech system is working correctly.',
                 zh: '测试通知。语音系统运行正常。',
               };
-              const text = testTexts[settings.language] || testTexts.es;
-              queueRef.current.push(text);
+              queueRef.current.push(testTexts[settings.language] || testTexts.es);
               processQueue();
             }}
             data-testid="tts-test-btn"
