@@ -246,16 +246,29 @@ export default function RegisteredUsersTab() {
         onRefresh={fetchUsers}
       />
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={t.searchPlaceholder}
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-          className="pl-9 h-9"
-          data-testid="users-search"
-        />
+      {/* Search + Export */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t.searchPlaceholder}
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            className="pl-9 h-9"
+            data-testid="users-search"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5 shrink-0"
+          onClick={handleExportCsv}
+          disabled={filtered.length === 0}
+          data-testid="export-users-csv"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t.exportCsv}
+        </Button>
       </div>
 
       {/* Table */}
