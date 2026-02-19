@@ -240,13 +240,13 @@ class ActivityFeedService:
              "timestamp": 1, "status": 1}
         ).to_list(100)
 
-        for l in logs:
+        for log in logs:
             events.append({
                 "type": "monday_sync",
-                "timestamp": l.get("timestamp", ""),
-                "title": f"Monday.com sync: {l.get('board_name', 'Unknown board')}",
-                "description": f"{l.get('action', 'sync')} - {l.get('items_synced', 0)} items - {l.get('status', 'complete')}",
-                "meta": {"board_name": l.get("board_name")},
+                "timestamp": log.get("timestamp", ""),
+                "title": f"Monday.com sync: {log.get('board_name', 'Unknown board')}",
+                "description": f"{log.get('action', 'sync')} - {log.get('items_synced', 0)} items - {log.get('status', 'complete')}",
+                "meta": {"board_name": log.get("board_name")},
             })
         return events
 
