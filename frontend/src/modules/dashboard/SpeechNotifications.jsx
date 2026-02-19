@@ -1,0 +1,354 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRealtime, useRealtimeEvent } from '@/contexts/RealtimeContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Volume2, VolumeX, Settings2, Loader2 } from 'lucide-react';
+
+const API = process.env.REACT_APP_BACKEND_URL;
+
+const VOICES = [
+  { value: 'nova', label: 'Nova (Energetic)' },
+  { value: 'coral', label: 'Coral (Warm)' },
+  { value: 'alloy', label: 'Alloy (Neutral)' },
+  { value: 'shimmer', label: 'Shimmer (Bright)' },
+  { value: 'echo', label: 'Echo (Calm)' },
+  { value: 'onyx', label: 'Onyx (Deep)' },
+  { value: 'fable', label: 'Fable (Expressive)' },
+  { value: 'sage', label: 'Sage (Measured)' },
+  { value: 'ash', label: 'Ash (Clear)' },
+];
+
+const LANGUAGES = [
+  { value: 'es', label: 'Espanol' },
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+];
+
+const EVENT_LABELS = {
+  order_submitted: 'Orders',
+  access_request: 'Access Requests',
+  access_request_approved: 'Approvals',
+  access_request_rejected: 'Rejections',
+  access_request_updated: 'Request Updates',
+  user_registered: 'New Users',
+  wallet_topup: 'Wallet Top-ups',
+  crm_message: 'CRM Messages',
+  order_status_changed: 'Order Updates',
+};
+
+export default function SpeechNotifications() {
+  const { token, user } = useAuth();
+  const realtime = useRealtime();
+  const [muted, setMuted] = useState(() => {
+    const saved = localStorage.getItem('tts_muted');
+    return saved === 'true';
+  });
+  const [settings, setSettings] = useState(null);
+  const [speaking, setSpeaking] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const queueRef = useRef([]);
+  const processingRef = useRef(false);
+  const audioRef = useRef(null);
+
+  const isAdmin = user?.is_admin;
+
+  // Load settings
+  useEffect(() => {
+    if (!token || !isAdmin) return;
+    fetch(`${API}/api/admin/tts/settings`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setSettings(data); })
+      .catch(() => {});
+  }, [token, isAdmin]);
+
+  // Save mute state
+  useEffect(() => {
+    localStorage.setItem('tts_muted', String(muted));
+  }, [muted]);
+
+  // Process queue
+  const processQueue = useCallback(async () => {
+    if (processingRef.current || queueRef.current.length === 0 || muted) return;
+    processingRef.current = true;
+    setSpeaking(true);
+
+    while (queueRef.current.length > 0 && !muted) {
+      const text = queueRef.current.shift();
+      try {
+        const res = await fetch(`${API}/api/admin/tts/speak`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            text,
+            voice: settings?.voice || 'nova',
+            speed: settings?.speed || 1.0,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.audio) {
+            await playAudio(data.audio, settings?.volume ?? 0.8);
+          }
+        }
+      } catch {}
+    }
+
+    processingRef.current = false;
+    setSpeaking(false);
+  }, [token, muted, settings]);
+
+  const playAudio = (base64Audio, volume) => {
+    return new Promise((resolve) => {
+      try {
+        const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+        audio.volume = Math.min(1, Math.max(0, volume));
+        audioRef.current = audio;
+        audio.onended = resolve;
+        audio.onerror = resolve;
+        audio.play().catch(resolve);
+      } catch {
+        resolve();
+      }
+    });
+  };
+
+  // Listen to all realtime events
+  useRealtimeEvent('*', useCallback((data) => {
+    if (muted || !settings?.enabled || !isAdmin) return;
+
+    // Check if this event type is enabled
+    const enabledEvents = settings?.enabled_events || [];
+    const eventType = data.type;
+    if (!enabledEvents.includes(eventType) && enabledEvents.length > 0) return;
+
+    // Extract message in configured language
+    const lang = settings?.language || 'es';
+    let text = '';
+    if (data.message && typeof data.message === 'object') {
+      text = data.message[lang] || data.message.es || data.message.en || '';
+    } else if (typeof data.message === 'string') {
+      text = data.message;
+    }
+
+    if (!text) return;
+
+    queueRef.current.push(text);
+    processQueue();
+  }, [muted, settings, isAdmin, processQueue]));
+
+  // Save settings to backend
+  const saveSettings = useCallback(async (newSettings) => {
+    setSettings(newSettings);
+    try {
+      await fetch(`${API}/api/admin/tts/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newSettings),
+      });
+    } catch {}
+  }, [token]);
+
+  const updateSetting = (key, value) => {
+    const updated = { ...settings, [key]: value };
+    saveSettings(updated);
+  };
+
+  // Only render for admins
+  if (!isAdmin || !settings) return null;
+
+  return (
+    <div className="flex items-center gap-1" data-testid="speech-notifications">
+      {/* Mute/Unmute toggle */}
+      <Button
+        variant={muted ? 'ghost' : 'ghost'}
+        size="sm"
+        className={`h-8 w-8 p-0 relative ${!muted ? 'text-primary' : 'text-muted-foreground'}`}
+        onClick={() => {
+          setMuted(!muted);
+          if (!muted && audioRef.current) {
+            audioRef.current.pause();
+            queueRef.current = [];
+            processingRef.current = false;
+            setSpeaking(false);
+          }
+        }}
+        title={muted ? 'Enable speech notifications' : 'Mute speech notifications'}
+        data-testid="tts-mute-btn"
+      >
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className={`h-4 w-4 ${speaking ? 'animate-pulse' : ''}`} />
+        )}
+        {speaking && !muted && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+          </span>
+        )}
+      </Button>
+
+      {/* Settings dropdown */}
+      <DropdownMenu open={showSettings} onOpenChange={setShowSettings}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" data-testid="tts-settings-btn">
+            <Settings2 className="h-3.5 w-3.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-72 p-3" side="bottom">
+          <DropdownMenuLabel className="text-xs font-semibold px-0">Speech Settings</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          {/* Enabled toggle */}
+          <div className="flex items-center justify-between py-2">
+            <span className="text-xs font-medium">Speech Enabled</span>
+            <Button
+              variant={settings.enabled ? 'default' : 'outline'}
+              size="sm"
+              className="h-6 text-[10px] px-2"
+              onClick={() => updateSetting('enabled', !settings.enabled)}
+              data-testid="tts-toggle-enabled"
+            >
+              {settings.enabled ? 'ON' : 'OFF'}
+            </Button>
+          </div>
+
+          {/* Language */}
+          <div className="flex items-center justify-between py-2">
+            <span className="text-xs font-medium">Language</span>
+            <Select value={settings.language} onValueChange={(v) => updateSetting('language', v)}>
+              <SelectTrigger className="h-7 w-28 text-xs" data-testid="tts-language-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map(l => (
+                  <SelectItem key={l.value} value={l.value} className="text-xs">{l.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Voice */}
+          <div className="flex items-center justify-between py-2">
+            <span className="text-xs font-medium">Voice</span>
+            <Select value={settings.voice} onValueChange={(v) => updateSetting('voice', v)}>
+              <SelectTrigger className="h-7 w-36 text-xs" data-testid="tts-voice-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {VOICES.map(v => (
+                  <SelectItem key={v.value} value={v.value} className="text-xs">{v.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Speed */}
+          <div className="py-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium">Speed</span>
+              <span className="text-[10px] text-muted-foreground">{settings.speed}x</span>
+            </div>
+            <Slider
+              value={[settings.speed]}
+              min={0.5}
+              max={2.0}
+              step={0.25}
+              onValueChange={([v]) => updateSetting('speed', v)}
+              className="w-full"
+              data-testid="tts-speed-slider"
+            />
+          </div>
+
+          {/* Volume */}
+          <div className="py-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium">Volume</span>
+              <span className="text-[10px] text-muted-foreground">{Math.round(settings.volume * 100)}%</span>
+            </div>
+            <Slider
+              value={[settings.volume]}
+              min={0.1}
+              max={1.0}
+              step={0.1}
+              onValueChange={([v]) => updateSetting('volume', v)}
+              className="w-full"
+              data-testid="tts-volume-slider"
+            />
+          </div>
+
+          <DropdownMenuSeparator />
+
+          {/* Event type toggles */}
+          <DropdownMenuLabel className="text-[10px] font-semibold px-0 text-muted-foreground uppercase tracking-wide">
+            Announce Events
+          </DropdownMenuLabel>
+          {Object.entries(EVENT_LABELS).map(([key, label]) => (
+            <DropdownMenuCheckboxItem
+              key={key}
+              checked={(settings.enabled_events || []).includes(key)}
+              onCheckedChange={(checked) => {
+                const current = settings.enabled_events || [];
+                const next = checked
+                  ? [...current, key]
+                  : current.filter(e => e !== key);
+                updateSetting('enabled_events', next);
+              }}
+              className="text-xs"
+            >
+              {label}
+            </DropdownMenuCheckboxItem>
+          ))}
+
+          {/* Test button */}
+          <DropdownMenuSeparator />
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-7 text-xs mt-1"
+            onClick={async () => {
+              const testTexts = {
+                es: 'Notificación de prueba. El sistema de voz está funcionando correctamente.',
+                en: 'Test notification. The speech system is working correctly.',
+                zh: '测试通知。语音系统运行正常。',
+              };
+              const text = testTexts[settings.language] || testTexts.es;
+              queueRef.current.push(text);
+              processQueue();
+            }}
+            data-testid="tts-test-btn"
+          >
+            {speaking ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Volume2 className="h-3 w-3 mr-1" />}
+            Test Voice
+          </Button>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
