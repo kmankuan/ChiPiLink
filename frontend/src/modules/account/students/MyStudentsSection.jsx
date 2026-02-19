@@ -449,6 +449,12 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
     loadData();
   }, [loadData]);
 
+  // Auto-refresh when admin updates access request status
+  useRealtimeEvent('access_request_approved', useCallback(() => loadData(), [loadData]));
+  useRealtimeEvent('access_request_rejected', useCallback(() => loadData(), [loadData]));
+  useRealtimeEvent('access_request_in_review', useCallback(() => loadData(), [loadData]));
+  useRealtimeEvent('access_request_info_required', useCallback(() => loadData(), [loadData]));
+
   // Form handlers
   const resetForm = () => {
     setFormData({
