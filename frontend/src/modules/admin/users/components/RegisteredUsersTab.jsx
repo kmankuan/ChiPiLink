@@ -91,6 +91,9 @@ export default function RegisteredUsersTab() {
       noUsers: 'No users found', searchPlaceholder: 'Search by name or email...',
       updated: 'User updated', never: 'Never',
       exportCsv: 'Export CSV', exported: 'Exported {count} users',
+      delete: 'Delete', deleteUser: 'Delete User',
+      deleteConfirm: 'Are you sure you want to delete this user? This action cannot be undone.',
+      deleted: 'User deleted', deleteSelf: 'Cannot delete your own account',
     },
     es: {
       title: 'Usuarios Registrados', subtitle: 'Ver y gestionar todas las cuentas de usuario',
@@ -104,6 +107,9 @@ export default function RegisteredUsersTab() {
       noUsers: 'No se encontraron usuarios', searchPlaceholder: 'Buscar por nombre o correo...',
       updated: 'Usuario actualizado', never: 'Nunca',
       exportCsv: 'Exportar CSV', exported: '{count} usuarios exportados',
+      delete: 'Eliminar', deleteUser: 'Eliminar Usuario',
+      deleteConfirm: '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
+      deleted: 'Usuario eliminado', deleteSelf: 'No puedes eliminar tu propia cuenta',
     },
     zh: {
       title: '注册用户', subtitle: '查看和管理所有用户账户',
@@ -117,6 +123,9 @@ export default function RegisteredUsersTab() {
       noUsers: '未找到用户', searchPlaceholder: '按名称或邮箱搜索...',
       updated: '用户已更新', never: '从未',
       exportCsv: '导出CSV', exported: '已导出 {count} 位用户',
+      delete: '删除', deleteUser: '删除用户',
+      deleteConfirm: '确定要删除此用户吗？此操作无法撤消。',
+      deleted: '用户已删除', deleteSelf: '无法删除自己的账户',
     },
   };
   const t = translations[lang] || translations.en;
