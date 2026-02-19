@@ -89,6 +89,7 @@ export default function RegisteredUsersTab() {
       isAdmin: 'Administrator', isActive: 'Active Account', phone: 'Phone',
       noUsers: 'No users found', searchPlaceholder: 'Search by name or email...',
       updated: 'User updated', never: 'Never',
+      exportCsv: 'Export CSV', exported: 'Exported {count} users',
     },
     es: {
       title: 'Usuarios Registrados', subtitle: 'Ver y gestionar todas las cuentas de usuario',
@@ -101,6 +102,7 @@ export default function RegisteredUsersTab() {
       isAdmin: 'Administrador', isActive: 'Cuenta Activa', phone: 'Teléfono',
       noUsers: 'No se encontraron usuarios', searchPlaceholder: 'Buscar por nombre o correo...',
       updated: 'Usuario actualizado', never: 'Nunca',
+      exportCsv: 'Exportar CSV', exported: '{count} usuarios exportados',
     },
     zh: {
       title: '注册用户', subtitle: '查看和管理所有用户账户',
@@ -113,6 +115,7 @@ export default function RegisteredUsersTab() {
       isAdmin: '管理员', isActive: '活跃账户', phone: '电话',
       noUsers: '未找到用户', searchPlaceholder: '按名称或邮箱搜索...',
       updated: '用户已更新', never: '从未',
+      exportCsv: '导出CSV', exported: '已导出 {count} 位用户',
     },
   };
   const t = translations[lang] || translations.en;
