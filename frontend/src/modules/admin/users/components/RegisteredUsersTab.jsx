@@ -516,6 +516,34 @@ export default function RegisteredUsersTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>
+        <DialogContent className="sm:max-w-sm" data-testid="delete-user-dialog">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              {t.deleteUser}
+            </DialogTitle>
+            <DialogDescription>{t.deleteConfirm}</DialogDescription>
+          </DialogHeader>
+          {deleteDialog && (
+            <div className="rounded-md bg-muted/50 p-3 text-sm">
+              <p className="font-medium">{deleteDialog.name || '—'}</p>
+              <p className="text-muted-foreground text-xs">{deleteDialog.email || '—'}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialog(null)} data-testid="delete-user-cancel">
+              {t.cancel}
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting} data-testid="delete-user-confirm">
+              {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              {t.delete}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
