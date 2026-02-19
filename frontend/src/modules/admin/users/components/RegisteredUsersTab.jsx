@@ -161,7 +161,7 @@ export default function RegisteredUsersTab() {
     return true;
   });
 
-  const { paginated: paginatedItems, page: currentPage, totalPages, setPage: setCurrentPage } = usePagination(filtered, 15);
+  const { paginated: paginatedItems, page: currentPage, totalPages, setPage: setCurrentPage, totalItems: paginationTotal, pageSize, setPageSize, canPrev, canNext } = usePagination(filtered, 15);
   const activeCount = users.filter(u => u.is_active !== false).length;
 
   const handleSaveEdit = async () => {
@@ -324,11 +324,14 @@ export default function RegisteredUsersTab() {
           </div>
 
           <TablePagination
-            currentPage={currentPage}
+            page={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
             totalItems={filtered.length}
-            itemsPerPage={15}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            canPrev={canPrev}
+            canNext={canNext}
           />
         </>
       )}
