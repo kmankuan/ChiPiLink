@@ -259,6 +259,32 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Data verified: 24 events (24h), 51 (7d), 86 (30d), 229 (90d)
 - Testing agent verified 100% pass rate
 
+### Phase 5s - Full WebSocket Real-Time Updates (Complete - Feb 2026)
+- **Backend Event Emitters** (`/app/backend/modules/realtime/events.py`):
+  - `emit_order_submitted` → notifies admin room when user places order
+  - `emit_access_request_created` → notifies admin room when user links a student
+  - `emit_access_request_updated` → notifies user AND admin room when admin approves/rejects
+  - `emit_order_status_changed` → notifies user AND admin room on order status changes
+  - `emit_user_registered` → notifies admin room on new user sign-ups
+  - `emit_wallet_transaction` → notifies user + admin (for top-ups)
+  - `emit_crm_message` → notifies recipient (admin→user or user→admin)
+  - All emit calls are non-blocking (try/except pass) so WS errors don't break business logic
+- **Backend Wiring**: Added emit calls to:
+  - `textbook_access.py` → `approve_request()`, `create_student()`
+  - `textbook_orders.py` → `submit_order_direct()`
+- **Frontend `RealtimeContext`** (`/app/frontend/src/contexts/RealtimeContext.jsx`):
+  - `RealtimeProvider` wraps entire app, establishes WS connection on auth
+  - `useRealtimeEvent(eventType, callback)` hook for components to subscribe
+  - Auto-reconnect (3s delay), ping/pong keep-alive (25s), language sync
+  - Wildcard `*` subscription for catch-all listeners
+- **Frontend Components Wired**:
+  - `ActivityFeed` → `useRealtimeEvent('*')` instant refresh on any event
+  - `StudentRequestsTab` → `useRealtimeEvent('access_request')` + `'access_request_updated'`
+  - `TextbookOrdersAdminTab` → `useRealtimeEvent('order_submitted')` + `'order_status_changed'`
+  - `MyStudentsSection` (user) → `useRealtimeEvent('access_request_approved/rejected/in_review/info_required')`
+  - `TextbookOrderPage` (user) → `useRealtimeEvent('order_status_changed')`
+- Testing agent verified 100% pass rate (15/15 backend + frontend)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
