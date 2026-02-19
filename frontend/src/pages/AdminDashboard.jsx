@@ -63,6 +63,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import SpeechNotifications from '@/modules/dashboard/SpeechNotifications';
 
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
