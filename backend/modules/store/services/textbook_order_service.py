@@ -714,6 +714,25 @@ class TextbookOrderService(BaseService):
                     {"$inc": {"inventory_quantity": -qty}}
                 )
 
+        # 8b. Update draft order to mark submitted items as 'ordered'
+        ordered_book_ids = {item["book_id"] for item in order_items}
+        now = datetime.now(timezone.utc).isoformat()
+        draft_order = await self.order_repo.get_by_student(student_id, year)
+        if draft_order:
+            draft_items = draft_order.get("items", [])
+            updated = False
+            for draft_item in draft_items:
+                if draft_item["book_id"] in ordered_book_ids and draft_item.get("status") != OrderItemStatus.ORDERED.value:
+                    draft_item["status"] = OrderItemStatus.ORDERED.value
+                    draft_item["ordered_at"] = now
+                    draft_item["quantity_ordered"] = 1
+                    updated = True
+            if updated:
+                await self.order_repo.update_order(
+                    draft_order["order_id"],
+                    {"items": draft_items}
+                )
+
         # 9. Send to Monday.com (background — don't block the user)
         import asyncio
         monday_item_id = None
