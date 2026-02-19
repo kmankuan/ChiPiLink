@@ -48,6 +48,10 @@ export default function UsersManagementModule() {
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">
+          <TabsTrigger value="registered-users" className="gap-2">
+            <Users className="h-4 w-4" />
+            {labels.users}
+          </TabsTrigger>
           <TabsTrigger value="student-requests" className="gap-2">
             <ClipboardList className="h-4 w-4" />
             {labels.requests}
