@@ -380,6 +380,7 @@ function App() {
             </InlineTranslationProvider>
           </SiteConfigProvider>
         </OneSignalProvider>
+        </RealtimeProvider>
       </AuthProvider>
     </ThemeProvider>
   );
