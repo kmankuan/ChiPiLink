@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useRealtimeEvent } from '@/contexts/RealtimeContext';
 import axios from 'axios';
 import { toast } from 'sonner';
 
