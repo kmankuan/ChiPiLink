@@ -44,7 +44,13 @@ class UserService(BaseService):
             limit=limit,
             is_admin=is_admin
         )
-        return [User(**r) for r in results]
+        users = []
+        for r in results:
+            try:
+                users.append(User(**r))
+            except Exception:
+                pass
+        return users
     
     async def update_user(
         self,

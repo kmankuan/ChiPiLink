@@ -13,8 +13,8 @@ import uuid
 
 class UserBase(BaseModel):
     """Base user model"""
-    email: EmailStr
-    name: str
+    email: Optional[str] = None
+    name: Optional[str] = ""
     phone: Optional[str] = None
     address: Optional[Any] = None  # Can be str, dict, or None
 
