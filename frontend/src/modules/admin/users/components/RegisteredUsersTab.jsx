@@ -111,7 +111,8 @@ export default function RegisteredUsersTab({ token }) {
       noUsers: '未找到用户', searchPlaceholder: '按名称或邮箱搜索...',
       updated: '用户已更新', never: '从未',
     },
-  }[lang] || {};
+  }[lang] || translations.en;
+  const t = translations[lang] || translations.en;
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
