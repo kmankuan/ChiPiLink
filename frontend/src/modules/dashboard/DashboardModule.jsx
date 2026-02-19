@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MondaySyncWidget from './MondaySyncWidget';
+import ActivityFeed from './ActivityFeed';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
