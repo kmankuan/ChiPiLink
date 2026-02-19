@@ -570,7 +570,7 @@ export default function AdminDashboard() {
                     {activeModule === 'dashboard' && t('admin.moduleDesc.dashboard', 'Welcome to ChiPi Link administration panel')}
                     {activeModule === 'unatienda' && t('admin.moduleDesc.unatienda', 'Manage catalogs, products, students and Unatienda orders')}
                     {activeModule === 'orders' && t('admin.moduleDesc.orders', 'Manage your customer orders')}
-                    {activeModule === 'customers' && t('admin.moduleDesc.users', 'Manage users, their exclusive access requests and connections')}
+                    {activeModule === 'customers' && t('admin.moduleDesc.users', 'Manage user accounts and connections')}
                     {activeModule === 'memberships' && t('admin.moduleDesc.memberships', 'Manage plans, memberships, visits and QR codes')}
                     {activeModule === 'pinpanclub' && t('admin.moduleDesc.pinpanclub', 'Table Tennis Club - Matches, players and tournaments')}
                     {activeModule === 'roles' && t('admin.moduleDesc.roles', 'Manage user roles and system permissions')}
