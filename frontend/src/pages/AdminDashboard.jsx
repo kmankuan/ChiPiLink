@@ -568,7 +568,7 @@ export default function AdminDashboard() {
                   <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
                   <p className="text-muted-foreground text-sm">
                     {activeModule === 'dashboard' && t('admin.moduleDesc.dashboard', 'Welcome to ChiPi Link administration panel')}
-                    {activeModule === 'unatienda' && t('admin.moduleDesc.unatienda', 'Manage catalogs, products, students and Unatienda orders')}
+                    {activeModule === 'unatienda' && t('admin.moduleDesc.unatienda', 'Manage catalogs, products, students, schools and Unatienda orders')}
                     {activeModule === 'orders' && t('admin.moduleDesc.orders', 'Manage your customer orders')}
                     {activeModule === 'customers' && t('admin.moduleDesc.users', 'Manage user accounts and connections')}
                     {activeModule === 'memberships' && t('admin.moduleDesc.memberships', 'Manage plans, memberships, visits and QR codes')}
