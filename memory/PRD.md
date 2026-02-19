@@ -285,6 +285,27 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - `TextbookOrderPage` (user) → `useRealtimeEvent('order_status_changed')`
 - Testing agent verified 100% pass rate (15/15 backend + frontend)
 
+### Phase 5t - AI Speech Notifications with OpenAI TTS (Complete - Feb 2026)
+- **Backend TTS Service** (`/app/backend/modules/admin/tts_service.py`):
+  - Uses `emergentintegrations.llm.openai.OpenAITextToSpeech` with EMERGENT_LLM_KEY
+  - `POST /api/admin/tts/speak` → generates base64 MP3 from text
+  - In-memory cache (MD5 key, max 50 entries) to avoid regenerating same text
+  - `GET/PUT /api/admin/tts/settings` → persistent settings in MongoDB
+- **Frontend `SpeechNotifications`** component in admin header:
+  - Mute/unmute toggle (persisted in localStorage)
+  - Settings dropdown with:
+    - Speech Enabled ON/OFF
+    - Language: ES (default) / EN / ZH
+    - Voice: 9 OpenAI voices (Nova, Coral, Alloy, Shimmer, Echo, Onyx, Fable, Sage, Ash)
+    - Speed slider: 0.5x - 2.0x
+    - Volume slider: 10% - 100%
+    - 9 event type toggles (Orders, Access Requests, Approvals, Rejections, etc.)
+    - Test Voice button
+  - Sequential audio queue (processingRef prevents overlap)
+  - Listens to WebSocket events via `useRealtimeEvent('*')`
+  - Extracts message in configured language from multilingual WS payload
+- Testing agent verified 100% pass rate (24/24 backend + frontend)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
