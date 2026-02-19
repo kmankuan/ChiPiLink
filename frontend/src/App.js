@@ -353,6 +353,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <RealtimeProvider>
         <OneSignalProvider>
           <SiteConfigProvider>
             <InlineTranslationProvider>
