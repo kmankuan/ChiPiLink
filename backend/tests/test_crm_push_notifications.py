@@ -8,7 +8,7 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://student-cleanup-tool.preview.emergentagent.com"
+    BASE_URL = "https://user-mgmt-api-1.preview.emergentagent.com"
 
 
 class TestCrmWebhookEndpoint:

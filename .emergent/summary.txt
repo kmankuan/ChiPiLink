@@ -1,73 +1,64 @@
 <analysis>**original_problem_statement:**
-The user requested a feature to clean up test data. This was initially implemented for orders and linked CRM data. The user then noted that test data in the Wallet and Users departments were not being included.
-
-In a subsequent message, the user provided a screenshot of the Access Requests tab and asked why this data was also not being cleaned. They expanded the request to include User/ Solicitudes Vinculación (Linking Requests) and Todos los Estudiantes (All Students). The user also pointed out that some UI elements were displaying in Spanish even when the application language was set to English.
-
-The agent investigated and found three key issues:
-1.  The cleanup service only identified students who had placed an order, ignoring students who only had access/enrollment requests.
-2.  The Users admin module contained hardcoded Spanish labels instead of using the internationalization (i18n) framework.
-3.  The Access Requests tab did not use the common  component, leading to an inconsistent UI.
-
-The agent was in the process of fixing all three issues when the session ended.
+The user observed that the Users module within the admin panel was incomplete. While it contained tabs for Access Requests and All Students, it was missing a fundamental feature: a tab to view and manage the registered user accounts of the application. The user highlighted this gap with a screenshot and requested that this functionality be implemented.
 
 **User's preferred language**: English
 
 **what currently exists?**
-- A full-stack application (React/FastAPI/MongoDB).
-- A Data Cleanup feature in the admin panel designed to reset test data.
-- The cleanup feature is currently incomplete: it only finds students who have placed an order, missing those who only have access/linking requests.
-- The Users section of the admin panel has UI/UX issues: hardcoded Spanish labels and an inconsistent header on the Access Requests tab.
+*   A full-stack application using React, FastAPI, and MongoDB.
+*   A Users admin module () with existing tabs for student-related requests.
+*   A complete set of backend APIs for CRUD operations on users, available at  and .
+*   A newly created but non-functional frontend tab () intended to display the user data from the aforementioned APIs.
 
 **Last working item**:
--   **Last item agent was working:** The agent was performing a multi-part fix to enhance the Data Cleanup module and resolve UI issues in the Users admin section. The plan was to:
-    1.  Modify the backend cleanup service to find *all* students, including those without orders.
-    2.  Replace hardcoded Spanish labels in the Users admin module with translation keys.
-    3.  Refactor the Access Requests tab to use the standard  for UI consistency.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. The backend change requires  or testing agent verification to ensure all students are now found. The frontend changes require  or the frontend testing agent to confirm UI consistency and correct language display.
--   **User Testing Done:** N
+*   **Last item agent was working:** The agent was actively debugging the new Registered Users tab. The tab was rendering in the UI, but the data table remained empty with a No users found message, and the header statistics were failing to load. The investigation revealed that the backend API endpoint () was failing with a Pydantic validation error due to malformed data in one of the user documents in the database (a non-string value in the  field).
+*   **Status:** BLOCKED
+*   **Agent Testing Done:** N
+*   **Which testing method agent to use?** backend testing agent. The primary fix is in the backend. The agent should first use  to confirm the API endpoint  returns a successful response after the fix. Afterward, a  can be used to verify the frontend UI populates correctly.
+*   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Incomplete Data Cleanup and UI/i18n Bugs in Users Module (P0)**
+*   **Issue 1: Pydantic Validation Error Blocks Registered Users Tab (P0)**
 
 **Issues Detail:**
--   **Issue 1:**
-    -   **Description:** The data cleanup feature is not comprehensive, as it fails to list students who have only made access/linking requests but have never placed an order. Concurrently, the Users management section suffers from UI defects, including hardcoded Spanish text and inconsistent component usage.
-    -   **Attempted fixes:** The agent identified the root causes by reviewing , , and . An initial  command was executed to start fixing the backend service logic.
-    -   **Next debug checklist:**
-        1.  Verify the backend fix in  was successful. The  method should now query the  collection directly to fetch all students, not just those linked to orders.
-        2.  Apply the frontend fix in  by replacing hardcoded Spanish strings (Solicitudes Vinculación, Todos los Estudiantes) with translation keys (e.g., ).
-        3.  Refactor  to implement the reusable  component, unifying the UI.
-        4.  Test the complete flow: confirm the Data Cleanup preview now lists all test students (with and without orders) and that the Users admin UI displays correct English labels and a consistent header.
-    -   **Why fix this issue and what will be achieved with the fix?** This will deliver a complete data reset tool as requested by the user, significantly improving the efficiency of their testing workflow. It also resolves critical UI and internationalization bugs, enhancing the overall quality of the admin panel.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on other issue:** No.
+*   **Issue 1:**
+    *   **Description:** The new Registered Users tab is non-functional because its backing API, , crashes during data serialization. Backend logs confirm a Pydantic  is thrown when processing a user document from the  collection that contains a non-string value for its  field, which violates the  model schema.
+    *   **Attempted fixes:** The agent successfully diagnosed the issue by inspecting backend logs after ruling out frontend-side problems like authentication or state management.
+    *   **Next debug checklist:**
+        1.  Examine the  Pydantic model in .
+        2.  Identify the faulty document(s) in the  MongoDB collection.
+        3.  Implement a robust fix in the backend. The recommended approach is to make the Pydantic model more resilient to data inconsistencies. For example, by modifying the  field definition or adding a custom validator to handle or coerce unexpected types. This is preferable to a one-time database correction.
+        4.  Verify the fix by calling the  endpoint and ensuring it returns a  status with the list of users.
+        5.  Confirm the frontend Registered Users tab now correctly displays the user data table.
+    *   **Why fix this issue and what will be achieved with the fix?** Resolving this blocker will complete the user's feature request, delivering a crucial user management interface for administrators.
+    *   **Status:** IN PROGRESS
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** both
+    *   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Complete Users Module Cleanup and Refactor (P0)**
-    -   **Where to resume:** The agent has already initiated the backend fix. The next step is to execute the planned changes on the frontend, starting with replacing the hardcoded Spanish labels in .
-    -   **What will be achieved with this?** A fully functional and comprehensive data cleanup tool and a consistent, properly translated Users admin section.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** both
-    -   **Blocked on something:** No.
+*   **Task 1: Implement Registered Users Tab (P0)**
+    *   **Where to resume:** Resume by fixing the Pydantic validation error in the backend. The frontend component  is already created and integrated but is blocked by this backend failure.
+    *   **What will be achieved with this?** A fully functional tab in the Users module that allows admins to view, search, and manage all registered user accounts.
+    *   **Status:** BLOCKED
+    *   **Should Test frontend/backend/both after fix?** both
+    *   **Blocked on something:** Blocked by Issue 1: Pydantic Validation Error.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   **(P1)** Abstract the progress icon system into a global resource.
-    -   **(P2)** Implement a Stop button for the full Monday.com sync operation.
--   **Future Tasks:**
-    -   **(P3)** Build an on-demand landing page redesign tool.
-    -   **(P4)** Extend Monday.com synchronization to the general product inventory.
-    -   **(P5)** Implement push notifications for student access requests.
+*   **Upcoming Tasks:**
+    *   **(P1)** Activity Feed Enhancement: Add a settings option to choose between polling and WebSockets for real-time updates.
+    *   **(P2)** Abstract the progress icon system into a global resource.
+    *   **(P3)** Implement a Stop button for the full Monday.com sync operation.
+*   **Future Tasks:**
+    *   **(P4)** Build an on-demand landing page redesign tool.
+    *   **(P5)** Extend Monday.com synchronization to the general product inventory.
+    *   **(P6)** Implement push notifications for student access requests.
 
 **Completed work in this session**
--   **Feature - Comprehensive Data Cleanup Module (DONE):** Built a backend service and frontend UI to preview and delete test data, including orders, students, CRM data, wallets, and users. Implemented safety checks to protect admin accounts.
--   **Feature - Monday.com Integration Enhancement (DONE):** Refactored the Monday.com integration to handle the one order per submission logic, add  to CRM messages for better tracking, and allow the admin chat to highlight the specific order topic.
--   **Bug Fix - Monday.com Label Mapping (DONE):** Corrected incorrect label mappings for grades and order statuses sent to the Monday.com API.
--   **Core Refactor - One Submission, One Order (DONE):** Re-architected the order submission workflow to create a new, separate order for every submission, correcting a fundamental business logic flaw. This included major changes to the backend and removing obsolete UI from the frontend.
+*   **Feature - Data Cleanup & UI Fix (DONE):** Corrected the data cleanup logic to be more comprehensive and refactored the Users admin UI to fix i18n and consistency issues.
+*   **Feature - Admin Dashboard Activity Feed (DONE):** Added a real-time activity feed to the admin dashboard with filtering and auto-refresh capabilities.
+*   **Feature - Real-Time Updates via WebSockets (DONE):** Integrated a WebSocket-based system to provide real-time data updates across the application for both admin and client users, eliminating the need for manual page refreshes.
+*   **Feature - Speech Notifications with OpenAI TTS (DONE):** Implemented an AI-powered speech notification system for admins that announces key events, complete with a detailed settings panel.
+*   **Feature - ElevenLabs TTS Integration (DONE):** Enhanced the speech notification system by adding ElevenLabs as an alternative TTS provider, allowing users to choose their preferred voice service.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -79,75 +70,73 @@ None.
 
 
 **Key Technical Concepts**
--   **Selective Data Deletion:** The  identifies interconnected test data across multiple MongoDB collections (, , , ) and deletes them, while programmatically protecting essential data like admin user accounts.
--   **Internationalization (i18n):** The current task involves fixing hardcoded text by replacing it with keys for a translation library (  function) to enable proper language switching.
--   **Component Reuse:** The task includes refactoring a UI tab to use the existing  component to enforce design consistency across the admin panel.
+*   **Pydantic Validation:** The current issue stems from a strict Pydantic model validation failing on inconsistent database data. The fix requires making the data model more robust.
+*   **API Debugging:** The root cause was identified by methodically debugging from the frontend to the backend, culminating in an analysis of server logs.
+*   **WebSockets for Real-Time:** The application now uses a publish-subscribe architecture where backend services broadcast events over WebSockets, and the frontend listens to trigger live UI updates.
+*   **Dual-Provider TTS Integration:** The application features a flexible Text-to-Speech system that abstracts away provider-specific logic (OpenAI, ElevenLabs), allowing users to switch between them seamlessly.
 
 **key DB schema**
--   ****: Contains user enrollment and access requests. The cleanup tool is being modified to scan this collection directly to find all students, not just those with orders.
--   ****: Contains user accounts, targeted for deletion by the cleanup service.
--   ****, ****: Related to user balances, also targeted for cleanup.
+*   ****: This collection contains a document with an invalid  field (not a string), which is causing the Pydantic validation error.
 
 **All files of reference**
--   **Critical for Next Task:**
-    -    (Backend logic to fix)
-    -    (UI with hardcoded labels to fix)
-    -    (UI to refactor with )
--   **For Context:**
-    -    (The main UI for the cleanup feature)
+*   **Critical for Next Task:**
+    *    (The Pydantic model to inspect and fix).
+    *    (The log file containing the exact Pydantic error trace for analysis).
+    *    (The blocked frontend component).
+*   **For Context:**
+    *    (The code where the model is applied and the error is raised).
+    *    (The parent component for the new tab).
 
 **Areas that need refactoring**:
--   : Needs i18n refactoring to remove hardcoded Spanish.
--   : Needs UI refactoring to incorporate the  component.
+None. The current priority is fixing the bug.
 
 **key api endpoints**
--   : Previews all data entities that will be deleted.
--   : Executes the deletion of the selected data.
--   : Fetches the list of all students for the cleanup UI. The service logic for this endpoint is currently being fixed.
+*   ****: **(BROKEN)** This endpoint is currently failing with a server-side Pydantic validation error, which prevents the Registered Users tab from loading data.
+*   : Generates speech audio from text using either OpenAI or ElevenLabs.
+*   : Fetches a timeline of recent application activities.
+*   : The primary endpoint for real-time WebSocket connections.
 
 **Critical Info for New Agent**
--   Your immediate priority is to complete the in-progress fix for the **Users & Data Cleanup Module**.
--   The previous agent had already analyzed the problem and started the implementation. You need to pick up where they left off.
--   **Resume the plan:**
-    1.  Ensure the backend change in  is correctly applied to find *all* students.
-    2.  Proceed with the two frontend fixes: replacing hardcoded Spanish labels in  and applying the  to .
--   After implementing all three parts, perform a full end-to-end test to verify that the cleanup tool is comprehensive and the Users UI is correct.
+*   Your immediate and only priority is to fix the **Pydantic validation error** breaking the  endpoint. This is the sole blocker for the Registered Users feature.
+*   The previous agent has already diagnosed the problem, so you can start directly with the fix.
+*   **Your Plan:**
+    1.  Examine the  model in .
+    2.  Implement a fix to make the model more tolerant of malformed data in the  field. Using a Pydantic  or adjusting the field type is the recommended approach.
+    3.  Confirm with  that the  endpoint now works correctly.
+    4.  The frontend component () should then function without needing any changes. Verify this with a screenshot.
 
 **documents and test reports created in this job**
--   
--   Test reports are available in , such as .
+*   
+*   Test reports are available in .
 
 **Last 10 User Messages and any pending HUMAN messages**
--   **User:** Asked why wallet and user test data were not included in the cleanup.
--   **Agent:** Agreed to extend the feature.
--   **User:** Provided a screenshot of Access Requests and asked why they weren't being cleaned up.
--   **User:** Pointed out that Spanish text was appearing in the UI.
--   **User:** Clarified that Solicitudes Vinculación and Todos los Estudiantes should also be part of the cleanup.
--   **Agent:** Confirmed understanding and began a thorough review of the Users module.
--   **Agent:** Identified the root causes: the cleanup service was only looking at students with orders, and the UI had hardcoded Spanish labels.
--   **Agent:** Began implementing the multi-part fix to address all identified issues.
+*   The user requested to add ElevenLabs as a TTS option. (Completed)
+*   The user then pointed out that the Users module was missing a tab to manage registered user accounts and requested it be added. (In Progress)
+*   The agent acknowledged the request and started implementation, but is currently blocked by a backend bug.
 
 **Project Health Check:**
--   **Broken:** The Data Cleanup feature is functionally incomplete as it misses a significant portion of test data. The Users admin section has UI bugs (hardcoded Spanish text and inconsistent styling).
--   **Mocked:** None.
+*   **Broken:** The Registered Users feature is non-functional due to a critical backend error on the  endpoint.
+*   **Mocked:** None.
 
 **3rd Party Integrations**
--   Monday.com API v2
--   Google Photos, Gmail (IMAP)
--   Telegram Bot API
--   OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation
--   Lottie (via  library)
--    (for fuzzy string matching)
+*   Monday.com API v2
+*   Google Photos, Gmail
+*   Telegram Bot API
+*   OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation
+*   OpenAI TTS () — uses Emergent LLM Key
+*   ElevenLabs TTS — requires User API Key
+*   Lottie ()
+*   
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (on previous features)
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** None.
+*   **Testing agent used after significant changes:** YES
+*   **Troubleshoot agent used after agent stuck in loop:** NO
+*   **Test files created:** None
+*   **Known regressions:** None
 
 **Credentials to test flow:**
--   **Email:** 
--   **Password:** 
+*   **Email:** 
+*   **Password:** 
 
 **What agent forgot to execute**
-The previous agent correctly identified all aspects of the user's latest request and was actively implementing a comprehensive solution when the session ended. No tasks were forgotten.</analysis>
+The agent correctly identified the user's request and was in the final stages of debugging the implementation when the session ended. No tasks were forgotten.</analysis>
