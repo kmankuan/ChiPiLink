@@ -13,6 +13,7 @@ import { InlineTranslationProvider } from '@/contexts/InlineTranslationContext';
 import { LayoutProvider } from '@/contexts/LayoutContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { OneSignalProvider } from '@/contexts/OneSignalContext';
+import { RealtimeProvider } from '@/contexts/RealtimeContext';
 
 // Layout
 import { Header } from '@/components/layout/Header';
