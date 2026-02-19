@@ -343,16 +343,22 @@ async def tts_speak(body: dict, admin: dict = Depends(get_admin_user)):
         raise HTTPException(status_code=400, detail="text is required")
 
     settings = await tts_service.get_settings()
+    provider = body.get("provider", settings.get("provider", "openai"))
+
     audio_b64 = await tts_service.generate_speech(
         text=text,
+        provider=provider,
         voice=body.get("voice", settings.get("voice", "nova")),
         speed=body.get("speed", settings.get("speed", 1.0)),
         model=body.get("model", settings.get("model", "tts-1")),
+        voice_id=body.get("voice_id", settings.get("elevenlabs_voice_id", "")),
+        stability=body.get("stability", settings.get("elevenlabs_stability", 0.5)),
+        similarity_boost=body.get("similarity_boost", settings.get("elevenlabs_similarity", 0.75)),
     )
     if not audio_b64:
-        raise HTTPException(status_code=500, detail="TTS generation failed")
+        raise HTTPException(status_code=500, detail="TTS generation failed. Check provider API key.")
 
-    return {"audio": audio_b64, "format": "mp3"}
+    return {"audio": audio_b64, "format": "mp3", "provider": provider}
 
 
 @router.get("/tts/settings")
@@ -367,6 +373,20 @@ async def update_tts_settings(body: dict, admin: dict = Depends(get_admin_user))
     """Update TTS notification settings."""
     from .tts_service import tts_service
     return await tts_service.update_settings(body)
+
+
+@router.get("/tts/providers")
+async def get_tts_providers(admin: dict = Depends(get_admin_user)):
+    """Get available TTS providers and their status."""
+    from .tts_service import tts_service
+    return await tts_service.get_provider_status()
+
+
+@router.get("/tts/elevenlabs/voices")
+async def get_elevenlabs_voices(admin: dict = Depends(get_admin_user)):
+    """Get available ElevenLabs voices."""
+    from .tts_service import tts_service
+    return {"voices": await tts_service.get_elevenlabs_voices()}
 
 
 
