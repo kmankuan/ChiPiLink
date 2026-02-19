@@ -63,8 +63,9 @@ function formatRelative(isoStr) {
   return formatDate(isoStr);
 }
 
-export default function RegisteredUsersTab({ token }) {
+export default function RegisteredUsersTab() {
   const { i18n } = useTranslation();
+  const { token } = useAuth();
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({ total_users: 0, admins: 0, regular_users: 0 });
   const [loading, setLoading] = useState(true);
