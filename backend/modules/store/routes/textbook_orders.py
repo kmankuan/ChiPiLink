@@ -49,6 +49,20 @@ async def submit_order_direct(
         )
         
         logger.info(f"[submit_order_direct] Order created: {result.get('order_id')}")
+
+        # Broadcast real-time event to admin
+        try:
+            from modules.realtime.events import emit_order_submitted
+            await emit_order_submitted(
+                order_id=result.get("order_id", ""),
+                student_name=result.get("student_name", ""),
+                total_amount=result.get("total_amount", 0),
+                item_count=len(items),
+                user_id=user_id,
+            )
+        except Exception:
+            pass  # Non-blocking
+
         return result
     except ValueError as e:
         logger.error(f"[submit_order_direct] ValueError: {e}")
