@@ -73,8 +73,8 @@ export default function RegisteredUsersTab({ token }) {
   const [editDialog, setEditDialog] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const lang = i18n.language || 'en';
-  const t = {
+  const lang = (i18n.language || 'en').substring(0, 2);
+  const translations = {
     en: {
       title: 'Registered Users', subtitle: 'View and manage all app user accounts',
       total: 'Total Users', admins: 'Admins', regular: 'Regular', active: 'Active',
