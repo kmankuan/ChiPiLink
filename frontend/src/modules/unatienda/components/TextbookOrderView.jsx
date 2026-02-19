@@ -309,7 +309,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
           uploaded_files: uploadedFiles,
           payment_method: "wallet"
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 30000 }
       );
 
       toast.success(te.paymentSuccess || te.orderSuccess);
