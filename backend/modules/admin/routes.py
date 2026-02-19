@@ -295,6 +295,42 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     }
 
 
+# ============== ACTIVITY FEED ==============
+
+@router.get("/activity-feed")
+async def get_activity_feed(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    event_types: Optional[str] = None,
+    limit: int = 50,
+    admin: dict = Depends(get_admin_user),
+):
+    """Get unified activity feed from multiple collections."""
+    from .activity_feed_service import activity_feed_service
+
+    types_list = event_types.split(",") if event_types else None
+    result = await activity_feed_service.get_feed(
+        date_from=date_from, date_to=date_to,
+        event_types=types_list, limit=limit,
+    )
+    return result
+
+
+@router.get("/activity-feed/settings")
+async def get_activity_feed_settings(admin: dict = Depends(get_admin_user)):
+    """Get activity feed display settings."""
+    from .activity_feed_service import activity_feed_service
+    return await activity_feed_service.get_settings()
+
+
+@router.put("/activity-feed/settings")
+async def update_activity_feed_settings(body: dict, admin: dict = Depends(get_admin_user)):
+    """Update activity feed display settings."""
+    from .activity_feed_service import activity_feed_service
+    return await activity_feed_service.update_settings(body)
+
+
+
 
 
 # ============== LANDING PAGE CONFIG ==============
