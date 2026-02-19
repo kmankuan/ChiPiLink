@@ -125,7 +125,11 @@ export default function RegisteredUsersTab() {
       });
       if (usersRes.ok) {
         const data = await usersRes.json();
-        setUsers(Array.isArray(data) ? data : []);
+        const arr = Array.isArray(data) ? data : [];
+        window.__debugUsers = { data, arr, len: arr.length };
+        setUsers(arr);
+      } else {
+        window.__debugUsers = { error: usersRes.status };
       }
     } catch (err) {
       console.error('Users fetch error:', err);
