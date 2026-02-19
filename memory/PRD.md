@@ -320,6 +320,18 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Graceful degradation**: ElevenLabs fails gracefully with error when no API key
 - Testing agent verified 100% pass rate (16/16 backend + frontend)
 
+### Phase 5v - Registered Users Tab (Complete - Feb 2026)
+- **Admin Users Module**: Added "Cuentas" (Accounts) tab to manage all registered user accounts
+- **Backend fix**: Resolved Pydantic validation error on `/api/auth-v2/users`:
+  - Changed `UserBase.email` from `EmailStr` to `Optional[str]=None` (handles null emails in DB)
+  - Changed `UserBase.name` from `str` to `Optional[str]=''` (handles missing names)
+  - Added try/except in `get_all_users` service to skip any remaining invalid documents
+- **Frontend fix**: Fixed `RegisteredUsersTab.jsx`:
+  - Corrected `usePagination` hook destructuring (paginated/page/setPage vs paginatedItems/currentPage/setCurrentPage)
+  - Fixed `TablePagination` props to match component interface
+- **Features**: User table with search, role filters (All/Admin/Regular), stats bar, edit dialog, pagination
+- Testing agent verified 100% pass rate (14/14 backend + frontend)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
