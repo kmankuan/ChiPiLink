@@ -342,6 +342,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - All gracefully degrade — order is saved even if integrations timeout
 - **Frontend fix**: Added 30s axios timeout to prevent infinite "Procesando..." spinner
 
+### Phase 5x - Module Restructuring: Users & Unatienda (Complete - Feb 2026)
+- **Problem**: Student-related tabs (Access Requests, All Students, Schools, Form Config) were split between Users and Unatienda modules, causing confusion and duplication
+- **Fix**: Consolidated all student/school/enrollment workflows into Unatienda module:
+  - **Users module** simplified: now only Accounts + Connections (pure user management)
+  - **Unatienda SCHOOL group** gained: Schools tab (was in Users)
+  - **Unatienda SETTINGS group** gained: Enrollment Form tab (was "Form Config" in Users)
+  - Removed duplicate All Students + Access Requests tabs from Users (already unified in Unatienda's StudentsTab)
+- Updated module descriptions in i18n (en/es) and dashboard header
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
