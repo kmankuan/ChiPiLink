@@ -197,6 +197,32 @@ export default function RegisteredUsersTab() {
     }
   };
 
+  const handleExportCsv = () => {
+    const rows = filtered.map(u => ({
+      Name: u.name || '',
+      Email: u.email || '',
+      Role: u.is_admin ? 'Admin' : 'User',
+      Status: u.is_active !== false ? 'Active' : 'Inactive',
+      Phone: u.phone || '',
+      Students: (u.students || []).length,
+      'Last Login': u.last_login || '',
+      Created: u.created_at || '',
+    }));
+    const headers = Object.keys(rows[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => headers.map(h => `"${String(r[h]).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users_export_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(t.exported.replace('{count}', filtered.length));
+  };
+
   return (
     <div className="space-y-3" data-testid="registered-users-tab">
       <BoardHeader
