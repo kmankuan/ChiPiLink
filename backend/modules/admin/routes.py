@@ -331,6 +331,45 @@ async def update_activity_feed_settings(body: dict, admin: dict = Depends(get_ad
 
 
 
+# ============== TTS (Text-to-Speech) NOTIFICATIONS ==============
+
+@router.post("/tts/speak")
+async def tts_speak(body: dict, admin: dict = Depends(get_admin_user)):
+    """Generate speech audio from notification text."""
+    from .tts_service import tts_service
+
+    text = body.get("text", "")
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    settings = await tts_service.get_settings()
+    audio_b64 = await tts_service.generate_speech(
+        text=text,
+        voice=body.get("voice", settings.get("voice", "nova")),
+        speed=body.get("speed", settings.get("speed", 1.0)),
+        model=body.get("model", settings.get("model", "tts-1")),
+    )
+    if not audio_b64:
+        raise HTTPException(status_code=500, detail="TTS generation failed")
+
+    return {"audio": audio_b64, "format": "mp3"}
+
+
+@router.get("/tts/settings")
+async def get_tts_settings(admin: dict = Depends(get_admin_user)):
+    """Get TTS notification settings."""
+    from .tts_service import tts_service
+    return await tts_service.get_settings()
+
+
+@router.put("/tts/settings")
+async def update_tts_settings(body: dict, admin: dict = Depends(get_admin_user)):
+    """Update TTS notification settings."""
+    from .tts_service import tts_service
+    return await tts_service.update_settings(body)
+
+
+
 
 
 # ============== LANDING PAGE CONFIG ==============
