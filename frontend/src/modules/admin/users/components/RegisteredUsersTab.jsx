@@ -115,15 +115,20 @@ export default function RegisteredUsersTab({ token }) {
   const t = translations[lang] || translations.en;
 
   const fetchUsers = useCallback(async () => {
+    if (!token) return;
     setLoading(true);
     try {
       const [usersRes, statsRes] = await Promise.all([
         fetch(`${API}/api/auth-v2/users?limit=500`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API}/api/auth-v2/users/stats`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      if (usersRes.ok) setUsers(await usersRes.json());
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        setUsers(Array.isArray(data) ? data : data.users || []);
+      }
       if (statsRes.ok) setStats(await statsRes.json());
-    } catch {
+    } catch (err) {
+      console.error('RegisteredUsersTab fetch error:', err);
       toast.error('Failed to load users');
     } finally {
       setLoading(false);
