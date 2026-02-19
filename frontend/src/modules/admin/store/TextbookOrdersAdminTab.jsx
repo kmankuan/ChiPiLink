@@ -108,6 +108,10 @@ export default function TextbookOrdersAdminTab() {
     fetchData();
   }, [filterStatus, filterGrade]);
 
+  // Auto-refresh on real-time order events
+  useRealtimeEvent('order_submitted', useCallback(() => fetchData(), []));
+  useRealtimeEvent('order_status_changed', useCallback(() => fetchData(), []));
+
   const fetchData = async () => {
     setLoading(true);
     const token = localStorage.getItem('auth_token');
