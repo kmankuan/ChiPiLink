@@ -321,6 +321,10 @@ export default function TextbookAccessAdminTab({ token }) {
     fetchRequests();
   }, [fetchRequests]);
 
+  // Auto-refresh on real-time access request events
+  useRealtimeEvent('access_request', useCallback(() => fetchRequests(), [fetchRequests]));
+  useRealtimeEvent('access_request_updated', useCallback(() => fetchRequests(), [fetchRequests]));
+
   const handleAction = async (request, action) => {
     setActionDialog({ request, action });
     setActionData({ notes: '', reason: '', selectedReasonId: '' });
