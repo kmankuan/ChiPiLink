@@ -115,6 +115,11 @@ export default function TextbookOrderPage({ embedded = false }) {
     }
   }, [selectedStudent]);
 
+  // Auto-refresh when admin updates order status
+  useRealtimeEvent('order_status_changed', useCallback(() => {
+    if (selectedStudent) fetchOrder(selectedStudent.student_id);
+  }, [selectedStudent]));
+
   const fetchOrder = async (studentId) => {
     setLoading(true);
     try {
