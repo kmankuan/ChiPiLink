@@ -306,6 +306,20 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - Extracts message in configured language from multilingual WS payload
 - Testing agent verified 100% pass rate (24/24 backend + frontend)
 
+### Phase 5u - ElevenLabs as Alternative TTS Provider (Complete - Feb 2026)
+- **Dual-provider TTS**: Provider dropdown in Speech Settings — switch between OpenAI TTS and ElevenLabs
+- **Backend**: `tts_service.py` supports both providers via `_generate_openai()` and `_generate_elevenlabs()`
+  - `GET /api/admin/tts/providers` → shows available providers (OpenAI always, ElevenLabs when key present)
+  - `GET /api/admin/tts/elevenlabs/voices` → returns ElevenLabs voices (default fallback when no key)
+  - `POST /api/admin/tts/speak` → accepts `provider` param to route to correct engine
+- **Frontend**: Conditional UI based on selected provider:
+  - OpenAI: 9 voices + speed slider
+  - ElevenLabs: voice selector + stability/similarity sliders
+  - "Add ELEVENLABS_API_KEY to enable ElevenLabs" hint when key missing
+  - ElevenLabs option disabled in dropdown when no key
+- **Graceful degradation**: ElevenLabs fails gracefully with error when no API key
+- Testing agent verified 100% pass rate (16/16 backend + frontend)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
