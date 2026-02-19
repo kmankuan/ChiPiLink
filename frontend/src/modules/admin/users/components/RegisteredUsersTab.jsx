@@ -76,6 +76,8 @@ export default function RegisteredUsersTab() {
   const [filterRole, setFilterRole] = useState('all');
   const [editDialog, setEditDialog] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const lang = (i18n.language || 'en').substring(0, 2);
   const translations = {
