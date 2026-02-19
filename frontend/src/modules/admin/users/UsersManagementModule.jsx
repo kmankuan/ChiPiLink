@@ -76,7 +76,7 @@ export default function UsersManagementModule() {
 
         {/* Registered Users */}
         <TabsContent value="registered-users" className="space-y-4">
-          <RegisteredUsersTab token={localStorage.getItem('auth_token')} />
+          <RegisteredUsersTab />
         </TabsContent>
 
         {/* Student Link Requests */}
