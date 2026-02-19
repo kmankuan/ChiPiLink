@@ -19,9 +19,13 @@ class UserBase(BaseModel):
     address: Optional[Any] = None  # Can be str, dict, or None
 
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
     """User creation model with password"""
+    email: EmailStr
+    name: str
     password: str
+    phone: Optional[str] = None
+    address: Optional[Any] = None
 
 
 class UserUpdate(BaseModel):
