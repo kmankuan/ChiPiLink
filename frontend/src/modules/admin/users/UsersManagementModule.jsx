@@ -30,6 +30,7 @@ import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 import SchoolsManagementTab from './components/SchoolsManagementTab';
 import StudentRequestsTab from './components/StudentRequestsTab';
 import AllStudentsTab from './components/AllStudentsTab';
+import RegisteredUsersTab from './components/RegisteredUsersTab';
 import { useTranslation } from 'react-i18next';
 
 export default function UsersManagementModule() {
