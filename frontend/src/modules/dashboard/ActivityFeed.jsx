@@ -165,6 +165,11 @@ export default function ActivityFeed() {
     }
   }, [token, activeDays, enabledTypes, eventTypeMeta]);
 
+  // Auto-refresh on WebSocket events
+  useRealtimeEvent('*', useCallback(() => {
+    fetchFeed(false);
+  }, [fetchFeed]));
+
   useEffect(() => { fetchFeed(); }, [fetchFeed]);
 
   // Auto-refresh
