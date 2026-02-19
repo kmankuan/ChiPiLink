@@ -80,3 +80,17 @@ async def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.delete("/{user_id}")
+async def delete_user(
+    user_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Delete user (admin). Cannot delete yourself."""
+    if user_id == admin["user_id"]:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    deleted = await user_service.delete_user(user_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"detail": "User deleted"}
