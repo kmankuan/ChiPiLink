@@ -234,6 +234,9 @@ export default function DashboardModule() {
         </Card>
       )}
 
+      {/* Activity Feed */}
+      <ActivityFeed />
+
       {/* Monday.com Sync Dashboard */}
       <MondaySyncWidget />
 
