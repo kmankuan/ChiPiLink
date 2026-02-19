@@ -749,27 +749,36 @@ class TextbookOrderService(BaseService):
             update_data["monday_item_ids"] = [monday_item_id]
         await self.order_repo.update_order(order_id, update_data)
 
-        # 11. Send notification
-        await self._notify_order_submitted(order, user_name, user_email)
+        # 11. Send notification (with timeout)
+        try:
+            await asyncio.wait_for(
+                self._notify_order_submitted(order, user_name, user_email),
+                timeout=10.0
+            )
+        except (asyncio.TimeoutError, Exception) as e:
+            logger.warning(f"[create_and_submit_order] Notification failed (non-blocking): {e}")
 
-        # 12. CRM auto-link
+        # 12. CRM auto-link (with timeout)
         try:
             from ..services.crm_chat_service import crm_chat_service
-            await crm_chat_service.link_student_on_order_submit(
-                student_id=student_id,
-                student_name=order.get("student_name", ""),
-                user_id=user_id,
-                user_email=user_email,
-                user_name=user_name,
-                order_summary={
-                    "order_id": order_id,
-                    "grade": grade,
-                    "items": order_items,
-                    "total": total_amount,
-                    "is_presale": is_presale,
-                },
+            await asyncio.wait_for(
+                crm_chat_service.link_student_on_order_submit(
+                    student_id=student_id,
+                    student_name=order.get("student_name", ""),
+                    user_id=user_id,
+                    user_email=user_email,
+                    user_name=user_name,
+                    order_summary={
+                        "order_id": order_id,
+                        "grade": grade,
+                        "items": order_items,
+                        "total": total_amount,
+                        "is_presale": is_presale,
+                    },
+                ),
+                timeout=10.0
             )
-        except Exception as crm_err:
+        except (asyncio.TimeoutError, Exception) as crm_err:
             logger.error(f"[create_and_submit_order] CRM auto-link failed (non-blocking): {crm_err}")
 
         # 13. Build response
