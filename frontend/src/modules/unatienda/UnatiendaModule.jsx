@@ -61,7 +61,7 @@ function NavTab({ id, label, icon: Icon, isActive, onClick, testId }) {
     <button
       onClick={() => onClick(id)}
       data-testid={testId || `tab-${id}`}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+      className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
         isActive
           ? 'bg-primary text-primary-foreground shadow-sm'
           : 'text-muted-foreground hover:text-foreground hover:bg-muted'
