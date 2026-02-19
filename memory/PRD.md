@@ -239,6 +239,26 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - Refresh button, clear filters, mobile-responsive filters
 - Testing agent verified 100% pass rate (backend + frontend)
 
+### Phase 5r - Activity Feed on Admin Dashboard (Complete - Feb 2026)
+- **Backend**: `GET /api/admin/activity-feed` aggregates events from 6+ collections:
+  - `store_textbook_orders` (order submissions)
+  - `store_students` enrollments (access requests, approvals, rejections)
+  - `auth_users` (new user registrations)
+  - `chipi_transactions` + `wallet_transactions` (wallet top-ups and transactions)
+  - `crm_chat_messages` (CRM topics and replies)
+  - `monday_sync_logs` (Monday.com sync events)
+- **Settings API**: `GET/PUT /api/admin/activity-feed/settings` for persistent configuration
+- **Frontend**: `ActivityFeed` component on admin dashboard with:
+  - Timeline UI grouped by date with colored dots, type icons, titles, descriptions
+  - Date range presets: Last 24h, 7d, 30d, 90d
+  - Event type filter dropdown (11 event types with checkboxes)
+  - Auto-refresh every 30s with live indicator (green pulsing dot)
+  - Pause/Play toggle for auto-refresh
+  - Summary chips showing event count breakdown by type
+  - Scrollable feed with max-height constraint
+- Data verified: 24 events (24h), 51 (7d), 86 (30d), 229 (90d)
+- Testing agent verified 100% pass rate
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
