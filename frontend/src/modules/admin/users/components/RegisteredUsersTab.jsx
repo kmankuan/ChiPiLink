@@ -120,7 +120,7 @@ export default function RegisteredUsersTab() {
     if (!token) return;
     setLoading(true);
     try {
-      const usersRes = await fetch(`${API}/api/auth-v2/users?limit=500`, {
+      const usersRes = await fetch(`${API}/api/auth-v2/users?limit=100`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (usersRes.ok) {
