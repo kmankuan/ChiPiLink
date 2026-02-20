@@ -554,6 +554,53 @@ export default function TxbInventoryTab() {
         </CardContent>
       </Card>
 
+      {/* Sync History */}
+      {syncHistory.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <History className="h-4 w-4" />
+              Sync History
+              <span className="text-[10px] text-muted-foreground ml-auto font-normal">{syncHistory.length} recent</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5 max-h-[240px] overflow-y-auto" data-testid="sync-history-panel">
+              {syncHistory.map((entry, i) => (
+                <div key={i} className="flex items-center gap-2 text-[11px] py-1.5 px-2.5 rounded-lg bg-muted/30" data-testid={`sync-history-entry-${i}`}>
+                  {entry.status === 'completed' ? (
+                    <CheckCircle className="h-3 w-3 text-green-600 shrink-0" />
+                  ) : entry.status === 'cancelled' ? (
+                    <Square className="h-3 w-3 text-amber-500 shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-3 w-3 text-red-500 shrink-0" />
+                  )}
+                  <span className="text-muted-foreground shrink-0">
+                    {new Date(entry.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}{' '}
+                    {new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className="font-medium capitalize">{entry.status}</span>
+                  {entry.total > 0 && (
+                    <span className="text-muted-foreground">
+                      {entry.processed || entry.total}/{entry.total}
+                      {entry.created > 0 && <span className="text-green-600 ml-1">+{entry.created}</span>}
+                      {entry.updated > 0 && <span className="text-blue-600 ml-1">~{entry.updated}</span>}
+                      {entry.failed > 0 && <span className="text-red-500 ml-1">!{entry.failed}</span>}
+                    </span>
+                  )}
+                  {entry.duration_s != null && (
+                    <span className="text-muted-foreground ml-auto shrink-0">{entry.duration_s}s</span>
+                  )}
+                  {entry.error && (
+                    <span className="text-red-500 truncate max-w-[200px]" title={entry.error}>{entry.error}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Bidirectional Stock Sync */}
       <Card>
         <CardHeader className="pb-3">
