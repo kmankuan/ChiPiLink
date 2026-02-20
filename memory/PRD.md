@@ -53,13 +53,17 @@ See CHANGELOG.md for full history of all phases.
 - **Full Sync Stop Button**: Converted Monday.com full sync from synchronous to background task pattern. Added `GET /full-sync/status` (polling progress), `POST /full-sync/cancel` (graceful cancellation via `_full_sync_cancel` flag). Frontend shows real-time progress bar (processed/total, created/updated/failed counts) and a red Stop button (Square icon) during sync. Dashboard widget also updated for async response.
 - Testing: 100% pass rate (15/15 tests)
 
-### Phase 7b - Sync History Log + Board Integration Verification (Complete - Feb 20, 2026)
+### Phase 7b - Sync History Log + Board Verification + Infinite Sync Fix (Complete - Feb 20, 2026)
 - **Sync History Log**: Added `_log_sync()` method to `monday_txb_inventory_adapter.py` using `txb_inventory_sync_history` MongoDB collection (max 50 entries, auto-cleanup). Each entry records: timestamp, trigger, status, created/updated/failed counts, total, processed, duration_s, error. API endpoint: `GET /api/store/monday/txb-inventory/sync-history`. Frontend `TxbInventoryTab.jsx` shows a scrollable history panel with status icons, timestamps, and duration.
+- **Infinite 2-Way Sync Loop Prevention**: Fixed critical potential bug where orders imported from Monday.com (pre-sale) could be re-synced back to Monday.com, creating duplicates. Three guards added:
+  1. `sync-all` query now excludes orders with `monday_item_ids` set (not just `monday_item_id`)
+  2. `_send_to_monday()` skips creating new Monday.com item if order already has `monday_item_ids`
+  3. Pre-sale import now sets both `monday_item_id` (singular) and `monday_item_ids` (array) for consistency
 - **Board Integration Verification**: All 3 Monday.com board integrations confirmed working:
-  - Orders Board (18397140868): Auto-sync enabled, subitems for per-book tracking, column mapping for 12 fields
-  - Textbooks Board (18397140920): Full sync with cancel support, grade groups, stock sync, 10 columns + 4 subitem columns
-  - Messages/CRM Board (5931665026): Customer chat via Updates/Replies, 32 columns including email, phone, student info
-- Testing: 100% pass rate (14/14 backend + all frontend UI elements)
+  - Orders Board (18397140868): Auto-sync enabled, 10 synced orders
+  - Textbooks Board (18397140920): Full sync with cancel support, 15/25 textbooks tracked
+  - Messages/CRM Board (5931665026): Customer chat via Updates/Replies
+- Testing: 94% backend (15/16, 1 transient), 100% frontend. Critical sync fix verified via direct MongoDB query.
 
 ## Upcoming Tasks
 None - all P1 and P2 tasks from the backlog are now complete.
