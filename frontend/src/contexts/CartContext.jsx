@@ -58,16 +58,16 @@ export function CartProvider({ children }) {
       toast.success(`${product.name} agregado al carrito`);
       return [...prev, {
         book_id: product.book_id,
-        nombre: product.name,
-        precio: product.sale_price || product.price,
+        name: product.name,
+        price: product.sale_price || product.price,
         precio_original: product.price,
         image_url: product.image_url,
-        grado: product.grade,
-        materia: product.subject,
+        grade: product.grade,
+        subject: product.subject,
         inventory_quantity: product.inventory_quantity,
         is_private_catalog: product.is_private_catalog || false,
-        editorial: product.publisher,
-        codigo: product.code,
+        publisher: product.publisher,
+        code: product.code,
         quantity
       }];
     });
