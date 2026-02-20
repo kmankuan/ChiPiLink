@@ -16,6 +16,7 @@ import PreSaleImportTab from './tabs/PreSaleImportTab';
 import MessagesTab from './tabs/MessagesTab';
 import SchoolsManagementTab from '@/modules/admin/users/components/SchoolsManagementTab';
 import FormFieldsConfigTab from '@/modules/admin/users/components/FormFieldsConfigTab';
+import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
