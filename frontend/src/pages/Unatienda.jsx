@@ -354,7 +354,10 @@ export default function Unatienda() {
               setActiveView('textbook-order');
             }}
             onLinkStudent={() => navigate('/my-account?tab=students')}
-            onBack={() => setActiveView('public')}
+            onBack={() => {
+              setActiveView('public');
+              setShowLandingView(true);
+            }}
           />
         ) : activeView === 'textbook-order' && selectedStudent ? (
           <TextbookOrderView
