@@ -358,6 +358,21 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Data fix**: Ran one-time script to sync all existing draft orders with their submitted counterparts (fixed 1 draft, marked 4 items as ordered)
 - **Result**: Ordered items now show as "Comprado · Solicitar Reorden" with green checkmarks, unordered items remain selectable
 
+### Phase 5z - Tab Renaming & Store Checkout Dynamic Forms (Complete - Feb 2026)
+- **Tab renaming**: Clarified form config tabs in Unatienda → Settings:
+  - "Order Form" → "Textbook Order Form"
+  - "Enrollment Form" → "Student Link Form"
+  - Added new "Store Checkout Form" tab
+- **Store Checkout Form**: Full CRUD admin config for public store checkout fields
+  - Backend: `/api/store/checkout-form-config/...` endpoints (extends OrderFormConfigService)
+  - Frontend: `StoreCheckoutFormConfigTab` (thin wrapper reusing OrderFormConfigTab with configApiPath prop)
+  - Default fields: Full Name, Email, Phone, Delivery Address
+- **Public Store Checkout**: `UnatiendaCheckout.jsx` now loads dynamic fields from API instead of hardcoded inputs
+  - Supports: text, email, phone, textarea, select, checkbox, date, number, file field types
+  - Falls back to hardcoded fields if API fails
+- **Cart bug fix** (by testing agent): Fixed Spanish/English key mismatch in CartContext causing `toFixed` error
+- Testing agent verified 100% pass rate (11/11 backend + all frontend features)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
