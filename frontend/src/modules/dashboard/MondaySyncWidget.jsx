@@ -225,15 +225,49 @@ export default function MondaySyncWidget() {
 
       if (res.ok) {
         const result = await res.json();
-        toast.success(`Sync complete: ${JSON.stringify(result).slice(0, 100)}`);
-        fetchDashboard();
+        if (result.status === 'started' || result.status === 'already_running') {
+          toast.info('Sync started in background');
+          // Poll for completion for txb_inventory
+          if (boardId === 'txb_inventory') {
+            const poll = async () => {
+              try {
+                const sr = await fetch(`${API}/api/store/monday/txb-inventory/full-sync/status`, {
+                  headers: { Authorization: `Bearer ${getToken()}` },
+                });
+                if (!sr.ok) { setSyncing(null); return; }
+                const status = await sr.json();
+                if (status.status === 'completed') {
+                  toast.success(`Sync complete: Created ${status.created}, Updated ${status.updated}`);
+                  setSyncing(null);
+                  fetchDashboard();
+                } else if (status.status === 'cancelled' || status.status === 'error') {
+                  toast.info(status.status === 'cancelled' ? 'Sync was cancelled' : `Sync error: ${status.error}`);
+                  setSyncing(null);
+                  fetchDashboard();
+                } else {
+                  setTimeout(poll, 2000);
+                }
+              } catch {
+                setSyncing(null);
+              }
+            };
+            setTimeout(poll, 2000);
+          } else {
+            setSyncing(null);
+            fetchDashboard();
+          }
+        } else {
+          toast.success(`Sync complete: ${JSON.stringify(result).slice(0, 100)}`);
+          setSyncing(null);
+          fetchDashboard();
+        }
       } else {
         const err = await res.json().catch(() => ({}));
         toast.error(err.detail || 'Sync failed');
+        setSyncing(null);
       }
     } catch (e) {
       toast.error('Sync request failed');
-    } finally {
       setSyncing(null);
     }
   };
