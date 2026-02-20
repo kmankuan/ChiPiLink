@@ -682,9 +682,22 @@ async def bulk_archive_orders(data: dict, admin: dict = Depends(get_admin_user))
     order_ids = data.get("order_ids", [])
     if not order_ids:
         raise HTTPException(status_code=400, detail="No orders specified")
-    r = await db.textbook_orders.update_many(
+    r = await db.store_textbook_orders.update_many(
         {"order_id": {"$in": order_ids}},
         {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/bulk-delete")
+async def bulk_delete_orders(data: dict, admin: dict = Depends(get_admin_user)):
+    """Permanently delete orders from database"""
+    from core.database import db
+    order_ids = data.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="No orders specified")
+    r = await db.store_textbook_orders.delete_many(
+        {"order_id": {"$in": order_ids}}
+    )
+    return {"status": "deleted", "count": r.deleted_count}
 
