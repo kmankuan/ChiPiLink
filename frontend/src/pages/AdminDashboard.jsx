@@ -85,6 +85,14 @@ const CommunityFeedModule = lazy(() => import('@/modules/community/CommunityFeed
 const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
 const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModule'));
 
+// School Textbooks modules
+const TextbookCatalogModule = lazy(() => import('@/modules/school-textbooks/TextbookCatalogModule'));
+const StudentsSchoolsModule = lazy(() => import('@/modules/school-textbooks/StudentsSchoolsModule'));
+const PreSaleImportTab = lazy(() => import('@/modules/unatienda/tabs/PreSaleImportTab'));
+const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/MondayTextbookSyncModule'));
+const TextbookFormSettingsModule = lazy(() => import('@/modules/school-textbooks/TextbookFormSettingsModule'));
+const MessagesTab = lazy(() => import('@/modules/unatienda/tabs/MessagesTab'));
+
 // Administration sub-modules (previously nested inside AdminModule)
 const SiteConfigModule = lazy(() => import('@/modules/admin/SiteConfigModule'));
 const AuthMethodsConfig = lazy(() => import('@/modules/admin/AuthMethodsConfig'));
