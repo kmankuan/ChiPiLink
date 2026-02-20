@@ -42,6 +42,16 @@ See CHANGELOG.md for full history of all phases.
 - **Impact**: Prevents duplicate orders caused by multiple clicks on the submit button during loading.
 - Testing: 100% pass rate (15/15 tests)
 
+### Phase 6d - Admin Sidebar Reorganization (Complete - Feb 20, 2026)
+- **New "School Textbooks" sidebar group**: Textbook Catalog, Students & Schools, Pre-Sale Import, Monday.com Sync, Form Settings
+- **Messages moved to Commerce**: Same level as Orders — both serve textbook and public store workflows
+- **Wallet Sync moved to Wallet module**: WalletMondayTab added as a tab inside WalletModule
+- **Monday.com slimmed**: Removed textbook-specific + wallet tabs. Keeps only: Workspaces, Webhooks, General, Public Widget
+- **UnatiendaModule slimmed to retail-only**: Inventory, Public Store, Stock Movements, Store Checkout Form, Config, Demo Data
+- **i18n translations added**: All 3 languages (en/es/zh) for new nav items
+- **Bug fix**: BookOrdersMondayTab `allBoards` prop crash fixed (testing agent)
+- Testing: 100% pass rate (12/12 tests)
+
 ## Upcoming Tasks
 - **(P1)** Abstract the progress icon system into a global resource
 - **(P2)** Implement a "Stop" button for the full Monday.com sync operation
