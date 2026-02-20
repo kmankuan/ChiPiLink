@@ -290,6 +290,19 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
 
     setSubmitting(true);
     try {
+      // Refresh wallet balance before submitting to avoid stale data
+      try {
+        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+        const freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+        setWalletBalance(freshBalance);
+        const total = textbooks.filter(b => selectedBooks[b.book_id]).reduce((sum, b) => sum + (b.price || 0), 0);
+        if (freshBalance < total) {
+          toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
+          setSubmitting(false);
+          return;
+        }
+      } catch {}
+
       const orderItems = selectedBookIds.map(bookId => {
         const book = textbooks.find(b => b.book_id === bookId);
         return {
@@ -326,6 +339,8 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
     } catch (error) {
       console.error('Error submitting order:', error);
       toast.error(error.response?.data?.detail || te.orderError);
+      // Refresh wallet balance on error (it may have been charged)
+      fetchWalletBalance();
     } finally {
       setSubmitting(false);
     }
