@@ -716,6 +716,8 @@ class TextbookOrderService(BaseService):
                     )
         except Exception as stock_err:
             logger.error(f"[create_and_submit_order] Stock deduction failed (non-blocking): {stock_err}")
+            if wallet_transaction:
+                await self._notify_admin_post_order_failure(order_id, user_name, student.get("full_name", ""), total_amount, "stock_deduction", str(stock_err))
 
         # 8b. Update draft order to mark submitted items as 'ordered'
         try:
