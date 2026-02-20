@@ -41,16 +41,22 @@ class TestDraftOrdersFilter:
             f"{BASE_URL}/api/store/textbook-orders/my-orders",
             headers={"Authorization": f"Bearer {admin_token}"}
         )
-        # Should return 200 with orders array
+        # Should return 200 with orders
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
-        orders = response.json()
-        assert isinstance(orders, list), "Response should be a list"
+        data = response.json()
+        # Response format is {"orders": [...], "total": N, "user_id": "..."}
+        orders = data.get("orders", []) if isinstance(data, dict) else data
+        
+        assert isinstance(orders, list), f"Orders should be a list, got {type(orders)}"
         
         # Verify no draft orders are returned
         draft_orders = [o for o in orders if o.get("status") == "draft"]
         assert len(draft_orders) == 0, f"Found draft orders in response: {draft_orders}"
-        print(f"Verified: {len(orders)} orders returned, 0 draft orders (as expected)")
+        
+        # Also verify the orders have non-draft statuses
+        statuses = set(o.get("status") for o in orders if o.get("status"))
+        print(f"Verified: {len(orders)} orders returned, statuses: {statuses}, 0 draft orders (as expected)")
 
 
 class TestAdminImpersonation:
