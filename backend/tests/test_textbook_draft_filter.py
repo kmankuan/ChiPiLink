@@ -15,12 +15,12 @@ class TestTextbookDraftFiltering:
     @pytest.fixture(scope="class")
     def admin_token(self):
         """Get admin authentication token"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
             "password": "admin"
         })
         if response.status_code == 200:
-            return response.json().get("access_token")
+            return response.json().get("token")
         pytest.skip("Admin authentication failed")
     
     def test_api_health(self):
