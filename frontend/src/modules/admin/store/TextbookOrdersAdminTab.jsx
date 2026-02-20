@@ -726,9 +726,10 @@ export default function TextbookOrdersAdminTab() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Action Bar — Archive only (orders are financial records) */}
+      {/* Bulk Action Bar — Archive + Delete */}
       <BulkActionBar count={orderSelection.count} onClear={orderSelection.clear}
         onArchive={() => setConfirmArchive(true)}
+        onDelete={() => setConfirmDelete(true)}
         loading={bulkLoading} />
 
       <ConfirmDialog
@@ -739,6 +740,17 @@ export default function TextbookOrdersAdminTab() {
         description="Archived orders are hidden from view but preserved for records. This can be reversed."
         variant="warning"
         confirmLabel="Archive"
+        loading={bulkLoading}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleBulkDeleteOrders}
+        title={`Permanently delete ${orderSelection.count} order(s)?`}
+        description="This will permanently remove the selected orders from the database. This action CANNOT be undone."
+        variant="destructive"
+        confirmLabel="Delete Forever"
         loading={bulkLoading}
       />
 
