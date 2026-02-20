@@ -843,6 +843,28 @@ class TextbookOrderService(BaseService):
         except Exception as refund_error:
             logger.error(f"[_refund_wallet] CRITICAL: Refund failed: {refund_error}")
 
+
+    async def _notify_admin_post_order_failure(self, order_id: str, user_name: str, student_name: str, amount: float, step: str, error_msg: str):
+        """Notify admin when wallet was charged but a post-order step failed"""
+        try:
+            notification = {
+                "type": "order_post_step_failure",
+                "title": "Alerta: Paso post-orden falló (billetera cobrada)",
+                "message": f"Orden {order_id}: billetera cobrada ${amount:.2f} para {student_name} ({user_name}), pero paso '{step}' falló: {error_msg}",
+                "data": {
+                    "order_id": order_id,
+                    "step_failed": step,
+                    "amount_charged": amount,
+                    "error": error_msg
+                },
+                "severity": "warning",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.notifications.insert_one(notification)
+            logger.warning(f"[_notify_admin_post_order_failure] Admin notified: order {order_id}, step {step} failed after wallet charge")
+        except Exception as e:
+            logger.error(f"[_notify_admin_post_order_failure] Failed to create notification: {e}")
+
     async def _send_to_monday(
         self,
         order: Dict,
