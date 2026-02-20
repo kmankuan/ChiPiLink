@@ -613,11 +613,6 @@ export default function MondayModule() {
           </Card>
         </TabsContent>
 
-        {/* ========== TAB: BOOKS ========== */}
-        <TabsContent value="textbooks" className="mt-6">
-          <BookOrdersMondayTab connected={connected} boards={boards} />
-        </TabsContent>
-
         {/* ========== TAB: GENERAL ========== */}
         <TabsContent value="general" className="space-y-6 mt-6">
           {/* Status Cards */}
@@ -790,29 +785,9 @@ export default function MondayModule() {
           </div>
         </TabsContent>
 
-        {/* ========== TAB: TXB INVENTORY ========== */}
-        <TabsContent value="txb-inventory" className="mt-6">
-          <TxbInventoryTab />
-        </TabsContent>
-
         {/* ========== TAB: WEBHOOKS ========== */}
         <TabsContent value="webhooks" className="mt-6">
           <WebhooksTab />
-        </TabsContent>
-
-        {/* ========== TAB: WALLET ========== */}
-        <TabsContent value="wallet" className="mt-6">
-          <WalletMondayTab />
-        </TabsContent>
-
-        {/* ========== TAB: SYNC DASHBOARD ========== */}
-        <TabsContent value="sync-dashboard" className="mt-6">
-          <WalletSyncDashboard />
-        </TabsContent>
-
-        {/* ========== TAB: STATUS MAPPING ========== */}
-        <TabsContent value="status-mapping" className="mt-6">
-          <StatusMappingTab />
         </TabsContent>
 
         {/* ========== TAB: PUBLIC WIDGET ========== */}
