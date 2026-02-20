@@ -29,6 +29,10 @@ TXB_INVENTORY_KEY = "store.textbook_orders.txb_inventory"
 # In-memory tracking for background column sync tasks
 _column_sync_tasks: Dict[str, asyncio.Task] = {}
 
+# In-memory tracking for full sync background task and cancellation
+_full_sync_task: Optional[asyncio.Task] = None
+_full_sync_cancel = False
+
 
 class TxbInventoryAdapter(BaseMondayAdapter):
     """Adapter for textbook inventory board — bidirectional sync with Monday.com"""
