@@ -314,21 +314,6 @@ async def startup_event():
         start_gmail(),
         start_banner_sync(),
     )
-        # Re-register local webhook handler if previously configured
-        await monday_banner_adapter.ensure_local_handler()
-
-        sync_config = await monday_banner_adapter.get_config()
-        auto_sync = sync_config.get("auto_sync", {})
-        if auto_sync.get("enabled") and sync_config.get("enabled") and sync_config.get("board_id"):
-            interval = auto_sync.get("interval_minutes", 10)
-            banner_sync_scheduler.start(interval)
-            logger.info(f"Monday banner auto-sync started (every {interval} min)")
-        else:
-            banner_sync_scheduler.start(10)
-            banner_sync_scheduler.pause()
-            logger.info("Monday banner auto-sync initialized (paused — not enabled)")
-    except Exception as e:
-        logger.warning(f"Could not initialize banner auto-sync: {e}")
 
     logger.info("All modules loaded successfully")
 
