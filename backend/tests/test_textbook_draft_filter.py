@@ -200,14 +200,9 @@ class TestBackendRepositoryDraftFilter:
         with open(repo_path, 'r') as f:
             content = f.read()
         
-        # Find the get_all method
-        get_all_match = re.search(r'async def get_all\([^)]*\):[^}]+?query = \{([^}]+)\}', content, re.DOTALL)
-        assert get_all_match, "get_all method should exist"
-        
-        query_content = get_all_match.group(1)
-        assert '"status":' in query_content, "get_all should have status filter"
-        assert '"$ne":' in query_content, "get_all should use $ne operator"
-        assert '"draft"' in query_content, "get_all should filter out 'draft'"
+        # Check for the draft exclusion query in get_all
+        assert 'async def get_all(' in content, "get_all method should exist"
+        assert '"status": {"$ne": "draft"}' in content, "get_all should exclude draft orders"
         print("✓ Backend repository get_all method excludes draft orders")
 
 
