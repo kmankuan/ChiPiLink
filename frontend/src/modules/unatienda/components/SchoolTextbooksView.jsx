@@ -267,7 +267,7 @@ export default function SchoolTextbooksView({
   const [studentOrders, setStudentOrders] = useState({}); // { studentId: orderData }
   const [studentLoading, setStudentLoading] = useState({}); // { studentId: boolean }
   const [selectedBooks, setSelectedBooks] = useState({}); // { studentId: { bookId: bool } }
-  const [submitting, setSubmitting] = useState(false);
+  const [executeSubmit, submitting] = useGuardedAction();
   const [reorderItem, setReorderItem] = useState(null);
   const [reorderReason, setReorderReason] = useState('');
   const [requestingReorder, setRequestingReorder] = useState(false);
