@@ -33,8 +33,14 @@ See CHANGELOG.md for full history of all phases.
 ### Phase 6b - Archive Fix + Delete Orders + Admin Alert (Complete - Feb 20, 2026)
 - **Archive Bug Fix**: `bulk-archive` endpoint was writing to `db.textbook_orders` (wrong collection) instead of `db.store_textbook_orders`. Archiving now works correctly.
 - **Delete Orders**: New `POST /api/store/textbook-orders/admin/bulk-delete` endpoint permanently removes orders from database. Frontend adds a red "Delete" button next to "Archive" in the bulk action bar, with a destructive confirmation dialog.
-- **Admin Alert on Post-Order Failure**: New `_notify_admin_post_order_failure` method creates a notification in the `notifications` collection when wallet is charged but a subsequent step (stock deduction or draft update) fails. This helps admin proactively detect edge cases.
+- **Admin Alert on Post-Order Failure**: New `_notify_admin_post_order_failure` method creates a notification in the `notifications` collection when wallet is charged but a subsequent step (stock deduction or draft update) fails.
 - Testing: 100% pass rate (17/17 tests)
+
+### Phase 6c - Draft Filter + Double-Submit Prevention (Complete - Feb 20, 2026)
+- **Draft Orders Hidden from Admin**: `get_all` repository query now includes `{"status": {"$ne": "draft"}}` — draft orders (internal tracking) no longer clutter the admin Textbook Orders tab. Reduced from 30 to 25 visible orders.
+- **useGuardedAction Hook**: New reusable hook at `/app/frontend/src/hooks/useGuardedAction.js` — uses a `useRef` guard to immediately block re-entry before React state updates. Returns `[execute, isRunning]`. Applied to both `SchoolTextbooksView` and `TextbookOrderView` order submission flows.
+- **Impact**: Prevents duplicate orders caused by multiple clicks on the submit button during loading.
+- Testing: 100% pass rate (15/15 tests)
 
 ## Upcoming Tasks
 - **(P1)** Abstract the progress icon system into a global resource
