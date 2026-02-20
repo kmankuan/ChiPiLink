@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  ChevronLeft, GraduationCap, Home, Loader2, Search, Store
+  ChevronLeft, GraduationCap, Home, Loader2, Lock, Search, Store
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import SchoolTextbooksView from '@/modules/unatienda/components/SchoolTextbooksView';
