@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import BookOrdersMondayTab from './components/BookOrdersMondayTab';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,20 +47,12 @@ import {
   Plus,
   Trash2,
   Key,
-  BookOpen,
   LayoutGrid,
   Plug,
-  Layers,
-  Wallet,
-  Activity,
   Eye
 } from 'lucide-react';
 
-import TxbInventoryTab from './components/TxbInventoryTab';
 import WebhooksTab from './components/WebhooksTab';
-import StatusMappingTab from './components/StatusMappingTab';
-import WalletMondayTab from './components/WalletMondayTab';
-import WalletSyncDashboard from './components/WalletSyncDashboard';
 import PublicBoardWidgetTab from './components/PublicBoardWidgetTab';
 import { useTranslation } from 'react-i18next';
 
