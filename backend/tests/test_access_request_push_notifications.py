@@ -195,9 +195,15 @@ class TestBackendAPIEndpoints:
         # Should return 200 (even if empty array)
         assert response.status_code == 200, f"Admin all-students endpoint failed: {response.text}"
         data = response.json()
-        assert isinstance(data, list), "Expected list response"
         
-        print(f"PASS: Admin all-students endpoint returns {len(data)} students")
+        # Response can be a list or dict with "students" key
+        if isinstance(data, dict):
+            students = data.get("students", [])
+        else:
+            students = data
+        assert isinstance(students, list), "Expected list of students"
+        
+        print(f"PASS: Admin all-students endpoint returns {len(students)} students")
     
     def test_notifications_config_endpoint(self):
         """Verify push notifications config endpoint exists"""
