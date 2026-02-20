@@ -251,6 +251,28 @@ export default function TextbookOrdersAdminTab() {
     finally { setBulkLoading(false); }
   };
 
+  const handleBulkDeleteOrders = async () => {
+    setBulkLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/store/textbook-orders/admin/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order_ids: Array.from(orderSelection.selected) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`${data.count} order(s) permanently deleted`);
+      } else {
+        toast.error('Delete failed');
+      }
+      orderSelection.clear();
+      setConfirmDelete(false);
+      fetchData();
+    } catch { toast.error('Delete failed'); }
+    finally { setBulkLoading(false); }
+  };
+
   // Get unique grades from orders
   const grades = [...new Set(orders.map(o => o.grade).filter(Boolean))].sort();
 
