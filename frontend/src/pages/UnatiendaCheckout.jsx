@@ -125,18 +125,38 @@ function DynamicFormField({ field, value, onChange, lang }) {
 }
 
 export default function UnatiendaCheckout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { items, subtotal, updateQuantity, removeItem, clearCart } = useCart();
   
   const [loading, setLoading] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [orderId, setOrderId] = useState(null);
-  const [customerInfo, setCustomerInfo] = useState({
-    nombre: '',
-    email: '',
-    telefono: ''
-  });
+  const [formFields, setFormFields] = useState([]);
+  const [formData, setFormData] = useState({});
+
+  const lang = (i18n.language || 'es').substring(0, 2);
+
+  // Load dynamic form fields
+  useEffect(() => {
+    const fetchFields = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/store/checkout-form-config/fields`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+        });
+        const fields = res.data?.fields || [];
+        setFormFields(fields.sort((a, b) => a.order - b.order));
+      } catch {
+        // Fallback: use hardcoded fields if API fails
+        setFormFields([
+          { field_id: 'nombre', field_type: 'text', label: 'Full Name', label_es: 'Nombre Completo', placeholder_es: 'Tu nombre', required: true, order: 0 },
+          { field_id: 'email', field_type: 'email', label: 'Email', label_es: 'Correo Electrónico', placeholder_es: 'tu@email.com', required: true, order: 1 },
+          { field_id: 'telefono', field_type: 'phone', label: 'Phone', label_es: 'Teléfono', placeholder_es: '+507 6000-0000', required: false, order: 2 },
+        ]);
+      }
+    };
+    fetchFields();
+  }, []);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -145,18 +165,24 @@ export default function UnatiendaCheckout() {
     }
   }, [items, orderId, navigate]);
 
-  const handleInputChange = (field, value) => {
-    setCustomerInfo(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (fieldId, value) => {
+    setFormData(prev => ({ ...prev, [fieldId]: value }));
   };
 
   const validateForm = () => {
-    if (!customerInfo.nombre.trim()) {
-      toast.error('Por favor ingresa tu nombre');
-      return false;
-    }
-    if (!customerInfo.email.trim() || !customerInfo.email.includes('@')) {
-      toast.error('Por favor ingresa un email válido');
-      return false;
+    for (const field of formFields) {
+      if (field.required) {
+        const val = formData[field.field_id];
+        if (!val || (typeof val === 'string' && !val.trim())) {
+          const label = field[`label_${lang}`] || field.label;
+          toast.error(`${label} es requerido`);
+          return false;
+        }
+        if (field.field_type === 'email' && !String(val).includes('@')) {
+          toast.error('Por favor ingresa un email válido');
+          return false;
+        }
+      }
     }
     return true;
   };
@@ -166,7 +192,6 @@ export default function UnatiendaCheckout() {
     
     setCreatingOrder(true);
     try {
-      // Create order in backend
       const orderData = {
         items: items.map(item => ({
           book_id: item.book_id,
@@ -174,9 +199,10 @@ export default function UnatiendaCheckout() {
           cantidad: item.quantity,
           precio_unitario: item.price
         })),
-        cliente_nombre: customerInfo.nombre,
-        cliente_email: customerInfo.email,
-        cliente_telefono: customerInfo.telefono,
+        cliente_nombre: formData.nombre || formData[formFields.find(f => f.field_type === 'text')?.field_id] || '',
+        cliente_email: formData.email || formData[formFields.find(f => f.field_type === 'email')?.field_id] || '',
+        cliente_telefono: formData.telefono || formData[formFields.find(f => f.field_type === 'phone')?.field_id] || '',
+        form_data: formData,
         subtotal: subtotal,
         total: subtotal,
         tipo: 'unatienda'
