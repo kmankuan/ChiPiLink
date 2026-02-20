@@ -150,24 +150,70 @@ export default function TxbInventoryTab() {
     }
   };
 
+  const [syncProgress, setSyncProgress] = useState(null);
+
   const handleFullSync = async () => {
     setSyncing(true);
+    setSyncProgress(null);
     try {
       const res = await fetch(`${API}/api/store/monday/txb-inventory/full-sync`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok) {
-        toast.success(`Synced! Created: ${data.created}, Updated: ${data.updated}, Failed: ${data.failed}`);
-        fetchConfig();
-      } else {
+      if (!res.ok) {
         toast.error(data.detail || 'Sync failed');
+        setSyncing(false);
+        return;
       }
+      if (data.status === 'already_running') {
+        toast.info('Full sync is already running');
+      } else {
+        toast.info('Full sync started...');
+      }
+      // Start polling
+      const poll = async () => {
+        try {
+          const sr = await fetch(`${API}/api/store/monday/txb-inventory/full-sync/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!sr.ok) { setSyncing(false); return; }
+          const status = await sr.json();
+          setSyncProgress(status);
+          if (status.status === 'completed') {
+            toast.success(`Synced! Created: ${status.created}, Updated: ${status.updated}, Failed: ${status.failed}`);
+            setSyncing(false);
+            fetchConfig();
+          } else if (status.status === 'cancelled') {
+            toast.info(`Sync stopped. Processed ${status.processed}/${status.total} (Created: ${status.created}, Updated: ${status.updated})`);
+            setSyncing(false);
+            fetchConfig();
+          } else if (status.status === 'error') {
+            toast.error(`Sync failed: ${status.error || 'Unknown error'}`);
+            setSyncing(false);
+          } else {
+            setTimeout(poll, 1500);
+          }
+        } catch {
+          setSyncing(false);
+        }
+      };
+      setTimeout(poll, 1500);
     } catch {
       toast.error('Network error during sync');
-    } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleCancelSync = async () => {
+    try {
+      await fetch(`${API}/api/store/monday/txb-inventory/full-sync/cancel`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.info('Cancelling sync...');
+    } catch {
+      toast.error('Failed to cancel sync');
     }
   };
 
