@@ -355,11 +355,12 @@ export default function Unatienda() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setActiveView('textbooks')}
-                      className="rounded-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400"
+                      onClick={() => { setActiveView('textbooks'); setShowLandingView(false); }}
+                      className="rounded-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400 gap-1.5"
                       data-testid="textbooks-category-btn"
                     >
-                      <GraduationCap className="h-4 w-4 mr-1.5" />
+                      <Lock className="h-3 w-3" />
+                      <GraduationCap className="h-4 w-4" />
                       {storeConfig?.textbooks_category_label?.[i18n?.language] || 'School Textbooks'}
                     </Button>
                   )}
