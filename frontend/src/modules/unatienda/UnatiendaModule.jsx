@@ -162,7 +162,8 @@ export default function UnatiendaModule() {
         {activeTab === 'schools' && <SchoolsManagementTab token={token} />}
         {activeTab === 'school-year' && <SchoolYearTab token={token} />}
         {activeTab === 'form-config' && <OrderFormConfigTab />}
-        {activeTab === 'enrollment-form' && <FormFieldsConfigTab token={token} />}
+        {activeTab === 'student-link-form' && <FormFieldsConfigTab token={token} />}
+        {activeTab === 'store-checkout-form' && <StoreCheckoutFormConfigTab token={token} />}
         {activeTab === 'configuration' && <ConfigurationTab token={token} />}
         {activeTab === 'demo' && <DemoDataTab token={token} onRefresh={fetchStats} />}
       </div>
