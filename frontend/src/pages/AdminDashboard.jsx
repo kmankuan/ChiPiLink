@@ -133,9 +133,20 @@ const navGroups = [
     items: [
       { id: 'unatienda', labelKey: 'nav.unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
       { id: 'orders', labelKey: 'nav.orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+      { id: 'messages', labelKey: 'nav.messages', fallbackLabel: 'Messages', icon: MessageSquare, permission: 'unatienda.access' },
       { id: 'wallet', labelKey: 'nav.wallet', icon: Wallet, permission: 'admin.site_config' },
       { id: 'payment-alerts', labelKey: 'nav.paymentAlerts', icon: BellRing, permission: 'admin.site_config', adminOnly: true },
       { id: 'analytics', labelKey: 'nav.reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
+    ],
+  },
+  {
+    group: 'School Textbooks',
+    items: [
+      { id: 'textbook-catalog', labelKey: 'nav.textbookCatalog', fallbackLabel: 'Textbook Catalog', icon: BookOpen, permission: 'unatienda.access' },
+      { id: 'students-schools', labelKey: 'nav.studentsSchools', fallbackLabel: 'Students & Schools', icon: GraduationCap, permission: 'unatienda.access' },
+      { id: 'presale-import', labelKey: 'nav.presaleImport', fallbackLabel: 'Pre-Sale Import', icon: Upload, permission: 'unatienda.access' },
+      { id: 'monday-textbook-sync', labelKey: 'nav.mondayTextbookSync', fallbackLabel: 'Monday.com Sync', icon: RefreshCw, permission: 'unatienda.access' },
+      { id: 'textbook-form-settings', labelKey: 'nav.textbookFormSettings', fallbackLabel: 'Form Settings', icon: ClipboardList, permission: 'unatienda.access' },
     ],
   },
   {
