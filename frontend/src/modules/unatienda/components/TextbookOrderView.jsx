@@ -284,12 +284,11 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
     setShowSummary(true);
   };
 
-  const handleConfirmSubmitOrder = async () => {
+  const handleConfirmSubmitOrder = () => executeSubmit(async () => {
     const selectedBookIds = Object.entries(selectedBooks)
       .filter(([_, selected]) => selected)
       .map(([bookId]) => bookId);
 
-    setSubmitting(true);
     try {
       // Refresh wallet balance before submitting to avoid stale data
       try {
@@ -299,7 +298,6 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
         const total = textbooks.filter(b => selectedBooks[b.book_id]).reduce((sum, b) => sum + (b.price || 0), 0);
         if (freshBalance < total) {
           toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
-          setSubmitting(false);
           return;
         }
       } catch {}
@@ -342,10 +340,8 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
       toast.error(error.response?.data?.detail || te.orderError);
       // Refresh wallet balance on error (it may have been charged)
       fetchWalletBalance();
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
 
   // Handle reorder request
   const handleReorderRequest = async (bookId) => {
