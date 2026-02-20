@@ -9,12 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import Lottie from 'lottie-react';
 import {
   ProgressIcon, ProgressIconPreview, LottieProgressIcon,
   PROGRESS_THEMES, PROGRESS_LEVELS,
   isProgressAnimation, parseProgressAnimation, getProgressAnimationType,
 } from '@/components/ui/ProgressIcons';
+import { StatusAnimation, ANIMATION_OPTIONS } from '@/components/ui/StatusAnimation';
 import {
   Check, Save, Loader2, Plus, Trash2, ExternalLink, Image,
   ChevronDown, ChevronUp, Pencil, Eye,
