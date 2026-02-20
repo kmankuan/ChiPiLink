@@ -105,59 +105,30 @@ class TestTextbookOrderBugFix:
         print("Wallet error message verified as Spanish via code review")
 
     def test_submit_with_valid_structure(self, auth_headers):
-        """Test submit with properly structured request"""
-        # First get students to find one with enrollment
-        students_response = requests.get(
-            f"{BASE_URL}/api/students",
-            headers=auth_headers
-        )
-        
-        if students_response.status_code != 200:
-            pytest.skip("Cannot get students list")
-        
-        students = students_response.json()
-        if not students:
-            pytest.skip("No students in database")
-        
-        # Find a student with approved enrollment
-        test_student = None
-        for student in students:
-            enrollments = student.get("enrollments", [])
-            for enrollment in enrollments:
-                if enrollment.get("status") == "approved":
-                    test_student = student
-                    break
-            if test_student:
-                break
-        
-        if not test_student:
-            pytest.skip("No student with approved enrollment")
-        
-        student_id = test_student.get("student_id") or test_student.get("sync_id")
-        print(f"Testing with student: {student_id}, name: {test_student.get('full_name')}")
-        
-        # Try to submit with valid student but no valid items
+        """Test submit with properly structured request using a real student"""
+        # Use a known student_id with approved enrollment
+        # Test with real student but invalid book - should get 400 "No valid items"
         response = requests.post(
             f"{BASE_URL}/api/store/textbook-orders/submit",
             headers=auth_headers,
             json={
-                "student_id": student_id,
+                "student_id": "std_test_admin_001",
                 "items": [{"book_id": "nonexistent_book", "quantity": 1}],
                 "payment_method": "wallet"
             }
         )
         
-        # Should get 400 "No valid items to order", NOT 500 NameError
         print(f"Submit response: {response.status_code}, detail: {response.text[:300]}")
         
-        # Key assertion: no 500 server error
+        # Key assertion: no 500 server error (which would indicate NameError bug)
         if response.status_code == 500:
             error_detail = response.json().get("detail", "")
             assert "year is not defined" not in error_detail.lower(), \
                 f"Critical bug: NameError 'year' still exists: {error_detail}"
         
-        # Expected: 400 with "No valid items to order" or similar
-        assert response.status_code in [400, 404], f"Unexpected: {response.status_code}"
+        # Expected: 400 with "No valid items to order"
+        assert response.status_code == 400, f"Expected 400, got: {response.status_code}"
+        assert "No valid items" in response.text, f"Expected 'No valid items' error: {response.text}"
 
 
 class TestFrontendWalletRefresh:
