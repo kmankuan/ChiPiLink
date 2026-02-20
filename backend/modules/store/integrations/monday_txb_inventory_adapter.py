@@ -83,13 +83,17 @@ class TxbInventoryAdapter(BaseMondayAdapter):
     # ──────────── Full Sync: Push all textbooks to Monday.com ────────────
 
     async def full_sync(self) -> Dict:
-        """Push all private catalog textbooks to Monday.com board.
-        Creates new items or updates existing ones. Returns sync stats."""
+        """Start full sync as a background task. Returns immediately with status."""
+        global _full_sync_task, _full_sync_cancel
+
+        # Check if already running
+        if _full_sync_task and not _full_sync_task.done():
+            return {"status": "already_running"}
+
         config = await self.get_txb_inventory_config()
         board_id = config.get("board_id")
         enabled = config.get("enabled", False)
         col_map = config.get("column_mapping", {})
-        use_grade_groups = config.get("use_grade_groups", False)
 
         if not enabled or not board_id:
             return {"error": "TXB inventory board not configured or disabled", "synced": 0}
@@ -98,98 +102,182 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         if not code_col:
             return {"error": "Book code column not mapped", "synced": 0}
 
-        # Fetch all private catalog textbooks
-        textbooks = await db.store_products.find(
-            {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
-            {"_id": 0}
-        ).sort([("grade", 1), ("name", 1)]).to_list(500)
+        # Reset cancel flag and set initial status in DB
+        _full_sync_cancel = False
+        await db.monday_full_sync_status.update_one(
+            {"key": "full_sync"},
+            {"$set": {
+                "key": "full_sync",
+                "status": "running",
+                "created": 0, "updated": 0, "failed": 0,
+                "total": 0, "processed": 0,
+                "started_at": datetime.now(timezone.utc).isoformat(),
+                "finished_at": None, "error": None,
+            }},
+            upsert=True,
+        )
 
-        if not textbooks:
-            return {"synced": 0, "message": "No active textbooks found"}
+        # Launch background task
+        _full_sync_task = asyncio.create_task(self._run_full_sync())
+        return {"status": "started"}
 
-        # Fetch column types for proper value formatting
-        col_types = await self._get_board_column_types(board_id)
+    async def cancel_full_sync(self) -> Dict:
+        """Cancel a running full sync."""
+        global _full_sync_cancel, _full_sync_task
+        if not _full_sync_task or _full_sync_task.done():
+            return {"status": "not_running"}
+        _full_sync_cancel = True
+        return {"status": "cancelling"}
 
-        # If using grade groups, fetch existing groups from the board
-        grade_group_map = {}
-        if use_grade_groups:
-            grade_group_map = await self._get_or_create_grade_groups(board_id, textbooks)
+    async def get_full_sync_status(self) -> Dict:
+        """Get status of the full sync background task."""
+        doc = await db.monday_full_sync_status.find_one(
+            {"key": "full_sync"}, {"_id": 0}
+        )
+        return doc or {"status": "idle"}
 
-        created = 0
-        updated = 0
-        failed = 0
-        items_map = {}  # book_code -> monday_item_id
+    async def _run_full_sync(self):
+        """Background task: push all textbooks to Monday.com with cancel support."""
+        global _full_sync_cancel
+        try:
+            config = await self.get_txb_inventory_config()
+            board_id = config.get("board_id")
+            col_map = config.get("column_mapping", {})
+            use_grade_groups = config.get("use_grade_groups", False)
+            code_col = col_map.get("code")
 
-        for book in textbooks:
-            book_code = book.get("code", "")
-            if not book_code:
-                book_code = book.get("book_id", "")
+            textbooks = await db.store_products.find(
+                {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+                {"_id": 0}
+            ).sort([("grade", 1), ("name", 1)]).to_list(500)
 
-            try:
-                # Search for existing item
-                found = await self.client.search_items_by_column(board_id, code_col, book_code)
+            if not textbooks:
+                await db.monday_full_sync_status.update_one(
+                    {"key": "full_sync"},
+                    {"$set": {"status": "completed", "total": 0, "processed": 0,
+                              "finished_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                return
 
-                # Build column values
-                col_values = self._build_column_values(book, col_map, col_types)
-
-                if found:
-                    # Update existing item
-                    item_id = found[0]["id"]
-                    needs_labels = self._needs_create_labels(col_values, col_types)
-                    await self.client.update_column_values(
-                        board_id, item_id, col_values,
-                        create_labels_if_missing=needs_labels
-                    )
-                    updated += 1
-                    items_map[book_code] = item_id
-                    logger.info(f"TXB Sync: updated '{book_code}' (item {item_id})")
-                else:
-                    # Create new item
-                    group_id = None
-                    if use_grade_groups:
-                        grade = book.get("grade", "Other")
-                        group_id = grade_group_map.get(grade, config.get("group_id"))
-
-                    item_name = book.get("name", book_code)
-                    needs_labels = self._needs_create_labels(col_values, col_types)
-                    item_id = await self.client.create_item(
-                        board_id, item_name, col_values, group_id,
-                        create_labels_if_missing=needs_labels
-                    )
-                    if item_id:
-                        created += 1
-                        items_map[book_code] = item_id
-                        logger.info(f"TXB Sync: created '{book_code}' (item {item_id})")
-                    else:
-                        failed += 1
-                        logger.error(f"TXB Sync: failed to create '{book_code}'")
-
-            except Exception as e:
-                failed += 1
-                logger.error(f"TXB Sync error for '{book_code}': {e}")
-
-        # Store sync results
-        sync_stats = {
-            "created": created,
-            "updated": updated,
-            "failed": failed,
-            "total_textbooks": len(textbooks),
-            "synced_at": datetime.now(timezone.utc).isoformat(),
-        }
-        await monday_config.save(TXB_INVENTORY_KEY, {
-            **config,
-            "last_full_sync": datetime.now(timezone.utc).isoformat(),
-            "sync_stats": sync_stats,
-        })
-
-        # Save monday_item_id references on products for future updates
-        for book_code, item_id in items_map.items():
-            await db.store_products.update_one(
-                {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
-                {"$set": {"monday_item_id": str(item_id)}}
+            total = len(textbooks)
+            await db.monday_full_sync_status.update_one(
+                {"key": "full_sync"}, {"$set": {"total": total}}
             )
 
-        return sync_stats
+            col_types = await self._get_board_column_types(board_id)
+
+            grade_group_map = {}
+            if use_grade_groups:
+                grade_group_map = await self._get_or_create_grade_groups(board_id, textbooks)
+
+            created = 0
+            updated = 0
+            failed = 0
+            items_map = {}
+
+            for i, book in enumerate(textbooks):
+                # Check cancellation
+                if _full_sync_cancel:
+                    logger.info("Full sync cancelled by user")
+                    await db.monday_full_sync_status.update_one(
+                        {"key": "full_sync"},
+                        {"$set": {
+                            "status": "cancelled",
+                            "created": created, "updated": updated, "failed": failed,
+                            "processed": i, "total": total,
+                            "finished_at": datetime.now(timezone.utc).isoformat(),
+                        }}
+                    )
+                    return
+
+                book_code = book.get("code", "") or book.get("book_id", "")
+
+                try:
+                    found = await self.client.search_items_by_column(board_id, code_col, book_code)
+                    col_values = self._build_column_values(book, col_map, col_types)
+
+                    if found:
+                        item_id = found[0]["id"]
+                        needs_labels = self._needs_create_labels(col_values, col_types)
+                        await self.client.update_column_values(
+                            board_id, item_id, col_values,
+                            create_labels_if_missing=needs_labels
+                        )
+                        updated += 1
+                        items_map[book_code] = item_id
+                        logger.info(f"TXB Sync: updated '{book_code}' (item {item_id})")
+                    else:
+                        group_id = None
+                        if use_grade_groups:
+                            grade = book.get("grade", "Other")
+                            group_id = grade_group_map.get(grade, config.get("group_id"))
+
+                        item_name = book.get("name", book_code)
+                        needs_labels = self._needs_create_labels(col_values, col_types)
+                        item_id = await self.client.create_item(
+                            board_id, item_name, col_values, group_id,
+                            create_labels_if_missing=needs_labels
+                        )
+                        if item_id:
+                            created += 1
+                            items_map[book_code] = item_id
+                            logger.info(f"TXB Sync: created '{book_code}' (item {item_id})")
+                        else:
+                            failed += 1
+                            logger.error(f"TXB Sync: failed to create '{book_code}'")
+
+                except Exception as e:
+                    failed += 1
+                    logger.error(f"TXB Sync error for '{book_code}': {e}")
+
+                # Update progress every 3 items
+                if (i + 1) % 3 == 0 or i == total - 1:
+                    await db.monday_full_sync_status.update_one(
+                        {"key": "full_sync"},
+                        {"$set": {"created": created, "updated": updated, "failed": failed, "processed": i + 1}}
+                    )
+
+            # Store sync results
+            sync_stats = {
+                "created": created,
+                "updated": updated,
+                "failed": failed,
+                "total_textbooks": total,
+                "synced_at": datetime.now(timezone.utc).isoformat(),
+            }
+            await monday_config.save(TXB_INVENTORY_KEY, {
+                **config,
+                "last_full_sync": datetime.now(timezone.utc).isoformat(),
+                "sync_stats": sync_stats,
+            })
+
+            for book_code, item_id in items_map.items():
+                await db.store_products.update_one(
+                    {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                    {"$set": {"monday_item_id": str(item_id)}}
+                )
+
+            await db.monday_full_sync_status.update_one(
+                {"key": "full_sync"},
+                {"$set": {
+                    "status": "completed",
+                    "created": created, "updated": updated, "failed": failed,
+                    "processed": total, "total": total,
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                }}
+            )
+            logger.info(f"Full sync completed: created={created}, updated={updated}, failed={failed}")
+
+        except Exception as e:
+            logger.error(f"Full sync error: {e}")
+            await db.monday_full_sync_status.update_one(
+                {"key": "full_sync"},
+                {"$set": {
+                    "status": "error",
+                    "error": str(e),
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                }}
+            )
 
     # ──────────── Per-Column Sync (Background Task) ────────────
 
