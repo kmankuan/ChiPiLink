@@ -65,6 +65,12 @@ See CHANGELOG.md for full history of all phases.
   - Messages/CRM Board (5931665026): Customer chat via Updates/Replies
 - Testing: 94% backend (15/16, 1 transient), 100% frontend. Critical sync fix verified via direct MongoDB query.
 
+### Phase 7c - CRM Submit Button Fix + Draft Filter + Admin Impersonation (Complete - Feb 20, 2026)
+- **Bug Fix - CRM Chat submit button hidden on mobile**: The "New Topic" modal's submit button was obscured by the bottom navigation bar. Added `mb-16 sm:mb-0` margin and adjusted `maxHeight` to `calc(80vh - 4rem)` so the modal sits above the bottom nav on mobile.
+- **Bug Fix - Draft orders visible to users**: The `get_by_user()` method in `textbook_order_repository.py` now filters out `status: "draft"` orders, matching the admin-side behavior.
+- **Feature - Admin Impersonation ("View as User")**: Admin can click the Eye icon next to any non-admin user in the Users management tab to generate a 30-minute impersonation token. The admin is redirected to the user-facing view with a visible amber banner showing "Viewing as [User Name]" with an Exit button. All impersonation events are logged in the `impersonation_logs` MongoDB collection for audit. Key files: `core/auth.py` (token creation), `auth/routes/users.py` (endpoint), `AuthContext.js` (state management), `ImpersonationBanner.jsx` (UI), `RegisteredUsersTab.jsx` (Eye button).
+- Testing: 100% pass rate (8/8 backend + all frontend elements verified)
+
 ## Upcoming Tasks
 None - all P1 and P2 tasks from the backlog are now complete.
 
