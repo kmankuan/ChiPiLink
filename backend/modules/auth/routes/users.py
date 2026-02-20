@@ -94,3 +94,39 @@ async def delete_user(
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
     return {"detail": "User deleted"}
+
+
+@router.post("/{user_id}/impersonate")
+async def impersonate_user(
+    user_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Generate a short-lived impersonation token so admin can view the app as this user.
+    Token expires in 30 minutes. Logged for audit."""
+    from core.auth import create_impersonation_token
+    from core.database import db
+    from datetime import datetime, timezone
+
+    target = await user_service.get_user(user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    token = create_impersonation_token(user_id, admin["user_id"])
+
+    # Audit log
+    await db.impersonation_logs.insert_one({
+        "admin_user_id": admin["user_id"],
+        "admin_name": admin.get("name", admin.get("email", "")),
+        "target_user_id": user_id,
+        "target_name": target.get("name", target.get("email", "")),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "token": token,
+        "user": {
+            "user_id": target.get("user_id"),
+            "name": target.get("name"),
+            "email": target.get("email"),
+        }
+    }
