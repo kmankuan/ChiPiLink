@@ -18,7 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
   Save, Package, RefreshCw, Users, Upload, Webhook, ArrowLeftRight,
-  CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine, Search
+  CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine, Search,
+  Square
 } from 'lucide-react';
 import {
   Select,
