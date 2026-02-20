@@ -31,6 +31,7 @@ from .order_summary_config import router as order_summary_config_router
 from .stock_orders import router as stock_orders_router
 from .presale_import import router as presale_import_router
 from .crm_chat import router as crm_chat_router
+from .store_checkout_form_config import router as store_checkout_form_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -56,6 +57,7 @@ router.include_router(order_summary_config_router)
 router.include_router(stock_orders_router)
 router.include_router(presale_import_router)
 router.include_router(crm_chat_router)
+router.include_router(store_checkout_form_router)
 
 # Re-export for compatibility
 store_refactored_router = router
