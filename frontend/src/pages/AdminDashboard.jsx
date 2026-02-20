@@ -59,7 +59,12 @@ import {
   Send,
   FileText,
   EyeOff,
-  Trash2
+  Trash2,
+  BookOpen,
+  GraduationCap,
+  Upload,
+  RefreshCw,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
