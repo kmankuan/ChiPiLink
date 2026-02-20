@@ -52,6 +52,13 @@ See CHANGELOG.md for full history of all phases.
 - **Bug fix**: BookOrdersMondayTab `allBoards` prop crash fixed (testing agent)
 - Testing: 100% pass rate (12/12 tests)
 
+### Phase 6e - Push Notifications for Student Access Requests (Complete - Feb 20, 2026)
+- **Admin push on new request**: When a parent submits a student access request, all admin users receive a push notification via OneSignal ("Nueva solicitud de acceso: StudentName (Grade - School)")
+- **User push on status change**: When admin approves/rejects a request, the requesting parent receives a push notification with status-specific title (aprobada/rechazada/en revisión/info requerida)
+- **Non-blocking**: Push calls wrapped in try/except — if OneSignal fails, WebSocket events still work
+- **Implementation**: Added `_send_push_to_admins` and `_send_push_to_user` helpers in `/app/backend/modules/realtime/events.py`
+- Testing: 100% pass rate (14/14 tests)
+
 ## Upcoming Tasks
 - **(P1)** Abstract the progress icon system into a global resource
 - **(P2)** Implement a "Stop" button for the full Monday.com sync operation
@@ -59,7 +66,6 @@ See CHANGELOG.md for full history of all phases.
 ## Future/Backlog Tasks
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
-- **(P5)** Push notifications for student access requests
 
 ## Configuration
 - **CRM Board ID**: 5931665026 (Admin Customers board)
