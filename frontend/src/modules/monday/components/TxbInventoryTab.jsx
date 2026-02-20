@@ -73,6 +73,19 @@ export default function TxbInventoryTab() {
     sync_stats: {},
     stock_approval_column_id: null,
   });
+  const [syncHistory, setSyncHistory] = useState([]);
+
+  const fetchSyncHistory = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/sync-history?limit=20`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSyncHistory(data.history || []);
+      }
+    } catch { /* ignore */ }
+  }, [token]);
 
   const fetchConfig = useCallback(async () => {
     try {
