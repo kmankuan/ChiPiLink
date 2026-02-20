@@ -83,6 +83,40 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         """Save TXB inventory board configuration"""
         return await monday_config.save(TXB_INVENTORY_KEY, data)
 
+    # ──────────── Sync History Log ────────────
+
+    async def _log_sync(self, trigger: str, status: str, stats: Dict, error: str = ""):
+        """Append a sync event to the history log. Keeps last SYNC_HISTORY_MAX entries."""
+        entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "trigger": trigger,
+            "status": status,
+            "created": stats.get("created", 0),
+            "updated": stats.get("updated", 0),
+            "failed": stats.get("failed", 0),
+            "total": stats.get("total", 0),
+            "processed": stats.get("processed", 0),
+            "duration_s": stats.get("duration_s"),
+            "error": error,
+        }
+        await db[SYNC_HISTORY_COLLECTION].insert_one(entry)
+        count = await db[SYNC_HISTORY_COLLECTION].count_documents({})
+        if count > SYNC_HISTORY_MAX:
+            oldest = await db[SYNC_HISTORY_COLLECTION].find(
+                {}, {"_id": 1}
+            ).sort("timestamp", 1).limit(count - SYNC_HISTORY_MAX).to_list(None)
+            if oldest:
+                await db[SYNC_HISTORY_COLLECTION].delete_many(
+                    {"_id": {"$in": [o["_id"] for o in oldest]}}
+                )
+
+    async def get_sync_history(self, limit: int = 20) -> list:
+        """Get recent sync history entries."""
+        entries = await db[SYNC_HISTORY_COLLECTION].find(
+            {}, {"_id": 0}
+        ).sort("timestamp", -1).limit(limit).to_list(None)
+        return entries
+
     # ──────────── Full Sync: Push all textbooks to Monday.com ────────────
 
     async def full_sync(self) -> Dict:
