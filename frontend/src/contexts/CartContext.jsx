@@ -9,12 +9,23 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount and migrate old format
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem(CART_STORAGE_KEY);
       if (savedCart) {
-        setItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        // Migrate old cart format (precio -> price, nombre -> name)
+        const migratedCart = parsedCart.map(item => ({
+          ...item,
+          name: item.name || item.nombre,
+          price: item.price ?? item.precio ?? 0,
+          grade: item.grade || item.grado,
+          subject: item.subject || item.materia,
+          publisher: item.publisher || item.editorial,
+          code: item.code || item.codigo
+        }));
+        setItems(migratedCart);
       }
     } catch (error) {
       console.error('Error loading cart:', error);
