@@ -349,7 +349,7 @@ export default function UnatiendaCheckout() {
               </CardContent>
             </Card>
 
-            {/* Customer Info */}
+            {/* Customer Info — Dynamic Fields */}
             {!orderId && (
               <Card>
                 <CardHeader>
@@ -362,48 +362,15 @@ export default function UnatiendaCheckout() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nombre">Nombre completo *</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="nombre"
-                        placeholder="Tu nombre"
-                        value={customerInfo.nombre}
-                        onChange={(e) => handleInputChange('nombre', e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Correo electrónico *</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="tu@email.com"
-                        value={customerInfo.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="telefono">Teléfono (opcional)</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="telefono"
-                        placeholder="+507 6000-0000"
-                        value={customerInfo.telefono}
-                        onChange={(e) => handleInputChange('telefono', e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
+                  {formFields.map((field) => (
+                    <DynamicFormField
+                      key={field.field_id}
+                      field={field}
+                      value={formData[field.field_id]}
+                      onChange={handleFieldChange}
+                      lang={lang}
+                    />
+                  ))}
                 </CardContent>
               </Card>
             )}
