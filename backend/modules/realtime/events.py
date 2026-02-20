@@ -118,6 +118,12 @@ async def emit_access_request_updated(
     }
     label = status_labels.get(new_status, {"es": new_status, "en": new_status, "zh": new_status})
 
+    msg = {
+        "es": f"Solicitud de {student_name}: {label['es']}",
+        "en": f"Request for {student_name}: {label['en']}",
+        "zh": f"{student_name} 的请求: {label['zh']}",
+    }
+
     # Notify the user who made the request
     await ws_manager.send_to_user(user_id, {
         "type": f"access_request_{new_status}",
@@ -126,11 +132,7 @@ async def emit_access_request_updated(
             "student_name": student_name,
             "status": new_status,
         },
-        "message": {
-            "es": f"Solicitud de {student_name}: {label['es']}",
-            "en": f"Request for {student_name}: {label['en']}",
-            "zh": f"{student_name} 的请求: {label['zh']}",
-        },
+        "message": msg,
     })
 
     # Also notify admin room so other admins see the change
@@ -141,12 +143,22 @@ async def emit_access_request_updated(
             "student_name": student_name,
             "status": new_status,
         },
-        "message": {
-            "es": f"Solicitud de {student_name}: {label['es']}",
-            "en": f"Request for {student_name}: {label['en']}",
-            "zh": f"{student_name} 的请求: {label['zh']}",
-        },
+        "message": msg,
     })
+
+    # Push notification to the requesting user
+    push_title_map = {
+        "approved": "Solicitud aprobada",
+        "rejected": "Solicitud rechazada",
+        "in_review": "Solicitud en revisión",
+        "info_required": "Se necesita información",
+    }
+    await _send_push_to_user(
+        user_id=user_id,
+        title=push_title_map.get(new_status, f"Actualización de solicitud"),
+        body=msg["es"],
+        data={"type": "access_request_updated", "student_id": student_id, "status": new_status}
+    )
 
 
 async def emit_user_registered(user_id: str, name: str, email: str):
