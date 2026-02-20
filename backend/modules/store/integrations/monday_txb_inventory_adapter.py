@@ -176,6 +176,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
     async def _run_full_sync(self):
         """Background task: push all textbooks to Monday.com with cancel support."""
         global _full_sync_cancel
+        started_at = datetime.now(timezone.utc)
         try:
             config = await self.get_txb_inventory_config()
             board_id = config.get("board_id")
@@ -194,6 +195,8 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                     {"$set": {"status": "completed", "total": 0, "processed": 0,
                               "finished_at": datetime.now(timezone.utc).isoformat()}}
                 )
+                dur = (datetime.now(timezone.utc) - started_at).total_seconds()
+                await self._log_sync("manual", "completed", {"total": 0, "processed": 0, "duration_s": round(dur, 1)})
                 return
 
             total = len(textbooks)
@@ -225,6 +228,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                             "finished_at": datetime.now(timezone.utc).isoformat(),
                         }}
                     )
+                    dur = (datetime.now(timezone.utc) - started_at).total_seconds()
+                    await self._log_sync("manual", "cancelled", {
+                        "created": created, "updated": updated, "failed": failed,
+                        "total": total, "processed": i, "duration_s": round(dur, 1),
+                    })
                     return
 
                 book_code = book.get("code", "") or book.get("book_id", "")
@@ -303,6 +311,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                     "finished_at": datetime.now(timezone.utc).isoformat(),
                 }}
             )
+            dur = (datetime.now(timezone.utc) - started_at).total_seconds()
+            await self._log_sync("manual", "completed", {
+                "created": created, "updated": updated, "failed": failed,
+                "total": total, "processed": total, "duration_s": round(dur, 1),
+            })
             logger.info(f"Full sync completed: created={created}, updated={updated}, failed={failed}")
 
         except Exception as e:
@@ -315,6 +328,8 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                     "finished_at": datetime.now(timezone.utc).isoformat(),
                 }}
             )
+            dur = (datetime.now(timezone.utc) - started_at).total_seconds()
+            await self._log_sync("manual", "error", {"duration_s": round(dur, 1)}, error=str(e))
 
     # ──────────── Per-Column Sync (Background Task) ────────────
 
