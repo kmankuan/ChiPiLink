@@ -405,6 +405,18 @@ export default function RegisteredUsersTab() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {!u.is_admin && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                            onClick={() => handleImpersonate(u)}
+                            data-testid={`impersonate-user-${u.user_id}`}
+                            title="View as this user"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
