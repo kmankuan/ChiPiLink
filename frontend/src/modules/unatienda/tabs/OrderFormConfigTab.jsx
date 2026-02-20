@@ -229,7 +229,7 @@ export default function OrderFormConfigTab({ configApiPath = '/api/store/order-f
   const handleToggleActive = async (field) => {
     try {
       await axios.put(
-        `${API_URL}/api/store/order-form-config/admin/fields/${field.field_id}`,
+        `${apiBase}/admin/fields/${field.field_id}`,
         { active: !field.active },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -245,7 +245,7 @@ export default function OrderFormConfigTab({ configApiPath = '/api/store/order-f
 
     try {
       await axios.delete(
-        `${API_URL}/api/store/order-form-config/admin/fields/${field.field_id}?hard_delete=true`,
+        `${apiBase}/admin/fields/${field.field_id}?hard_delete=true`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Field deleted');
