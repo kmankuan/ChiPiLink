@@ -39,8 +39,8 @@ class TextbookOrderRepository(BaseRepository):
         })
     
     async def get_by_user(self, user_id: str, year: Optional[int] = None) -> List[Dict]:
-        """Get all orders for a user"""
-        query = {"user_id": user_id}
+        """Get all orders for a user (excludes drafts)"""
+        query = {"user_id": user_id, "status": {"$ne": "draft"}}
         if year:
             query["year"] = year
         return await self.find_many(query=query, sort=[("created_at", -1)])
