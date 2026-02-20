@@ -38,7 +38,13 @@
     "forms": "Forms",
     "demoData": "Demo Data",
     "migration": "Migration",
-    "moduleStatus": "Module Status"
+    "moduleStatus": "Module Status",
+    "messages": "Messages",
+    "textbookCatalog": "Textbook Catalog",
+    "studentsSchools": "Students & Schools",
+    "presaleImport": "Pre-Sale Import",
+    "mondayTextbookSync": "Monday.com Sync",
+    "textbookFormSettings": "Form Settings"
   },
   "landing": {
     "hero": {

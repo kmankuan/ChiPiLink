@@ -38,7 +38,13 @@
     "forms": "Formularios",
     "demoData": "Datos Demo",
     "migration": "Migración",
-    "moduleStatus": "Estado de Módulos"
+    "moduleStatus": "Estado de Módulos",
+    "messages": "Mensajes",
+    "textbookCatalog": "Catálogo de Textos",
+    "studentsSchools": "Estudiantes y Colegios",
+    "presaleImport": "Importar Pre-Venta",
+    "mondayTextbookSync": "Sync Monday.com",
+    "textbookFormSettings": "Config. Formularios"
   },
   "landing": {
     "hero": {

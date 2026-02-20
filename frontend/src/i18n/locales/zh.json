@@ -37,7 +37,13 @@
     "forms": "表单",
     "demoData": "演示数据",
     "migration": "迁移",
-    "moduleStatus": "模块状态"
+    "moduleStatus": "模块状态",
+    "messages": "消息",
+    "textbookCatalog": "教科书目录",
+    "studentsSchools": "学生与学校",
+    "presaleImport": "预售导入",
+    "mondayTextbookSync": "Monday.com 同步",
+    "textbookFormSettings": "表单设置"
   },
   "landing": {
     "hero": {
