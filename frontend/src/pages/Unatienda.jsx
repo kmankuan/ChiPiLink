@@ -35,8 +35,24 @@ export default function Unatienda() {
   const { user, token, isAuthenticated } = useAuth();
   const { addItem, items, openCart } = useCart();
 
+  // Helper: read initial view from URL
+  const getInitialView = () => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view === 'textbooks' || view === 'textbook-order') return view;
+    const category = params.get('category');
+    const tab = params.get('tab');
+    if (category === 'textbooks' || tab === 'textbooks') return 'textbooks';
+    return 'public';
+  };
+
+  const getInitialStudentId = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('student') || null;
+  };
+
   // Main state
-  const [activeView, setActiveView] = useState('public');
+  const [activeView, setActiveView] = useState(getInitialView);
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -46,64 +62,47 @@ export default function Unatienda() {
   const [storeConfig, setStoreConfig] = useState(null);
   const [privateCatalogAccess, setPrivateCatalogAccess] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [pendingStudentId] = useState(getInitialStudentId);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [showLandingView, setShowLandingView] = useState(true);
+  const [showLandingView, setShowLandingView] = useState(() => getInitialView() === 'public');
   const [addedItems, setAddedItems] = useState({});
-  const [urlParams, setUrlParams] = useState(null);
 
-  // ---- URL Parameter Handling ----
-
+  // Sync activeView to URL so refresh preserves the current view
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const categoria = params.get('categoria');
-    const category = params.get('category');
-    const search = params.get('search');
-    const tab = params.get('tab');
-    const studentId = params.get('student');
-
-    if (category === 'textbooks' && !studentId) {
-      setActiveView('textbooks');
-      window.history.replaceState({}, '', '/unatienda');
-    } else if (tab === 'textbooks') {
-      setActiveView('textbooks');
-      window.history.replaceState({}, '', '/unatienda');
-    } else if (category === 'textbooks' && studentId) {
-      setUrlParams({ category, studentId });
-    }
-
-    if (categoria) setSelectedCategory(categoria);
-    if (search) setSearchTerm(decodeURIComponent(search));
-
-    if (categoria || search) {
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete('categoria');
-      newUrl.searchParams.delete('search');
-      window.history.replaceState({}, '', newUrl.pathname);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!urlParams || !privateCatalogAccess) return;
-    const { category, studentId } = urlParams;
-
-    if (category === 'textbooks' && studentId) {
-      const student = privateCatalogAccess.students?.find(
-        s => s.student_id === studentId || s.sync_id === studentId ||
-          s.student_id?.includes(studentId) || studentId?.includes(s.student_id)
-      );
-
-      if (student && privateCatalogAccess.has_access) {
-        setSelectedStudent(student);
-        setActiveView('textbook-order');
+    const url = new URL(window.location.href);
+    if (activeView === 'public') {
+      url.searchParams.delete('view');
+      url.searchParams.delete('student');
+    } else {
+      url.searchParams.set('view', activeView);
+      if (activeView === 'textbook-order' && selectedStudent) {
+        url.searchParams.set('student', selectedStudent.student_id || selectedStudent.sync_id);
       } else {
-        setActiveView('textbooks');
+        url.searchParams.delete('student');
       }
-
-      window.history.replaceState({}, '', '/unatienda');
-      setUrlParams(null);
     }
-  }, [urlParams, privateCatalogAccess]);
+    // Clean legacy params
+    url.searchParams.delete('category');
+    url.searchParams.delete('tab');
+    url.searchParams.delete('categoria');
+    url.searchParams.delete('search');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }, [activeView, selectedStudent]);
+
+  // Restore student selection from URL on initial load (once access data is ready)
+  useEffect(() => {
+    if (!pendingStudentId || !privateCatalogAccess) return;
+    const student = privateCatalogAccess.students?.find(
+      s => s.student_id === pendingStudentId || s.sync_id === pendingStudentId
+    );
+    if (student && privateCatalogAccess.has_access) {
+      setSelectedStudent(student);
+      setActiveView('textbook-order');
+    } else {
+      setActiveView('textbooks');
+    }
+  }, [pendingStudentId, privateCatalogAccess]);
 
   // ---- Data Loading ----
 
