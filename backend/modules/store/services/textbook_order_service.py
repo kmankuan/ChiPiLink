@@ -740,6 +740,8 @@ class TextbookOrderService(BaseService):
                     )
         except Exception as draft_err:
             logger.error(f"[create_and_submit_order] Draft order update failed (non-blocking): {draft_err}")
+            if wallet_transaction:
+                await self._notify_admin_post_order_failure(order_id, user_name, student.get("full_name", ""), total_amount, "draft_update", str(draft_err))
 
         # 9. Send to Monday.com (background — don't block the user)
         import asyncio
