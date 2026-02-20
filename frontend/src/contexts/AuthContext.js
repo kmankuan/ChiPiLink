@@ -154,6 +154,12 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    // If impersonating, just exit impersonation
+    const impersonating = localStorage.getItem('impersonate_original_token');
+    if (impersonating) {
+      exitImpersonation();
+      return;
+    }
     try {
       await api.post(AUTH_ENDPOINTS.logout);
     } catch (error) {
@@ -167,6 +173,36 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
   };
+
+  const startImpersonation = (impToken, targetUser) => {
+    // Save original admin token
+    const originalToken = localStorage.getItem('auth_token');
+    localStorage.setItem('impersonate_original_token', originalToken);
+    localStorage.setItem('impersonate_target', JSON.stringify(targetUser));
+    // Switch to impersonation token
+    localStorage.setItem('auth_token', impToken);
+    setToken(impToken);
+    setUser(null);
+    // Redirect to user view and reload
+    window.location.href = '/';
+  };
+
+  const exitImpersonation = () => {
+    const originalToken = localStorage.getItem('impersonate_original_token');
+    localStorage.removeItem('impersonate_original_token');
+    localStorage.removeItem('impersonate_target');
+    if (originalToken) {
+      localStorage.setItem('auth_token', originalToken);
+      setToken(originalToken);
+      setUser(null);
+      window.location.href = '/admin';
+    }
+  };
+
+  const isImpersonating = !!localStorage.getItem('impersonate_original_token');
+  const impersonationTarget = isImpersonating
+    ? JSON.parse(localStorage.getItem('impersonate_target') || '{}')
+    : null;
 
   const updateUser = (updates) => {
     setUser(prev => ({ ...prev, ...updates }));
