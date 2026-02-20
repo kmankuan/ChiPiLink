@@ -82,6 +82,11 @@ async def emit_access_request_created(
     school_name: str, user_id: str
 ):
     """Notify admins when a user creates an access request."""
+    msg = {
+        "es": f"Nueva solicitud de acceso: {student_name} ({grade}° - {school_name})",
+        "en": f"New access request: {student_name} ({grade}° - {school_name})",
+        "zh": f"新访问请求: {student_name} ({grade}° - {school_name})",
+    }
     await ws_manager.broadcast_to_room(ROOM_ADMIN, {
         "type": "access_request",
         "payload": {
@@ -90,12 +95,14 @@ async def emit_access_request_created(
             "grade": grade,
             "school_name": school_name,
         },
-        "message": {
-            "es": f"Nueva solicitud de acceso: {student_name} ({grade}° - {school_name})",
-            "en": f"New access request: {student_name} ({grade}° - {school_name})",
-            "zh": f"新访问请求: {student_name} ({grade}° - {school_name})",
-        },
+        "message": msg,
     })
+    # Push notification to admins
+    await _send_push_to_admins(
+        title="Nueva solicitud de acceso",
+        body=msg["es"],
+        data={"type": "access_request", "student_id": student_id}
+    )
 
 
 async def emit_access_request_updated(
