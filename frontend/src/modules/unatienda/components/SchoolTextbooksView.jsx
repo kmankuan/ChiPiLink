@@ -435,6 +435,19 @@ export default function SchoolTextbooksView({
 
     setSubmitting(true);
     try {
+      // Refresh wallet balance before submitting to avoid stale data
+      try {
+        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+        const freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+        setWalletBalance(freshBalance);
+        const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
+        if (freshBalance < total) {
+          toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
+          setSubmitting(false);
+          return;
+        }
+      } catch {}
+
       const res = await axios.post(
         `${API_URL}/api/store/textbook-orders/submit`,
         {
@@ -442,7 +455,7 @@ export default function SchoolTextbooksView({
           items: selectedList.map(b => ({ book_id: b.book_id, quantity: 1 })),
           payment_method: 'wallet',
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 30000 }
       );
       // Show warnings if some items failed
       if (res.data?.warnings?.length > 0) {
@@ -459,6 +472,10 @@ export default function SchoolTextbooksView({
       await fetchOrderForStudent(studentId);
     } catch (error) {
       toast.error(error.response?.data?.detail || t.orderError);
+      // Refresh wallet balance on error (it may have been charged)
+      axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
+        .catch(() => {});
     } finally {
       setSubmitting(false);
     }
