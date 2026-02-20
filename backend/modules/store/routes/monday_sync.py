@@ -292,12 +292,26 @@ async def save_txb_inventory_config(
 
 @router.post("/txb-inventory/full-sync")
 async def txb_inventory_full_sync(admin: dict = Depends(get_admin_user)):
-    """Push all textbooks to Monday.com board (create or update)"""
+    """Start full sync as a background task (create or update textbooks on Monday.com)"""
     from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
     result = await txb_inventory_adapter.full_sync()
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
     return result
+
+
+@router.get("/txb-inventory/full-sync/status")
+async def txb_full_sync_status(admin: dict = Depends(get_admin_user)):
+    """Get the current status of the full sync background task"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    return await txb_inventory_adapter.get_full_sync_status()
+
+
+@router.post("/txb-inventory/full-sync/cancel")
+async def txb_full_sync_cancel(admin: dict = Depends(get_admin_user)):
+    """Cancel a running full sync"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    return await txb_inventory_adapter.cancel_full_sync()
 
 
 @router.post("/txb-inventory/sync-stock/{book_id}")
