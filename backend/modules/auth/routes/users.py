@@ -114,19 +114,20 @@ async def impersonate_user(
     token = create_impersonation_token(user_id, admin["user_id"])
 
     # Audit log
+    target_dict = target.dict() if hasattr(target, 'dict') else target
     await db.impersonation_logs.insert_one({
         "admin_user_id": admin["user_id"],
         "admin_name": admin.get("name", admin.get("email", "")),
         "target_user_id": user_id,
-        "target_name": target.get("name", target.get("email", "")),
+        "target_name": target_dict.get("name", target_dict.get("email", "")),
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
 
     return {
         "token": token,
         "user": {
-            "user_id": target.get("user_id"),
-            "name": target.get("name"),
-            "email": target.get("email"),
+            "user_id": target_dict.get("user_id"),
+            "name": target_dict.get("name"),
+            "email": target_dict.get("email"),
         }
     }
