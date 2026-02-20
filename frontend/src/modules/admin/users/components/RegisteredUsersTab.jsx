@@ -259,6 +259,24 @@ export default function RegisteredUsersTab() {
     }
   };
 
+  const handleImpersonate = async (user) => {
+    try {
+      const res = await fetch(`${API}/api/auth-v2/users/${user.user_id}/impersonate`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        startImpersonation(data.token, data.user);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Impersonation failed');
+      }
+    } catch {
+      toast.error('Impersonation failed');
+    }
+  };
+
   return (
     <div className="space-y-3" data-testid="registered-users-tab">
       <BoardHeader
