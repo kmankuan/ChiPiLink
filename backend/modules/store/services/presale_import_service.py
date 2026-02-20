@@ -204,6 +204,7 @@ class PreSaleImportService:
             "status": "awaiting_link",
             "source": "monday_import",
             "is_presale": True,
+            "monday_item_id": monday_item_id,
             "monday_item_ids": [monday_item_id],
             "imported_by": admin_user_id,
             "imported_at": now,
