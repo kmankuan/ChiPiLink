@@ -96,6 +96,9 @@ async def get_current_user(
         if not user:
             logger.warning(f"[auth] User not found in database: {user_id}")
             raise HTTPException(status_code=401, detail="User not found")
+        # Mark impersonation if present
+        if payload.get("impersonated_by"):
+            user["_impersonated_by"] = payload["impersonated_by"]
         return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
