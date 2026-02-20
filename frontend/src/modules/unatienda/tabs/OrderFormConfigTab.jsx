@@ -68,9 +68,10 @@ const fieldTypeIcons = {
   info: Info
 };
 
-export default function OrderFormConfigTab() {
+export default function OrderFormConfigTab({ configApiPath = '/api/store/order-form-config', title, description }) {
   const { t } = useTranslation();
   const { token } = useAuth();
+  const apiBase = `${API_URL}${configApiPath}`;
   const [fields, setFields] = useState([]);
   const [fieldTypes, setFieldTypes] = useState([]);
   const [loading, setLoading] = useState(true);
