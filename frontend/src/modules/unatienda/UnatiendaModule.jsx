@@ -48,8 +48,9 @@ const TAB_GROUPS = [
   {
     label: 'Settings',
     tabs: [
-      { id: 'form-config', label: 'Order Form', icon: FileText },
-      { id: 'enrollment-form', label: 'Enrollment Form', icon: ClipboardList, testId: 'enrollment-form-tab-trigger' },
+      { id: 'form-config', label: 'Textbook Order Form', icon: FileText },
+      { id: 'student-link-form', label: 'Student Link Form', icon: ClipboardList, testId: 'student-link-form-tab-trigger' },
+      { id: 'store-checkout-form', label: 'Store Checkout Form', icon: CreditCard, testId: 'store-checkout-form-tab-trigger' },
       { id: 'configuration', label: 'Config', icon: Settings },
       { id: 'demo', label: 'Demo Data', icon: Database },
     ],
