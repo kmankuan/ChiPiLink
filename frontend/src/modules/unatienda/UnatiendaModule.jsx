@@ -1,26 +1,22 @@
+/**
+ * UnatiendaModule — Retail Store Management (Public Store)
+ * Contains: Inventory, Public Store, Stock Movements, Store Checkout Form, Config, Demo Data
+ * School textbook features have been moved to the "School Textbooks" sidebar group.
+ */
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Store, Package, FileText, Calendar, Warehouse, Truck, Settings, Database, MessageCircle, School, ClipboardList, CreditCard } from 'lucide-react';
+import { Loader2, Store, ShoppingCart, Warehouse, Truck, Settings, Database, CreditCard } from 'lucide-react';
 
+import InventoryTab from './tabs/InventoryTab';
 import PublicCatalogTab from './tabs/PublicCatalogTab';
-import PrivateCatalogTab from './tabs/PrivateCatalogTab';
-import StudentsTab from './tabs/StudentsTab';
+import StockOrdersTab from './tabs/StockOrdersTab';
+import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 import ConfigurationTab from './tabs/ConfigurationTab';
 import DemoDataTab from './tabs/DemoDataTab';
-import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
-import OrderFormConfigTab from './tabs/OrderFormConfigTab';
-import SchoolYearTab from './tabs/SchoolYearTab';
-import StockOrdersTab from './tabs/StockOrdersTab';
-import PreSaleImportTab from './tabs/PreSaleImportTab';
-import MessagesTab from './tabs/MessagesTab';
-import SchoolsManagementTab from '@/modules/admin/users/components/SchoolsManagementTab';
-import FormFieldsConfigTab from '@/modules/admin/users/components/FormFieldsConfigTab';
-import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-/* Tab groups — logical sections */
 const TAB_GROUPS = [
   {
     label: 'Catalog',
@@ -31,26 +27,8 @@ const TAB_GROUPS = [
     ],
   },
   {
-    label: 'Orders',
-    tabs: [
-      { id: 'textbook-orders', label: 'Textbook Orders', icon: Package },
-      { id: 'presale-import', label: 'Pre-Sale Import', icon: Truck, testId: 'presale-import-tab-trigger' },
-      { id: 'messages', label: 'Messages', icon: MessageCircle, testId: 'messages-tab-trigger' },
-    ],
-  },
-  {
-    label: 'School',
-    tabs: [
-      { id: 'students', label: 'Students', icon: Users },
-      { id: 'schools', label: 'Schools', icon: School, testId: 'schools-tab-trigger' },
-      { id: 'school-year', label: 'School Year', icon: Calendar },
-    ],
-  },
-  {
     label: 'Settings',
     tabs: [
-      { id: 'form-config', label: 'Textbook Order Form', icon: FileText },
-      { id: 'student-link-form', label: 'Student Link Form', icon: ClipboardList, testId: 'student-link-form-tab-trigger' },
       { id: 'store-checkout-form', label: 'Store Checkout Form', icon: CreditCard, testId: 'store-checkout-form-tab-trigger' },
       { id: 'configuration', label: 'Config', icon: Settings },
       { id: 'demo', label: 'Demo Data', icon: Database },
@@ -106,14 +84,11 @@ export default function UnatiendaModule() {
 
   const statItems = [
     { icon: Store, value: stats?.public_products || 0, label: 'Public', color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/40' },
-    { icon: BookOpen, value: stats?.private_products || 0, label: 'Textbooks', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/40' },
-    { icon: Users, value: stats?.students || 0, label: 'Students', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40' },
     { icon: ShoppingCart, value: stats?.orders_pending || 0, label: 'Pending', color: 'text-orange-600 bg-orange-50 dark:bg-orange-950/40', alert: (stats?.orders_pending || 0) > 0 },
   ];
 
   return (
     <div className="space-y-4" data-testid="unatienda-module">
-      {/* ── Compact header: stats as inline badges ── */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1" data-testid="unatienda-stats">
         {statItems.map(s => (
           <div
@@ -127,7 +102,6 @@ export default function UnatiendaModule() {
         ))}
       </div>
 
-      {/* ── Grouped tab navigation — wrapping rows ── */}
       <nav data-testid="unatienda-nav">
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 border-b pb-2">
           {TAB_GROUPS.map((group) => (
@@ -151,19 +125,10 @@ export default function UnatiendaModule() {
         </div>
       </nav>
 
-      {/* ── Tab content ── */}
       <div data-testid="unatienda-content">
-        {activeTab === 'inventory' && <PrivateCatalogTab token={token} onRefresh={fetchStats} />}
+        {activeTab === 'inventory' && <InventoryTab token={token} onRefresh={fetchStats} />}
         {activeTab === 'public-catalog' && <PublicCatalogTab token={token} onRefresh={fetchStats} />}
         {activeTab === 'stock-orders' && <StockOrdersTab token={token} />}
-        {activeTab === 'textbook-orders' && <TextbookOrdersAdminTab />}
-        {activeTab === 'presale-import' && <PreSaleImportTab token={token} />}
-        {activeTab === 'messages' && <MessagesTab token={token} />}
-        {activeTab === 'students' && <StudentsTab token={token} />}
-        {activeTab === 'schools' && <SchoolsManagementTab token={token} />}
-        {activeTab === 'school-year' && <SchoolYearTab token={token} />}
-        {activeTab === 'form-config' && <OrderFormConfigTab />}
-        {activeTab === 'student-link-form' && <FormFieldsConfigTab token={token} />}
         {activeTab === 'store-checkout-form' && <StoreCheckoutFormConfigTab token={token} />}
         {activeTab === 'configuration' && <ConfigurationTab token={token} />}
         {activeTab === 'demo' && <DemoDataTab token={token} onRefresh={fetchStats} />}
