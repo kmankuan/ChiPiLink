@@ -296,9 +296,9 @@ export default function OrderFormConfigTab({ configApiPath = '/api/store/order-f
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Configuración del Formulario de Pedido</h3>
+          <h3 className="text-lg font-semibold">{title || 'Configuración del Formulario de Pedido'}</h3>
           <p className="text-sm text-muted-foreground">
-            Gestiona los campos que aparecen en el formulario de pedido de textos
+            {description || 'Gestiona los campos que aparecen en el formulario de pedido de textos'}
           </p>
         </div>
         <div className="flex items-center gap-4">
