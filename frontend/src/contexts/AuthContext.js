@@ -225,7 +225,12 @@ export function AuthProvider({ children }) {
     updateUser,
     checkAuth,
     laopanConfig,
-    api
+    api,
+    // Impersonation
+    startImpersonation,
+    exitImpersonation,
+    isImpersonating,
+    impersonationTarget,
   };
 
   return (
