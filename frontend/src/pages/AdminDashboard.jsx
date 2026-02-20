@@ -92,6 +92,16 @@ const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/M
 const TextbookFormSettingsModule = lazy(() => import('@/modules/school-textbooks/TextbookFormSettingsModule'));
 const MessagesTab = lazy(() => import('@/modules/unatienda/tabs/MessagesTab'));
 
+// Prefetch critical modules after initial render (avoids loading flash on navigation)
+const PREFETCH_MODULES = [
+  () => import('@/modules/admin/store/TextbookOrdersAdminTab'),
+  () => import('@/modules/unatienda/tabs/MessagesTab'),
+  () => import('@/modules/unatienda/UnatiendaModule'),
+  () => import('@/modules/wallet/WalletModule'),
+  () => import('@/modules/school-textbooks/TextbookCatalogModule'),
+  () => import('@/modules/school-textbooks/StudentsSchoolsModule'),
+];
+
 // Administration sub-modules (previously nested inside AdminModule)
 const SiteConfigModule = lazy(() => import('@/modules/admin/SiteConfigModule'));
 const AuthMethodsConfig = lazy(() => import('@/modules/admin/AuthMethodsConfig'));
