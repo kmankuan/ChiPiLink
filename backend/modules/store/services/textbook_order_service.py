@@ -836,7 +836,7 @@ class TextbookOrderService(BaseService):
                 amount=amount,
                 currency=Currency.USD,
                 payment_method=WalletPaymentMethod.WALLET,
-                description=f"Refund: order creation failed",
+                description="Refund: order creation failed",
                 reference=wallet_transaction.get("transaction_id")
             )
             logger.info(f"[_refund_wallet] Wallet refunded ${amount:.2f} for user {user_id}")
