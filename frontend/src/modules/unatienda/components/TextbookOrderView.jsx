@@ -34,7 +34,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   const [studentOrders, setStudentOrders] = useState({});
   const [textbooks, setTextbooks] = useState([]);
   const [loadingTextbooks, setLoadingTextbooks] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [executeSubmit, submitting] = useGuardedAction();
   const [selectedBooks, setSelectedBooks] = useState({});
   const [reorderingBook, setReorderingBook] = useState(null);
   const [currentOrderId, setCurrentOrderId] = useState(null);
