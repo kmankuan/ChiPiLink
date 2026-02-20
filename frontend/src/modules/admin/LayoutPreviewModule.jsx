@@ -187,53 +187,6 @@ const DEFAULT_STATUS_OPTIONS = [
   { value: 'maintenance', label: 'Maintenance', color: '#ef4444', animation: 'wrench', gif_url: '' },
 ];
 
-// Build progress animation options dynamically from themes
-const PROGRESS_ANIM_OPTIONS = Object.entries(PROGRESS_THEMES).flatMap(([themeKey, themeData]) =>
-  PROGRESS_LEVELS.map(level => ({
-    value: getProgressAnimationType(level.key, themeKey),
-    label: `${themeData.levels[level.key]?.label || level.label} (${themeData.name})`,
-    group: themeData.name,
-  }))
-);
-
-const ANIMATION_OPTIONS = [
-  { value: 'none', label: 'None' },
-  // Original
-  { value: 'building_bars', label: 'Building Bars' },
-  { value: 'pulse', label: 'Pulse Glow' },
-  { value: 'bounce', label: 'Bounce' },
-  { value: 'spinner', label: 'Spinner' },
-  { value: 'blocks', label: 'Stacking Blocks' },
-  { value: 'hammer', label: 'Hammer' },
-  { value: 'wrench', label: 'Wrench Spin' },
-  { value: 'rocket', label: 'Rocket' },
-  { value: 'wave', label: 'Wave' },
-  // Chinese / Cultural
-  { value: 'lantern', label: 'Lantern (Chinese)' },
-  { value: 'dragon', label: 'Dragon (Chinese)' },
-  { value: 'bamboo', label: 'Bamboo Growth' },
-  { value: 'temple', label: 'Temple / Pagoda' },
-  { value: 'sparkle', label: 'Sparkle' },
-  // Construction
-  { value: 'crane', label: 'Crane' },
-  // Tech / Digital
-  { value: 'coding', label: 'Coding' },
-  { value: 'data_sync', label: 'Data Sync' },
-  // Celebration
-  { value: 'fireworks', label: 'Fireworks' },
-  // Progress Bar
-  { value: 'progress_bar', label: 'Progress Bar' },
-  // Scene-based
-  { value: 'coding_scene', label: 'Person Coding (Scene)' },
-  { value: 'building_progress', label: 'Building Progress 0-100%' },
-  // ── Progress Icon Sets (Chinese themes & more) ──
-  ...PROGRESS_ANIM_OPTIONS,
-  // Lottie
-  { value: 'lottie_url', label: 'Lottie Animation (URL)' },
-  // Custom
-  { value: 'custom_gif', label: 'Custom GIF/Image' },
-];
-
 // Single icon editor row
 function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
   const [showPicker, setShowPicker] = useState(false);
