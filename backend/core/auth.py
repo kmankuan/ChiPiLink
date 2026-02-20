@@ -41,6 +41,17 @@ def create_token(user_id: str, is_admin: bool = False) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+def create_impersonation_token(target_user_id: str, admin_user_id: str) -> str:
+    """Create a short-lived JWT for admin impersonation of a user"""
+    payload = {
+        "sub": target_user_id,
+        "is_admin": False,
+        "impersonated_by": admin_user_id,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
 async def get_current_user(
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
