@@ -22,6 +22,7 @@ import {
 import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { ExpandableText } from '../../../components/ui/expandable-text';
+import { useGuardedAction } from '@/hooks/useGuardedAction';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
