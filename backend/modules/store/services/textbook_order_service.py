@@ -700,38 +700,44 @@ class TextbookOrderService(BaseService):
                 await self._refund_wallet(user_id, total_amount, wallet_transaction)
             raise create_err
 
-        # 8. Deduct stock
-        for item in order_items:
-            qty = item.get("quantity_ordered", 1)
-            if is_presale:
-                await db.store_products.update_one(
-                    {"book_id": item["book_id"]},
-                    {"$inc": {"reserved_quantity": qty}}
-                )
-            else:
-                await db.store_products.update_one(
-                    {"book_id": item["book_id"]},
-                    {"$inc": {"inventory_quantity": -qty}}
-                )
+        # 8. Deduct stock (non-blocking — order is already saved)
+        try:
+            for item in order_items:
+                qty = item.get("quantity_ordered", 1)
+                if is_presale:
+                    await db.store_products.update_one(
+                        {"book_id": item["book_id"]},
+                        {"$inc": {"reserved_quantity": qty}}
+                    )
+                else:
+                    await db.store_products.update_one(
+                        {"book_id": item["book_id"]},
+                        {"$inc": {"inventory_quantity": -qty}}
+                    )
+        except Exception as stock_err:
+            logger.error(f"[create_and_submit_order] Stock deduction failed (non-blocking): {stock_err}")
 
         # 8b. Update draft order to mark submitted items as 'ordered'
-        ordered_book_ids = {item["book_id"] for item in order_items}
-        now = datetime.now(timezone.utc).isoformat()
-        draft_order = await self.order_repo.get_by_student(student_id, current_year)
-        if draft_order:
-            draft_items = draft_order.get("items", [])
-            updated = False
-            for draft_item in draft_items:
-                if draft_item["book_id"] in ordered_book_ids and draft_item.get("status") != OrderItemStatus.ORDERED.value:
-                    draft_item["status"] = OrderItemStatus.ORDERED.value
-                    draft_item["ordered_at"] = now
-                    draft_item["quantity_ordered"] = 1
-                    updated = True
-            if updated:
-                await self.order_repo.update_order(
-                    draft_order["order_id"],
-                    {"items": draft_items}
-                )
+        try:
+            ordered_book_ids = {item["book_id"] for item in order_items}
+            now_draft = datetime.now(timezone.utc).isoformat()
+            draft_order = await self.order_repo.get_by_student(student_id, current_year)
+            if draft_order:
+                draft_items = draft_order.get("items", [])
+                updated = False
+                for draft_item in draft_items:
+                    if draft_item["book_id"] in ordered_book_ids and draft_item.get("status") != OrderItemStatus.ORDERED.value:
+                        draft_item["status"] = OrderItemStatus.ORDERED.value
+                        draft_item["ordered_at"] = now_draft
+                        draft_item["quantity_ordered"] = 1
+                        updated = True
+                if updated:
+                    await self.order_repo.update_order(
+                        draft_order["order_id"],
+                        {"items": draft_items}
+                    )
+        except Exception as draft_err:
+            logger.error(f"[create_and_submit_order] Draft order update failed (non-blocking): {draft_err}")
 
         # 9. Send to Monday.com (background — don't block the user)
         import asyncio
