@@ -123,7 +123,7 @@ export default function CartDrawer() {
                     <h4 className="font-medium text-sm truncate">{item.name}</h4>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-sm text-muted-foreground">
-                        ${item.price.toFixed(2)}
+                        ${(item.price || 0).toFixed(2)}
                       </p>
                       {item.is_private_catalog && item.grade && (
                         <Badge variant="secondary" className="text-xs py-0 h-5">
