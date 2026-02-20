@@ -169,7 +169,7 @@ export default function CartDrawer() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     <p className="font-semibold text-sm">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
                     </p>
                   </div>
                 </div>
