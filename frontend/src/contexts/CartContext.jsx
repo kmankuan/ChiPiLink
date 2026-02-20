@@ -116,8 +116,8 @@ export function CartProvider({ children }) {
   const closeCart = () => setIsOpen(false);
   const toggleCart = () => setIsOpen(prev => !prev);
 
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemCount = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const subtotal = items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0);
   
   // Separate private and public items
   const privateItems = items.filter(item => item.is_private_catalog);
