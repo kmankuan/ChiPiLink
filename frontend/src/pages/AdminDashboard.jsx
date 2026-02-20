@@ -60,7 +60,6 @@ import {
   FileText,
   EyeOff,
   Trash2,
-  BookOpen,
   GraduationCap,
   Upload,
   RefreshCw,
