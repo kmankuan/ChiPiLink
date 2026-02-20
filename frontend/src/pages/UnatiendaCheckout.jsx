@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Card,
   CardContent,
@@ -27,12 +30,99 @@ import {
   Minus,
   Plus,
   Trash2,
-  Store
+  Store,
+  MapPin,
+  FileText,
+  Calendar,
+  CheckSquare,
+  Upload,
+  List,
+  Type,
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const FIELD_ICONS = {
+  text: Type,
+  email: Mail,
+  phone: Phone,
+  textarea: FileText,
+  select: List,
+  date: Calendar,
+  checkbox: CheckSquare,
+  file: Upload,
+  number: Type,
+};
+
+function DynamicFormField({ field, value, onChange, lang }) {
+  const label = field[`label_${lang}`] || field.label;
+  const placeholder = field[`placeholder_${lang}`] || field.placeholder || '';
+  const Icon = FIELD_ICONS[field.field_type] || Type;
+
+  switch (field.field_type) {
+    case 'textarea':
+      return (
+        <div className="space-y-2">
+          <Label>{label} {field.required && '*'}</Label>
+          <Textarea
+            placeholder={placeholder}
+            value={value || ''}
+            onChange={(e) => onChange(field.field_id, e.target.value)}
+            rows={3}
+            data-testid={`checkout-field-${field.field_id}`}
+          />
+        </div>
+      );
+    case 'select':
+      return (
+        <div className="space-y-2">
+          <Label>{label} {field.required && '*'}</Label>
+          <Select value={value || ''} onValueChange={(v) => onChange(field.field_id, v)}>
+            <SelectTrigger data-testid={`checkout-field-${field.field_id}`}>
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.options || []).map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt[`label_${lang}`] || opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    case 'checkbox':
+      return (
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={!!value}
+            onCheckedChange={(v) => onChange(field.field_id, v)}
+            data-testid={`checkout-field-${field.field_id}`}
+          />
+          <Label>{label} {field.required && '*'}</Label>
+        </div>
+      );
+    default:
+      return (
+        <div className="space-y-2">
+          <Label>{label} {field.required && '*'}</Label>
+          <div className="relative">
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type={field.field_type === 'email' ? 'email' : field.field_type === 'phone' ? 'tel' : field.field_type === 'number' ? 'number' : field.field_type === 'date' ? 'date' : 'text'}
+              placeholder={placeholder}
+              value={value || ''}
+              onChange={(e) => onChange(field.field_id, e.target.value)}
+              className="pl-10"
+              data-testid={`checkout-field-${field.field_id}`}
+            />
+          </div>
+        </div>
+      );
+  }
+}
 
 export default function UnatiendaCheckout() {
   const { t } = useTranslation();
