@@ -244,23 +244,60 @@ export default function Unatienda() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-8 px-4">
+      {/* Adaptive Hero Section */}
+      <div className={`relative py-3 sm:py-6 px-4 ${
+        activeView === 'public' 
+          ? 'bg-gradient-to-br from-primary/10 via-background to-secondary/10' 
+          : 'bg-gradient-to-br from-purple-500/10 via-background to-indigo-500/10'
+      }`}>
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-primary/10 shrink-0">
-                <Store className="h-5 w-5 sm:h-8 sm:w-8 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              {activeView !== 'public' && (
+                <button
+                  onClick={() => { setActiveView('public'); setShowLandingView(true); setSelectedStudent(null); }}
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/80 transition-colors shrink-0"
+                  data-testid="back-to-store-btn"
+                >
+                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                </button>
+              )}
+              <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${
+                activeView === 'public' ? 'bg-primary/10' : 'bg-purple-500/10'
+              }`}>
+                {activeView === 'public' ? (
+                  <Store className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
+                ) : (
+                  <GraduationCap className="h-5 w-5 sm:h-7 sm:w-7 text-purple-600 dark:text-purple-400" />
+                )}
               </div>
               <div className="min-w-0">
-                <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-bold truncate">
-                  {storeInfo?.name || 'Unatienda'}
+                <h1 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold truncate">
+                  {activeView === 'public' 
+                    ? (storeInfo?.name || 'Unatienda')
+                    : (activeView === 'textbook-order' && selectedStudent
+                      ? `${selectedStudent.first_name || selectedStudent.full_name?.split(' ')[0] || ''}`
+                      : (storeConfig?.textbooks_category_label?.[i18n?.language] || 'School Textbooks')
+                    )
+                  }
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
-                  {storeInfo?.description || 'Tu tienda de confianza'}
+                <p className="text-[11px] sm:text-sm text-muted-foreground truncate">
+                  {activeView === 'public'
+                    ? (storeInfo?.description || 'Tu tienda de confianza')
+                    : (activeView === 'textbook-order' && selectedStudent
+                      ? `${selectedStudent.school_name || ''} ${selectedStudent.grade ? `• ${selectedStudent.grade}°` : ''}`
+                      : 'Textos escolares exclusivos'
+                    )
+                  }
                 </p>
               </div>
             </div>
+            {activeView !== 'public' && (
+              <Badge variant="outline" className="shrink-0 text-[10px] border-purple-300 text-purple-600 dark:border-purple-700 dark:text-purple-400 hidden sm:flex">
+                <Lock className="h-3 w-3 mr-1" />
+                Privado
+              </Badge>
+            )}
           </div>
         </div>
       </div>
