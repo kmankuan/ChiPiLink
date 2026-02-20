@@ -89,6 +89,7 @@ import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
+import { ImpersonationBanner } from '@/components/shared/ImpersonationBanner';
 // CXGenieWidget removed - access via header support button instead
 
 import '@/App.css';
