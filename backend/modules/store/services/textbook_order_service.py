@@ -654,7 +654,7 @@ class TextbookOrderService(BaseService):
             balance = wallet.get("balance_usd", 0)
             if balance < total_amount:
                 raise ValueError(
-                    f"Insufficient wallet balance. Available: ${balance:.2f}, Required: ${total_amount:.2f}"
+                    f"Saldo insuficiente. Disponible: ${balance:.2f}, Requerido: ${total_amount:.2f}"
                 )
             wallet_transaction = await wallet_service.charge(
                 user_id=user_id,
