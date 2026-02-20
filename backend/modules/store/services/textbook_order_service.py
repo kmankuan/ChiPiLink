@@ -875,13 +875,21 @@ class TextbookOrderService(BaseService):
     ) -> Dict:
         """Send order to Monday.com — delegates to adapter architecture.
         Creates item + subitems on orders board, then updates TXB inventory board.
+        Skips order sync if order already has a Monday.com item (e.g. pre-sale import).
         """
         from .monday_sync_service import monday_sync_service
 
-        # 1. Sync order to Monday.com (item + subitems + update)
-        result = await monday_sync_service.sync_order_to_monday(
-            order, selected_items, user_name, user_email, submission_total
-        )
+        # Guard: If order already has Monday.com items (e.g. imported from board),
+        # skip creating a new item to prevent duplicate/infinite sync loops.
+        existing_ids = order.get("monday_item_ids", [])
+        if existing_ids:
+            logger.info(f"Order {order.get('order_id')} already has Monday.com items {existing_ids}, skipping order board sync")
+            result = {"item_id": existing_ids[0], "subitems": []}
+        else:
+            # 1. Sync order to Monday.com (item + subitems + update)
+            result = await monday_sync_service.sync_order_to_monday(
+                order, selected_items, user_name, user_email, submission_total
+            )
 
         # 2. Update TXB inventory board — create subitems per student (non-blocking)
         try:
