@@ -12,7 +12,7 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://user-mgmt-api-1.preview.emergentagent.com"
+    BASE_URL = "https://form-config-test.preview.emergentagent.com"
 
 # Test data from agent context - verified students for presale testing
 PRESALE_STUDENT_ID = "std_ac97051aed2f"  # presale_mode=True, grade=3
