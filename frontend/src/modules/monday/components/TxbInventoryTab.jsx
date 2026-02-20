@@ -482,16 +482,53 @@ export default function TxbInventoryTab() {
               )}
             </div>
           )}
-          <Button
-            onClick={handleFullSync}
-            disabled={syncing || !config.enabled || !config.board_id}
-            className="w-full gap-2"
-            variant="outline"
-            data-testid="full-sync-btn"
-          >
-            {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {syncing ? 'Syncing all textbooks...' : 'Sync All Textbooks to Monday.com'}
-          </Button>
+          {syncing && syncProgress && syncProgress.total > 0 && (
+            <div className="space-y-2" data-testid="sync-progress">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">
+                  Syncing {syncProgress.processed || 0}/{syncProgress.total} textbooks...
+                </span>
+                <span className="font-mono text-muted-foreground">
+                  {Math.round(((syncProgress.processed || 0) / syncProgress.total) * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 rounded-full overflow-hidden bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${((syncProgress.processed || 0) / syncProgress.total) * 100}%` }}
+                />
+              </div>
+              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                <span className="text-green-600">Created: {syncProgress.created || 0}</span>
+                <span className="text-blue-600">Updated: {syncProgress.updated || 0}</span>
+                {syncProgress.failed > 0 && <span className="text-red-600">Failed: {syncProgress.failed}</span>}
+              </div>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button
+              onClick={handleFullSync}
+              disabled={syncing || !config.enabled || !config.board_id}
+              className="flex-1 gap-2"
+              variant="outline"
+              data-testid="full-sync-btn"
+            >
+              {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {syncing ? 'Syncing all textbooks...' : 'Sync All Textbooks to Monday.com'}
+            </Button>
+            {syncing && (
+              <Button
+                onClick={handleCancelSync}
+                variant="destructive"
+                size="icon"
+                className="shrink-0"
+                data-testid="stop-sync-btn"
+                title="Stop sync"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           {(!config.enabled || !config.board_id) && (
             <p className="text-[10px] text-amber-600 flex items-center gap-1">
               <AlertCircle className="h-3 w-3" />
