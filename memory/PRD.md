@@ -53,6 +53,14 @@ See CHANGELOG.md for full history of all phases.
 - **Full Sync Stop Button**: Converted Monday.com full sync from synchronous to background task pattern. Added `GET /full-sync/status` (polling progress), `POST /full-sync/cancel` (graceful cancellation via `_full_sync_cancel` flag). Frontend shows real-time progress bar (processed/total, created/updated/failed counts) and a red Stop button (Square icon) during sync. Dashboard widget also updated for async response.
 - Testing: 100% pass rate (15/15 tests)
 
+### Phase 7b - Sync History Log + Board Integration Verification (Complete - Feb 20, 2026)
+- **Sync History Log**: Added `_log_sync()` method to `monday_txb_inventory_adapter.py` using `txb_inventory_sync_history` MongoDB collection (max 50 entries, auto-cleanup). Each entry records: timestamp, trigger, status, created/updated/failed counts, total, processed, duration_s, error. API endpoint: `GET /api/store/monday/txb-inventory/sync-history`. Frontend `TxbInventoryTab.jsx` shows a scrollable history panel with status icons, timestamps, and duration.
+- **Board Integration Verification**: All 3 Monday.com board integrations confirmed working:
+  - Orders Board (18397140868): Auto-sync enabled, subitems for per-book tracking, column mapping for 12 fields
+  - Textbooks Board (18397140920): Full sync with cancel support, grade groups, stock sync, 10 columns + 4 subitem columns
+  - Messages/CRM Board (5931665026): Customer chat via Updates/Replies, 32 columns including email, phone, student info
+- Testing: 100% pass rate (14/14 backend + all frontend UI elements)
+
 ## Upcoming Tasks
 None - all P1 and P2 tasks from the backlog are now complete.
 
@@ -60,9 +68,10 @@ None - all P1 and P2 tasks from the backlog are now complete.
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
 
-## Configuration
-- **CRM Board ID**: 5931665026 (Admin Customers board)
-- **Email Column**: `email`
+## Monday.com Board Configuration
+- **Orders Board ID**: 18397140868 (textbook orders, with subitems per book)
+- **Textbooks Board ID**: 18397140920 (textbook inventory, full sync + stock sync)
+- **CRM Board ID**: 5931665026 (customer chat, Updates = topics, Replies = messages)
 - Monday.com API Token: configured in backend/.env
 
 ## Key Files
