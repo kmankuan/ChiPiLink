@@ -197,13 +197,16 @@ export default function TxbInventoryTab() {
             toast.success(`Synced! Created: ${status.created}, Updated: ${status.updated}, Failed: ${status.failed}`);
             setSyncing(false);
             fetchConfig();
+            fetchSyncHistory();
           } else if (status.status === 'cancelled') {
             toast.info(`Sync stopped. Processed ${status.processed}/${status.total} (Created: ${status.created}, Updated: ${status.updated})`);
             setSyncing(false);
             fetchConfig();
+            fetchSyncHistory();
           } else if (status.status === 'error') {
             toast.error(`Sync failed: ${status.error || 'Unknown error'}`);
             setSyncing(false);
+            fetchSyncHistory();
           } else {
             setTimeout(poll, 1500);
           }
