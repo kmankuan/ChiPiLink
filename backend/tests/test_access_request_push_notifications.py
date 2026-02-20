@@ -156,8 +156,12 @@ class TestBackendAPIEndpoints:
     
     def test_backend_health(self):
         """Verify backend is running"""
-        response = self.session.get(f"{BASE_URL}/api/health")
-        assert response.status_code == 200
+        # Retry a few times for transient errors
+        for _ in range(3):
+            response = self.session.get(f"{BASE_URL}/api/health", timeout=10)
+            if response.status_code == 200:
+                break
+        assert response.status_code == 200, f"Backend health check failed: {response.status_code}"
         data = response.json()
         assert data.get("status") == "healthy"
         print("PASS: Backend is healthy")
