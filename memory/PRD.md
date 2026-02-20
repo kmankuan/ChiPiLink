@@ -59,6 +59,12 @@ See CHANGELOG.md for full history of all phases.
 - **Implementation**: Added `_send_push_to_admins` and `_send_push_to_user` helpers in `/app/backend/modules/realtime/events.py`
 - Testing: 100% pass rate (14/14 tests)
 
+### Phase 6f - URL State Persistence + Performance (Complete - Feb 20, 2026)
+- **Unatienda view persistence**: `activeView` now syncs to URL params (`?view=textbooks`, `?view=textbook-order&student=xxx`). Refreshing the page preserves the current view instead of jumping back to the public store.
+- **Admin module prefetching**: 6 most-used modules (Orders, Messages, Unatienda, Wallet, Textbook Catalog, Students & Schools) are silently preloaded 2s after admin dashboard mount — no loading flash when navigating.
+- **Backend parallel startup**: Startup phases now use `asyncio.gather()` — init time ~52ms (was sequential). Seed data, module init, and background services all parallelized.
+- Testing: 100% pass rate (14/14 tests)
+
 ## Upcoming Tasks
 - **(P1)** Abstract the progress icon system into a global resource
 - **(P2)** Implement a "Stop" button for the full Monday.com sync operation
