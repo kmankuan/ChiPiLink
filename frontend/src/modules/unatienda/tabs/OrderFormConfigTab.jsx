@@ -108,10 +108,10 @@ export default function OrderFormConfigTab({ configApiPath = '/api/store/order-f
   const fetchData = async () => {
     try {
       const [fieldsRes, typesRes] = await Promise.all([
-        axios.get(`${API_URL}/api/store/order-form-config/admin/fields?include_inactive=${showInactive}`, {
+        axios.get(`${apiBase}/admin/fields?include_inactive=${showInactive}`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`${API_URL}/api/store/order-form-config/field-types`)
+        axios.get(`${apiBase}/field-types`)
       ]);
       
       setFields(fieldsRes.data.fields || []);
@@ -202,14 +202,14 @@ export default function OrderFormConfigTab({ configApiPath = '/api/store/order-f
 
       if (editingField) {
         await axios.put(
-          `${API_URL}/api/store/order-form-config/admin/fields/${editingField.field_id}`,
+          `${apiBase}/admin/fields/${editingField.field_id}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         toast.success('Field updated');
       } else {
         await axios.post(
-          `${API_URL}/api/store/order-form-config/admin/fields`,
+          `${apiBase}/admin/fields`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
