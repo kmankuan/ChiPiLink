@@ -223,9 +223,11 @@ async def sync_all_orders(admin: dict = Depends(get_admin_user)):
 
     try:
         # Find orders without monday_item_id that are not cancelled/draft
+        # Also exclude orders that have monday_item_ids (from pre-sale import)
         orders = await database.store_textbook_orders.find(
             {"$or": [{"monday_item_id": None}, {"monday_item_id": {"$exists": False}}],
-             "status": {"$nin": ["cancelled", "draft"]}},
+             "$and": [{"$or": [{"monday_item_ids": {"$exists": False}}, {"monday_item_ids": {"$size": 0}}, {"monday_item_ids": None}]}],
+             "status": {"$nin": ["cancelled", "draft", "awaiting_link"]}},
             {"_id": 0}
         ).to_list(100)
 
