@@ -25,7 +25,8 @@ class TestTextbookOrderBugFix:
             }
         )
         if response.status_code == 200:
-            return response.json().get("access_token")
+            # API returns "token" not "access_token"
+            return response.json().get("token")
         pytest.skip("Admin authentication failed")
     
     @pytest.fixture(scope="class")  
