@@ -241,32 +241,31 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup"""
+    import asyncio
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
     
-    # Create database indexes for optimized queries
+    # Phase 1: Database indexes (must be first)
     await create_indexes()
     
-    # Seed essential data (admin user, site config, translations, landing page)
-    await seed_admin_user()
-    await seed_site_config()
-    await seed_translations()
-    await seed_landing_page()
+    # Phase 2: Seed essential data in parallel
+    await asyncio.gather(
+        seed_admin_user(),
+        seed_site_config(),
+        seed_translations(),
+        seed_landing_page(),
+    )
 
-    # Seed showcase defaults (banners + media player)
+    # Phase 3: Initialize modules in parallel
     from modules.showcase import seed_showcase_defaults
-    await seed_showcase_defaults()
+    await asyncio.gather(
+        seed_showcase_defaults(),
+        init_users(),
+        init_notifications(),
+        roles_service.initialize_default_roles(),
+    )
     
-    # Initialize Users module (async init)
-    await init_users()
-    
-    # Initialize Notifications module (async init)
-    await init_notifications()
-    
-    # Initialize Roles module (create default roles)
-    await roles_service.initialize_default_roles()
-    
-    # Register Monday.com wallet webhook handler + event subscriptions
+    # Phase 4: Register webhooks and start pollers in parallel
     from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
     await wallet_monday_adapter.register_webhooks()
     wallet_monday_adapter.init_event_handlers()
@@ -284,20 +283,37 @@ async def startup_event():
     else:
         logger.info("Recharge Approval board not configured or disabled, skipping webhook")
 
-    # Start Telegram polling for community feed
-    from modules.community.services.telegram_service import telegram_service
-    if telegram_service.token:
-        await telegram_service.start_polling()
-        logger.info("Telegram community feed polling started")
+    # Start background services in parallel
+    async def start_telegram():
+        from modules.community.services.telegram_service import telegram_service
+        if telegram_service.token:
+            await telegram_service.start_polling()
+            logger.info("Telegram community feed polling started")
 
-    # Start Gmail background polling for payment alerts
-    from modules.wallet_topups.gmail_poller import gmail_poller
-    await gmail_poller.start()
+    async def start_gmail():
+        from modules.wallet_topups.gmail_poller import gmail_poller
+        await gmail_poller.start()
 
-    # Start Monday.com banner auto-sync scheduler
-    from modules.showcase.scheduler import banner_sync_scheduler
-    from modules.showcase.monday_banner_adapter import monday_banner_adapter
-    try:
+    async def start_banner_sync():
+        from modules.showcase.scheduler import banner_sync_scheduler
+        from modules.showcase.monday_banner_adapter import monday_banner_adapter
+        try:
+            sync_config = await db['showcase_sync_config'].find_one({"id": "default"}, {"_id": 0})
+            if sync_config and sync_config.get("enabled") and sync_config.get("board_id"):
+                monday_banner_adapter.configure(board_id=str(sync_config["board_id"]))
+                interval = sync_config.get("interval_minutes", 15)
+                banner_sync_scheduler.start(monday_banner_adapter, interval_minutes=interval)
+                logger.info(f"Banner auto-sync started (every {interval} min)")
+            else:
+                logger.info("Banner auto-sync not configured, skipping")
+        except Exception as e:
+            logger.warning(f"Banner auto-sync init failed (non-blocking): {e}")
+
+    await asyncio.gather(
+        start_telegram(),
+        start_gmail(),
+        start_banner_sync(),
+    )
         # Re-register local webhook handler if previously configured
         await monday_banner_adapter.ensure_local_handler()
 
