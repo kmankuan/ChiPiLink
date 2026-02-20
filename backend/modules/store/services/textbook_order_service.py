@@ -717,7 +717,7 @@ class TextbookOrderService(BaseService):
         # 8b. Update draft order to mark submitted items as 'ordered'
         ordered_book_ids = {item["book_id"] for item in order_items}
         now = datetime.now(timezone.utc).isoformat()
-        draft_order = await self.order_repo.get_by_student(student_id, year)
+        draft_order = await self.order_repo.get_by_student(student_id, current_year)
         if draft_order:
             draft_items = draft_order.get("items", [])
             updated = False
