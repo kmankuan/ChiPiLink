@@ -1,6 +1,7 @@
 """
 Realtime Event Emitters
 Broadcasts events via WebSocket to relevant users/rooms when app actions happen.
+Also sends push notifications for critical events (access requests).
 Used by service methods to push live updates to connected clients.
 """
 import logging
@@ -12,6 +13,47 @@ logger = logging.getLogger(__name__)
 
 ROOM_ADMIN = "admin"
 ROOM_STORE = "store"
+
+PUSH_CATEGORY = "student_access"
+
+
+async def _send_push_to_admins(title: str, body: str, data: Dict = None):
+    """Send push notification to all admin users."""
+    try:
+        from core.database import db
+        from modules.notifications.services.push_service import push_notification_service
+
+        admin_users = await db.users.find(
+            {"is_admin": True}, {"_id": 0, "user_id": 1}
+        ).to_list(50)
+        admin_ids = [u["user_id"] for u in admin_users if u.get("user_id")]
+
+        if admin_ids:
+            await push_notification_service.send_to_users(
+                user_ids=admin_ids,
+                category_id=PUSH_CATEGORY,
+                title=title,
+                body=body,
+                data=data or {}
+            )
+    except Exception as e:
+        logger.warning(f"[push] Failed to send admin push: {e}")
+
+
+async def _send_push_to_user(user_id: str, title: str, body: str, data: Dict = None):
+    """Send push notification to a specific user."""
+    try:
+        from modules.notifications.services.push_service import push_notification_service
+
+        await push_notification_service.send_notification(
+            user_id=user_id,
+            category_id=PUSH_CATEGORY,
+            title=title,
+            body=body,
+            data=data or {}
+        )
+    except Exception as e:
+        logger.warning(f"[push] Failed to send user push to {user_id}: {e}")
 
 
 async def emit_order_submitted(
