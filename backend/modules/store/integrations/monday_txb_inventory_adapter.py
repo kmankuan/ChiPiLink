@@ -33,6 +33,9 @@ _column_sync_tasks: Dict[str, asyncio.Task] = {}
 _full_sync_task: Optional[asyncio.Task] = None
 _full_sync_cancel = False
 
+SYNC_HISTORY_COLLECTION = "txb_inventory_sync_history"
+SYNC_HISTORY_MAX = 50
+
 
 class TxbInventoryAdapter(BaseMondayAdapter):
     """Adapter for textbook inventory board — bidirectional sync with Monday.com"""
