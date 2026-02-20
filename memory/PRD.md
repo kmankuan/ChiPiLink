@@ -30,6 +30,12 @@ See CHANGELOG.md for full history of all phases.
 - **Frontend Fix 3**: Added timeout: 30000 to SchoolTextbooksView submit call
 - Testing: 100% pass rate (15/15 tests)
 
+### Phase 6b - Archive Fix + Delete Orders + Admin Alert (Complete - Feb 20, 2026)
+- **Archive Bug Fix**: `bulk-archive` endpoint was writing to `db.textbook_orders` (wrong collection) instead of `db.store_textbook_orders`. Archiving now works correctly.
+- **Delete Orders**: New `POST /api/store/textbook-orders/admin/bulk-delete` endpoint permanently removes orders from database. Frontend adds a red "Delete" button next to "Archive" in the bulk action bar, with a destructive confirmation dialog.
+- **Admin Alert on Post-Order Failure**: New `_notify_admin_post_order_failure` method creates a notification in the `notifications` collection when wallet is charged but a subsequent step (stock deduction or draft update) fails. This helps admin proactively detect edge cases.
+- Testing: 100% pass rate (17/17 tests)
+
 ## Upcoming Tasks
 - **(P1)** Abstract the progress icon system into a global resource
 - **(P2)** Implement a "Stop" button for the full Monday.com sync operation
