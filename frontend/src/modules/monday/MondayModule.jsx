@@ -417,29 +417,9 @@ export default function MondayModule() {
             <Building2 className="h-3.5 w-3.5" />
             Workspaces
           </TabsTrigger>
-          <TabsTrigger value="textbooks" className="gap-1.5 text-xs">
-            <BookOpen className="h-3.5 w-3.5" />
-            Book Orders
-          </TabsTrigger>
-          <TabsTrigger value="txb-inventory" className="gap-1.5 text-xs">
-            <Layers className="h-3.5 w-3.5" />
-            TXB Inventory
-          </TabsTrigger>
           <TabsTrigger value="webhooks" className="gap-1.5 text-xs">
             <Plug className="h-3.5 w-3.5" />
             Webhooks
-          </TabsTrigger>
-          <TabsTrigger value="wallet" className="gap-1.5 text-xs">
-            <Wallet className="h-3.5 w-3.5" />
-            Wallet
-          </TabsTrigger>
-          <TabsTrigger value="sync-dashboard" className="gap-1.5 text-xs">
-            <Activity className="h-3.5 w-3.5" />
-            Sync Dashboard
-          </TabsTrigger>
-          <TabsTrigger value="status-mapping" className="gap-1.5 text-xs">
-            <Settings className="h-3.5 w-3.5" />
-            Status Mapping
           </TabsTrigger>
           <TabsTrigger value="general" className="gap-1.5 text-xs">
             <LayoutGrid className="h-3.5 w-3.5" />
