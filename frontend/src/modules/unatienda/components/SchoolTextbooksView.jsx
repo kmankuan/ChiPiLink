@@ -424,7 +424,7 @@ export default function SchoolTextbooksView({
     setSummaryStudent(student);
   };
 
-  const handleConfirmOrder = async () => {
+  const handleConfirmOrder = () => executeSubmit(async () => {
     if (!summaryStudent) return;
     const student = summaryStudent;
     const studentId = student.student_id || student.sync_id;
@@ -434,7 +434,6 @@ export default function SchoolTextbooksView({
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
 
-    setSubmitting(true);
     try {
       // Refresh wallet balance before submitting to avoid stale data
       try {
@@ -444,7 +443,6 @@ export default function SchoolTextbooksView({
         const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
         if (freshBalance < total) {
           toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
-          setSubmitting(false);
           return;
         }
       } catch {}
@@ -477,10 +475,8 @@ export default function SchoolTextbooksView({
       axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
         .catch(() => {});
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
   
   const handleReorderRequest = async () => {
     if (!reorderItem) return;
