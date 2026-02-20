@@ -297,12 +297,25 @@ export default function AdminDashboard() {
         return <UnatiendaModule />;
       case 'orders':
         return <TextbookOrdersAdminTab />;
+      case 'messages':
+        return <MessagesTab token={localStorage.getItem('auth_token')} />;
       case 'wallet':
         return <WalletModule />;
       case 'payment-alerts':
         return <PaymentAlertsModule />;
       case 'analytics':
         return <StoreAnalyticsModule />;
+      // School Textbooks
+      case 'textbook-catalog':
+        return <TextbookCatalogModule />;
+      case 'students-schools':
+        return <StudentsSchoolsModule />;
+      case 'presale-import':
+        return <PreSaleImportTab token={localStorage.getItem('auth_token')} />;
+      case 'monday-textbook-sync':
+        return <MondayTextbookSyncModule />;
+      case 'textbook-form-settings':
+        return <TextbookFormSettingsModule />;
       case 'customers':
         return <UsersManagementModule />;
       case 'memberships':
