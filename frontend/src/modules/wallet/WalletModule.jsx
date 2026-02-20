@@ -1,15 +1,16 @@
 /**
  * WalletModule — Admin Wallet Management
- * Tabs: Overview, Transactions, Bank Info, Settings
+ * Tabs: Overview, Transactions, Bank Info, Monday.com Sync, Settings
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wallet, ArrowLeftRight, Building2, Settings } from 'lucide-react';
+import { Wallet, ArrowLeftRight, Building2, Settings, RefreshCw } from 'lucide-react';
 import WalletOverviewTab from './tabs/WalletOverviewTab';
 import WalletTransactionsTab from './tabs/WalletTransactionsTab';
 import BankInfoTab from './tabs/BankInfoTab';
 import WalletSettingsTab from './tabs/WalletSettingsTab';
+import WalletMondayTab from '@/modules/monday/components/WalletMondayTab';
 
 export default function WalletModule() {
   const token = localStorage.getItem('auth_token');
@@ -24,7 +25,7 @@ export default function WalletModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="flex gap-1 h-auto p-1 w-full justify-start flex-wrap">
           <TabsTrigger value="overview" className="gap-1.5 text-xs">
             <Wallet className="h-3.5 w-3.5" />
             {t('wallet.overview')}
@@ -36,6 +37,10 @@ export default function WalletModule() {
           <TabsTrigger value="bank-info" className="gap-1.5 text-xs">
             <Building2 className="h-3.5 w-3.5" />
             {t('wallet.bankInfo')}
+          </TabsTrigger>
+          <TabsTrigger value="monday-sync" className="gap-1.5 text-xs">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Monday.com Sync
           </TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 text-xs">
             <Settings className="h-3.5 w-3.5" />
@@ -53,6 +58,10 @@ export default function WalletModule() {
 
         <TabsContent value="bank-info" className="mt-4">
           <BankInfoTab token={token} />
+        </TabsContent>
+
+        <TabsContent value="monday-sync" className="mt-4">
+          <WalletMondayTab />
         </TabsContent>
 
         <TabsContent value="settings" className="mt-4">
