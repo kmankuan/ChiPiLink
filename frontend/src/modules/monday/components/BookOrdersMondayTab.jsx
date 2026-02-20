@@ -371,7 +371,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4 space-y-4">
-            <BoardSelector boards={allBoards} groups={ordersGroups} boardId={ordersBoard} groupId={ordersGroup}
+            <BoardSelector boards={boards} groups={ordersGroups} boardId={ordersBoard} groupId={ordersGroup}
               onBoardChange={setOrdersBoard} onGroupChange={setOrdersGroup} label="Orders Board"
               description="Each order creates 1 item here. The order resume is posted as an Update." />
 
@@ -426,7 +426,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4 space-y-4">
-            <BoardSelector boards={allBoards} groups={[]} boardId={textbooksBoard} groupId=""
+            <BoardSelector boards={boards} groups={[]} boardId={textbooksBoard} groupId=""
               onBoardChange={setTextbooksBoard} onGroupChange={() => {}} label="Textbooks Board"
               description="Each textbook is an item. When a student orders a book, a subitem is created under the matching textbook." />
 
