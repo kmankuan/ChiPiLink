@@ -101,6 +101,7 @@ export default function TextbookOrdersAdminTab() {
   const [adminNotes, setAdminNotes] = useState('');
   const [showArchived, setShowArchived] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [chatStudent, setChatStudent] = useState(null);
 
