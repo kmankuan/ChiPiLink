@@ -1,0 +1,63 @@
+{
+  "summary": "Tested three bug fixes: (1) Draft orders filter - verified GET /api/store/textbook-orders/my-orders excludes draft orders. (2) Admin Impersonation - POST /api/auth-v2/users/{user_id}/impersonate returns token, impersonation token accesses user endpoints, blocked from admin endpoints (403), audit logs created in MongoDB. (3) CRM Chat modal has mb-16 sm:mb-0 class for mobile bottom margin. (4) ImpersonationBanner component shows amber banner with Exit button during impersonation. All 8 backend tests passed. Frontend impersonation UI verified working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Admin login works (POST /api/auth-v2/login with admin@chipi.co/admin)",
+    "GET /api/store/textbook-orders/my-orders excludes draft orders - returns only non-draft orders",
+    "POST /api/auth-v2/users/{user_id}/impersonate returns token and user info",
+    "Impersonation token allows access to GET /api/auth-v2/users/me (returns target user)",
+    "Impersonation token is blocked from admin endpoints (GET /api/auth-v2/users returns 403)",
+    "Impersonating non-existent user returns 404",
+    "Non-admin users cannot use impersonate endpoint (403)",
+    "Impersonation creates audit log in MongoDB impersonation_logs collection",
+    "CRM Chat modal has mb-16 sm:mb-0 class for mobile bottom margin",
+    "Admin Users page shows Eye icon (impersonate) button for non-admin users",
+    "ImpersonationBanner component renders with amber background during impersonation",
+    "ImpersonationBanner shows 'Viewing as {user}' with Exit button",
+    "Admin panel loads correctly with all sidebar sections"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_impersonation_draft_filter.py",
+    "/app/test_reports/pytest/pytest_results_impersonation_draft.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "textbook_order_repository.py get_by_user correctly has status != draft filter",
+    "core/auth.py create_impersonation_token() correctly creates 30-min token with impersonated_by claim",
+    "users.py POST /{user_id}/impersonate endpoint has proper admin check and audit logging",
+    "AuthContext.js startImpersonation/exitImpersonation/isImpersonating state management implemented correctly",
+    "ImpersonationBanner.jsx renders only when isImpersonating is true with proper styling",
+    "CrmChat.jsx line 426: mb-16 sm:mb-0 ensures modal sits above bottom navigation on mobile",
+    "RegisteredUsersTab.jsx shows Eye button only for non-admin users with correct data-testid"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_impersonation_draft_filter.py"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 tests passed)",
+    "frontend": "100% (All UI elements verified)"
+  },
+  "test_credentials": {
+    "admin": {"email": "admin@chipi.co", "password": "admin"},
+    "login_route": "/admin/login",
+    "test_user_for_impersonation": "Juan Pérez (cli_6cc8b44b7ad5)"
+  },
+  "seed_data_creation": "None required - used existing users",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Three bug fixes verified: (1) Draft filter on my-orders endpoint working - status != draft query added to textbook_order_repository.py get_by_user. (2) Admin impersonation flow: POST /api/auth-v2/users/{user_id}/impersonate -> returns {token, user}, impersonation token has is_admin=false and impersonated_by claim, token expires in 30 min. (3) CRM Chat modal on mobile has mb-16 bottom margin to sit above bottom nav. ImpersonationBanner at top of App.js shows when localStorage has impersonate_original_token. Impersonation logs stored in MongoDB impersonation_logs collection.",
+  "impersonation_verification": {
+    "endpoint": "POST /api/auth-v2/users/{user_id}/impersonate",
+    "token_claims": ["sub=target_user_id", "is_admin=false", "impersonated_by=admin_user_id", "exp=30min"],
+    "ui_flow": "Admin > Users > Click Eye icon > Redirected to / with amber banner > Click Exit returns to /admin",
+    "audit_logs": "Verified in chipilink_prod.impersonation_logs collection with admin_user_id, target_user_id, created_at"
+  }
+}
