@@ -43,6 +43,7 @@ import {
   GraduationCap,
   Download,
   Trash2,
+  Eye,
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
