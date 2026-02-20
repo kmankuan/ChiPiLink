@@ -238,6 +238,15 @@ export default function AdminDashboard() {
     return () => setScope('public');
   }, [setScope]);
 
+  // Prefetch critical modules after initial paint to avoid loading flash on nav
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      PREFETCH_MODULES.forEach(loader => loader().catch(() => {}));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
