@@ -115,7 +115,7 @@ export default function TxbInventoryTab() {
     }
   }, [token]);
 
-  useEffect(() => { fetchConfig(); }, [fetchConfig]);
+  useEffect(() => { fetchConfig(); fetchSyncHistory(); }, [fetchConfig, fetchSyncHistory]);
 
   const fetchBoardColumns = useCallback(async (boardId) => {
     if (!boardId) return;
