@@ -314,6 +314,14 @@ async def txb_full_sync_cancel(admin: dict = Depends(get_admin_user)):
     return await txb_inventory_adapter.cancel_full_sync()
 
 
+@router.get("/txb-inventory/sync-history")
+async def txb_sync_history(limit: int = 20, admin: dict = Depends(get_admin_user)):
+    """Get recent sync history entries for textbook inventory"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    history = await txb_inventory_adapter.get_sync_history(limit=limit)
+    return {"history": history}
+
+
 @router.post("/txb-inventory/sync-stock/{book_id}")
 async def txb_sync_stock(book_id: str, admin: dict = Depends(get_admin_user)):
     """Push a single product's stock to Monday.com"""
