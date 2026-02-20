@@ -362,6 +362,7 @@ function App() {
                 <BrowserRouter>
                   <LayoutProvider>
                     <div className="App min-h-screen bg-background noise-bg app-content pb-[66px]">
+                      <ImpersonationBanner />
                       <AppRouter />
                       <BottomNav />
                       <CartDrawer />
