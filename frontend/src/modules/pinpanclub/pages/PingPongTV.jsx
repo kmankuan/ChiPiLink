@@ -732,6 +732,16 @@ export default function PingPongTV() {
                 <LayoutDashboard className="w-4 h-4" />
                 <span className="hidden md:inline">Dashboard</span>
               </button>
+              <button
+                onClick={() => setMode('tournament')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  mode === 'tournament' ? 'bg-white text-black' : 'text-white/60 hover:text-white'
+                }`}
+                data-testid="tv-tournament-mode-btn"
+              >
+                <Trophy className="w-4 h-4" />
+                <span className="hidden md:inline">Tournament</span>
+              </button>
             </div>
 
             {/* Controls */}
