@@ -681,6 +681,161 @@ export default function PingPongTV() {
     );
   };
 
+  const renderTournament = () => {
+    if (!arenaTournament) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center">
+            <Trophy className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white/60">No Active Tournament</h2>
+            <p className="text-white/40 mt-2">Start a tournament in PinPan Arena to display it here</p>
+          </div>
+        </div>
+      );
+    }
+
+    const t = arenaTournament;
+    const isCompleted = t.status === 'completed';
+    const FORMAT_LABELS = { single_elimination: 'Single Elimination', round_robin: 'Round Robin', group_knockout: 'Group + Knockout', rapidpin: 'RapidPin Mode' };
+
+    // Sort matches for display
+    const activeMatches = arenaMatches.filter(m => m.status === 'in_progress');
+    const pendingMatches = arenaMatches.filter(m => m.status === 'pending' && m.player_a_id && m.player_b_id);
+    const completedMatches = arenaMatches.filter(m => m.status === 'completed');
+
+    return (
+      <div className="p-6 space-y-6 overflow-auto max-h-[calc(100vh-80px)]">
+        {/* Tournament Title */}
+        <div className="text-center">
+          <h1 className="text-4xl font-black text-white tracking-tight">{t.name}</h1>
+          <div className="flex items-center justify-center gap-4 mt-2 text-white/60 text-sm">
+            <span className="px-3 py-1 rounded-full bg-white/10">{FORMAT_LABELS[t.format] || t.format}</span>
+            <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {t.total_participants} players</span>
+            <span className={`px-3 py-1 rounded-full ${isCompleted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'}`}>
+              {t.status?.replace(/_/g, ' ').toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* Champion */}
+        {isCompleted && t.champion_id && (
+          <div className="text-center bg-gradient-to-r from-amber-900/40 via-yellow-800/30 to-amber-900/40 rounded-2xl p-6 border border-amber-500/30">
+            <Trophy className="w-12 h-12 text-amber-400 mx-auto mb-2" />
+            <p className="text-amber-400 text-xs uppercase tracking-widest font-bold">Champion</p>
+            <p className="text-3xl font-black text-white mt-1">
+              {t.participants?.find(p => p.player_id === t.champion_id)?.player_name || 'Unknown'}
+            </p>
+            <div className="flex justify-center gap-8 mt-3">
+              {t.runner_up_id && (
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 uppercase">Runner-up</p>
+                  <p className="text-white font-semibold">{t.participants?.find(p => p.player_id === t.runner_up_id)?.player_name}</p>
+                </div>
+              )}
+              {t.third_place_id && (
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 uppercase">3rd Place</p>
+                  <p className="text-white font-semibold">{t.participants?.find(p => p.player_id === t.third_place_id)?.player_name}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Active Matches Highlight */}
+        {activeMatches.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold text-white/80 mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> Live Now
+            </h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {activeMatches.map(m => (
+                <div key={m.match_id} className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-semibold text-lg">{m.player_a_name || 'TBD'}</span>
+                    <span className="text-white/60 text-xs">vs</span>
+                    <span className="text-white font-semibold text-lg">{m.player_b_name || 'TBD'}</span>
+                  </div>
+                  <div className="text-center mt-1">
+                    <span className="text-3xl font-mono font-bold text-white">{m.score_a} - {m.score_b}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bracket / Match List */}
+        <div>
+          <h3 className="text-lg font-bold text-white/80 mb-3">Bracket</h3>
+          <div className="space-y-3">
+            {(t.brackets || []).map((bracket, bi) => {
+              const roundMatches = arenaMatches.filter(m => {
+                if (bracket.name === 'Third Place') return m.group === '__third_place__';
+                if (m.group === '__third_place__') return false;
+                return m.round_num === bracket.round;
+              });
+              if (roundMatches.length === 0) return null;
+              return (
+                <div key={bi}>
+                  <h4 className="text-sm font-semibold text-white/50 mb-2">{bracket.name}</h4>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {roundMatches.map(m => {
+                      const isDone = m.status === 'completed' || m.status === 'bye';
+                      return (
+                        <div key={m.match_id} className={`flex items-center gap-2 p-3 rounded-lg border ${isDone ? 'bg-white/5 border-white/5' : 'bg-white/10 border-white/10'}`}>
+                          <span className={`flex-1 text-right text-sm truncate ${m.winner_id === m.player_a_id ? 'text-green-400 font-bold' : 'text-white/80'}`}>
+                            {m.player_a_name || 'TBD'}
+                          </span>
+                          <span className="shrink-0 w-16 text-center text-xs font-mono text-white/60">
+                            {isDone ? `${m.score_a}-${m.score_b}` : 'vs'}
+                          </span>
+                          <span className={`flex-1 text-sm truncate ${m.winner_id === m.player_b_id ? 'text-green-400 font-bold' : 'text-white/80'}`}>
+                            {m.player_b_name || 'TBD'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Standings for RR / Group */}
+        {(t.format === 'round_robin' || t.format === 'rapidpin') && t.group_standings?.__rr__?.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold text-white/80 mb-3">Standings</h3>
+            <div className="bg-white/5 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-white/50 border-b border-white/10">
+                    <th className="p-3 text-left">#</th><th className="p-3 text-left">Player</th>
+                    <th className="p-3 text-center">P</th><th className="p-3 text-center">W</th>
+                    <th className="p-3 text-center">L</th><th className="p-3 text-center font-bold">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.group_standings.__rr__.map((s, i) => (
+                    <tr key={s.player_id} className="border-b border-white/5 text-white/80">
+                      <td className="p-3 font-bold text-white/40">{i + 1}</td>
+                      <td className="p-3 font-medium">{s.player_name}</td>
+                      <td className="p-3 text-center">{s.played}</td>
+                      <td className="p-3 text-center text-green-400">{s.won}</td>
+                      <td className="p-3 text-center text-red-400">{s.lost}</td>
+                      <td className="p-3 text-center font-bold text-white">{s.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 flex flex-col ${isFullscreen ? '' : ''}`}>
       {/* Header with Sponsor Spaces */}
