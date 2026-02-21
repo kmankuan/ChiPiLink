@@ -228,7 +228,7 @@ export default function PingPongDashboard() {
                   <Users className="h-4 w-4 mr-2" />
                   Players
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/arena')}>
                   <Trophy className="h-4 w-4 mr-2" />
                   Tournaments
                 </Button>
