@@ -10,6 +10,7 @@ import uuid
 
 from core.auth import get_admin_user
 from core.database import db
+from .alerts import create_stock_alert_if_needed
 
 router = APIRouter(prefix="/inventory", tags=["Sysbook - Inventory"])
 
