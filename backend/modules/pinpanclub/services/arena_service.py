@@ -926,6 +926,22 @@ class ArenaService(BaseService):
                 }
                 await self.tournament_repo.update_tournament(tid, result)
 
+        # Notify all participants about completion
+        final_tournament = await self.get_tournament(tid)
+        if final_tournament and final_tournament.get("status") == TournamentStatus.COMPLETED.value:
+            champion_name = ""
+            if final_tournament.get("champion_id"):
+                champion_name = next(
+                    (p.get("player_name", "") for p in final_tournament.get("participants", []) if p["player_id"] == final_tournament["champion_id"]),
+                    "Unknown"
+                )
+            await self._notify_participants(
+                final_tournament,
+                f"Tournament Complete: {final_tournament.get('name', '')}",
+                f"Champion: {champion_name}!" if champion_name else "The tournament has ended!",
+                action_url=f"/arena/{tid}"
+            )
+
     async def complete_tournament(self, tournament_id: str) -> Dict:
         """Manually complete/finalize a tournament"""
         await self._check_tournament_completion(tournament_id)
