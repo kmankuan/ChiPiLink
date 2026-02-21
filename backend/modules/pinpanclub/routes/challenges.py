@@ -94,44 +94,44 @@ async def generate_weekly_challenges(admin: dict = Depends(get_admin_user)):
 # ============== PLAYER CHALLENGES ==============
 
 @router.post("/start/{challenge_id}", response_model=PlayerChallenge)
-async def start_challenge(challenge_id: str, jugador_id: str):
+async def start_challenge(challenge_id: str, player_id: str):
     """Iniciar a challenge para a player"""
     try:
-        return await challenge_service.start_challenge(jugador_id, challenge_id)
+        return await challenge_service.start_challenge(player_id, challenge_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/player/{jugador_id}")
+@router.get("/player/{player_id}")
 async def get_player_challenges(
-    jugador_id: str,
+    player_id: str,
     status: Optional[str] = None
 ):
     """Get retos de a player"""
-    challenges = await challenge_service.get_player_challenges(jugador_id, status)
-    stats = await challenge_service.get_player_stats(jugador_id)
+    challenges = await challenge_service.get_player_challenges(player_id, status)
+    stats = await challenge_service.get_player_stats(player_id)
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "challenges": challenges,
         "stats": stats
     }
 
 
-@router.get("/player/{jugador_id}/active")
-async def get_active_challenges(jugador_id: str):
+@router.get("/player/{player_id}/active")
+async def get_active_challenges(player_id: str):
     """Get retos active de a player"""
-    challenges = await challenge_service.get_player_challenges(jugador_id, "in_progress")
-    return {"player_id": jugador_id, "active_challenges": challenges}
+    challenges = await challenge_service.get_player_challenges(player_id, "in_progress")
+    return {"player_id": player_id, "active_challenges": challenges}
 
 
-@router.get("/player/{jugador_id}/stats")
-async def get_player_challenge_stats(jugador_id: str):
+@router.get("/player/{player_id}/stats")
+async def get_player_challenge_stats(player_id: str):
     """Get statistics of challenges of the player"""
-    stats = await challenge_service.get_player_stats(jugador_id)
-    rank = await challenge_service.get_player_rank(jugador_id)
+    stats = await challenge_service.get_player_stats(player_id)
+    rank = await challenge_service.get_player_rank(player_id)
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "stats": stats,
         "rank": rank
     }
@@ -143,7 +143,7 @@ async def get_player_challenge_stats(jugador_id: str):
 async def get_leaderboard(
     limit: int = 20,
     offset: int = 0,
-    jugador_id: Optional[str] = None
+    player_id: Optional[str] = None
 ):
     """Get leaderboard of challenges"""
     leaderboard = await challenge_service.get_leaderboard(limit, offset)
@@ -155,14 +155,14 @@ async def get_leaderboard(
     }
 
 
-@router.get("/player/{jugador_id}/rank")
-async def get_player_rank(jugador_id: str):
+@router.get("/player/{player_id}/rank")
+async def get_player_rank(player_id: str):
     """Get information de rango de a player"""
     from core.database import db
     
     # Get leaderboard entry
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
-        {"player_id": jugador_id},
+        {"player_id": player_id},
         {"_id": 0}
     )
     
@@ -201,7 +201,7 @@ async def get_player_rank(jugador_id: str):
         progress = 100
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "total_points": total_points,
         "challenges_completed": challenges_completed,
         "current_streak": current_streak,
