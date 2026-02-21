@@ -1,6 +1,6 @@
 """
 Sysbook — Stock Orders (Textbook-scoped)
-Shipments, Returns, Adjustments — filtered to catalog_type=pca.
+Shipments, Returns, Adjustments — filtered to catalog_type=sysbook.
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
