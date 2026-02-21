@@ -390,6 +390,7 @@ class PinPanSettingsService(BaseService):
                 "total_losses": {"$sum": "$partidos_perdidos"},
                 "total_refereed": {"$sum": "$partidos_arbitrados"},
                 "seasons_count": {"$sum": 1},
+                "last_info": {"$last": "$jugador_info"},
             }}
         ]
         rp_stats = await rp_col.aggregate(rp_pipeline).to_list(length=10000)
@@ -402,6 +403,10 @@ class PinPanSettingsService(BaseService):
             p["rapidpin_matches_won"] = e.get("total_wins", 0)
             p["rapidpin_seasons"] = e.get("seasons_count", 0)
             p["rapidpin_points"] = e.get("total_points", 0)
+            # Extract name from jugador_info
+            info = e.get("last_info") or {}
+            if not p["player_name"] and (info.get("apodo") or info.get("nombre")):
+                p["player_name"] = info.get("apodo") or info.get("nombre", "")
 
         # 4. Referee profiles
         ref_entries = await self.referee_col.find({}, {"_id": 0}).to_list(length=10000)
