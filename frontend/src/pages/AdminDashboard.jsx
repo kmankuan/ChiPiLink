@@ -151,9 +151,11 @@ const navGroups = [
     ],
   },
   {
-    group: 'School Textbooks',
+    group: 'Sysbook',
     items: [
-      { id: 'textbook-catalog', labelKey: 'nav.textbookCatalog', fallbackLabel: 'Textbook Catalog', icon: BookOpen, permission: 'unatienda.access' },
+      { id: 'sysbook-inventory', labelKey: 'nav.sysbookInventory', fallbackLabel: 'Inventory', icon: BookOpen, permission: 'unatienda.access' },
+      { id: 'sysbook-stock-movements', labelKey: 'nav.sysbookStockMovements', fallbackLabel: 'Stock Movements', icon: Truck, permission: 'unatienda.access' },
+      { id: 'sysbook-analytics', labelKey: 'nav.sysbookAnalytics', fallbackLabel: 'Analytics', icon: BarChart2, permission: 'unatienda.access' },
       { id: 'students-schools', labelKey: 'nav.studentsSchools', fallbackLabel: 'Students & Schools', icon: GraduationCap, permission: 'unatienda.access' },
       { id: 'presale-import', labelKey: 'nav.presaleImport', fallbackLabel: 'Pre-Sale Import', icon: Upload, permission: 'unatienda.access' },
       { id: 'monday-textbook-sync', labelKey: 'nav.mondayTextbookSync', fallbackLabel: 'Monday.com Sync', icon: RefreshCw, permission: 'unatienda.access' },
