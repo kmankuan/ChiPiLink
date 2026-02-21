@@ -841,3 +841,52 @@ async def push_realtime_notification(user_id: str, notification: dict):
         })
         return True
     return False
+
+
+# ============== ARENA TOURNAMENT WEBSOCKET ==============
+
+@ws_router.websocket("/arena/{tournament_id}")
+async def websocket_arena_tournament(websocket: WebSocket, tournament_id: str):
+    """
+    WebSocket endpoint for watching a PinPan Arena tournament live.
+    Broadcasts bracket updates, match results, and standings changes.
+    """
+    client_id = f"arena_{uuid.uuid4().hex[:8]}"
+    
+    await manager.connect(websocket, client_id, "spectator", tournament_id=tournament_id)
+    
+    try:
+        while True:
+            try:
+                data = await asyncio.wait_for(websocket.receive_json(), timeout=30)
+                if data.get("type") == "pong":
+                    pass
+            except asyncio.TimeoutError:
+                await manager.send_personal(client_id, {
+                    "type": "ping",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+    except WebSocketDisconnect:
+        manager.disconnect(client_id)
+    except Exception as e:
+        logger.error(f"Arena WS error for {client_id}: {e}")
+        manager.disconnect(client_id)
+
+
+async def broadcast_arena_update(tournament_id: str, tournament: dict = None, matches: list = None):
+    """
+    Broadcast an Arena tournament update to all watchers.
+    Called from arena_service when match results are submitted.
+    """
+    message = {
+        "type": "arena_update",
+        "tournament_id": tournament_id,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    if tournament:
+        message["tournament"] = tournament
+    if matches:
+        message["matches"] = matches
+    
+    await manager.broadcast_to_tournament(tournament_id, message)
+
