@@ -239,7 +239,7 @@ export default function SysbookStockMovementsTab() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {selectedOrder && TYPE_META[selectedOrder.type] && <TYPE_META[selectedOrder.type].icon className="h-5 w-5" />}
+              {selectedOrder && (() => { const Icon = TYPE_META[selectedOrder.type]?.icon; return Icon ? <Icon className="h-5 w-5" /> : null; })()}
               Order {selectedOrder?.order_id}
             </DialogTitle>
             <DialogDescription>
