@@ -58,6 +58,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **App.js Routes**: Updated all route params to English
 - **Testing**: 100% pass rate (15 backend + all frontend tests)
 
+### Phase 11 - Tournament Statistics & Analytics Dashboard (Feb 21, 2026)
+- **Backend**: Rewrote `/api/pinpanclub/analytics/dashboard` to aggregate from Arena, League, RapidPin, Referee, and Hall of Fame
+- **Data Points**: total_players, matches per week, arena stats (total/active/completed), referee stats, weekly activity (7 days), 4-week trend, game mode distribution, top active players, recent tournaments, HoF top 5, new players
+- **Frontend**: Dark theme dashboard with 4 tabs (Overview, Arena, Game Modes, Players), stacked bar charts, KPI cards, mode distribution bars
+- **Testing**: 100% frontend, 94% backend (1 transient network timeout)
+
 ## Key API Endpoints
 
 ### RapidPin (English field names)
