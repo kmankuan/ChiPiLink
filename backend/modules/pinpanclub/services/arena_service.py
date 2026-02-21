@@ -244,7 +244,7 @@ class ArenaService(BaseService):
 
     async def _generate_single_elimination(self, tid: str, tournament: Dict, participants: List[Dict]) -> Dict:
         """Generate single elimination bracket"""
-        participants = sorted(participants, key=lambda x: x.get("seed", 999))
+        participants = sorted(participants, key=lambda x: x.get("seed") or 999)
         num_players = len(participants)
         num_rounds = math.ceil(math.log2(num_players))
         bracket_size = 2 ** num_rounds
@@ -376,7 +376,7 @@ class ArenaService(BaseService):
     async def _generate_group_knockout(self, tid: str, tournament: Dict, participants: List[Dict]) -> Dict:
         """Generate group stage + knockout bracket"""
         num_groups = tournament.get("num_groups", 4)
-        participants = sorted(participants, key=lambda x: x.get("seed", 999))
+        participants = sorted(participants, key=lambda x: x.get("seed") or 999)
 
         # Distribute into groups (snake seeding)
         groups = {chr(65 + i): [] for i in range(num_groups)}  # A, B, C, D...
