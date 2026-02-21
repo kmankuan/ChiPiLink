@@ -125,9 +125,9 @@ async def sync_active_matches(admin: dict = Depends(get_admin_user)):
     }
 
 
-@router.post("/sync/match/{partido_id}")
+@router.post("/sync/match/{match_id}")
 async def sync_single_match(
-    partido_id: str,
+    match_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Sincronizar a match specific"""
@@ -135,13 +135,13 @@ async def sync_single_match(
     if not config.matches_board_id:
         raise HTTPException(status_code=400, detail="Board of matches no configurado")
     
-    monday_id = await monday_service.sync_match(partido_id)
+    monday_id = await monday_service.sync_match(match_id)
     if not monday_id:
         raise HTTPException(status_code=400, detail="Error sincronizando partido")
     
     return {
         "success": True,
-        "partido_id": partido_id,
+        "match_id": match_id,
         "monday_item_id": monday_id
     }
 
@@ -162,7 +162,7 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
     
     for match in matches:
         try:
-            success = await monday_service.sync_match_result(match["partido_id"])
+            success = await monday_service.sync_match_result(match["match_id"])
             if success:
                 synced += 1
             else:

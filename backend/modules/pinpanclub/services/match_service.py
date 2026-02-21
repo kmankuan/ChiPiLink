@@ -199,90 +199,90 @@ class MatchService(BaseService):
             await self.emit_event(
                 PinpanClubEvents.MATCH_SET_COMPLETED,
                 {
-                    "partido_id": partido_id,
-                    "set_number": set_actual - 1,
-                    "ganador_set": ganador_set,
+                    "match_id": match_id,
+                    "set_number": current_set - 1,
+                    "set_winner": set_winner,
                     "sets_a": sets_a,
                     "sets_b": sets_b
                 }
             )
         
         # Verify si ended the match
-        sets_para_ganar = (match.mejor_de // 2) + 1
-        if sets_a >= sets_para_ganar or sets_b >= sets_para_ganar:
+        sets_to_win = (match.best_of // 2) + 1
+        if sets_a >= sets_to_win or sets_b >= sets_to_win:
             winner_id = match.player_a_id if sets_a > sets_b else match.player_b_id
-            await self._finish_match(partido_id, winner_id, match)
+            await self._finish_match(match_id, winner_id, match)
         
         # Notify WebSockets
-        await self._broadcast_to_match(partido_id)
+        await self._broadcast_to_match(match_id)
         
-        return await self.get_match(partido_id)
+        return await self.get_match(match_id)
     
     async def _finish_match(
         self,
-        partido_id: str,
+        match_id: str,
         winner_id: str,
         match: Match
     ) -> None:
         """Finalizar partido y actualizar ELOs"""
-        fecha_fin = datetime.now(timezone.utc).isoformat()
-        await self.repository.finish_match(partido_id, winner_id, fecha_fin)
+        end_date = datetime.now(timezone.utc).isoformat()
+        await self.repository.finish_match(match_id, winner_id, end_date)
         
         # Emit match finished event
         await self.emit_event(
             PinpanClubEvents.MATCH_FINISHED,
             {
-                "partido_id": partido_id,
+                "match_id": match_id,
                 "winner_id": winner_id,
-                "end_date": fecha_fin,
+                "end_date": end_date,
                 "player_a_id": match.player_a_id,
                 "player_b_id": match.player_b_id
             },
             priority=EventPriority.CRITICAL
         )
         
-        self.log_info(f"Match finished: {partido_id}, winner: {winner_id}")
+        self.log_info(f"Match finished: {match_id}, winner: {winner_id}")
     
-    async def cancel_match(self, partido_id: str) -> bool:
+    async def cancel_match(self, match_id: str) -> bool:
         """
         Cancelar partido.
         Emite evento: pinpanclub.match.cancelled
         """
-        success = await self.repository.cancel_match(partido_id)
+        success = await self.repository.cancel_match(match_id)
         
         if success:
             await self.emit_event(
                 PinpanClubEvents.MATCH_CANCELLED,
-                {"partido_id": partido_id}
+                {"match_id": match_id}
             )
         
         return success
     
     # WebSocket management
-    def register_websocket(self, partido_id: str, websocket) -> None:
+    def register_websocket(self, match_id: str, websocket) -> None:
         """Register connection WebSocket para un partido"""
-        if partido_id not in self._websocket_connections:
-            self._websocket_connections[partido_id] = set()
-        self._websocket_connections[partido_id].add(websocket)
+        if match_id not in self._websocket_connections:
+            self._websocket_connections[match_id] = set()
+        self._websocket_connections[match_id].add(websocket)
     
-    def unregister_websocket(self, partido_id: str, websocket) -> None:
+    def unregister_websocket(self, match_id: str, websocket) -> None:
         """Desregistrar connection WebSocket"""
-        if partido_id in self._websocket_connections:
-            self._websocket_connections[partido_id].discard(websocket)
+        if match_id in self._websocket_connections:
+            self._websocket_connections[match_id].discard(websocket)
     
-    async def _broadcast_to_match(self, partido_id: str) -> None:
+    async def _broadcast_to_match(self, match_id: str) -> None:
         """Send update a todos los WebSockets de un partido"""
-        if partido_id not in self._websocket_connections:
+        if match_id not in self._websocket_connections:
             return
         
-        match = await self.get_match(partido_id)
+        match = await self.get_match(match_id)
         if not match:
             return
         
         message = match.model_dump()
         dead_connections = set()
         
-        for ws in self._websocket_connections[partido_id]:
+        for ws in self._websocket_connections[match_id]:
             try:
                 await ws.send_json(message)
             except Exception:
@@ -290,7 +290,7 @@ class MatchService(BaseService):
         
         # Clean connections muertas
         for ws in dead_connections:
-            self._websocket_connections[partido_id].discard(ws)
+            self._websocket_connections[match_id].discard(ws)
     
     async def get_stats(self) -> Dict:
         """Get statistics de partidos"""

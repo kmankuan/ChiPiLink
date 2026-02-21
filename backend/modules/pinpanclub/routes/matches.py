@@ -42,10 +42,10 @@ async def get_match_stats():
     return await match_service.get_stats()
 
 
-@router.get("/{partido_id}", response_model=Match)
-async def get_match(partido_id: str):
+@router.get("/{match_id}", response_model=Match)
+async def get_match(match_id: str):
     """Get match by ID"""
-    match = await match_service.get_match(partido_id)
+    match = await match_service.get_match(match_id)
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
     return match
@@ -60,38 +60,38 @@ async def create_match(
     return await match_service.create_match(data)
 
 
-@router.post("/{partido_id}/start", response_model=Match)
+@router.post("/{match_id}/start", response_model=Match)
 async def start_match(
-    partido_id: str,
+    match_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Start match"""
-    match = await match_service.start_match(partido_id)
+    match = await match_service.start_match(match_id)
     if not match:
         raise HTTPException(status_code=400, detail="No se puede iniciar the match")
     return match
 
 
-@router.post("/{partido_id}/score", response_model=Match)
+@router.post("/{match_id}/score", response_model=Match)
 async def update_score(
-    partido_id: str,
+    match_id: str,
     data: MatchScoreUpdate,
     admin: dict = Depends(get_admin_user)
 ):
     """Update score dthe match"""
-    match = await match_service.update_score(partido_id, data.accion)
+    match = await match_service.update_score(match_id, data.action)
     if not match:
         raise HTTPException(status_code=400, detail="No se puede actualizar the match")
     return match
 
 
-@router.post("/{partido_id}/cancel")
+@router.post("/{match_id}/cancel")
 async def cancel_match(
-    partido_id: str,
+    match_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Cancelar partido"""
-    success = await match_service.cancel_match(partido_id)
+    success = await match_service.cancel_match(match_id)
     if not success:
         raise HTTPException(status_code=400, detail="No se puede cancelar the match")
     return {"success": True, "message": "Partido cancelado"}

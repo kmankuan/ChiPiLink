@@ -16,27 +16,27 @@ class MatchRepository(BaseRepository):
     """
     
     COLLECTION_NAME = PinpanClubCollections.MATCHES
-    ID_FIELD = "partido_id"
+    ID_FIELD = "match_id"
     
     def __init__(self):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
         """Create new match"""
-        match_data["partido_id"] = str(uuid.uuid4())
+        match_data["match_id"] = str(uuid.uuid4())
         match_data["status"] = "pendiente"
         match_data["points_player_a"] = 0
         match_data["points_player_b"] = 0
         match_data["sets_jugador_a"] = 0
         match_data["sets_jugador_b"] = 0
-        match_data["set_actual"] = 1
+        match_data["current_set"] = 1
         match_data["historial_sets"] = []
         
         return await self.insert_one(match_data)
     
-    async def get_by_id(self, partido_id: str) -> Optional[Dict]:
+    async def get_by_id(self, match_id: str) -> Optional[Dict]:
         """Get match by ID"""
-        return await self.find_by_id(self.ID_FIELD, partido_id)
+        return await self.find_by_id(self.ID_FIELD, match_id)
     
     async def get_active_matches(self) -> List[Dict]:
         """Get partidos activos (en curso o pausados)"""
@@ -73,53 +73,53 @@ class MatchRepository(BaseRepository):
             sort=[("ronda", 1), ("created_at", 1)]
         )
     
-    async def update_match(self, partido_id: str, data: Dict) -> bool:
+    async def update_match(self, match_id: str, data: Dict) -> bool:
         """Update datos de partido"""
-        return await self.update_by_id(self.ID_FIELD, partido_id, data)
+        return await self.update_by_id(self.ID_FIELD, match_id, data)
     
     async def update_score(
         self,
-        partido_id: str,
+        match_id: str,
         puntos_a: int,
         puntos_b: int,
         sets_a: int,
         sets_b: int,
-        set_actual: int,
+        current_set: int,
         historial: List[Dict]
     ) -> bool:
         """Update score dthe match"""
-        return await self.update_match(partido_id, {
+        return await self.update_match(match_id, {
             "points_player_a": puntos_a,
             "points_player_b": puntos_b,
             "sets_jugador_a": sets_a,
             "sets_jugador_b": sets_b,
-            "set_actual": set_actual,
+            "current_set": current_set,
             "historial_sets": historial
         })
     
-    async def start_match(self, partido_id: str, fecha_inicio: str) -> bool:
+    async def start_match(self, match_id: str, fecha_inicio: str) -> bool:
         """Start match"""
-        return await self.update_match(partido_id, {
+        return await self.update_match(match_id, {
             "status": "en_curso",
             "start_date": fecha_inicio
         })
     
     async def finish_match(
         self,
-        partido_id: str,
+        match_id: str,
         winner_id: str,
-        fecha_fin: str
+        end_date: str
     ) -> bool:
         """Finalizar partido"""
-        return await self.update_match(partido_id, {
+        return await self.update_match(match_id, {
             "status": "finalizado",
             "winner_id": winner_id,
-            "end_date": fecha_fin
+            "end_date": end_date
         })
     
-    async def cancel_match(self, partido_id: str) -> bool:
+    async def cancel_match(self, match_id: str) -> bool:
         """Cancelar partido"""
-        return await self.update_match(partido_id, {"status": "cancelado"})
+        return await self.update_match(match_id, {"status": "cancelado"})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
         """Get matches not synced with Monday.com"""
@@ -142,9 +142,9 @@ class MatchRepository(BaseRepository):
             }
         )
     
-    async def set_monday_item_id(self, partido_id: str, monday_item_id: str) -> bool:
+    async def set_monday_item_id(self, match_id: str, monday_item_id: str) -> bool:
         """Establecer ID de Monday.com"""
-        return await self.update_match(partido_id, {"monday_item_id": monday_item_id})
+        return await self.update_match(match_id, {"monday_item_id": monday_item_id})
     
     async def count_by_state(self) -> Dict[str, int]:
         """Contar partidos by status"""
