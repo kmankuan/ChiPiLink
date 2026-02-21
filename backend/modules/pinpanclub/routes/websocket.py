@@ -419,7 +419,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
             "set": current_set,
             "points_a": points_a,
             "points_b": points_b,
-            "ganador": set_winner
+            "winner": set_winner
         })
         
         if set_winner == "a":

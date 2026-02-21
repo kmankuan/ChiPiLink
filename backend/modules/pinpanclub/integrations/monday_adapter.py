@@ -33,13 +33,13 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
         async def on_match_created(event: Event):
             config = await self._get_sync_config()
             if config.get("auto_sync_matches"):
-                await self.sync_match(event.payload.get("partido_id"))
+                await self.sync_match(event.payload.get("match_id"))
 
         @event_bus.subscribe(PinpanClubEvents.MATCH_FINISHED)
         async def on_match_finished(event: Event):
             config = await self._get_sync_config()
             if config.get("auto_sync_results"):
-                await self.sync_match_result(event.payload.get("partido_id"))
+                await self.sync_match_result(event.payload.get("match_id"))
 
         @event_bus.subscribe(PinpanClubEvents.PLAYER_CREATED)
         async def on_player_created(event: Event):
@@ -104,7 +104,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
 
     # ---- Match Sync ----
 
-    async def sync_match(self, partido_id: str) -> Optional[str]:
+    async def sync_match(self, match_id: str) -> Optional[str]:
         """Sync a match to Monday.com"""
         config = await self._get_sync_config()
         board_id = config.get("matches_board_id")
@@ -112,7 +112,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
             return None
 
         match = await db.pinpanclub_partidos.find_one(
-            {"partido_id": partido_id}, {"_id": 0}
+            {"match_id": match_id}, {"_id": 0}
         )
         if not match:
             return None
@@ -145,14 +145,14 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
         monday_id = await self.client.create_item(board_id, item_name, column_values)
         if monday_id:
             await db.pinpanclub_partidos.update_one(
-                {"partido_id": partido_id},
+                {"match_id": match_id},
                 {"$set": {"monday_item_id": monday_id}}
             )
-            logger.info(f"Match synced to Monday: {partido_id} -> {monday_id}")
+            logger.info(f"Match synced to Monday: {match_id} -> {monday_id}")
 
         return monday_id
 
-    async def sync_match_result(self, partido_id: str) -> bool:
+    async def sync_match_result(self, match_id: str) -> bool:
         """Update match result in Monday.com"""
         config = await self._get_sync_config()
         board_id = config.get("matches_board_id")
@@ -160,7 +160,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
             return False
 
         match = await db.pinpanclub_partidos.find_one(
-            {"partido_id": partido_id}, {"_id": 0}
+            {"match_id": match_id}, {"_id": 0}
         )
         if not match or not match.get("monday_item_id"):
             return False
@@ -183,7 +183,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
             board_id, match["monday_item_id"], column_values
         )
         if success:
-            logger.info(f"Match result synced: {partido_id}")
+            logger.info(f"Match result synced: {match_id}")
         return success
 
     # ---- Bulk Sync ----
@@ -213,12 +213,12 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
         synced, failed = 0, 0
         for m in matches:
             try:
-                if await self.sync_match(m["partido_id"]):
+                if await self.sync_match(m["match_id"]):
                     synced += 1
                 else:
                     failed += 1
             except Exception as e:
-                logger.error(f"Error syncing match {m['partido_id']}: {e}")
+                logger.error(f"Error syncing match {m['match_id']}: {e}")
                 failed += 1
         return {"synced": synced, "failed": failed}
 
@@ -247,7 +247,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
                         {"monday_item_id": item_id},
                         {"$set": {"status": "finalizado"}}
                     )
-                    return {"status": "updated", "partido_id": match.get("partido_id")}
+                    return {"status": "updated", "match_id": match.get("match_id")}
 
         return {"status": "acknowledged"}
 

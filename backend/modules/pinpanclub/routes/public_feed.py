@@ -47,31 +47,31 @@ async def get_public_activity_feed(
             # Super Pin matches
             superpin_matches = await db.pinpanclub_superpin_matches.find(
                 {"status": "completado"},
-                {"_id": 0, "partido_id": 1, "jugador1_id": 1, "jugador2_id": 1, 
+                {"_id": 0, "match_id": 1, "player1_id": 1, "player2_id": 1, 
                  "winner_id": 1, "resultado": 1, "match_date": 1, "league_id": 1}
             ).sort("match_date", -1).limit(matches_limit).to_list(matches_limit)
             
             # Enrich with player names
             for match in superpin_matches:
                 p1 = await db.pingpong_players.find_one(
-                    {"player_id": match.get("jugador1_id")},
+                    {"player_id": match.get("player1_id")},
                     {"_id": 0, "name": 1, "nickname": 1, "avatar_url": 1}
                 )
                 p2 = await db.pingpong_players.find_one(
-                    {"player_id": match.get("jugador2_id")},
+                    {"player_id": match.get("player2_id")},
                     {"_id": 0, "name": 1, "nickname": 1, "avatar_url": 1}
                 )
                 matches.append({
-                    "match_id": match.get("partido_id"),
+                    "match_id": match.get("match_id"),
                     "type": "superpin",
                     "player1": {
-                        "id": match.get("jugador1_id"),
+                        "id": match.get("player1_id"),
                         "name": p1.get("name") if p1 else "Jugador 1",
                         "nickname": p1.get("nickname") if p1 else None,
                         "avatar": p1.get("avatar_url") if p1 else None
                     },
                     "player2": {
-                        "id": match.get("jugador2_id"),
+                        "id": match.get("player2_id"),
                         "name": p2.get("name") if p2 else "Jugador 2",
                         "nickname": p2.get("nickname") if p2 else None,
                         "avatar": p2.get("avatar_url") if p2 else None

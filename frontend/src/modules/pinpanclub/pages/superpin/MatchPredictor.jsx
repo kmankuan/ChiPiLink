@@ -1,6 +1,6 @@
 /**
  * Match Predictor Component
- * Predice el resultado entre dos jugadores basándose en ELO, H2H y racha
+ * Predicts the result between two players based on ELO, H2H and streak
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';

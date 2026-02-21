@@ -41,13 +41,13 @@ class MondayService(BaseService):
         async def on_match_created(event: Event):
             config = await self.get_config()
             if config.auto_sync_matches and config.matches_board_id:
-                await self.sync_match(event.payload["partido_id"])
+                await self.sync_match(event.payload["match_id"])
         
         @event_bus.subscribe(PinpanClubEvents.MATCH_FINISHED)
         async def on_match_finished(event: Event):
             config = await self.get_config()
             if config.auto_sync_results and config.matches_board_id:
-                await self.sync_match_result(event.payload["partido_id"])
+                await self.sync_match_result(event.payload["match_id"])
         
         @event_bus.subscribe(PinpanClubEvents.PLAYER_CREATED)
         async def on_player_created(event: Event):
@@ -264,13 +264,13 @@ class MondayService(BaseService):
         
         return monday_id
     
-    async def sync_match(self, partido_id: str) -> Optional[str]:
+    async def sync_match(self, match_id: str) -> Optional[str]:
         """Sincronizar partido con Monday.com"""
         config = await self.get_config()
         if not config.matches_board_id:
             return None
         
-        match = await self.match_repository.get_by_id(partido_id)
+        match = await self.match_repository.get_by_id(match_id)
         if not match:
             return None
         
@@ -317,18 +317,18 @@ class MondayService(BaseService):
             )
             
             if monday_id:
-                await self.match_repository.set_monday_item_id(partido_id, monday_id)
-                self.log_info(f"Match synced to Monday: {partido_id} -> {monday_id}")
+                await self.match_repository.set_monday_item_id(match_id, monday_id)
+                self.log_info(f"Match synced to Monday: {match_id} -> {monday_id}")
             
             return monday_id
     
-    async def sync_match_result(self, partido_id: str) -> bool:
+    async def sync_match_result(self, match_id: str) -> bool:
         """Update resultado dthe match en Monday.com"""
         config = await self.get_config()
         if not config.matches_board_id:
             return False
         
-        match = await self.match_repository.get_by_id(partido_id)
+        match = await self.match_repository.get_by_id(match_id)
         if not match or not match.get("monday_item_id"):
             return False
         
@@ -355,7 +355,7 @@ class MondayService(BaseService):
         )
         
         if success:
-            self.log_info(f"Match result synced: {partido_id}")
+            self.log_info(f"Match result synced: {match_id}")
         
         return success
     
@@ -388,13 +388,13 @@ class MondayService(BaseService):
         
         for match in matches:
             try:
-                result = await self.sync_match(match["partido_id"])
+                result = await self.sync_match(match["match_id"])
                 if result:
                     synced += 1
                 else:
                     failed += 1
             except Exception as e:
-                self.log_error(f"Error syncing match {match['partido_id']}", e)
+                self.log_error(f"Error syncing match {match['match_id']}", e)
                 failed += 1
         
         return {"synced": synced, "failed": failed}

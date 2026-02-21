@@ -139,7 +139,7 @@ export default function SuperPinLeagueDetail() {
         const match = await response.json();
         setShowNewMatchModal(false);
         setNewMatch({ player_a_id: '', player_b_id: '' });
-        navigate(`/pinpanclub/superpin/match/${match.partido_id}`);
+        navigate(`/pinpanclub/superpin/match/${match.match_id}`);
       }
     } catch (error) {
       console.error('Error creating match:', error);
@@ -372,9 +372,9 @@ export default function SuperPinLeagueDetail() {
               <div className="space-y-3">
                 {matches.map((match) => (
                   <div
-                    key={match.partido_id}
+                    key={match.match_id}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate(`/pinpanclub/superpin/match/${match.partido_id}`)}
+                    onClick={() => navigate(`/pinpanclub/superpin/match/${match.match_id}`)}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div className="text-center flex-1">

@@ -191,11 +191,11 @@ export default function PingPongTV() {
     
     // Update in active matches list
     setActiveMatches(prev => prev.map(m => 
-      m.partido_id === data.match.partido_id ? data.match : m
+      m.match_id === data.match.match_id ? data.match : m
     ));
     
     // Trigger point animation
-    triggerAnimation('point', data.point.jugador);
+    triggerAnimation('point', data.point.player_side);
     
     // Play sound
     if (soundEnabled) {
@@ -219,13 +219,13 @@ export default function PingPongTV() {
     
     // Set won
     if (data.set_ganado) {
-      triggerSpecialEvent('set_won', { ganador: data.ganador_set });
+      triggerSpecialEvent('set_won', { ganador: data.set_winner });
       if (soundEnabled) playSound('setWin');
     }
     
     // Match finished
     if (data.partido_terminado) {
-      triggerSpecialEvent('match_won', { ganador: data.ganador_partido });
+      triggerSpecialEvent('match_won', { ganador: data.match_winner });
       if (soundEnabled) playSound('gameOver');
     }
   };
@@ -362,7 +362,7 @@ export default function PingPongTV() {
 
   const fetchRecentResults = async () => {
     try {
-      const response = await fetch(`${PINPANCLUB_API.matches}?estado=finalizado&limit=5`);
+      const response = await fetch(`${PINPANCLUB_API.matches}?status=finished&limit=5`);
       const data = await response.json();
       setRecentResults(data);
     } catch (error) {
@@ -438,7 +438,7 @@ export default function PingPongTV() {
                   </div>
                 )}
                 <h2 className="text-3xl font-bold text-white mb-1">
-                  {playerA.nickname || playerA.nombre || 'Jugador A'}
+                  {playerA.nickname || playerA.nombre || 'Player A'}
                 </h2>
                 <p className="text-lg text-white/60">ELO: {playerA.elo_rating || 1000}</p>
                 
@@ -463,7 +463,7 @@ export default function PingPongTV() {
                     </span>
                     <span className="text-6xl text-white/40">:</span>
                     <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'b' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
-                      {currentMatch.puntos_player_b}
+                      {currentMatch.points_player_b}
                     </span>
                   </div>
 
@@ -497,7 +497,7 @@ export default function PingPongTV() {
                       <div key={i} className="bg-white/10 rounded-lg px-4 py-2">
                         <div className="text-sm text-white/60">Set {set.set}</div>
                         <div className="text-xl font-bold text-white">
-                          {set.puntos_a} - {set.puntos_b}
+                          {set.points_a} - {set.points_b}
                         </div>
                       </div>
                     ))}
@@ -515,7 +515,7 @@ export default function PingPongTV() {
                   </div>
                 )}
                 <h2 className="text-3xl font-bold text-white mb-1">
-                  {playerB.nickname || playerB.nombre || 'Jugador B'}
+                  {playerB.nickname || playerB.nombre || 'Player B'}
                 </h2>
                 <p className="text-lg text-white/60">ELO: {playerB.elo_rating || 1000}</p>
                 
@@ -561,10 +561,10 @@ export default function PingPongTV() {
       <div className={`h-full grid ${gridCols} gap-4 p-4`}>
         {matches.map(match => (
           <MiniScoreboard 
-            key={match.partido_id} 
+            key={match.match_id} 
             match={match}
             onClick={() => {
-              setMatchId(match.partido_id);
+              setMatchId(match.match_id);
               setMode('single');
             }}
           />
@@ -595,10 +595,10 @@ export default function PingPongTV() {
               <div className="grid grid-cols-2 gap-4">
                 {liveMatches.slice(0, 4).map(match => (
                   <MiniScoreboard 
-                    key={match.partido_id} 
+                    key={match.match_id} 
                     match={match}
                     onClick={() => {
-                      setMatchId(match.partido_id);
+                      setMatchId(match.match_id);
                       setMode('single');
                     }}
                   />
@@ -615,14 +615,14 @@ export default function PingPongTV() {
             </h2>
             <div className="space-y-2">
               {recentResults.slice(0, 5).map(match => (
-                <div key={match.partido_id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+                <div key={match.match_id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
                   <div className="flex items-center gap-3">
                     <span className={`font-bold ${match.winner_id === match.player_a_id ? 'text-green-400' : 'text-white/60'}`}>
-                      {match.player_a_info?.nombre || 'Jugador A'}
+                      {match.player_a_info?.nombre || 'Player A'}
                     </span>
                     <span className="text-white/40">vs</span>
                     <span className={`font-bold ${match.winner_id === match.player_b_id ? 'text-green-400' : 'text-white/60'}`}>
-                      {match.player_b_info?.nombre || 'Jugador B'}
+                      {match.player_b_info?.nombre || 'Player B'}
                     </span>
                   </div>
                   <div className="text-xl font-bold text-white">
@@ -1161,7 +1161,7 @@ function MiniScoreboard({ match, onClick }) {
                 {playerA.nombre?.[0] || 'A'}
               </div>
             )}
-            <span className="text-white font-semibold">{playerA.nickname || playerA.nombre || 'Jugador A'}</span>
+            <span className="text-white font-semibold">{playerA.nickname || playerA.nombre || 'Player A'}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-white">{match.points_player_a}</span>
@@ -1179,10 +1179,10 @@ function MiniScoreboard({ match, onClick }) {
                 {playerB.nombre?.[0] || 'B'}
               </div>
             )}
-            <span className="text-white font-semibold">{playerB.nickname || playerB.nombre || 'Jugador B'}</span>
+            <span className="text-white font-semibold">{playerB.nickname || playerB.nombre || 'Player B'}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-white">{match.puntos_player_b}</span>
+            <span className="text-2xl font-bold text-white">{match.points_player_b}</span>
             <span className="text-lg text-red-400">{match.sets_player_b}</span>
           </div>
         </div>
@@ -1205,12 +1205,12 @@ function SpecialEventOverlay({ event }) {
     match_point: {
       bg: 'from-yellow-600 to-orange-600',
       text: '⚡ MATCH POINT',
-      subtext: data?.jugador === 'a' ? 'Jugador A' : 'Jugador B'
+      subtext: data?.player_side === 'a' ? 'Player A' : 'Player B'
     },
     set_point: {
       bg: 'from-blue-600 to-purple-600',
       text: '🎯 SET POINT',
-      subtext: data?.jugador === 'a' ? 'Jugador A' : 'Jugador B'
+      subtext: data?.player_side === 'a' ? 'Player A' : 'Player B'
     },
     deuce: {
       bg: 'from-purple-600 to-pink-600',
@@ -1220,12 +1220,12 @@ function SpecialEventOverlay({ event }) {
     set_won: {
       bg: 'from-green-600 to-emerald-600',
       text: '🏆 SET GANADO',
-      subtext: data?.ganador === 'a' ? 'Jugador A' : 'Jugador B'
+      subtext: data?.winner === 'a' ? 'Player A' : 'Player B'
     },
     match_won: {
       bg: 'from-yellow-500 to-yellow-600',
       text: '🎉 PARTIDO TERMINADO',
-      subtext: data?.ganador === 'a' ? '¡Jugador A GANA!' : '¡Jugador B GANA!'
+      subtext: data?.winner === 'a' ? '¡Jugador A GANA!' : '¡Jugador B GANA!'
     },
     timeout: {
       bg: 'from-gray-600 to-gray-700',
