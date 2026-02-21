@@ -1000,7 +1000,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         loading={loading}
         onRefresh={fetchProducts}
         actions={<>
-          <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} />
+          <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} apiBase={sysbook ? `${API}/api/sysbook` : undefined} />
           <Button onClick={() => handleOpenForm()} size="sm" className="gap-1 h-7 text-xs" data-testid="add-product-btn">
             <Plus className="h-3 w-3" /> <span className="hidden sm:inline">{translate('store.addBook', 'Add Product')}</span><span className="sm:hidden">Add</span>
           </Button>
