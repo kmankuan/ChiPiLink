@@ -32,7 +32,8 @@ import {
   Clock,
   Scale,
   Award,
-  BarChart3
+  BarChart3,
+  Swords
 } from 'lucide-react';
 import NotificationCenter from '../components/NotificationCenter';
 import WeeklyChallenges from '../components/WeeklyChallenges';
