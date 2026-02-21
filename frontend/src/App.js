@@ -65,6 +65,10 @@ import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/ra
 // PinPan Arena Module
 import { ArenaHub, ArenaCreate, ArenaDetail, ArenaPublic } from '@/modules/pinpanclub/pages/arena';
 
+// Hall of Fame & Referee
+import HallOfFame from '@/modules/pinpanclub/pages/HallOfFame';
+import RefereeSettings from '@/modules/pinpanclub/pages/RefereeSettings';
+
 // Weekly Challenges Page
 import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
 
