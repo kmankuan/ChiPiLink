@@ -302,6 +302,192 @@ class PinPanSettingsService(BaseService):
 
         self.log_info(f"Arena leaderboard updated for tournament {tournament.get('tournament_id')}")
 
+    # ============== HALL OF FAME - GLOBAL ALL-TIME LEADERBOARD ==============
+
+    async def get_hall_of_fame(self, mode: str = None, limit: int = 50) -> List[Dict]:
+        """Get the combined all-time Hall of Fame leaderboard"""
+        hof_col = db[PinpanClubCollections.HALL_OF_FAME]
+
+        query = {"total_points": {"$gt": 0}}
+        sort_field = "total_points"
+
+        if mode == "arena":
+            sort_field = "arena_points"
+        elif mode == "league":
+            sort_field = "league_points"
+        elif mode == "rapidpin":
+            sort_field = "rapidpin_points"
+        elif mode == "referee":
+            sort_field = "referee_points"
+
+        cursor = hof_col.find(query, {"_id": 0}).sort(sort_field, -1).limit(limit)
+        entries = await cursor.to_list(length=limit)
+
+        # Add rank numbers
+        for idx, entry in enumerate(entries, 1):
+            entry["rank"] = idx
+
+        return entries
+
+    async def get_player_hall_of_fame(self, player_id: str) -> Optional[Dict]:
+        """Get a player's Hall of Fame stats"""
+        hof_col = db[PinpanClubCollections.HALL_OF_FAME]
+        return await hof_col.find_one({"player_id": player_id}, {"_id": 0})
+
+    async def rebuild_hall_of_fame(self) -> int:
+        """Rebuild the Hall of Fame by aggregating across all game modes"""
+        hof_col = db[PinpanClubCollections.HALL_OF_FAME]
+        players_col = db[PinpanClubCollections.PLAYERS]
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Gather all player IDs from all sources
+        all_players = {}
+
+        # 1. Arena leaderboard
+        arena_entries = await self.leaderboard_col.find({}, {"_id": 0}).to_list(length=10000)
+        for e in arena_entries:
+            pid = e["player_id"]
+            if pid not in all_players:
+                all_players[pid] = self._empty_hof_entry(pid)
+            p = all_players[pid]
+            p["player_name"] = e.get("player_name") or p["player_name"]
+            p["player_avatar"] = e.get("player_avatar") or p["player_avatar"]
+            p["arena_tournaments"] = e.get("tournaments_played", 0)
+            p["arena_wins"] = e.get("tournaments_won", 0)
+            p["arena_matches_played"] = e.get("matches_played", 0)
+            p["arena_matches_won"] = e.get("matches_won", 0)
+            p["arena_points"] = e.get("total_points", 0)
+
+        # 2. League (SuperPin) rankings — aggregate from all leagues
+        league_col = db[PinpanClubCollections.SUPERPIN_RANKINGS]
+        league_pipeline = [
+            {"$group": {
+                "_id": "$player_id",
+                "total_matches": {"$sum": "$matches_played"},
+                "total_wins": {"$sum": "$matches_won"},
+                "total_points": {"$sum": "$points"},
+                "leagues_count": {"$sum": 1},
+            }}
+        ]
+        league_stats = await league_col.aggregate(league_pipeline).to_list(length=10000)
+        for e in league_stats:
+            pid = e["_id"]
+            if pid not in all_players:
+                all_players[pid] = self._empty_hof_entry(pid)
+            p = all_players[pid]
+            p["league_matches_played"] = e.get("total_matches", 0)
+            p["league_matches_won"] = e.get("total_wins", 0)
+            p["league_seasons"] = e.get("leagues_count", 0)
+            p["league_points"] = e.get("total_points", 0)
+
+        # 3. RapidPin rankings — aggregate from all seasons
+        rp_col = db[PinpanClubCollections.RAPIDPIN_RANKINGS]
+        rp_pipeline = [
+            {"$group": {
+                "_id": "$jugador_id",
+                "total_points": {"$sum": "$puntos_totales"},
+                "total_wins": {"$sum": "$partidos_ganados"},
+                "total_losses": {"$sum": "$partidos_perdidos"},
+                "total_refereed": {"$sum": "$partidos_arbitrados"},
+                "seasons_count": {"$sum": 1},
+            }}
+        ]
+        rp_stats = await rp_col.aggregate(rp_pipeline).to_list(length=10000)
+        for e in rp_stats:
+            pid = e["_id"]
+            if pid not in all_players:
+                all_players[pid] = self._empty_hof_entry(pid)
+            p = all_players[pid]
+            p["rapidpin_matches_played"] = e.get("total_wins", 0) + e.get("total_losses", 0)
+            p["rapidpin_matches_won"] = e.get("total_wins", 0)
+            p["rapidpin_seasons"] = e.get("seasons_count", 0)
+            p["rapidpin_points"] = e.get("total_points", 0)
+
+        # 4. Referee profiles
+        ref_entries = await self.referee_col.find({}, {"_id": 0}).to_list(length=10000)
+        for e in ref_entries:
+            pid = e["player_id"]
+            if pid not in all_players:
+                all_players[pid] = self._empty_hof_entry(pid)
+            p = all_players[pid]
+            p["player_name"] = e.get("player_name") or p["player_name"]
+            p["player_avatar"] = e.get("player_avatar") or p["player_avatar"]
+            p["referee_matches"] = e.get("total_matches_refereed", 0)
+            p["referee_points"] = e.get("total_points_earned", 0)
+            p["referee_rating"] = e.get("avg_rating", 0)
+            p["referee_badges"] = e.get("badges", [])
+
+        # 5. Fill in player info for any still missing names
+        for pid, entry in all_players.items():
+            if not entry["player_name"]:
+                player = await players_col.find_one({"player_id": pid}, {"_id": 0, "name": 1, "photo_url": 1, "nickname": 1})
+                if player:
+                    entry["player_name"] = player.get("nickname") or player.get("name", "")
+                    entry["player_avatar"] = player.get("photo_url")
+
+        # 6. Compute total points and upsert
+        count = 0
+        for pid, entry in all_players.items():
+            entry["total_points"] = (
+                entry["arena_points"]
+                + entry["league_points"]
+                + entry["rapidpin_points"]
+                + entry["referee_points"]
+            )
+            entry["total_matches"] = (
+                entry["arena_matches_played"]
+                + entry["league_matches_played"]
+                + entry["rapidpin_matches_played"]
+            )
+            entry["total_wins"] = (
+                entry["arena_matches_won"]
+                + entry["league_matches_won"]
+                + entry["rapidpin_matches_won"]
+            )
+            entry["updated_at"] = now
+
+            await hof_col.update_one(
+                {"player_id": pid},
+                {"$set": entry},
+                upsert=True
+            )
+            count += 1
+
+        self.log_info(f"Hall of Fame rebuilt: {count} entries")
+        return count
+
+    def _empty_hof_entry(self, player_id: str) -> Dict:
+        return {
+            "player_id": player_id,
+            "player_name": "",
+            "player_avatar": None,
+            # Arena
+            "arena_tournaments": 0,
+            "arena_wins": 0,
+            "arena_matches_played": 0,
+            "arena_matches_won": 0,
+            "arena_points": 0,
+            # League
+            "league_seasons": 0,
+            "league_matches_played": 0,
+            "league_matches_won": 0,
+            "league_points": 0,
+            # RapidPin
+            "rapidpin_seasons": 0,
+            "rapidpin_matches_played": 0,
+            "rapidpin_matches_won": 0,
+            "rapidpin_points": 0,
+            # Referee
+            "referee_matches": 0,
+            "referee_points": 0,
+            "referee_rating": 0,
+            "referee_badges": [],
+            # Combined
+            "total_points": 0,
+            "total_matches": 0,
+            "total_wins": 0,
+        }
+
 
 # Singleton
 pinpan_settings_service = PinPanSettingsService()
