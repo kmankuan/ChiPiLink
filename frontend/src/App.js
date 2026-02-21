@@ -62,6 +62,9 @@ import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking, Su
 // Rapid Pin Module
 import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
 
+// PinPan Arena Module
+import { ArenaHub, ArenaCreate, ArenaDetail } from '@/modules/pinpanclub/pages/arena';
+
 // Weekly Challenges Page
 import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
 
