@@ -325,6 +325,101 @@ function CrmConfigPanel({ token }) {
             </Badge>
           )}
         </div>
+
+        {/* Topic Presets Manager */}
+        <div className="border-t pt-3 mt-3">
+          <p className="text-xs font-bold mb-2">Topic Quick-Select Presets</p>
+          <p className="text-[10px] text-muted-foreground mb-2">
+            These appear as quick-select chips when users create a new topic.
+          </p>
+          <div className="space-y-1.5 mb-2" data-testid="topic-presets-list">
+            {presets.map((p, i) => {
+              const label = typeof p === 'string' ? p : p.label;
+              const active = typeof p === 'string' ? true : p.active !== false;
+              return (
+                <div key={i} className="flex items-center gap-2 text-xs">
+                  <span className={`flex-1 px-2 py-1 rounded border text-[11px] ${active ? 'bg-background' : 'bg-muted/50 text-muted-foreground line-through'}`}>
+                    {label}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const updated = [...presets];
+                      if (typeof updated[i] === 'string') {
+                        updated[i] = { label: updated[i], active: false, order: i };
+                      } else {
+                        updated[i] = { ...updated[i], active: !updated[i].active };
+                      }
+                      setPresets(updated);
+                    }}
+                    className="text-[10px] text-muted-foreground hover:text-foreground"
+                    data-testid={`toggle-preset-${i}`}
+                  >
+                    {active ? 'Hide' : 'Show'}
+                  </button>
+                  <button
+                    onClick={() => setPresets(presets.filter((_, j) => j !== i))}
+                    className="text-[10px] text-red-500 hover:text-red-700"
+                    data-testid={`remove-preset-${i}`}
+                  >
+                    Remove
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex gap-1.5">
+            <Input
+              value={newPreset}
+              onChange={(e) => setNewPreset(e.target.value)}
+              placeholder="New topic preset..."
+              className="h-7 text-xs flex-1"
+              data-testid="new-preset-input"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newPreset.trim()) {
+                  setPresets([...presets, { label: newPreset.trim(), active: true, order: presets.length }]);
+                  setNewPreset('');
+                }
+              }}
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              disabled={!newPreset.trim()}
+              onClick={() => {
+                setPresets([...presets, { label: newPreset.trim(), active: true, order: presets.length }]);
+                setNewPreset('');
+              }}
+              data-testid="add-preset-btn"
+            >
+              Add
+            </Button>
+            <Button
+              size="sm"
+              className="h-7 text-xs"
+              disabled={savingPresets}
+              onClick={async () => {
+                setSavingPresets(true);
+                try {
+                  const res = await fetch(`${API}/api/store/crm-chat/admin/topic-presets`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ presets }),
+                  });
+                  if (res.ok) toast.success('Topic presets saved');
+                  else toast.error('Failed to save presets');
+                } catch {
+                  toast.error('Error saving presets');
+                } finally {
+                  setSavingPresets(false);
+                }
+              }}
+              data-testid="save-presets-btn"
+            >
+              {savingPresets ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save Presets'}
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
