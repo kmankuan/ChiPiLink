@@ -604,43 +604,48 @@ export default function SuperPinLeagueDetail() {
         </div>
       )}
 
-      {/* Create Tournament Modal */}
+      {/* Create Arena Playoff from League */}
       {showCreateTournamentModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md mx-4">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-500" /> {t('superpin.tournaments.createTournament')}
+              <Trophy className="h-5 w-5 text-yellow-500" /> Create League Playoff
             </h2>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('superpin.tournaments.tournamentName')}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tournament Name
                 </label>
                 <input
                   type="text"
                   value={newTournament.nombre}
                   onChange={(e) => setNewTournament({ ...newTournament, nombre: e.target.value })}
-                  placeholder={`Torneo ${league?.temporada}`}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                  placeholder={`${league?.nombre || 'League'} Playoff`}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700"
+                  data-testid="playoff-name-input"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('superpin.tournaments.startDate')}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Start Date
                 </label>
                 <input
                   type="date"
                   value={newTournament.fecha_inicio}
                   onChange={(e) => setNewTournament({ ...newTournament, fecha_inicio: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700"
+                  data-testid="playoff-date-input"
                 />
               </div>
               
-              <div className="p-3 bg-yellow-50 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>{t('superpin.tournaments.participants')}:</strong> Top {Math.min(ranking?.entries?.length || 0, 8)} jugadores del ranking actual
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
+                <p className="text-sm text-indigo-800 dark:text-indigo-300">
+                  <strong>Participants:</strong> Top {Math.min(ranking?.entries?.length || 0, 8)} players from current league ranking will be auto-seeded.
+                </p>
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1">
+                  This creates a Single Elimination tournament in PinPan Arena.
                 </p>
               </div>
             </div>
@@ -653,43 +658,52 @@ export default function SuperPinLeagueDetail() {
                   setShowCreateTournamentModal(false);
                   setNewTournament({ nombre: '', fecha_inicio: '' });
                 }}
+                data-testid="cancel-playoff-btn"
               >
                 {t('common.cancel')}
               </Button>
               <Button 
-                type="button" 
+                type="button"
+                data-testid="create-playoff-btn"
                 onClick={async () => {
-                  if (!newTournament.nombre || !newTournament.fecha_inicio) {
-                    alert('Por favor completa todos los campos');
+                  if (!newTournament.nombre) {
+                    alert('Please enter a tournament name');
                     return;
                   }
                   try {
                     const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-                    const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments`, {
+                    // Create Arena tournament seeded from this league
+                    const response = await fetch(`${API_URL}/api/pinpanclub/arena/tournaments`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                       },
                       body: JSON.stringify({
-                        liga_id: ligaId,
-                        nombre: newTournament.nombre,
-                        fecha_inicio: newTournament.fecha_inicio
+                        name: newTournament.nombre,
+                        description: `Playoff tournament for ${league?.nombre || 'league'}`,
+                        format: 'single_elimination',
+                        max_players: Math.min(ranking?.entries?.length || 8, 16),
+                        best_of: 3,
+                        third_place_match: true,
+                        seeding_source: 'superpin',
+                        seeding_league_id: ligaId,
+                        start_date: newTournament.fecha_inicio || undefined,
                       })
                     });
                     if (response.ok) {
                       const data = await response.json();
                       setShowCreateTournamentModal(false);
                       setNewTournament({ nombre: '', fecha_inicio: '' });
-                      navigate(`/pinpanclub/superpin/tournament/${data.torneo_id}`);
+                      navigate(`/pinpanclub/arena/${data.tournament_id}`);
                     }
                   } catch (error) {
-                    console.error('Error creating tournament:', error);
+                    console.error('Error creating playoff:', error);
                   }
                 }}
-                className="bg-yellow-500 hover:bg-yellow-600"
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
               >
-                {t('superpin.tournaments.createTournament')}
+                Create Playoff
               </Button>
             </div>
           </div>
