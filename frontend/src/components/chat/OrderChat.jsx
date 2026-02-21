@@ -92,8 +92,8 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="bg-background rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md flex flex-col shadow-2xl"
-        style={{ maxHeight: '80vh' }}
+        className="bg-background rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md flex flex-col shadow-2xl mb-16 sm:mb-0"
+        style={{ maxHeight: 'calc(80vh - 4rem)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
