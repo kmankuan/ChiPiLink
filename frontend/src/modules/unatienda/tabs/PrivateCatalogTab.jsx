@@ -958,7 +958,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
           { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
         ] : [
           { value: 'all', label: 'All' },
-          { value: 'pca', label: 'Textbooks', icon: BookOpen },
+          { value: 'sysbook', label: 'Textbooks', icon: BookOpen },
           { value: 'public', label: 'Public', icon: Store },
           { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
         ]}
