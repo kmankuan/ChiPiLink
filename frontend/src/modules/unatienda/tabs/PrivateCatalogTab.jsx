@@ -950,10 +950,13 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     <div className="space-y-3">
       {/* Unified Board Header */}
       <BoardHeader
-        title="Inventory"
+        title={sysbook ? "Sysbook Inventory" : "Inventory"}
         icon={Warehouse}
-        subtitle="Unified product & textbook management"
-        tabs={[
+        subtitle={sysbook ? "School textbook inventory management" : "Unified product & textbook management"}
+        tabs={sysbook ? [
+          { value: 'all', label: 'All' },
+          { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
+        ] : [
           { value: 'all', label: 'All' },
           { value: 'pca', label: 'Textbooks', icon: BookOpen },
           { value: 'public', label: 'Public', icon: Store },
