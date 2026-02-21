@@ -195,6 +195,10 @@ async def sysbook_adjust_stock(book_id: str, adj: StockAdjustment, admin: dict =
     }
     await db.inventory_movements.insert_one(movement)
     movement.pop("_id", None)
+
+    # Check stock alert threshold
+    await create_stock_alert_if_needed(book_id, product.get("name", ""), new_qty, product.get("grade", ""), product.get("code", ""))
+
     return {"success": True, "old_quantity": old_qty, "new_quantity": new_qty, "movement": movement}
 
 
