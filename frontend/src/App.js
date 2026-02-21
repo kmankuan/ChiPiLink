@@ -195,6 +195,11 @@ function AppRouter() {
       <Route path="/pinpanclub/rapidpin" element={<><Header /><RapidPinDashboard /></>} />
       <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<><Header /><RapidPinSeason /></>} />
       
+      {/* PinPan Arena Routes */}
+      <Route path="/pinpanclub/arena" element={<><Header /><ArenaHub /></>} />
+      <Route path="/pinpanclub/arena/create" element={<><Header /><ArenaCreate /></>} />
+      <Route path="/pinpanclub/arena/:tournamentId" element={<><Header /><ArenaDetail /></>} />
+      
       {/* Weekly Challenges Route */}
       <Route path="/pinpanclub/challenges" element={<><Header /><WeeklyChallengesPage /></>} />
       
