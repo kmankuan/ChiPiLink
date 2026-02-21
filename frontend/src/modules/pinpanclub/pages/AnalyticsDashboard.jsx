@@ -436,7 +436,7 @@ function HofList({ entries }) {
         <div key={e.player_id} className="flex items-center justify-between p-2.5 bg-white/5 rounded-lg">
           <div className="flex items-center gap-2.5">
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-yellow-500 text-black' : i === 1 ? 'bg-gray-400 text-black' : i === 2 ? 'bg-orange-500 text-white' : 'bg-white/10 text-white/50'}`}>{e.rank || i + 1}</span>
-            <span className="text-sm font-medium">{e.player_name || 'Unknown'}</span>
+            <span className="text-sm font-medium text-white">{e.player_name || 'Unknown'}</span>
           </div>
           <div className="text-right">
             <span className="text-sm font-bold text-yellow-400">{e.total_points} pts</span>
