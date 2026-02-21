@@ -30,6 +30,23 @@ class ArenaService(BaseService):
         self.match_repo = ArenaMatchRepository()
         self.player_repo = PlayerRepository()
 
+    async def _notify_participants(self, tournament: Dict, title: str, body: str, action_url: str = None):
+        """Send push notification to all tournament participants (fire and forget)"""
+        try:
+            from modules.notifications.services.push_service import push_notification_service
+            user_ids = [p.get("player_id") for p in tournament.get("participants", []) if p.get("player_id")]
+            if user_ids:
+                await push_notification_service.send_to_users(
+                    user_ids=user_ids,
+                    category_id="arena_tournament",
+                    title=title,
+                    body=body,
+                    action_url=action_url,
+                    data={"tournament_id": tournament.get("tournament_id", "")}
+                )
+        except Exception as e:
+            self.log_warning(f"Push notification failed: {e}")
+
     # ============== TOURNAMENT CRUD ==============
 
     async def create_tournament(self, data: TournamentCreate, created_by: str = None) -> Dict:
