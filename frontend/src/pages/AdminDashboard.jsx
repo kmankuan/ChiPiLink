@@ -262,7 +262,7 @@ export default function AdminDashboard() {
    * The RBAC system is used for more granular permissions within modules.
    */
   const filteredNavGroups = useMemo(() => {
-    if (authLoading) return navGroups.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: t(i.labelKey) })) }));
+    if (authLoading) return navGroups.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey) })) }));
     
     return navGroups.map(g => ({
       ...g,
