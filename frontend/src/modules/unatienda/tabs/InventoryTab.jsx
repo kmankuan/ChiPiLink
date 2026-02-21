@@ -396,7 +396,7 @@ export default function InventoryTab({ token }) {
             toast.success(`${ids.length} product(s) ${labels[confirmBulk] || 'processed'}`);
             productSelection.clear();
             setConfirmBulk(null);
-            fetchData();
+            fetchDashboard(); fetchProducts();
           } catch (e) { toast.error(e.response?.data?.detail || 'Operation failed'); }
           finally { setBulkLoading(false); }
         }}
