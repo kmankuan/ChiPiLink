@@ -50,6 +50,10 @@ class PinpanClubCollections:
     RAPIDPIN_MATCHES = "pinpanclub_rapidpin_matches"
     RAPIDPIN_RANKINGS = "pinpanclub_rapidpin_rankings"
 
+    # PinPan Arena (unified tournaments)
+    ARENA_TOURNAMENTS = "pinpanclub_arena_tournaments"
+    ARENA_MATCHES = "pinpanclub_arena_matches"
+
 
 # =============================================================================
 # COMMUNITY MODULE COLLECTIONS
