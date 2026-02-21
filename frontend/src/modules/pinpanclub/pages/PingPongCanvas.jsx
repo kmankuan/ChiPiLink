@@ -656,7 +656,7 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                   {m.player_a_info?.nickname || 'A'} vs {m.player_b_info?.nickname || 'B'}
                 </div>
                 <div className="text-xs text-white/60">
-                  Mesa {m.mesa || '?'} • {m.puntos_player_a}-{m.puntos_player_b}
+                  Mesa {m.mesa || '?'} • {m.points_player_a}-{m.puntos_player_b}
                 </div>
               </button>
             ))}
@@ -707,7 +707,7 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
       <div className="text-center px-4">
         <div className="flex items-center gap-3">
           <span className={`text-6xl font-black ${match.saque === 'a' ? 'text-yellow-400' : 'text-white'}`}>
-            {match.puntos_player_a}
+            {match.points_player_a}
           </span>
           <span className="text-2xl text-white/40">:</span>
           <span className={`text-6xl font-black ${match.saque === 'b' ? 'text-yellow-400' : 'text-white'}`}>
@@ -772,7 +772,7 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
           {match.saque === 'a' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-black text-white">{match.puntos_player_a}</span>
+          <span className="text-3xl font-black text-white">{match.points_player_a}</span>
           <span className="text-lg font-bold text-blue-400">{match.sets_player_a}</span>
         </div>
       </div>
@@ -810,7 +810,7 @@ function SmallMatchDisplay({ match, playerA, playerB }) {
         {playerA.nickname?.[0] || playerA.nombre?.[0] || 'A'} vs {playerB.nickname?.[0] || playerB.nombre?.[0] || 'B'}
       </div>
       <div className="flex items-center justify-center gap-2">
-        <span className="text-2xl font-black text-white">{match.puntos_player_a}</span>
+        <span className="text-2xl font-black text-white">{match.points_player_a}</span>
         <span className="text-white/40">:</span>
         <span className="text-2xl font-black text-white">{match.puntos_player_b}</span>
       </div>

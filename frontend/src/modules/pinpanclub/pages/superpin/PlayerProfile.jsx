@@ -26,7 +26,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PlayerProfile() {
   const { t } = useTranslation();
-  const { playerId, jugadorId } = useParams();
+  const { playerId, playerId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -35,7 +35,7 @@ export default function PlayerProfile() {
   const [followStats, setFollowStats] = useState({ followers_count: 0, following_count: 0 });
   
   // Support both new and legacy param names
-  const playerIdToUse = playerId || jugadorId;
+  const playerIdToUse = playerId || playerId;
   
   // Current user ID for social features
   const currentUserId = user?.user_id || null;

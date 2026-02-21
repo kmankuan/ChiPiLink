@@ -39,7 +39,7 @@ export default function WeeklyChallengesPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <WeeklyChallenges jugadorId={currentUserId} />
+        <WeeklyChallenges playerId={currentUserId} />
       </main>
     </div>
   );

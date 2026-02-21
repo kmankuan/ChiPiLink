@@ -86,14 +86,14 @@ export default function SuperPinTournament() {
     }
   };
 
-  const getStatusBadge = (estado) => {
+  const getStatusBadge = (status) => {
     const styles = {
       pendiente: 'bg-gray-100 text-gray-800',
       en_curso: 'bg-blue-100 text-blue-800',
       finalizado: 'bg-green-100 text-green-800',
       bye: 'bg-yellow-100 text-yellow-800'
     };
-    return <Badge className={styles[estado] || styles.pendiente}>{t(`superpin.tournaments.status.${estado}`)}</Badge>;
+    return <Badge className={styles[status] || styles.pendiente}>{t(`superpin.tournaments.status.${status}`)}</Badge>;
   };
 
   const getPositionIcon = (position) => {

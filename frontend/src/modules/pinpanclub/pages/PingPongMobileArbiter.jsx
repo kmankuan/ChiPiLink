@@ -316,7 +316,7 @@ export default function PingPongMobileArbiter() {
         <div className="flex justify-center items-center gap-8">
           <div className="text-center">
             <div className={`text-7xl font-black ${match.saque === 'a' ? 'text-yellow-400' : 'text-white'}`}>
-              {match.puntos_player_a}
+              {match.points_player_a}
             </div>
             {match.saque === 'a' && <div className="text-yellow-400 text-xs mt-1">● SAQUE</div>}
           </div>

@@ -89,10 +89,10 @@ export default function SuperPinAdmin() {
     }
   };
 
-  const activateLeague = async (ligaId) => {
+  const activateLeague = async (leagueId) => {
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-      await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/activate`, {
+      await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/activate`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -102,14 +102,14 @@ export default function SuperPinAdmin() {
     }
   };
 
-  const getStatusBadge = (estado) => {
+  const getStatusBadge = (status) => {
     const styles = {
       draft: 'bg-gray-100 text-gray-800',
       active: 'bg-green-100 text-green-800',
       paused: 'bg-yellow-100 text-yellow-800',
       finished: 'bg-blue-100 text-blue-800'
     };
-    return <Badge className={styles[estado]}>{t(`superpin.leagues.status.${estado}`)}</Badge>;
+    return <Badge className={styles[status]}>{t(`superpin.leagues.status.${status}`)}</Badge>;
   };
 
   const getScoringLabel = (system) => {
@@ -173,7 +173,7 @@ export default function SuperPinAdmin() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('superpin.players.total')}</p>
-              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_jugadores || 0), 0)}</p>
+              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_players || 0), 0)}</p>
             </div>
           </CardContent>
         </Card>
@@ -228,7 +228,7 @@ export default function SuperPinAdmin() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right mr-4">
-                      <p className="text-sm text-gray-500">{league.total_jugadores || 0} {t('superpin.players.title').toLowerCase()}</p>
+                      <p className="text-sm text-gray-500">{league.total_players || 0} {t('superpin.players.title').toLowerCase()}</p>
                       <p className="text-sm text-gray-500">{league.total_matches || 0} {t('superpin.matches.title').toLowerCase()}</p>
                     </div>
                     {getStatusBadge(league.status)}

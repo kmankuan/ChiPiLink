@@ -451,7 +451,7 @@ function NewPlayersList({ players }) {
   return (
     <div className="space-y-2">
       {players.length === 0 ? (
-        <p className="text-white/60 text-center py-4">No hay nuevos jugadores</p>
+        <p className="text-white/60 text-center py-4">No new players</p>
       ) : (
         players.map((player, idx) => (
           <div key={idx} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">

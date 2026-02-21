@@ -114,7 +114,7 @@ export default function SeasonsPage() {
         {/* Player Stats */}
         {currentUserId && currentSeason && !seasonId && (
           <div className="mb-6">
-            <PlayerSeasonCard jugadorId={currentUserId} />
+            <PlayerSeasonCard playerId={currentUserId} />
           </div>
         )}
         
@@ -201,7 +201,7 @@ export default function SeasonsPage() {
             
             {/* Player's season rewards history */}
             {currentUserId && (
-              <PlayerSeasonRewardsHistory jugadorId={currentUserId} />
+              <PlayerSeasonRewardsHistory playerId={currentUserId} />
             )}
           </TabsContent>
         </Tabs>
@@ -211,18 +211,18 @@ export default function SeasonsPage() {
 }
 
 // Player's season rewards history component
-function PlayerSeasonRewardsHistory({ jugadorId }) {
+function PlayerSeasonRewardsHistory({ playerId }) {
   const { t } = useTranslation();
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     fetchRewards();
-  }, [jugadorId]);
+  }, [playerId]);
   
   const fetchRewards = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/seasons/player/${jugadorId}/rewards`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/seasons/player/${playerId}/rewards`);
       if (response.ok) {
         const data = await response.json();
         setRewards(data.rewards || []);

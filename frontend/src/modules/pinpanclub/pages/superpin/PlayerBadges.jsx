@@ -25,13 +25,13 @@ const RARITY_LABELS = {
   legendary: 'Legendary'
 };
 
-export default function PlayerBadges({ playerId, jugadorId, compact = false }) {
+export default function PlayerBadges({ playerId, playerId, compact = false }) {
   const { t } = useTranslation();
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Support both new and legacy prop names
-  const playerIdToUse = playerId || jugadorId;
+  const playerIdToUse = playerId || playerId;
 
   useEffect(() => {
     if (playerIdToUse) {
@@ -187,19 +187,19 @@ export function BadgeFeed({ limit = 10 }) {
 }
 
 // Badge Leaderboard Component
-export function BadgeLeaderboard({ ligaId = null, limit = 10 }) {
+export function BadgeLeaderboard({ leagueId = null, limit = 10 }) {
   const { t } = useTranslation();
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [ligaId, limit]);
+  }, [leagueId, limit]);
 
   const fetchLeaderboard = async () => {
     try {
       const params = new URLSearchParams({ limit: limit.toString() });
-      if (ligaId) params.append('liga_id', ligaId);
+      if (leagueId) params.append('liga_id', leagueId);
       
       const response = await fetch(`${API_URL}/api/pinpanclub/superpin/badges/leaderboard?${params}`);
       if (response.ok) {

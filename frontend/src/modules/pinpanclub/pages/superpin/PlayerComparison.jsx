@@ -1,6 +1,6 @@
 /**
  * Player Comparison Tool
- * Herramienta para comparar múltiples jugadores lado a lado
+ * Tool for comparing multiple players side by side
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,12 +47,12 @@ export default function PlayerComparison() {
     }
   };
 
-  const fetchPlayerStats = async (jugadorId) => {
+  const fetchPlayerStats = async (playerId) => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${jugadorId}/statistics`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${playerId}/statistics`);
       if (response.ok) {
         const data = await response.json();
-        setPlayerStats(prev => ({ ...prev, [jugadorId]: data }));
+        setPlayerStats(prev => ({ ...prev, [playerId]: data }));
       }
     } catch (error) {
       console.error('Error fetching player stats:', error);
@@ -74,16 +74,16 @@ export default function PlayerComparison() {
     }
   };
 
-  const removePlayer = (jugadorId) => {
-    setSelectedPlayers(prev => prev.filter(p => p.player_id !== jugadorId));
+  const removePlayer = (playerId) => {
+    setSelectedPlayers(prev => prev.filter(p => p.player_id !== playerId));
   };
 
   const clearAll = () => {
     setSelectedPlayers([]);
   };
 
-  const getStatValue = (jugadorId, path) => {
-    const stats = playerStats[jugadorId];
+  const getStatValue = (playerId, path) => {
+    const stats = playerStats[playerId];
     if (!stats) return '-';
     
     const parts = path.split('.');
@@ -104,7 +104,7 @@ export default function PlayerComparison() {
   const getBestValue = (statPath, higherIsBetter = true) => {
     const values = selectedPlayers.map(p => {
       const val = getStatValue(p.player_id, statPath);
-      return { jugadorId: p.player_id, value: typeof val === 'number' ? val : -Infinity };
+      return { playerId: p.player_id, value: typeof val === 'number' ? val : -Infinity };
     });
     
     if (values.length === 0) return null;
@@ -113,7 +113,7 @@ export default function PlayerComparison() {
       ? values.reduce((a, b) => a.value > b.value ? a : b)
       : values.reduce((a, b) => a.value < b.value ? a : b);
     
-    return best.value !== -Infinity ? best.jugadorId : null;
+    return best.value !== -Infinity ? best.playerId : null;
   };
 
   const filteredPlayers = availablePlayers.filter(p => 

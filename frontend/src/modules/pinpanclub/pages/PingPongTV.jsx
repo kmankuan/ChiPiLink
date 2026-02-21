@@ -459,7 +459,7 @@ export default function PingPongTV() {
                   {/* Current Set Score */}
                   <div className="flex items-center justify-center gap-8">
                     <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'a' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
-                      {currentMatch.puntos_player_a}
+                      {currentMatch.points_player_a}
                     </span>
                     <span className="text-6xl text-white/40">:</span>
                     <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'b' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
@@ -1164,7 +1164,7 @@ function MiniScoreboard({ match, onClick }) {
             <span className="text-white font-semibold">{playerA.nickname || playerA.nombre || 'Jugador A'}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-white">{match.puntos_player_a}</span>
+            <span className="text-2xl font-bold text-white">{match.points_player_a}</span>
             <span className="text-lg text-blue-400">{match.sets_player_a}</span>
           </div>
         </div>

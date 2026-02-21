@@ -557,7 +557,7 @@ export default function PingPongDashboard() {
                 </div>
                 
                 {/* Compact Weekly Challenges Preview */}
-                <WeeklyChallengesPreview jugadorId={currentUserId} />
+                <WeeklyChallengesPreview playerId={currentUserId} />
               </CardContent>
             </Card>
           </section>
@@ -789,7 +789,7 @@ export default function PingPongDashboard() {
 }
 
 // Compact Weekly Challenges Preview for Dashboard
-function WeeklyChallengesPreview({ jugadorId }) {
+function WeeklyChallengesPreview({ playerId }) {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

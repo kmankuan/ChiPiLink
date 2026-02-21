@@ -1,6 +1,6 @@
 /**
  * Super Pin Check-in Component
- * Componente para registro de presencia de jugadores
+ * Component for player attendance registration
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplete }) {
+export default function SuperPinCheckIn({ leagueId, leagueConfig, onCheckInComplete }) {
   const { t } = useTranslation();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [allPlayers, setAllPlayers] = useState([]);
@@ -32,12 +32,12 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
 
   useEffect(() => {
     fetchData();
-  }, [ligaId]);
+  }, [leagueId]);
 
   const fetchData = async () => {
     try {
       const [availableRes, playersRes] = await Promise.all([
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/available-players`),
+        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/available-players`),
         fetch(`${API_URL}/api/pinpanclub/players`)
       ]);
 
@@ -59,7 +59,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
     setCheckingIn(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${selectedPlayer}&method=manual`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/checkin?player_id=${selectedPlayer}&method=manual`,
         { method: 'POST' }
       );
 
@@ -92,7 +92,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
         try {
           const { latitude, longitude } = position.coords;
           const response = await fetch(
-            `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${selectedPlayer}&method=geolocation&latitude=${latitude}&longitude=${longitude}`,
+            `${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/checkin?player_id=${selectedPlayer}&method=geolocation&latitude=${latitude}&longitude=${longitude}`,
             { method: 'POST' }
           );
 
@@ -124,16 +124,16 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
   const handleQrCheckIn = async (qrData) => {
     // QR code contains: SUPERPIN_CHECKIN:{liga_id}:{player_id}
     const parts = qrData.split(':');
-    if (parts.length !== 3 || parts[0] !== 'SUPERPIN_CHECKIN' || parts[1] !== ligaId) {
+    if (parts.length !== 3 || parts[0] !== 'SUPERPIN_CHECKIN' || parts[1] !== leagueId) {
       alert(t('superpin.checkin.invalidQr'));
       return;
     }
 
-    const jugadorId = parts[2];
+    const playerId = parts[2];
     setCheckingIn(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${jugadorId}&method=qr_code&qr_code=${qrData}`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/checkin?player_id=${playerId}&method=qr_code&qr_code=${qrData}`,
         { method: 'POST' }
       );
 
@@ -149,10 +149,10 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
     }
   };
 
-  const handleCheckOut = async (jugadorId) => {
+  const handleCheckOut = async (playerId) => {
     try {
       await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkout?player_id=${jugadorId}`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/checkout?player_id=${playerId}`,
         { method: 'POST' }
       );
       await fetchData();
@@ -162,8 +162,8 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
     }
   };
 
-  const generatePlayerQr = (jugadorId) => {
-    return `SUPERPIN_CHECKIN:${ligaId}:${jugadorId}`;
+  const generatePlayerQr = (playerId) => {
+    return `SUPERPIN_CHECKIN:${leagueId}:${playerId}`;
   };
 
   // Filter out already checked-in players

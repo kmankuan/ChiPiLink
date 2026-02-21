@@ -44,7 +44,7 @@ export default function ChallengesPage() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <WeeklyChallenges jugadorId={currentUserId} />
+        <WeeklyChallenges playerId={currentUserId} />
       </div>
     </div>
   );

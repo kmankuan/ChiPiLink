@@ -1,6 +1,6 @@
 /**
  * Super Pin Ranking - Vista Pública
- * Vista del ranking para jugadores y espectadores
+ * Ranking view for players and spectators
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -18,10 +18,10 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinRanking() {
   const { t } = useTranslation();
-  const { ligaId } = useParams();
+  const { leagueId } = useParams();
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
-  const [selectedLeague, setSelectedLeague] = useState(ligaId || null);
+  const [selectedLeague, setSelectedLeague] = useState(leagueId || null);
   const [ranking, setRanking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -243,7 +243,7 @@ export default function SuperPinRanking() {
                                 >
                                   {entry.player_info?.name || t('superpin.ranking.player')}
                                 </p>
-                                <PlayerBadges jugadorId={entry.player_id} compact={true} />
+                                <PlayerBadges playerId={entry.player_id} compact={true} />
                               </div>
                               {entry.player_info?.nickname && (
                                 <p className="text-sm text-white/50">"{entry.player_info.nickname}"</p>

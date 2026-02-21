@@ -18,7 +18,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinLeagueDetail() {
   const { t } = useTranslation();
-  const { ligaId } = useParams();
+  const { leagueId } = useParams();
   const navigate = useNavigate();
   const [league, setLeague] = useState(null);
   const [ranking, setRanking] = useState(null);
@@ -38,16 +38,16 @@ export default function SuperPinLeagueDetail() {
 
   useEffect(() => {
     fetchData();
-  }, [ligaId]);
+  }, [leagueId]);
 
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       
       const [leagueRes, rankingRes, matchesRes, playersRes, usersRes] = await Promise.all([
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}`),
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/ranking`),
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/matches?limit=20`),
+        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}`),
+        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/ranking`),
+        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/matches?limit=20`),
         fetch(`${API_URL}/api/pinpanclub/players`),
         fetch(`${API_URL}/api/auth-v2/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -128,7 +128,7 @@ export default function SuperPinLeagueDetail() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          liga_id: ligaId,
+          liga_id: leagueId,
           player_a_id: newMatch.player_a_id,
           player_b_id: newMatch.player_b_id,
           match_type: 'ranked'
@@ -158,13 +158,13 @@ export default function SuperPinLeagueDetail() {
     return null;
   };
 
-  const getStatusLabel = (estado) => {
+  const getStatusLabel = (status) => {
     const statusMap = {
       pendiente: t('superpin.matches.status.pending'),
       en_curso: t('superpin.matches.status.inProgress'),
       finalizado: t('superpin.matches.status.finished')
     };
-    return statusMap[estado] || estado;
+    return statusMap[status] || status;
   };
 
   if (loading) {
@@ -224,7 +224,7 @@ export default function SuperPinLeagueDetail() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('superpin.players.title')}</p>
-              <p className="text-2xl font-bold">{ranking?.total_jugadores || 0}</p>
+              <p className="text-2xl font-bold">{ranking?.total_players || 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -341,7 +341,7 @@ export default function SuperPinLeagueDetail() {
                         <td className="p-3 text-center text-green-600">{entry.matches_won}</td>
                         <td className="p-3 text-center text-red-600">{entry.matches_lost}</td>
                         <td className="p-3 text-center">{getStreakBadge(entry.racha_actual)}</td>
-                        <td className="p-3 text-center">{getPositionChange(entry.cambio_posicion)}</td>
+                        <td className="p-3 text-center">{getPositionChange(entry.position_change)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -405,7 +405,7 @@ export default function SuperPinLeagueDetail() {
       {/* Check-in Tab */}
       {activeTab === 'checkin' && league.status === 'active' && (
         <SuperPinCheckIn 
-          ligaId={ligaId} 
+          leagueId={leagueId} 
           leagueConfig={league}
           onCheckInComplete={fetchData}
         />
@@ -688,7 +688,7 @@ export default function SuperPinLeagueDetail() {
                         best_of: 3,
                         third_place_match: true,
                         seeding_source: 'superpin',
-                        seeding_league_id: ligaId,
+                        seeding_league_id: leagueId,
                         start_date: newTournament.start_date || undefined,
                       })
                     });
