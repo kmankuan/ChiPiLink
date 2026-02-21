@@ -155,6 +155,7 @@ api_router = APIRouter(prefix="/api")
 # Register module routers
 api_router.include_router(auth_refactored_router)  # Microservices-ready routes
 api_router.include_router(store_refactored_router)  # Microservices-ready routes
+api_router.include_router(sysbook_router)  # Sysbook - School Textbook Management
 api_router.include_router(landing_router)
 api_router.include_router(community_refactored_router)  # Microservices-ready routes
 api_router.include_router(monday_router)
