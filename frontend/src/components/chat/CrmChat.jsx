@@ -336,7 +336,7 @@ function NewTopicForm({ studentId, token, onBack, onCreated, isAdmin }) {
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Quick select</label>
           <div className="flex flex-wrap gap-1.5">
-            {QUICK_SUBJECTS.map((s) => (
+            {quickSubjects.map((s) => (
               <button
                 key={s}
                 onClick={() => setSubject(s)}
