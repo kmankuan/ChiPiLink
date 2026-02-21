@@ -77,11 +77,17 @@ class ConnectionManager:
         
         info = self.connection_info.get(client_id, {})
         match_id = info.get("match_id")
+        tournament_id = info.get("tournament_id")
         
         if match_id and match_id in self.match_connections:
             self.match_connections[match_id].discard(client_id)
             if not self.match_connections[match_id]:
                 del self.match_connections[match_id]
+        
+        if tournament_id and tournament_id in self.tournament_connections:
+            self.tournament_connections[tournament_id].discard(client_id)
+            if not self.tournament_connections[tournament_id]:
+                del self.tournament_connections[tournament_id]
         
         self.global_connections.discard(client_id)
         
