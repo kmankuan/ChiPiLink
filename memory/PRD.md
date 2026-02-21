@@ -70,6 +70,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Frontend**: Delete button with destructive confirmation dialog, Restore button for archived items, Archive toggle filter
 - **Testing**: 100% (12/12 backend, all frontend)
 
+### Bugfix - Textbook Catalog Archive & Delete (Feb 21, 2026)
+- **Fixed**: Archive/delete queried by `product_id` but products use `book_id` (was `libro_id` before English migration), causing "0 archived, N failed"
+- **DB Migration**: Renamed Spanish fields in `store_products` (libro_id→book_id, cantidad_inventario→inventory_quantity, imagen_url→image_url, etc.)
+- **Added**: `bulk-unarchive` endpoint; fixed `bulk-archive` and `bulk-delete` to query by `book_id`
+- **Frontend**: Updated bulk action bar with Archive/Restore/Delete buttons
+- **Testing**: 100% (12/12 backend, all frontend)
+
 ## Key API Endpoints
 
 ### RapidPin (English field names)
