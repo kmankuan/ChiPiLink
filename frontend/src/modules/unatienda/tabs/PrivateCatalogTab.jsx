@@ -24,7 +24,7 @@ import { BoardHeader } from '@/components/shared/BoardHeader';
 
 /* ── Column definitions per catalog type ── */
 const COLUMN_DEFS = {
-  pca: [
+  sysbook: [
     { key: 'name', label: 'Book Name', width: 250, sortKey: 'name', sticky: true },
     { key: 'code', label: 'Code', width: 100, sortKey: 'code', mono: true },
     { key: 'grade', label: 'Grade', width: 80, sortKey: 'grade' },
