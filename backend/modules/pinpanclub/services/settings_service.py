@@ -384,13 +384,13 @@ class PinPanSettingsService(BaseService):
         rp_col = db[PinpanClubCollections.RAPIDPIN_RANKINGS]
         rp_pipeline = [
             {"$group": {
-                "_id": "$jugador_id",
-                "total_points": {"$sum": "$puntos_totales"},
-                "total_wins": {"$sum": "$partidos_ganados"},
-                "total_losses": {"$sum": "$partidos_perdidos"},
-                "total_refereed": {"$sum": "$partidos_arbitrados"},
+                "_id": "$player_id",
+                "total_points": {"$sum": "$total_points"},
+                "total_wins": {"$sum": "$matches_won"},
+                "total_losses": {"$sum": "$matches_lost"},
+                "total_refereed": {"$sum": "$matches_refereed"},
                 "seasons_count": {"$sum": 1},
-                "last_info": {"$last": "$jugador_info"},
+                "last_info": {"$last": "$player_info"},
             }}
         ]
         rp_stats = await rp_col.aggregate(rp_pipeline).to_list(length=10000)
@@ -403,10 +403,10 @@ class PinPanSettingsService(BaseService):
             p["rapidpin_matches_won"] = e.get("total_wins", 0)
             p["rapidpin_seasons"] = e.get("seasons_count", 0)
             p["rapidpin_points"] = e.get("total_points", 0)
-            # Extract name from jugador_info
+            # Extract name from player_info
             info = e.get("last_info") or {}
-            if not p["player_name"] and (info.get("nickname") or info.get("nombre")):
-                p["player_name"] = info.get("nickname") or info.get("nombre", "")
+            if not p["player_name"] and (info.get("nickname") or info.get("name")):
+                p["player_name"] = info.get("nickname") or info.get("name", "")
 
         # 4. Referee profiles
         ref_entries = await self.referee_col.find({}, {"_id": 0}).to_list(length=10000)
