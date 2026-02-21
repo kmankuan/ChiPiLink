@@ -188,7 +188,7 @@ export default function PingPongDashboard() {
                     mode="both"
                   />
                 )}
-                {/* Super Pin - Featured */}
+                {/* PinPan League - Featured */}
                 <Button 
                   variant="default" 
                   size="sm" 
@@ -196,7 +196,7 @@ export default function PingPongDashboard() {
                   className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
                 >
                   <Trophy className="h-4 w-4 mr-2" />
-                  🏆 Super Pin
+                  League
                 </Button>
                 {/* Rapid Pin - New */}
                 <Button 
@@ -244,7 +244,7 @@ export default function PingPongDashboard() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => navigate('/pinpanclub/superpin/admin')}>
                         <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
-                        Super Pin Admin
+                        League Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/pinpanclub/analytics')}>
                         <BarChart3 className="h-4 w-4 mr-2 text-indigo-500" />
@@ -298,7 +298,7 @@ export default function PingPongDashboard() {
             className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
           >
             <Trophy className="h-4 w-4 mr-2" />
-            🏆 Super Pin
+            League
           </Button>
           <Button 
             variant="default" 
@@ -349,7 +349,7 @@ export default function PingPongDashboard() {
         {/* Quick Stats */}
         <QuickStats />
 
-        {/* Super Pin Banner */}
+        {/* PinPan League Banner */}
         <section>
           <Card className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 border-0 overflow-hidden">
             <CardContent className="p-4 sm:p-6">
@@ -360,7 +360,7 @@ export default function PingPongDashboard() {
                   </div>
                   <div className="min-w-0">
                     <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
-                      🏆 Super Pin Ranking
+                      PinPan League
                     </h2>
                     <p className="text-green-200 text-sm sm:text-base">Sistema de ranking individual con ligas y temporadas</p>
                   </div>
