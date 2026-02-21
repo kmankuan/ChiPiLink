@@ -321,7 +321,7 @@ export default function MatchComments({ matchId, currentUserId }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-sm">
-                          {comment.author_info?.apodo || comment.author_info?.nombre || 'Anónimo'}
+                          {comment.author_info?.nickname || comment.author_info?.nombre || 'Anónimo'}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           · {formatTime(comment.created_at)}

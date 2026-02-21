@@ -79,8 +79,8 @@ export default function PingPongCanvas() {
       const data = await response.json();
       
       // Filter for active and pending
-      const filtered = data.filter(m => m.estado === 'en_curso' || m.estado === 'pendiente');
-      setActiveMatches(filtered.filter(m => m.estado === 'en_curso'));
+      const filtered = data.filter(m => m.status === 'en_curso' || m.status === 'pendiente');
+      setActiveMatches(filtered.filter(m => m.status === 'en_curso'));
       setAllMatches(filtered);
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -556,11 +556,11 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                       className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
                     >
                       <div className="font-medium">
-                        {m.player_a_info?.apodo || m.player_a_info?.nombre || 'Jugador A'} vs{' '}
-                        {m.player_b_info?.apodo || m.player_b_info?.nombre || 'Jugador B'}
+                        {m.player_a_info?.nickname || m.player_a_info?.nombre || 'Jugador A'} vs{' '}
+                        {m.player_b_info?.nickname || m.player_b_info?.nombre || 'Jugador B'}
                       </div>
                       <div className="text-xs text-white/60">
-                        Mesa {m.mesa || '?'} • {m.estado}
+                        Mesa {m.mesa || '?'} • {m.status}
                       </div>
                     </button>
                   ))}
@@ -583,7 +583,7 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
 
   const playerA = match.player_a_info || {};
   const playerB = match.player_b_info || {};
-  const isLive = match.estado === 'en_curso';
+  const isLive = match.status === 'en_curso';
 
   return (
     <div className={`w-full h-full rounded-xl overflow-hidden relative ${
@@ -653,7 +653,7 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                 className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
               >
                 <div className="font-medium truncate">
-                  {m.player_a_info?.apodo || 'A'} vs {m.player_b_info?.apodo || 'B'}
+                  {m.player_a_info?.nickname || 'A'} vs {m.player_b_info?.nickname || 'B'}
                 </div>
                 <div className="text-xs text-white/60">
                   Mesa {m.mesa || '?'} • {m.puntos_player_a}-{m.puntos_player_b}
@@ -688,7 +688,7 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
           </div>
         )}
         <div className="text-lg font-bold text-white truncate">
-          {playerA.apodo || playerA.nombre || 'Jugador A'}
+          {playerA.nickname || playerA.nombre || 'Jugador A'}
         </div>
         <div className="text-xs text-white/60">ELO: {playerA.elo_rating || 1000}</div>
         
@@ -734,7 +734,7 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
           </div>
         )}
         <div className="text-lg font-bold text-white truncate">
-          {playerB.apodo || playerB.nombre || 'Jugador B'}
+          {playerB.nickname || playerB.nombre || 'Jugador B'}
         </div>
         <div className="text-xs text-white/60">ELO: {playerB.elo_rating || 1000}</div>
         
@@ -767,7 +767,7 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
             )}
           </div>
           <span className="text-white font-medium truncate max-w-[120px]">
-            {playerA.apodo || playerA.nombre || 'Jugador A'}
+            {playerA.nickname || playerA.nombre || 'Jugador A'}
           </span>
           {match.saque === 'a' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
@@ -790,7 +790,7 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
             )}
           </div>
           <span className="text-white font-medium truncate max-w-[120px]">
-            {playerB.apodo || playerB.nombre || 'Jugador B'}
+            {playerB.nickname || playerB.nombre || 'Jugador B'}
           </span>
           {match.saque === 'b' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
@@ -807,7 +807,7 @@ function SmallMatchDisplay({ match, playerA, playerB }) {
   return (
     <div className="text-center">
       <div className="text-xs text-white/60 truncate mb-1">
-        {playerA.apodo?.[0] || playerA.nombre?.[0] || 'A'} vs {playerB.apodo?.[0] || playerB.nombre?.[0] || 'B'}
+        {playerA.nickname?.[0] || playerA.nombre?.[0] || 'A'} vs {playerB.nickname?.[0] || playerB.nombre?.[0] || 'B'}
       </div>
       <div className="flex items-center justify-center gap-2">
         <span className="text-2xl font-black text-white">{match.puntos_player_a}</span>

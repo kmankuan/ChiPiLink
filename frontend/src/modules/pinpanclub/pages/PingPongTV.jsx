@@ -438,7 +438,7 @@ export default function PingPongTV() {
                   </div>
                 )}
                 <h2 className="text-3xl font-bold text-white mb-1">
-                  {playerA.apodo || playerA.nombre || 'Jugador A'}
+                  {playerA.nickname || playerA.nombre || 'Jugador A'}
                 </h2>
                 <p className="text-lg text-white/60">ELO: {playerA.elo_rating || 1000}</p>
                 
@@ -515,7 +515,7 @@ export default function PingPongTV() {
                   </div>
                 )}
                 <h2 className="text-3xl font-bold text-white mb-1">
-                  {playerB.apodo || playerB.nombre || 'Jugador B'}
+                  {playerB.nickname || playerB.nombre || 'Jugador B'}
                 </h2>
                 <p className="text-lg text-white/60">ELO: {playerB.elo_rating || 1000}</p>
                 
@@ -542,7 +542,7 @@ export default function PingPongTV() {
   };
 
   const renderMultiMatch = () => {
-    const matches = activeMatches.filter(m => m.estado === 'en_curso');
+    const matches = activeMatches.filter(m => m.status === 'en_curso');
     
     if (matches.length === 0) {
       return (
@@ -574,7 +574,7 @@ export default function PingPongTV() {
   };
 
   const renderDashboard = () => {
-    const liveMatches = activeMatches.filter(m => m.estado === 'en_curso');
+    const liveMatches = activeMatches.filter(m => m.status === 'en_curso');
     
     return (
       <div className="h-full grid grid-cols-3 gap-4 p-4">
@@ -644,7 +644,7 @@ export default function PingPongTV() {
             </h2>
             <div className="space-y-2">
               {rankings.slice(0, 10).map((player, index) => (
-                <div key={player.jugador_id} className="flex items-center gap-3 bg-white/5 rounded-lg p-2">
+                <div key={player.player_id} className="flex items-center gap-3 bg-white/5 rounded-lg p-2">
                   <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                     index === 0 ? 'bg-yellow-500 text-black' :
                     index === 1 ? 'bg-gray-400 text-black' :
@@ -655,10 +655,10 @@ export default function PingPongTV() {
                   </span>
                   <div className="flex-1">
                     <div className="font-semibold text-white">
-                      {player.apodo || player.name}
+                      {player.nickname || player.name}
                     </div>
                     <div className="text-xs text-white/60">
-                      {player.partidos_ganados}W - {player.partidos_perdidos}L
+                      {player.matches_won}W - {player.matches_lost}L
                     </div>
                   </div>
                   <div className="text-lg font-bold text-blue-400">
@@ -1141,7 +1141,7 @@ function MiniScoreboard({ match, onClick }) {
       {/* Match Info */}
       <div className="flex items-center justify-between mb-3">
         {match.mesa && <span className="text-xs bg-white/20 px-2 py-1 rounded text-white">Mesa {match.mesa}</span>}
-        {match.estado === 'en_curso' && (
+        {match.status === 'en_curso' && (
           <span className="flex items-center gap-1 text-xs text-red-400">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             EN VIVO
@@ -1161,7 +1161,7 @@ function MiniScoreboard({ match, onClick }) {
                 {playerA.nombre?.[0] || 'A'}
               </div>
             )}
-            <span className="text-white font-semibold">{playerA.apodo || playerA.nombre || 'Jugador A'}</span>
+            <span className="text-white font-semibold">{playerA.nickname || playerA.nombre || 'Jugador A'}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-white">{match.puntos_player_a}</span>
@@ -1179,7 +1179,7 @@ function MiniScoreboard({ match, onClick }) {
                 {playerB.nombre?.[0] || 'B'}
               </div>
             )}
-            <span className="text-white font-semibold">{playerB.apodo || playerB.nombre || 'Jugador B'}</span>
+            <span className="text-white font-semibold">{playerB.nickname || playerB.nombre || 'Jugador B'}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-bold text-white">{match.puntos_player_b}</span>

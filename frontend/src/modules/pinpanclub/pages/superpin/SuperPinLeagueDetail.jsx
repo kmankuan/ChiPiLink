@@ -34,7 +34,7 @@ export default function SuperPinLeagueDetail() {
   const [newMatch, setNewMatch] = useState({ player_a_id: '', player_b_id: '' });
   const [loadingMonday, setLoadingMonday] = useState(false);
   const [tournaments, setTournaments] = useState([]);
-  const [newTournament, setNewTournament] = useState({ nombre: '', fecha_inicio: '' });
+  const [newTournament, setNewTournament] = useState({ nombre: '', start_date: '' });
 
   useEffect(() => {
     fetchData();
@@ -201,7 +201,7 @@ export default function SuperPinLeagueDetail() {
             <Button onClick={() => setShowNewMatchModal(true)} className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" /> {t('superpin.matches.new')}
             </Button>
-            {league.estado === 'active' && ranking?.entries?.length >= 2 && (
+            {league.status === 'active' && ranking?.entries?.length >= 2 && (
               <Button 
                 variant="outline" 
                 onClick={() => setShowCreateTournamentModal(true)}
@@ -235,7 +235,7 @@ export default function SuperPinLeagueDetail() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('superpin.matches.title')}</p>
-              <p className="text-2xl font-bold">{ranking?.total_partidos || 0}</p>
+              <p className="text-2xl font-bold">{ranking?.total_matches || 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -246,8 +246,8 @@ export default function SuperPinLeagueDetail() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('status.active')}</p>
-              <Badge className={league.estado === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                {t(`superpin.leagues.status.${league.estado}`)}
+              <Badge className={league.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                {t(`superpin.leagues.status.${league.status}`)}
               </Badge>
             </div>
           </CardContent>
@@ -268,7 +268,7 @@ export default function SuperPinLeagueDetail() {
         >
           <Target className="h-4 w-4 mr-2" /> {t('superpin.matches.title')}
         </Button>
-        {league.estado === 'active' && (
+        {league.status === 'active' && (
           <Button
             variant={activeTab === 'checkin' ? 'default' : 'outline'}
             onClick={() => setActiveTab('checkin')}
@@ -317,29 +317,29 @@ export default function SuperPinLeagueDetail() {
                             {index === 0 && '🥇'}
                             {index === 1 && '🥈'}
                             {index === 2 && '🥉'}
-                            {index > 2 && entry.posicion}
+                            {index > 2 && entry.position}
                           </span>
                         </td>
                         <td className="p-3">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                              {entry.jugador_info?.nombre?.[0] || '?'}
+                              {entry.player_info?.nombre?.[0] || '?'}
                             </div>
                             <div>
-                              <p className="font-medium">{entry.jugador_info?.nombre || t('superpin.ranking.player')}</p>
-                              {entry.jugador_info?.apodo && (
-                                <p className="text-sm text-gray-500">"{entry.jugador_info.apodo}"</p>
+                              <p className="font-medium">{entry.player_info?.nombre || t('superpin.ranking.player')}</p>
+                              {entry.player_info?.nickname && (
+                                <p className="text-sm text-gray-500">"{entry.player_info.nickname}"</p>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="p-3 text-center font-bold text-lg">{entry.puntos_totales}</td>
+                        <td className="p-3 text-center font-bold text-lg">{entry.total_points}</td>
                         {league.scoring_config?.system === 'elo' && (
                           <td className="p-3 text-center font-mono">{entry.elo_rating}</td>
                         )}
-                        <td className="p-3 text-center">{entry.partidos_jugados}</td>
-                        <td className="p-3 text-center text-green-600">{entry.partidos_ganados}</td>
-                        <td className="p-3 text-center text-red-600">{entry.partidos_perdidos}</td>
+                        <td className="p-3 text-center">{entry.matches_played}</td>
+                        <td className="p-3 text-center text-green-600">{entry.matches_won}</td>
+                        <td className="p-3 text-center text-red-600">{entry.matches_lost}</td>
                         <td className="p-3 text-center">{getStreakBadge(entry.racha_actual)}</td>
                         <td className="p-3 text-center">{getPositionChange(entry.cambio_posicion)}</td>
                       </tr>
@@ -391,8 +391,8 @@ export default function SuperPinLeagueDetail() {
                       pendiente: 'bg-gray-100 text-gray-800',
                       en_curso: 'bg-blue-100 text-blue-800',
                       finalizado: 'bg-green-100 text-green-800'
-                    }[match.estado]}>
-                      {getStatusLabel(match.estado)}
+                    }[match.status]}>
+                      {getStatusLabel(match.status)}
                     </Badge>
                   </div>
                 ))}
@@ -403,7 +403,7 @@ export default function SuperPinLeagueDetail() {
       )}
 
       {/* Check-in Tab */}
-      {activeTab === 'checkin' && league.estado === 'active' && (
+      {activeTab === 'checkin' && league.status === 'active' && (
         <SuperPinCheckIn 
           ligaId={ligaId} 
           leagueConfig={league}
@@ -467,8 +467,8 @@ export default function SuperPinLeagueDetail() {
                     >
                       <option value="">{t('superpin.players.selectPlayer')}</option>
                       {availablePlayers.map((player) => (
-                        <option key={player.jugador_id} value={player.jugador_id}>
-                          {player.name} {player.apodo ? `"${player.apodo}"` : ''}
+                        <option key={player.player_id} value={player.player_id}>
+                          {player.name} {player.nickname ? `"${player.nickname}"` : ''}
                         </option>
                       ))}
                     </select>
@@ -481,9 +481,9 @@ export default function SuperPinLeagueDetail() {
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">{t('superpin.players.selectPlayer')}</option>
-                      {availablePlayers.filter(p => p.jugador_id !== newMatch.player_a_id).map((player) => (
-                        <option key={player.jugador_id} value={player.jugador_id}>
-                          {player.name} {player.apodo ? `"${player.apodo}"` : ''}
+                      {availablePlayers.filter(p => p.player_id !== newMatch.player_a_id).map((player) => (
+                        <option key={player.player_id} value={player.player_id}>
+                          {player.name} {player.nickname ? `"${player.nickname}"` : ''}
                         </option>
                       ))}
                     </select>
@@ -634,8 +634,8 @@ export default function SuperPinLeagueDetail() {
                 </label>
                 <input
                   type="date"
-                  value={newTournament.fecha_inicio}
-                  onChange={(e) => setNewTournament({ ...newTournament, fecha_inicio: e.target.value })}
+                  value={newTournament.start_date}
+                  onChange={(e) => setNewTournament({ ...newTournament, start_date: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700"
                   data-testid="playoff-date-input"
                 />
@@ -657,7 +657,7 @@ export default function SuperPinLeagueDetail() {
                 variant="outline" 
                 onClick={() => {
                   setShowCreateTournamentModal(false);
-                  setNewTournament({ nombre: '', fecha_inicio: '' });
+                  setNewTournament({ nombre: '', start_date: '' });
                 }}
                 data-testid="cancel-playoff-btn"
               >
@@ -689,13 +689,13 @@ export default function SuperPinLeagueDetail() {
                         third_place_match: true,
                         seeding_source: 'superpin',
                         seeding_league_id: ligaId,
-                        start_date: newTournament.fecha_inicio || undefined,
+                        start_date: newTournament.start_date || undefined,
                       })
                     });
                     if (response.ok) {
                       const data = await response.json();
                       setShowCreateTournamentModal(false);
-                      setNewTournament({ nombre: '', fecha_inicio: '' });
+                      setNewTournament({ nombre: '', start_date: '' });
                       navigate(`/pinpanclub/arena/${data.tournament_id}`);
                     }
                   } catch (error) {

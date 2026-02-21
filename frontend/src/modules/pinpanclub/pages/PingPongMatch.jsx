@@ -115,11 +115,11 @@ export default function PingPongMatch() {
                     <SelectContent>
                       {players.map((player) => (
                         <SelectItem 
-                          key={player.jugador_id} 
-                          value={player.jugador_id}
-                          disabled={player.jugador_id === formData.player_b_id}
+                          key={player.player_id} 
+                          value={player.player_id}
+                          disabled={player.player_id === formData.player_b_id}
                         >
-                          {player.apodo || player.name} {player.apellido} (ELO: {player.elo_rating})
+                          {player.nickname || player.name} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -138,11 +138,11 @@ export default function PingPongMatch() {
                     <SelectContent>
                       {players.map((player) => (
                         <SelectItem 
-                          key={player.jugador_id} 
-                          value={player.jugador_id}
-                          disabled={player.jugador_id === formData.player_a_id}
+                          key={player.player_id} 
+                          value={player.player_id}
+                          disabled={player.player_id === formData.player_a_id}
                         >
-                          {player.apodo || player.name} {player.apellido} (ELO: {player.elo_rating})
+                          {player.nickname || player.name} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>
                       ))}
                     </SelectContent>

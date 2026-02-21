@@ -265,9 +265,9 @@ export default function PingPongMobileArbiter() {
     );
   }
 
-  const isLive = match.estado === 'en_curso';
-  const isPending = match.estado === 'pendiente';
-  const isFinished = match.estado === 'finalizado';
+  const isLive = match.status === 'en_curso';
+  const isPending = match.status === 'pendiente';
+  const isFinished = match.status === 'finalizado';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col">

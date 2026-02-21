@@ -133,7 +133,7 @@ export default function SuperPinTournament() {
               {tournament.nombre}
             </h1>
             <p className="text-gray-600 mt-1">
-              {tournament.participantes?.length || 0} {t('superpin.tournaments.participants')} • {getStatusBadge(tournament.estado)}
+              {tournament.participantes?.length || 0} {t('superpin.tournaments.participants')} • {getStatusBadge(tournament.status)}
             </p>
           </div>
           {!hasStarted && (
@@ -164,11 +164,11 @@ export default function SuperPinTournament() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
               {tournament.participantes?.map((p, idx) => (
-                <div key={p.jugador_id} className="p-3 bg-gray-50 rounded-lg text-center">
+                <div key={p.player_id} className="p-3 bg-gray-50 rounded-lg text-center">
                   <div className="w-10 h-10 bg-green-100 rounded-full mx-auto mb-2 flex items-center justify-center font-bold text-green-700">
-                    {p.posicion_ranking}
+                    {p.position_ranking}
                   </div>
-                  <p className="text-sm font-medium truncate">{p.jugador_info?.nombre || t('superpin.ranking.player')}</p>
+                  <p className="text-sm font-medium truncate">{p.player_info?.nombre || t('superpin.ranking.player')}</p>
                 </div>
               ))}
             </div>
@@ -196,12 +196,12 @@ export default function SuperPinTournament() {
                     <div
                       key={match.match_id}
                       className={`bg-white rounded-lg shadow-sm border-2 ${
-                        match.estado === 'finalizado' ? 'border-green-200' :
-                        match.estado === 'bye' ? 'border-yellow-200' :
+                        match.status === 'finalizado' ? 'border-green-200' :
+                        match.status === 'bye' ? 'border-yellow-200' :
                         'border-gray-200 hover:border-green-400 cursor-pointer'
                       }`}
                       onClick={() => {
-                        if (match.estado === 'pendiente' && match.player_a && match.player_b) {
+                        if (match.status === 'pendiente' && match.player_a && match.player_b) {
                           setSelectedMatch(match);
                           setShowResultModal(true);
                         }
@@ -209,40 +209,40 @@ export default function SuperPinTournament() {
                     >
                       {/* Player A */}
                       <div className={`p-3 border-b flex items-center justify-between ${
-                        match.winner === match.player_a?.jugador_id ? 'bg-green-50' : ''
+                        match.winner === match.player_a?.player_id ? 'bg-green-50' : ''
                       }`}>
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold">
-                            {match.player_a?.posicion_ranking || '?'}
+                            {match.player_a?.position_ranking || '?'}
                           </span>
-                          <span className={`text-sm ${match.winner === match.player_a?.jugador_id ? 'font-bold' : ''}`}>
-                            {match.player_a?.jugador_info?.nombre || (match.estado === 'bye' ? t('superpin.tournaments.bye') : t('superpin.tournaments.tbd'))}
+                          <span className={`text-sm ${match.winner === match.player_a?.player_id ? 'font-bold' : ''}`}>
+                            {match.player_a?.player_info?.nombre || (match.status === 'bye' ? t('superpin.tournaments.bye') : t('superpin.tournaments.tbd'))}
                           </span>
                         </div>
-                        {match.estado === 'finalizado' && (
+                        {match.status === 'finalizado' && (
                           <span className="text-sm font-bold">{match.score_a}</span>
                         )}
-                        {match.winner === match.player_a?.jugador_id && (
+                        {match.winner === match.player_a?.player_id && (
                           <CheckCircle className="h-4 w-4 text-green-600" />
                         )}
                       </div>
                       
                       {/* Player B */}
                       <div className={`p-3 flex items-center justify-between ${
-                        match.winner === match.player_b?.jugador_id ? 'bg-green-50' : ''
+                        match.winner === match.player_b?.player_id ? 'bg-green-50' : ''
                       }`}>
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold">
-                            {match.player_b?.posicion_ranking || '?'}
+                            {match.player_b?.position_ranking || '?'}
                           </span>
-                          <span className={`text-sm ${match.winner === match.player_b?.jugador_id ? 'font-bold' : ''}`}>
-                            {match.player_b?.jugador_info?.nombre || t('superpin.tournaments.tbd')}
+                          <span className={`text-sm ${match.winner === match.player_b?.player_id ? 'font-bold' : ''}`}>
+                            {match.player_b?.player_info?.nombre || t('superpin.tournaments.tbd')}
                           </span>
                         </div>
-                        {match.estado === 'finalizado' && (
+                        {match.status === 'finalizado' && (
                           <span className="text-sm font-bold">{match.score_b}</span>
                         )}
-                        {match.winner === match.player_b?.jugador_id && (
+                        {match.winner === match.player_b?.player_id && (
                           <CheckCircle className="h-4 w-4 text-green-600" />
                         )}
                       </div>
@@ -261,23 +261,23 @@ export default function SuperPinTournament() {
                 <div
                   key={match.match_id}
                   className={`bg-white rounded-lg shadow-sm border-2 w-56 ${
-                    match.estado === 'finalizado' ? 'border-amber-200' : 'border-gray-200'
+                    match.status === 'finalizado' ? 'border-amber-200' : 'border-gray-200'
                   }`}
                   onClick={() => {
-                    if (match.estado === 'pendiente' && match.player_a && match.player_b) {
+                    if (match.status === 'pendiente' && match.player_a && match.player_b) {
                       setSelectedMatch(match);
                       setShowResultModal(true);
                     }
                   }}
                 >
-                  <div className={`p-3 border-b ${match.winner === match.player_a?.jugador_id ? 'bg-amber-50' : ''}`}>
+                  <div className={`p-3 border-b ${match.winner === match.player_a?.player_id ? 'bg-amber-50' : ''}`}>
                     <span className="text-sm">
-                      {match.player_a?.jugador_info?.nombre || t('superpin.tournaments.semifinalLoser')}
+                      {match.player_a?.player_info?.nombre || t('superpin.tournaments.semifinalLoser')}
                     </span>
                   </div>
-                  <div className={`p-3 ${match.winner === match.player_b?.jugador_id ? 'bg-amber-50' : ''}`}>
+                  <div className={`p-3 ${match.winner === match.player_b?.player_id ? 'bg-amber-50' : ''}`}>
                     <span className="text-sm">
-                      {match.player_b?.jugador_info?.nombre || t('superpin.tournaments.semifinalLoser')}
+                      {match.player_b?.player_info?.nombre || t('superpin.tournaments.semifinalLoser')}
                     </span>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function SuperPinTournament() {
       )}
 
       {/* Final Results */}
-      {tournament.estado === 'finalizado' && tournament.resultados_finales?.length > 0 && (
+      {tournament.status === 'finalizado' && tournament.resultados_finales?.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -297,18 +297,18 @@ export default function SuperPinTournament() {
           </CardHeader>
           <CardContent>
             <div className="flex justify-center gap-8">
-              {tournament.resultados_finales.sort((a, b) => a.posicion - b.posicion).map(result => {
-                const player = tournament.participantes?.find(p => p.jugador_id === result.jugador_id);
+              {tournament.resultados_finales.sort((a, b) => a.position - b.position).map(result => {
+                const player = tournament.participantes?.find(p => p.player_id === result.player_id);
                 return (
-                  <div key={result.posicion} className="text-center">
-                    {getPositionIcon(result.posicion)}
+                  <div key={result.position} className="text-center">
+                    {getPositionIcon(result.position)}
                     <p className="mt-2 font-bold text-lg">
-                      {player?.jugador_info?.nombre || t('superpin.ranking.player')}
+                      {player?.player_info?.nombre || t('superpin.ranking.player')}
                     </p>
                     <p className="text-gray-500">
-                      {result.posicion === 1 && '🥇 ' + t('superpin.tournaments.champion')}
-                      {result.posicion === 2 && '🥈 ' + t('superpin.tournaments.runnerUp')}
-                      {result.posicion === 3 && '🥉 ' + t('superpin.tournaments.thirdPlace')}
+                      {result.position === 1 && '🥇 ' + t('superpin.tournaments.champion')}
+                      {result.position === 2 && '🥈 ' + t('superpin.tournaments.runnerUp')}
+                      {result.position === 3 && '🥉 ' + t('superpin.tournaments.thirdPlace')}
                     </p>
                   </div>
                 );
@@ -327,7 +327,7 @@ export default function SuperPinTournament() {
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4 items-center">
                 <div className="text-center">
-                  <p className="font-medium">{selectedMatch.player_a?.jugador_info?.nombre}</p>
+                  <p className="font-medium">{selectedMatch.player_a?.player_info?.nombre}</p>
                   <input
                     type="number"
                     min="0"
@@ -338,7 +338,7 @@ export default function SuperPinTournament() {
                 </div>
                 <div className="text-center text-gray-400 font-bold">VS</div>
                 <div className="text-center">
-                  <p className="font-medium">{selectedMatch.player_b?.jugador_info?.nombre}</p>
+                  <p className="font-medium">{selectedMatch.player_b?.player_info?.nombre}</p>
                   <input
                     type="number"
                     min="0"
@@ -357,20 +357,20 @@ export default function SuperPinTournament() {
                     onClick={() => {
                       const scoreA = parseInt(document.getElementById('score_a').value) || 0;
                       const scoreB = parseInt(document.getElementById('score_b').value) || 0;
-                      updateMatchResult(selectedMatch.match_id, selectedMatch.player_a.jugador_id, scoreA, scoreB);
+                      updateMatchResult(selectedMatch.match_id, selectedMatch.player_a.player_id, scoreA, scoreB);
                     }}
                   >
-                    {selectedMatch.player_a?.jugador_info?.nombre}
+                    {selectedMatch.player_a?.player_info?.nombre}
                   </Button>
                   <Button
                     className="flex-1"
                     onClick={() => {
                       const scoreA = parseInt(document.getElementById('score_a').value) || 0;
                       const scoreB = parseInt(document.getElementById('score_b').value) || 0;
-                      updateMatchResult(selectedMatch.match_id, selectedMatch.player_b.jugador_id, scoreA, scoreB);
+                      updateMatchResult(selectedMatch.match_id, selectedMatch.player_b.player_id, scoreA, scoreB);
                     }}
                   >
-                    {selectedMatch.player_b?.jugador_info?.nombre}
+                    {selectedMatch.player_b?.player_info?.nombre}
                   </Button>
                 </div>
               </div>

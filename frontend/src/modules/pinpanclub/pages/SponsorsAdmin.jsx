@@ -52,7 +52,7 @@ export default function SponsorsAdmin() {
   const [formData, setFormData] = useState({
     nombre: '',
     tipo: 'primary',
-    posicion: 'banner_bottom',
+    position: 'banner_bottom',
     logo_url: '',
     logo_base64: '',
     website_url: '',
@@ -171,7 +171,7 @@ export default function SponsorsAdmin() {
     setFormData({
       nombre: '',
       tipo: 'primary',
-      posicion: 'banner_bottom',
+      position: 'banner_bottom',
       logo_url: '',
       logo_base64: '',
       website_url: '',
@@ -200,7 +200,7 @@ export default function SponsorsAdmin() {
     setFormData({
       nombre: sponsor.nombre || '',
       tipo: sponsor.tipo || 'primary',
-      posicion: sponsor.posicion || 'banner_bottom',
+      position: sponsor.position || 'banner_bottom',
       logo_url: sponsor.logo_url || '',
       logo_base64: sponsor.logo_base64 || '',
       website_url: sponsor.website_url || '',
@@ -224,7 +224,7 @@ export default function SponsorsAdmin() {
   };
 
   const groupedSponsors = sponsors.reduce((acc, sponsor) => {
-    const pos = sponsor.posicion || 'banner_bottom';
+    const pos = sponsor.position || 'banner_bottom';
     if (!acc[pos]) acc[pos] = [];
     acc[pos].push(sponsor);
     return acc;
@@ -327,7 +327,7 @@ export default function SponsorsAdmin() {
                       <button 
                         onClick={() => { 
                           resetForm(); 
-                          setFormData(prev => ({...prev, posicion: pos.value}));
+                          setFormData(prev => ({...prev, position: pos.value}));
                           setShowForm(true); 
                         }}
                         className="text-blue-500 mt-2 hover:underline"
@@ -421,8 +421,8 @@ export default function SponsorsAdmin() {
                   <div>
                     <label className="block text-sm font-medium mb-1">Posición *</label>
                     <select
-                      value={formData.posicion}
-                      onChange={e => setFormData({...formData, posicion: e.target.value})}
+                      value={formData.position}
+                      onChange={e => setFormData({...formData, position: e.target.value})}
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       {POSITION_OPTIONS.map(opt => (

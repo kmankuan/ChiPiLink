@@ -162,7 +162,7 @@ export default function SuperPinAdmin() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('superpin.leagues.active')}</p>
-              <p className="text-2xl font-bold">{leagues.filter(l => l.estado === 'active').length}</p>
+              <p className="text-2xl font-bold">{leagues.filter(l => l.status === 'active').length}</p>
             </div>
           </CardContent>
         </Card>
@@ -184,7 +184,7 @@ export default function SuperPinAdmin() {
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('superpin.matches.total')}</p>
-              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_partidos || 0), 0)}</p>
+              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_matches || 0), 0)}</p>
             </div>
           </CardContent>
         </Card>
@@ -229,10 +229,10 @@ export default function SuperPinAdmin() {
                   <div className="flex items-center gap-4">
                     <div className="text-right mr-4">
                       <p className="text-sm text-gray-500">{league.total_jugadores || 0} {t('superpin.players.title').toLowerCase()}</p>
-                      <p className="text-sm text-gray-500">{league.total_partidos || 0} {t('superpin.matches.title').toLowerCase()}</p>
+                      <p className="text-sm text-gray-500">{league.total_matches || 0} {t('superpin.matches.title').toLowerCase()}</p>
                     </div>
-                    {getStatusBadge(league.estado)}
-                    {league.estado === 'draft' && (
+                    {getStatusBadge(league.status)}
+                    {league.status === 'draft' && (
                       <Button
                         size="sm"
                         variant="outline"

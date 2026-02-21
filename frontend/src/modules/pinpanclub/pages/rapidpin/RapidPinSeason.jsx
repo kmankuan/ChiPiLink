@@ -308,8 +308,8 @@ export default function RapidPinSeason() {
                           </SelectTrigger>
                           <SelectContent>
                             {players.map((p) => (
-                              <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                                {p.apodo || p.name}
+                              <SelectItem key={p.player_id} value={p.player_id}>
+                                {p.nickname || p.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -326,8 +326,8 @@ export default function RapidPinSeason() {
                           </SelectTrigger>
                           <SelectContent>
                             {players.map((p) => (
-                              <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                                {p.apodo || p.name}
+                              <SelectItem key={p.player_id} value={p.player_id}>
+                                {p.nickname || p.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -338,16 +338,16 @@ export default function RapidPinSeason() {
                     <div>
                       <Label>{t('rapidpin.matches.referee')}</Label>
                       <Select
-                        value={newMatch.arbitro_id}
-                        onValueChange={(v) => setNewMatch({ ...newMatch, arbitro_id: v })}
+                        value={newMatch.referee_id}
+                        onValueChange={(v) => setNewMatch({ ...newMatch, referee_id: v })}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder={t('rapidpin.matches.selectReferee')} />
                         </SelectTrigger>
                         <SelectContent>
                           {players.map((p) => (
-                            <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                              {p.apodo || p.name}
+                            <SelectItem key={p.player_id} value={p.player_id}>
+                              {p.nickname || p.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -366,15 +366,15 @@ export default function RapidPinSeason() {
                         <SelectContent>
                           {newMatch.player_a_id && (
                             <SelectItem value={newMatch.player_a_id}>
-                              {players.find(p => p.jugador_id === newMatch.player_a_id)?.apodo || 
-                               players.find(p => p.jugador_id === newMatch.player_a_id)?.nombre || 
+                              {players.find(p => p.player_id === newMatch.player_a_id)?.nickname || 
+                               players.find(p => p.player_id === newMatch.player_a_id)?.nombre || 
                                t('rapidpin.matches.playerA')}
                             </SelectItem>
                           )}
                           {newMatch.player_b_id && (
                             <SelectItem value={newMatch.player_b_id}>
-                              {players.find(p => p.jugador_id === newMatch.player_b_id)?.apodo || 
-                               players.find(p => p.jugador_id === newMatch.player_b_id)?.nombre || 
+                              {players.find(p => p.player_id === newMatch.player_b_id)?.nickname || 
+                               players.find(p => p.player_id === newMatch.player_b_id)?.nombre || 
                                t('rapidpin.matches.playerB')}
                             </SelectItem>
                           )}
@@ -387,16 +387,16 @@ export default function RapidPinSeason() {
                         <Label>{t('rapidpin.matches.winnerScore')}</Label>
                         <Input
                           type="number"
-                          value={newMatch.score_ganador}
-                          onChange={(e) => setNewMatch({ ...newMatch, score_ganador: parseInt(e.target.value) || 0 })}
+                          value={newMatch.score_winner}
+                          onChange={(e) => setNewMatch({ ...newMatch, score_winner: parseInt(e.target.value) || 0 })}
                         />
                       </div>
                       <div>
                         <Label>{t('rapidpin.matches.loserScore')}</Label>
                         <Input
                           type="number"
-                          value={newMatch.score_perdedor}
-                          onChange={(e) => setNewMatch({ ...newMatch, score_perdedor: parseInt(e.target.value) || 0 })}
+                          value={newMatch.score_loser}
+                          onChange={(e) => setNewMatch({ ...newMatch, score_loser: parseInt(e.target.value) || 0 })}
                         />
                       </div>
                     </div>
@@ -449,9 +449,9 @@ export default function RapidPinSeason() {
                             <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                               <span className="flex items-center gap-2">
                                 {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`}
-                                {result.jugador_info?.apodo || result.jugador_info?.nombre || '?'}
+                                {result.player_info?.nickname || result.player_info?.nombre || '?'}
                               </span>
-                              <span className="font-bold">{result.puntos_finales} pts</span>
+                              <span className="font-bold">{result.final_points} pts</span>
                             </div>
                           ))}
                         </div>
@@ -466,9 +466,9 @@ export default function RapidPinSeason() {
                               <div key={idx} className="flex items-center justify-between p-2 bg-purple-50 rounded">
                                 <span className="flex items-center gap-2">
                                   {idx === 0 ? '⚖️' : `${idx + 1}.`}
-                                  {result.jugador_info?.apodo || result.jugador_info?.nombre || '?'}
+                                  {result.player_info?.nickname || result.player_info?.nombre || '?'}
                                 </span>
-                                <span className="font-bold">{result.puntos_finales} arbitrajes</span>
+                                <span className="font-bold">{result.final_points} arbitrajes</span>
                               </div>
                             ))}
                           </div>
@@ -496,7 +496,7 @@ export default function RapidPinSeason() {
             )}
             
             {/* Show results badge if season is closed */}
-            {season.estado === 'closed' && (
+            {season.status === 'closed' && (
               <Badge className="bg-yellow-500/20 text-yellow-100 border-yellow-500/30">
                 <Lock className="w-3 h-3 mr-1" />
                 {t('rapidpin.seasons.status.closed')}
@@ -563,7 +563,7 @@ export default function RapidPinSeason() {
                       </div>
                       <Badge variant="outline" className="text-xs">
                         <Scale className="w-3 h-3 mr-1" />
-                        {getPlayerName(match.arbitro_info)}
+                        {getPlayerName(match.referee_info)}
                       </Badge>
                     </div>
                     <Button 
@@ -629,15 +629,15 @@ export default function RapidPinSeason() {
                               {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                             </td>
                             <td className="py-3 font-medium">
-                              {getPlayerName(entry.jugador_info)}
+                              {getPlayerName(entry.player_info)}
                             </td>
                             <td className="py-3 text-center">
-                              <span className="font-bold text-yellow-500">{entry.puntos_totales}</span>
+                              <span className="font-bold text-yellow-500">{entry.total_points}</span>
                             </td>
-                            <td className="py-3 text-center text-muted-foreground">{entry.partidos_jugados}</td>
-                            <td className="py-3 text-center text-green-500">{entry.partidos_ganados}</td>
-                            <td className="py-3 text-center text-red-500">{entry.partidos_perdidos}</td>
-                            <td className="py-3 text-center text-purple-500">{entry.partidos_arbitrados}</td>
+                            <td className="py-3 text-center text-muted-foreground">{entry.matches_played}</td>
+                            <td className="py-3 text-center text-green-500">{entry.matches_won}</td>
+                            <td className="py-3 text-center text-red-500">{entry.matches_lost}</td>
+                            <td className="py-3 text-center text-purple-500">{entry.matches_refereed}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -676,13 +676,13 @@ export default function RapidPinSeason() {
                               {idx === 0 ? '⚖️' : idx + 1}
                             </td>
                             <td className="py-3 font-medium">
-                              {getPlayerName(entry.jugador_info)}
+                              {getPlayerName(entry.player_info)}
                             </td>
                             <td className="py-3 text-center font-bold text-purple-500">
-                              {entry.partidos_arbitrados}
+                              {entry.matches_refereed}
                             </td>
                             <td className="py-3 text-center text-muted-foreground">
-                              +{entry.puntos_como_arbitro}
+                              +{entry.points_as_referee}
                             </td>
                           </tr>
                         ))}
@@ -709,7 +709,7 @@ export default function RapidPinSeason() {
                       <div 
                         key={match.match_id}
                         className={`p-4 rounded-lg border ${
-                          match.estado === 'validated' 
+                          match.status === 'validated' 
                             ? 'bg-green-500/5 border-green-500/20' 
                             : 'bg-yellow-500/5 border-yellow-500/20'
                         }`}
@@ -727,28 +727,28 @@ export default function RapidPinSeason() {
                             </div>
                             <span className="text-lg font-mono">
                               {match.winner_id === match.player_a_id 
-                                ? `${match.score_ganador}-${match.score_perdedor}`
-                                : `${match.score_perdedor}-${match.score_ganador}`
+                                ? `${match.score_winner}-${match.score_loser}`
+                                : `${match.score_loser}-${match.score_winner}`
                               }
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
                             <Badge variant="outline" className="text-xs">
                               <Scale className="w-3 h-3 mr-1" />
-                              {getPlayerName(match.arbitro_info)}
+                              {getPlayerName(match.referee_info)}
                             </Badge>
-                            <Badge variant={match.estado === 'validated' ? 'default' : 'secondary'}>
-                              {match.estado === 'validated' ? (
+                            <Badge variant={match.status === 'validated' ? 'default' : 'secondary'}>
+                              {match.status === 'validated' ? (
                                 <Check className="w-3 h-3 mr-1" />
                               ) : (
                                 <Clock className="w-3 h-3 mr-1" />
                               )}
-                              {t(`rapidpin.matches.status.${match.estado}`)}
+                              {t(`rapidpin.matches.status.${match.status}`)}
                             </Badge>
                           </div>
                         </div>
                         <div className="mt-2 text-xs text-muted-foreground">
-                          {formatDate(match.fecha_partido)} {formatTime(match.fecha_partido)}
+                          {formatDate(match.match_date)} {formatTime(match.match_date)}
                         </div>
                       </div>
                     ))}

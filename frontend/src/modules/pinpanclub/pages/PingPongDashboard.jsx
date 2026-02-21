@@ -455,7 +455,7 @@ export default function PingPongDashboard() {
                         <div 
                           key={match.match_id}
                           className={`flex items-center justify-between p-3 rounded-lg ${
-                            match.estado === 'validated' 
+                            match.status === 'validated' 
                               ? 'bg-green-500/10 border border-green-500/20' 
                               : 'bg-yellow-500/10 border border-yellow-500/20'
                           }`}
@@ -463,26 +463,26 @@ export default function PingPongDashboard() {
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
                               <span className={`font-medium text-white ${isPlayerAWinner ? 'text-green-400' : ''}`}>
-                                {match.player_a_info?.apodo || match.player_a_info?.nombre || '?'}
+                                {match.player_a_info?.nickname || match.player_a_info?.nombre || '?'}
                               </span>
                               <span className="text-orange-300">vs</span>
                               <span className={`font-medium text-white ${!isPlayerAWinner ? 'text-green-400' : ''}`}>
-                                {match.player_b_info?.apodo || match.player_b_info?.nombre || '?'}
+                                {match.player_b_info?.nickname || match.player_b_info?.nombre || '?'}
                               </span>
                             </div>
                             <Badge variant="outline" className="text-orange-200 border-orange-500/30 text-xs">
                               <Scale className="w-3 h-3 mr-1" />
-                              {match.arbitro_info?.apodo || match.arbitro_info?.nombre || '?'}
+                              {match.referee_info?.nickname || match.referee_info?.nombre || '?'}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="font-mono text-white">
                               {isPlayerAWinner 
-                                ? `${match.score_ganador}-${match.score_perdedor}`
-                                : `${match.score_perdedor}-${match.score_ganador}`
+                                ? `${match.score_winner}-${match.score_loser}`
+                                : `${match.score_loser}-${match.score_winner}`
                               }
                             </span>
-                            {match.estado === 'validated' ? (
+                            {match.status === 'validated' ? (
                               <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
                                 <Check className="w-3 h-3 mr-1" />
                                 Validado
@@ -635,9 +635,9 @@ export default function PingPongDashboard() {
                 <div className="divide-y">
                   {rankings.slice(0, 5).map((player, idx) => (
                     <div 
-                      key={player.jugador_id}
+                      key={player.player_id}
                       className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer"
-                      onClick={() => navigate(`/pingpong/player/${player.jugador_id}`)}
+                      onClick={() => navigate(`/pingpong/player/${player.player_id}`)}
                     >
                       <div className="flex items-center gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
@@ -661,10 +661,10 @@ export default function PingPongDashboard() {
                         )}
                         <div>
                           <div className="font-semibold">
-                            {player.apodo || player.name} {player.apellido}
+                            {player.nickname || player.name} {player.apellido}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {player.partidos_ganados}V - {player.partidos_perdidos}D
+                            {player.matches_won}V - {player.matches_lost}D
                           </div>
                         </div>
                       </div>
@@ -709,7 +709,7 @@ export default function PingPongDashboard() {
                     <div className="text-sm text-muted-foreground space-y-1">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        {new Date(tournament.fecha_inicio).toLocaleDateString('es-PA', {
+                        {new Date(tournament.start_date).toLocaleDateString('es-PA', {
                           day: 'numeric',
                           month: 'short',
                           hour: '2-digit',
@@ -759,13 +759,13 @@ export default function PingPongDashboard() {
                     >
                       <div className="flex items-center gap-4">
                         <div className={`font-semibold ${ganadorA ? 'text-green-600' : ''}`}>
-                          {playerA?.apodo || playerA?.nombre || 'Jugador A'}
+                          {playerA?.nickname || playerA?.nombre || 'Jugador A'}
                           {ganadorA && ' 🏆'}
                         </div>
                         <div className="text-muted-foreground">vs</div>
                         <div className={`font-semibold ${!ganadorA ? 'text-green-600' : ''}`}>
                           {!ganadorA && '🏆 '}
-                          {playerB?.apodo || playerB?.nombre || 'Jugador B'}
+                          {playerB?.nickname || playerB?.nombre || 'Jugador B'}
                         </div>
                       </div>
                       <div className="text-right">
@@ -773,7 +773,7 @@ export default function PingPongDashboard() {
                           {match.sets_player_a} - {match.sets_player_b}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(match.fecha_fin || match.created_at).toLocaleDateString('es-PA')}
+                          {new Date(match.end_date || match.created_at).toLocaleDateString('es-PA')}
                         </div>
                       </div>
                     </div>

@@ -381,13 +381,13 @@ function TopPlayersList({ players }) {
   return (
     <div className="space-y-3">
       {players.slice(0, 5).map((player, idx) => (
-        <div key={player.jugador_id || idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+        <div key={player.player_id || idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
           <div className="flex items-center gap-3">
             <span className={`text-lg font-bold ${idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-gray-300' : idx === 2 ? 'text-orange-400' : 'text-white/60'}`}>
               #{idx + 1}
             </span>
             <span className="text-white font-medium">
-              {player.apodo || player.name || 'Jugador'}
+              {player.nickname || player.name || 'Jugador'}
             </span>
           </div>
           <Badge variant="outline" className="border-indigo-500 text-indigo-300">
@@ -426,13 +426,13 @@ function ActivityRanking({ players }) {
         <p className="text-white/60 text-center py-8">No hay datos</p>
       ) : (
         players.map((player, idx) => (
-          <div key={player.jugador_id || idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+          <div key={player.player_id || idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-4">
               <span className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
                 {idx + 1}
               </span>
               <div>
-                <p className="text-white font-medium">{player.apodo || player.name}</p>
+                <p className="text-white font-medium">{player.nickname || player.name}</p>
                 <p className="text-white/60 text-xs">ELO: {player.elo_rating || 1000}</p>
               </div>
             </div>
@@ -542,7 +542,7 @@ function ChallengeLeaderboard({ entries }) {
               <span className={`text-lg ${idx === 0 ? '👑' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}`}>
                 {idx < 3 ? ['👑', '🥈', '🥉'][idx] : `#${idx + 1}`}
               </span>
-              <span className="text-white">{entry.jugador_info?.apodo || entry.jugador_info?.nombre || 'Jugador'}</span>
+              <span className="text-white">{entry.player_info?.nickname || entry.player_info?.nombre || 'Jugador'}</span>
             </div>
             <div className="text-right">
               <p className="text-purple-400 font-bold">{entry.total_points} pts</p>

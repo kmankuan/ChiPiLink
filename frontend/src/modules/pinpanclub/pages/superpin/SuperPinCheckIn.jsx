@@ -59,7 +59,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
     setCheckingIn(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?jugador_id=${selectedPlayer}&method=manual`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${selectedPlayer}&method=manual`,
         { method: 'POST' }
       );
 
@@ -92,7 +92,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
         try {
           const { latitude, longitude } = position.coords;
           const response = await fetch(
-            `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?jugador_id=${selectedPlayer}&method=geolocation&latitude=${latitude}&longitude=${longitude}`,
+            `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${selectedPlayer}&method=geolocation&latitude=${latitude}&longitude=${longitude}`,
             { method: 'POST' }
           );
 
@@ -122,7 +122,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
   };
 
   const handleQrCheckIn = async (qrData) => {
-    // QR code contains: SUPERPIN_CHECKIN:{liga_id}:{jugador_id}
+    // QR code contains: SUPERPIN_CHECKIN:{liga_id}:{player_id}
     const parts = qrData.split(':');
     if (parts.length !== 3 || parts[0] !== 'SUPERPIN_CHECKIN' || parts[1] !== ligaId) {
       alert(t('superpin.checkin.invalidQr'));
@@ -133,7 +133,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
     setCheckingIn(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?jugador_id=${jugadorId}&method=qr_code&qr_code=${qrData}`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkin?player_id=${jugadorId}&method=qr_code&qr_code=${qrData}`,
         { method: 'POST' }
       );
 
@@ -152,7 +152,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
   const handleCheckOut = async (jugadorId) => {
     try {
       await fetch(
-        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkout?jugador_id=${jugadorId}`,
+        `${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/checkout?player_id=${jugadorId}`,
         { method: 'POST' }
       );
       await fetchData();
@@ -167,8 +167,8 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
   };
 
   // Filter out already checked-in players
-  const checkedInIds = availablePlayers.map(p => p.jugador_id);
-  const playersNotCheckedIn = allPlayers.filter(p => !checkedInIds.includes(p.jugador_id));
+  const checkedInIds = availablePlayers.map(p => p.player_id);
+  const playersNotCheckedIn = allPlayers.filter(p => !checkedInIds.includes(p.player_id));
 
   if (loading) {
     return (
@@ -244,8 +244,8 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                 >
                   <option value="">{t('superpin.players.selectPlayer')}</option>
                   {playersNotCheckedIn.map((player) => (
-                    <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.name} {player.apodo ? `"${player.apodo}"` : ''}
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.name} {player.nickname ? `"${player.nickname}"` : ''}
                     </option>
                   ))}
                 </select>
@@ -281,7 +281,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                   >
                     <option value="">{t('superpin.checkin.selectForQr')}</option>
                     {playersNotCheckedIn.map((player) => (
-                      <option key={player.jugador_id} value={player.jugador_id}>
+                      <option key={player.player_id} value={player.player_id}>
                         {player.name}
                       </option>
                     ))}
@@ -297,7 +297,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                       level="M"
                     />
                     <p className="text-xs text-gray-500 mt-2">
-                      {allPlayers.find(p => p.jugador_id === qrCodeValue)?.nombre}
+                      {allPlayers.find(p => p.player_id === qrCodeValue)?.nombre}
                     </p>
                     <Button
                       size="sm"
@@ -327,8 +327,8 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                 >
                   <option value="">{t('superpin.players.selectPlayer')}</option>
                   {playersNotCheckedIn.map((player) => (
-                    <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.name} {player.apodo ? `"${player.apodo}"` : ''}
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.name} {player.nickname ? `"${player.nickname}"` : ''}
                     </option>
                   ))}
                 </select>
@@ -395,10 +395,10 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      {checkin.jugador_info?.nombre?.[0] || '?'}
+                      {checkin.player_info?.nombre?.[0] || '?'}
                     </div>
                     <div>
-                      <p className="font-medium">{checkin.jugador_info?.nombre}</p>
+                      <p className="font-medium">{checkin.player_info?.nombre}</p>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <Clock className="h-3 w-3" />
                         {new Date(checkin.checkin_time).toLocaleTimeString()}
@@ -415,7 +415,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                     size="sm"
                     variant="outline"
                     className="text-red-600 hover:bg-red-50"
-                    onClick={() => handleCheckOut(checkin.jugador_id)}
+                    onClick={() => handleCheckOut(checkin.player_id)}
                   >
                     <XCircle className="h-4 w-4 mr-1" /> {t('superpin.checkin.checkOut')}
                   </Button>

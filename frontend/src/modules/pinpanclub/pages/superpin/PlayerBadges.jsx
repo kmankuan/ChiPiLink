@@ -171,7 +171,7 @@ export function BadgeFeed({ limit = 10 }) {
           <span className="text-2xl">{badge.icon}</span>
           <div className="flex-1">
             <p className="font-medium">
-              {badge.jugador_info?.nombre || t('superpin.ranking.player')}
+              {badge.player_info?.nombre || t('superpin.ranking.player')}
               <span className="text-gray-500 font-normal"> {t('superpin.badges.earned')} </span>
               {badge.name}
             </p>
@@ -236,7 +236,7 @@ export function BadgeLeaderboard({ ligaId = null, limit = 10 }) {
           </span>
           <div className="flex-1">
             <p className="font-medium">
-              {entry.jugador_info?.nombre || t('superpin.ranking.player')}
+              {entry.player_info?.nombre || t('superpin.ranking.player')}
             </p>
             <div className="flex gap-2 text-xs text-gray-500">
               <span>🏆 {entry.legendary || 0}</span>

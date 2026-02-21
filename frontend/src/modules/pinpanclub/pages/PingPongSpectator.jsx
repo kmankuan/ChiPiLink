@@ -166,7 +166,7 @@ export default function PingPongSpectator() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <h1 className="font-bold text-xl" data-testid="live-title">PinPan Live</h1>
-              {match.estado === 'en_curso' && (
+              {match.status === 'en_curso' && (
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                   LIVE

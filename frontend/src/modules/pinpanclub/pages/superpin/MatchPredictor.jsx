@@ -32,7 +32,7 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
     setError(null);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/predict-match?player_a_id=${playerA.jugador_id}&player_b_id=${playerB.jugador_id}`
+        `${API_URL}/api/pinpanclub/superpin/predict-match?player_a_id=${playerA.player_id}&player_b_id=${playerB.player_id}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -109,7 +109,7 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
             <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-2xl font-bold">
               {player_a.nombre?.[0]}
             </div>
-            <h3 className="font-bold text-lg">{player_a.apodo || player_a.nombre}</h3>
+            <h3 className="font-bold text-lg">{player_a.nickname || player_a.nombre}</h3>
             <p className="text-sm text-gray-500">ELO: {player_a.elo}</p>
             <div className="mt-2">
               <span className={`text-3xl font-bold ${favoriteIsA ? 'text-green-600' : 'text-gray-600'}`}>
@@ -137,7 +137,7 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
             <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-bold">
               {player_b.nombre?.[0]}
             </div>
-            <h3 className="font-bold text-lg">{player_b.apodo || player_b.nombre}</h3>
+            <h3 className="font-bold text-lg">{player_b.nickname || player_b.nombre}</h3>
             <p className="text-sm text-gray-500">ELO: {player_b.elo}</p>
             <div className="mt-2">
               <span className={`text-3xl font-bold ${!favoriteIsA ? 'text-green-600' : 'text-gray-600'}`}>
@@ -210,7 +210,7 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
                   }`}
                 >
                   <span className="font-medium">
-                    {adv.player === 'a' ? player_a.apodo || player_a.nombre : player_b.apodo || player_b.nombre}
+                    {adv.player === 'a' ? player_a.nickname || player_a.nombre : player_b.nickname || player_b.nombre}
                   </span>
                   <span className="text-sm">
                     {adv.category === 'elo' ? 'ELO' : adv.category === 'win_rate' ? 'Win Rate' : 'H2H'}: {adv.detail}
@@ -233,12 +233,12 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
             <div className="flex items-center justify-center gap-8">
               <div className="text-center">
                 <span className="text-2xl font-bold text-green-600">{head_to_head.player_a_wins}</span>
-                <p className="text-sm text-gray-500">{player_a.apodo || player_a.nombre}</p>
+                <p className="text-sm text-gray-500">{player_a.nickname || player_a.nombre}</p>
               </div>
               <div className="text-gray-400">-</div>
               <div className="text-center">
                 <span className="text-2xl font-bold text-blue-600">{head_to_head.player_b_wins}</span>
-                <p className="text-sm text-gray-500">{player_b.apodo || player_b.nombre}</p>
+                <p className="text-sm text-gray-500">{player_b.nickname || player_b.nombre}</p>
               </div>
             </div>
             <p className="text-center text-sm text-gray-500 mt-2">

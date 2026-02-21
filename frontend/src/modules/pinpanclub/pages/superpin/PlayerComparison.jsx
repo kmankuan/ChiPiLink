@@ -60,22 +60,22 @@ export default function PlayerComparison() {
   };
 
   const addPlayer = async (player) => {
-    if (selectedPlayers.find(p => p.jugador_id === player.jugador_id)) return;
+    if (selectedPlayers.find(p => p.player_id === player.player_id)) return;
     
     setSelectedPlayers(prev => [...prev, player]);
     setShowPlayerSelector(false);
     setSearchQuery('');
     
     // Fetch stats if not already loaded
-    if (!playerStats[player.jugador_id]) {
+    if (!playerStats[player.player_id]) {
       setLoadingStats(true);
-      await fetchPlayerStats(player.jugador_id);
+      await fetchPlayerStats(player.player_id);
       setLoadingStats(false);
     }
   };
 
   const removePlayer = (jugadorId) => {
-    setSelectedPlayers(prev => prev.filter(p => p.jugador_id !== jugadorId));
+    setSelectedPlayers(prev => prev.filter(p => p.player_id !== jugadorId));
   };
 
   const clearAll = () => {
@@ -103,8 +103,8 @@ export default function PlayerComparison() {
 
   const getBestValue = (statPath, higherIsBetter = true) => {
     const values = selectedPlayers.map(p => {
-      const val = getStatValue(p.jugador_id, statPath);
-      return { jugadorId: p.jugador_id, value: typeof val === 'number' ? val : -Infinity };
+      const val = getStatValue(p.player_id, statPath);
+      return { jugadorId: p.player_id, value: typeof val === 'number' ? val : -Infinity };
     });
     
     if (values.length === 0) return null;
@@ -117,9 +117,9 @@ export default function PlayerComparison() {
   };
 
   const filteredPlayers = availablePlayers.filter(p => 
-    !selectedPlayers.find(sp => sp.jugador_id === p.jugador_id) &&
+    !selectedPlayers.find(sp => sp.player_id === p.player_id) &&
     (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     p.apodo?.toLowerCase().includes(searchQuery.toLowerCase()))
+     p.nickname?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // Stats to compare
@@ -202,16 +202,16 @@ export default function PlayerComparison() {
               {/* Selected Players */}
               {selectedPlayers.map((player) => (
                 <div
-                  key={player.jugador_id}
+                  key={player.player_id}
                   className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-full"
                 >
                   <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     {player.name?.[0]}
                   </div>
                   <span className="font-medium">{player.name}</span>
-                  {player.apodo && <span className="text-gray-500 text-sm">"{player.apodo}"</span>}
+                  {player.nickname && <span className="text-gray-500 text-sm">"{player.nickname}"</span>}
                   <button
-                    onClick={() => removePlayer(player.jugador_id)}
+                    onClick={() => removePlayer(player.player_id)}
                     className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600"
                   >
                     <X className="h-3 w-3" />
@@ -248,7 +248,7 @@ export default function PlayerComparison() {
                       ) : (
                         filteredPlayers.map((player) => (
                           <button
-                            key={player.jugador_id}
+                            key={player.player_id}
                             onClick={() => addPlayer(player)}
                             className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 text-left"
                           >
@@ -257,7 +257,7 @@ export default function PlayerComparison() {
                             </div>
                             <div>
                               <p className="font-medium">{player.name}</p>
-                              {player.apodo && <p className="text-sm text-gray-500">"{player.apodo}"</p>}
+                              {player.nickname && <p className="text-sm text-gray-500">"{player.nickname}"</p>}
                             </div>
                           </button>
                         ))
@@ -288,17 +288,17 @@ export default function PlayerComparison() {
                       <th className="text-left p-3 bg-gray-50 sticky left-0">{t('superpin.comparison.stat')}</th>
                       {selectedPlayers.map((player) => (
                         <th 
-                          key={player.jugador_id} 
+                          key={player.player_id} 
                           className="text-center p-3 min-w-[140px] cursor-pointer hover:bg-gray-50"
-                          onClick={() => navigate(`/pinpanclub/superpin/player/${player.jugador_id}`)}
+                          onClick={() => navigate(`/pinpanclub/superpin/player/${player.player_id}`)}
                         >
                           <div className="flex flex-col items-center gap-1">
                             <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
                               {player.name?.[0]}
                             </div>
                             <span className="font-medium">{player.name}</span>
-                            {player.apodo && (
-                              <span className="text-xs text-gray-400">"{player.apodo}"</span>
+                            {player.nickname && (
+                              <span className="text-xs text-gray-400">"{player.nickname}"</span>
                             )}
                           </div>
                         </th>
@@ -319,12 +319,12 @@ export default function PlayerComparison() {
                             </div>
                           </td>
                           {selectedPlayers.map((player) => {
-                            const value = getStatValue(player.jugador_id, stat.key);
-                            const isBest = bestPlayerId === player.jugador_id && value !== '-';
+                            const value = getStatValue(player.player_id, stat.key);
+                            const isBest = bestPlayerId === player.player_id && value !== '-';
                             
                             return (
                               <td 
-                                key={player.jugador_id} 
+                                key={player.player_id} 
                                 className={`text-center p-3 ${isBest ? 'bg-green-100' : ''}`}
                               >
                                 <span className={`text-lg font-bold ${
@@ -352,9 +352,9 @@ export default function PlayerComparison() {
                         </div>
                       </td>
                       {selectedPlayers.map((player) => {
-                        const badges = playerStats[player.jugador_id]?.badges || [];
+                        const badges = playerStats[player.player_id]?.badges || [];
                         return (
-                          <td key={player.jugador_id} className="text-center p-3">
+                          <td key={player.player_id} className="text-center p-3">
                             <div className="flex justify-center gap-1 flex-wrap">
                               {badges.slice(0, 5).map((badge) => (
                                 <span 
@@ -383,9 +383,9 @@ export default function PlayerComparison() {
                         </div>
                       </td>
                       {selectedPlayers.map((player) => {
-                        const form = playerStats[player.jugador_id]?.recent_form || [];
+                        const form = playerStats[player.player_id]?.recent_form || [];
                         return (
-                          <td key={player.jugador_id} className="text-center p-3">
+                          <td key={player.player_id} className="text-center p-3">
                             <div className="flex justify-center gap-1">
                               {form.slice(0, 5).map((result, i) => (
                                 <span
