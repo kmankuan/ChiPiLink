@@ -24,6 +24,7 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 | **PinPan Arena** | `/pinpanclub/arena/*` | Tournaments — organized competitive events |
 | **PinPan Live** | `/pinpanclub/live/:matchId` | Watch — follow a match in real-time via WebSocket |
 | **PinPan TV** | `/tv` | Big screen display — live scores, brackets, rankings |
+| **Public Tournament** | `/arena/:tournamentId` | Shareable public tournament view (no auth) |
 
 ## What's Been Implemented
 
@@ -32,48 +33,59 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Backend**: 18 API endpoints under `/api/pinpanclub/arena/`
 - **Frontend**: ArenaHub, ArenaCreate, ArenaDetail pages
 - **Integration**: Seeding from League (SuperPin) rankings or RapidPin seasons
-- **Collections**: `pinpanclub_arena_tournaments`, `pinpanclub_arena_matches`
 
 ### Phase 8b - Naming Unification & Feature Merge (Feb 21, 2026)
-- **Renamed SuperPin → PinPan League** across all user-facing labels:
-  - Dashboard buttons, banner, landing pages
-  - i18n files (en.json, es.json) 
-  - Module status config
-  - All page titles
-- **Merged SuperPin Tournament into Arena**: League detail "Create Playoff" now creates an Arena tournament seeded from league rankings (replaces old SuperPin tournament modal)
-- **Renamed PingPongSpectator → PinPan Live**: Migrated from 2-second polling to WebSocket with polling fallback. Shows connection status (Real-time/Polling).
-- **Added /pinpanclub/live/:matchId route** as the new Live spectator URL (old /pinpanclub/spectator/:matchId still works)
-- **Redirected Tournaments nav** to /pinpanclub/arena instead of old /pinpanclub/tournaments
-- **Fixed i18n**: Added missing translation keys for ranking empty states
-- **Testing**: 100% backend, 95%+ frontend (all issues resolved)
+- **Renamed SuperPin → PinPan League** across all user-facing labels
+- **Merged SuperPin Tournament into Arena**: League "Create Playoff" creates Arena tournaments
+- **Migrated PingPongSpectator → PinPan Live**: Polling → WebSocket with fallback
 
-### Earlier Phases (Complete)
-See previous PRD versions for Phase 1-7d history (textbooks, Monday.com sync, CRM, impersonation, etc.)
+### Phase 8c - Enhancement & Real-time Features (Feb 21, 2026)
+- **Public Shareable Tournament Page** (`/arena/:tournamentId`):
+  - No-auth-required view with purple gradient hero header
+  - WhatsApp share button, Copy Link button, native Share API support
+  - Auto-refresh via polling + WebSocket connection for live updates
+  - Shows tournament bracket, participants, standings, champion banner
+- **WebSocket Broadcast for Arena**:
+  - New endpoint: `/api/pinpanclub/ws/arena/{tournament_id}`
+  - Tournament-specific connection tracking in ConnectionManager
+  - `broadcast_arena_update()` called after every match result submission
+  - Removes MongoDB `_id` before JSON serialization
+- **Arena Tournament Mode in PinPan TV**:
+  - 4th display mode ("Tournament") added alongside Partido/Multi/Dashboard
+  - Dark-themed bracket visualization, live match highlight, standings
+  - Auto-fetches active tournament or accepts `?tournament=ID` param
+  - Receives arena_update WebSocket messages for real-time refresh
+- **Tournament Push Notifications** (OneSignal):
+  - Registration opened: notifies participants
+  - Brackets generated / tournament started: notifies all participants
+  - Tournament completed: notifies with champion name
+  - Fire-and-forget pattern (won't fail if OneSignal unconfigured)
+- **Share from ArenaDetail**: Share/Copy buttons in tournament detail header
 
 ## Key API Endpoints (PinPan Arena)
 - `GET /api/pinpanclub/arena/tournaments` — List tournaments
 - `POST /api/pinpanclub/arena/tournaments` — Create tournament (admin/mod)
-- `GET /api/pinpanclub/arena/tournaments/{id}` — Get tournament details
+- `GET /api/pinpanclub/arena/tournaments/{id}` — Get tournament details (public)
 - `PUT /api/pinpanclub/arena/tournaments/{id}` — Update tournament
-- `DELETE /api/pinpanclub/arena/tournaments/{id}` — Delete tournament
+- `DELETE /api/pinpanclub/arena/tournaments/{id}` — Delete tournament (admin)
 - `POST .../open-registration` | `close-registration` | `register` | `withdraw`
 - `POST .../apply-seeding` | `generate-brackets` | `generate-knockout`
-- `POST .../matches/{match_id}/result` — Submit result (auto-advances bracket)
+- `POST .../matches/{match_id}/result` — Submit result (auto-advances + broadcasts)
 - `POST .../rapidpin-match` — Submit RapidPin spontaneous match
 - `POST .../complete` — Finalize tournament
+- `WS /api/pinpanclub/ws/arena/{tournament_id}` — WebSocket for live updates
 
 ## Future/Backlog Tasks
-- **(P2)** Add Arena Tournament mode to PinPan TV (4th display mode)
-- **(P2)** WebSocket broadcast for Arena match results (real-time bracket updates for spectators)
-- **(P2)** Tournament push notifications via OneSignal
 - **(P3)** Tournament statistics & analytics dashboard
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
+- **(P5)** Open Graph meta tags for social sharing previews
 
 ## Key Files
-- `/app/frontend/src/modules/pinpanclub/pages/arena/` — Arena frontend pages
-- `/app/frontend/src/modules/pinpanclub/pages/PingPongSpectator.jsx` — PinPan Live (WebSocket spectator)
-- `/app/frontend/src/modules/pinpanclub/pages/PingPongDashboard.jsx` — Main dashboard (renamed labels)
+- `/app/frontend/src/modules/pinpanclub/pages/arena/` — Arena frontend pages (Hub, Create, Detail, Public)
+- `/app/frontend/src/modules/pinpanclub/pages/PingPongTV.jsx` — TV with Tournament mode
+- `/app/frontend/src/modules/pinpanclub/pages/PingPongSpectator.jsx` — PinPan Live (WebSocket)
 - `/app/backend/modules/pinpanclub/routes/arena.py` — Arena API routes
-- `/app/backend/modules/pinpanclub/services/arena_service.py` — Arena business logic
+- `/app/backend/modules/pinpanclub/services/arena_service.py` — Arena engine + broadcast + notifications
+- `/app/backend/modules/pinpanclub/routes/websocket.py` — WebSocket (arena endpoint + broadcast)
 - `/app/backend/modules/pinpanclub/models/arena.py` — Arena data models
