@@ -92,6 +92,12 @@ export default function ArenaDetail() {
   const isInProgress = tournament.status === 'in_progress';
   const isCompleted = tournament.status === 'completed';
 
+  const publicUrl = `${window.location.origin}/arena/${tournamentId}`;
+  const handleShareCopy = async () => {
+    try { await navigator.clipboard.writeText(publicUrl); toast.success('Public link copied!'); }
+    catch { toast.error('Could not copy'); }
+  };
+
   // Group matches by round
   const matchesByRound = {};
   matches.forEach(m => {
