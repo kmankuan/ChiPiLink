@@ -131,6 +131,14 @@ export default function ArenaDetail() {
                 </span>
               </div>
             </div>
+            <div className="flex gap-1 shrink-0">
+              <Button size="sm" variant="ghost" onClick={handleShareCopy} data-testid="detail-share-copy">
+                <Copy className="h-4 w-4 mr-1" /> Share
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => window.open(publicUrl, '_blank')} data-testid="detail-public-link">
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
