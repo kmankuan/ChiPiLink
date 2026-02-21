@@ -166,6 +166,7 @@ function AppRouter() {
       <Route path="/pinpanclub/match/:matchId" element={<><Header /><PingPongMatch /></>} />
       <Route path="/pinpanclub/arbiter/:matchId" element={<><Header /><PingPongArbiter /></>} />
       <Route path="/pinpanclub/spectator/:matchId" element={<><Header /><PingPongSpectator /></>} />
+      <Route path="/pinpanclub/live/:matchId" element={<><Header /><PingPongSpectator /></>} />
       <Route path="/pinpanclub/sponsors" element={<><Header /><SponsorsAdmin /></>} />
       <Route path="/pinpanclub/monday" element={<><Header /><PingPongMondayIntegration /></>} />
       
