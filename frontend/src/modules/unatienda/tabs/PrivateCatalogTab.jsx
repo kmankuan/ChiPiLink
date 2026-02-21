@@ -909,10 +909,19 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
     'Religion', 'Art', 'Music', 'Physical Education', 'Technology', 'Others'
   ];
 
-  // Stats
-  const totalStock = products.reduce((s, p) => s + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0);
-  const lowStockCount = products.filter(p => { const s = (p.inventory_quantity || 0) - (p.reserved_quantity || 0); return s > 0 && s < 5; }).length;
-  const outOfStockCount = products.filter(p => (p.inventory_quantity || 0) - (p.reserved_quantity || 0) <= 0).length;
+  // Stats — compute from the view-filtered list (excluding archived, respecting catalog type)
+  const statsProducts = useMemo(() => {
+    return products.filter(p => {
+      if (p.archived) return false;
+      if (catalogType === 'pca' && p._catalog !== 'pca') return false;
+      if (catalogType === 'public' && p._catalog !== 'public') return false;
+      return true;
+    });
+  }, [products, catalogType]);
+
+  const totalStock = statsProducts.reduce((s, p) => s + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0);
+  const lowStockCount = statsProducts.filter(p => { const s = (p.inventory_quantity || 0) - (p.reserved_quantity || 0); return s > 0 && s < 5; }).length;
+  const outOfStockCount = statsProducts.filter(p => (p.inventory_quantity || 0) - (p.reserved_quantity || 0) <= 0).length;
 
   if (loading) {
     return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
