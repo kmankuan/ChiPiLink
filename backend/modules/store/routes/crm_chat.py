@@ -192,6 +192,55 @@ async def crm_webhook_update(request: Request):
 
 # ============== NOTIFICATION ENDPOINTS ==============
 
+@router.get("/topic-presets")
+async def get_topic_presets(current_user: dict = Depends(get_current_user)):
+    """Get available topic presets for the New Topic form"""
+    from core.database import db
+    presets = await db.crm_topic_presets.find(
+        {"active": True}, {"_id": 0}
+    ).sort("order", 1).to_list(50)
+    if not presets:
+        # Return default presets if none configured
+        return {"presets": [
+            "Order Question", "Payment Issue", "Delivery Status",
+            "Return Request", "General Inquiry"
+        ]}
+    return {"presets": [p["label"] for p in presets]}
+
+
+@router.get("/admin/topic-presets")
+async def admin_get_topic_presets(admin: dict = Depends(get_admin_user)):
+    """Admin: get all topic presets (including inactive)"""
+    from core.database import db
+    presets = await db.crm_topic_presets.find(
+        {}, {"_id": 0}
+    ).sort("order", 1).to_list(100)
+    return {"presets": presets}
+
+
+@router.put("/admin/topic-presets")
+async def admin_save_topic_presets(body: dict, admin: dict = Depends(get_admin_user)):
+    """Admin: save topic presets list. Body: {presets: [{label, active, order}]}"""
+    from core.database import db
+    presets = body.get("presets", [])
+    # Replace all presets
+    await db.crm_topic_presets.delete_many({})
+    if presets:
+        docs = []
+        for i, p in enumerate(presets):
+            if isinstance(p, str):
+                docs.append({"label": p, "active": True, "order": i})
+            elif isinstance(p, dict):
+                docs.append({
+                    "label": p.get("label", ""),
+                    "active": p.get("active", True),
+                    "order": p.get("order", i),
+                })
+        if docs:
+            await db.crm_topic_presets.insert_many(docs)
+    return {"success": True, "count": len(presets)}
+
+
 @router.get("/notifications/unread")
 async def get_unread_crm_notifications(current_user: dict = Depends(get_current_user)):
     """Get unread CRM chat message counts for the current user"""
