@@ -35,24 +35,24 @@ async def unfollow_player(follower_id: str, following_id: str):
     return {"success": success}
 
 
-@router.get("/followers/{jugador_id}")
-async def get_followers(jugador_id: str, limit: int = 50):
+@router.get("/followers/{player_id}")
+async def get_followers(player_id: str, limit: int = 50):
     """Get seguidores de a player"""
-    followers = await social_service.get_followers(jugador_id, limit)
-    return {"player_id": jugador_id, "followers": followers, "total": len(followers)}
+    followers = await social_service.get_followers(player_id, limit)
+    return {"player_id": player_id, "followers": followers, "total": len(followers)}
 
 
-@router.get("/following/{jugador_id}")
-async def get_following(jugador_id: str, limit: int = 50):
+@router.get("/following/{player_id}")
+async def get_following(player_id: str, limit: int = 50):
     """Get a who sigue a player"""
-    following = await social_service.get_following(jugador_id, limit)
-    return {"player_id": jugador_id, "following": following, "total": len(following)}
+    following = await social_service.get_following(player_id, limit)
+    return {"player_id": player_id, "following": following, "total": len(following)}
 
 
-@router.get("/follow-stats/{jugador_id}", response_model=FollowStats)
-async def get_follow_stats(jugador_id: str):
+@router.get("/follow-stats/{player_id}", response_model=FollowStats)
+async def get_follow_stats(player_id: str):
     """Get statistics de seguidores"""
-    return await social_service.get_follow_stats(jugador_id)
+    return await social_service.get_follow_stats(player_id)
 
 
 @router.get("/is-following")
@@ -124,18 +124,18 @@ async def get_user_reaction(target_type: str, target_id: str, user_id: str):
 
 # ============== ACTIVITY FEED ==============
 
-@router.get("/feed/{jugador_id}")
-async def get_player_feed(jugador_id: str, limit: int = Query(20, ge=1, le=100)):
+@router.get("/feed/{player_id}")
+async def get_player_feed(player_id: str, limit: int = Query(20, ge=1, le=100)):
     """Get feed de actividad de a player"""
-    feed = await social_service.get_player_feed(jugador_id, limit)
-    return {"player_id": jugador_id, "feed": feed}
+    feed = await social_service.get_player_feed(player_id, limit)
+    return {"player_id": player_id, "feed": feed}
 
 
-@router.get("/feed/{jugador_id}/following")
-async def get_following_feed(jugador_id: str, limit: int = Query(50, ge=1, le=100)):
+@router.get("/feed/{player_id}/following")
+async def get_following_feed(player_id: str, limit: int = Query(50, ge=1, le=100)):
     """Get feed of players que sigue"""
-    feed = await social_service.get_following_feed(jugador_id, limit)
-    return {"player_id": jugador_id, "feed": feed}
+    feed = await social_service.get_following_feed(player_id, limit)
+    return {"player_id": player_id, "feed": feed}
 
 
 # ============== NOTIFICATIONS ==============

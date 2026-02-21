@@ -87,7 +87,7 @@ async def get_season_catalog(season_id: str):
 @router.post("/award")
 async def award_prize(
     prize_id: str,
-    jugador_id: str,
+    player_id: str,
     awarded_for: str,
     position: Optional[int] = None,
     season_id: Optional[str] = None,
@@ -97,7 +97,7 @@ async def award_prize(
     try:
         award = await prize_service.award_prize(
             prize_id=prize_id,
-            jugador_id=jugador_id,
+            player_id=player_id,
             awarded_for=awarded_for,
             position=position,
             season_id=season_id
@@ -125,14 +125,14 @@ async def award_season_prizes(
 
 # ============== PLAYER PRIZES ==============
 
-@router.get("/player/{jugador_id}")
+@router.get("/player/{player_id}")
 async def get_player_prizes(
-    jugador_id: str,
+    player_id: str,
     status: Optional[str] = None
 ):
     """Get premios de a player"""
-    prizes = await prize_service.get_player_prizes(jugador_id, status)
-    return {"player_id": jugador_id, "prizes": prizes, "total": len(prizes)}
+    prizes = await prize_service.get_player_prizes(player_id, status)
+    return {"player_id": player_id, "prizes": prizes, "total": len(prizes)}
 
 
 @router.get("/season/{season_id}")

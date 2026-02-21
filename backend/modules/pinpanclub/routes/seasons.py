@@ -127,15 +127,15 @@ async def get_season_leaderboard(
 
 # ============== PLAYER STATS ==============
 
-@router.get("/player/{jugador_id}/current")
-async def get_player_current_season_stats(jugador_id: str):
+@router.get("/player/{player_id}/current")
+async def get_player_current_season_stats(player_id: str):
     """Get statistics of the player en the season actual"""
-    stats = await seasons_service.get_player_season_stats(jugador_id)
+    stats = await seasons_service.get_player_season_stats(player_id)
     
     if not stats:
         season = await seasons_service.get_current_season()
         return {
-            "player_id": jugador_id,
+            "player_id": player_id,
             "season_id": season["season_id"] if season else None,
             "participating": False,
             "season_points": 0,
@@ -144,38 +144,38 @@ async def get_player_current_season_stats(jugador_id: str):
         }
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "participating": True,
         **stats
     }
 
 
-@router.get("/player/{jugador_id}/stats/{season_id}")
-async def get_player_season_stats(jugador_id: str, season_id: str):
+@router.get("/player/{player_id}/stats/{season_id}")
+async def get_player_season_stats(player_id: str, season_id: str):
     """Get statistics of the player en a season specific"""
-    stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
+    stats = await seasons_service.get_player_season_stats(player_id, season_id)
     
     if not stats:
         return {
-            "player_id": jugador_id,
+            "player_id": player_id,
             "season_id": season_id,
             "participating": False
         }
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "participating": True,
         **stats
     }
 
 
-@router.get("/player/{jugador_id}/rewards")
-async def get_player_season_rewards(jugador_id: str):
+@router.get("/player/{player_id}/rewards")
+async def get_player_season_rewards(player_id: str):
     """Get all recompensas de temporada de a player"""
-    rewards = await seasons_service.get_player_season_rewards(jugador_id)
+    rewards = await seasons_service.get_player_season_rewards(player_id)
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "rewards": rewards,
         "total": len(rewards)
     }

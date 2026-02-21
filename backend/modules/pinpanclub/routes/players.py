@@ -32,10 +32,10 @@ async def get_rankings(
     return await player_service.get_rankings(limit=limit)
 
 
-@router.get("/{jugador_id}", response_model=Player)
-async def get_player(jugador_id: str):
+@router.get("/{player_id}", response_model=Player)
+async def get_player(player_id: str):
     """Get jugador by ID"""
-    player = await player_service.get_player(jugador_id)
+    player = await player_service.get_player(player_id)
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     return player
@@ -50,26 +50,26 @@ async def create_player(
     return await player_service.create_player(data)
 
 
-@router.put("/{jugador_id}", response_model=Player)
+@router.put("/{player_id}", response_model=Player)
 async def update_player(
-    jugador_id: str,
+    player_id: str,
     data: PlayerUpdate,
     admin: dict = Depends(get_admin_user)
 ):
     """Update jugador (solo admin)"""
-    player = await player_service.update_player(jugador_id, data)
+    player = await player_service.update_player(player_id, data)
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     return player
 
 
-@router.delete("/{jugador_id}")
+@router.delete("/{player_id}")
 async def deactivate_player(
-    jugador_id: str,
+    player_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Desactivar jugador (soft delete, solo admin)"""
-    success = await player_service.deactivate_player(jugador_id)
+    success = await player_service.deactivate_player(player_id)
     if not success:
         raise HTTPException(status_code=404, detail="Player not found")
     return {"success": True, "message": "Jugador desactivado"}

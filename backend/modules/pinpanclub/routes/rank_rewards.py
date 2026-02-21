@@ -24,20 +24,20 @@ async def get_rank_rewards_info(lang: str = Query("es", description="Language co
     }
 
 
-@router.get("/player/{jugador_id}/history")
-async def get_player_rank_history(jugador_id: str):
+@router.get("/player/{player_id}/history")
+async def get_player_rank_history(player_id: str):
     """Get historial de rangos y recompensas de a player"""
-    history = await rank_rewards_service.get_player_rank_history(jugador_id)
+    history = await rank_rewards_service.get_player_rank_history(player_id)
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "history": history,
         "total_promotions": len(history)
     }
 
 
-@router.post("/check-promotion/{jugador_id}")
+@router.post("/check-promotion/{player_id}")
 async def check_rank_promotion(
-    jugador_id: str,
+    player_id: str,
     old_points: int = Query(..., description="Previous point total"),
     new_points: int = Query(..., description="New point total"),
     lang: str = Query("es", description="Language code")
@@ -47,7 +47,7 @@ async def check_rank_promotion(
     Normalmente llamado internamente after de completar retos.
     """
     result = await rank_rewards_service.check_rank_promotion(
-        jugador_id, old_points, new_points, lang
+        player_id, old_points, new_points, lang
     )
     
     if result:
@@ -62,9 +62,9 @@ async def check_rank_promotion(
     }
 
 
-@router.get("/current/{jugador_id}")
+@router.get("/current/{player_id}")
 async def get_current_rank_info(
-    jugador_id: str,
+    player_id: str,
     lang: str = Query("es", description="Language code")
 ):
     """Get information del rango actual de a player"""
@@ -72,7 +72,7 @@ async def get_current_rank_info(
     
     # Get puntos actuales
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
-        {"player_id": jugador_id},
+        {"player_id": player_id},
         {"_id": 0}
     )
     
@@ -82,7 +82,7 @@ async def get_current_rank_info(
     current_rank = rank_rewards_service.get_rank_by_points(total_points)
     
     # Get recompensas ya recibidas
-    history = await rank_rewards_service.get_player_rank_history(jugador_id)
+    history = await rank_rewards_service.get_player_rank_history(player_id)
     earned_ranks = [h["rank_id"] for h in history]
     
     # Current rank rewards info
@@ -109,7 +109,7 @@ async def get_current_rank_info(
         points_to_next = next_rank_data["min_points"] - total_points
     
     return {
-        "player_id": jugador_id,
+        "player_id": player_id,
         "total_points": total_points,
         "current_rank": {
             "id": current_rank["id"],
