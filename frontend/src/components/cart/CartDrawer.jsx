@@ -76,6 +76,15 @@ export default function CartDrawer() {
               <Button variant="outline" onClick={() => { closeCart(); navigate('/unatienda'); }}>
                 Explorar Unatienda
               </Button>
+              <Button
+                variant="ghost"
+                className="mt-2 gap-2 text-muted-foreground"
+                onClick={() => { closeCart(); navigate('/pedidos'); }}
+                data-testid="cart-my-orders-btn"
+              >
+                <ClipboardList className="h-4 w-4" />
+                Ver mis pedidos
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
