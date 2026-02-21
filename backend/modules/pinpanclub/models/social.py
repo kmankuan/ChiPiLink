@@ -1,6 +1,6 @@
 """
-Social Features - Modelos
-Seguir jugadores, comentarios, reactions
+Social Features - Models
+Follow players, comments, reactions
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -10,7 +10,7 @@ import uuid
 
 
 class ReactionType(str, Enum):
-    """Tipos de reaction"""
+    """Reaction types"""
     CLAP = "clap"           # 👏
     FIRE = "fire"           # 🔥
     TROPHY = "trophy"       # 🏆
@@ -19,7 +19,7 @@ class ReactionType(str, Enum):
 
 
 class ActivityType(str, Enum):
-    """Tipos de actividad en el feed"""
+    """Activity feed types"""
     MATCH_WON = "match_won"
     MATCH_PLAYED = "match_played"
     BADGE_EARNED = "badge_earned"
@@ -33,7 +33,7 @@ class ActivityType(str, Enum):
 # ============== FOLLOW ==============
 
 class Follow(BaseModel):
-    """Relationship de seguimiento entre jugadores"""
+    """Follow relationship between players"""
     follow_id: str = Field(default_factory=lambda: f"follow_{uuid.uuid4().hex[:8]}")
     follower_id: str      # Who follows
     following_id: str     # Who is followed
@@ -46,14 +46,14 @@ class Follow(BaseModel):
 
 
 class FollowCreate(BaseModel):
-    """Create seguimiento"""
+    """Create follow"""
     follower_id: str
     following_id: str
 
 
 class FollowStats(BaseModel):
-    """Statistics de seguidores"""
-    jugador_id: str
+    """Follower statistics"""
+    player_id: str
     followers_count: int = 0
     following_count: int = 0
 
@@ -61,20 +61,20 @@ class FollowStats(BaseModel):
 # ============== COMMENT ==============
 
 class Comment(BaseModel):
-    """Comentario en perfil de jugador"""
+    """Comment on player profile"""
     comment_id: str = Field(default_factory=lambda: f"comment_{uuid.uuid4().hex[:8]}")
     author_id: str
-    target_id: str        # Player o partido
-    target_type: str      # "player" o "match"
+    target_id: str        # Player or match
+    target_type: str      # "player" or "match"
     content: str
-    
-    # Info ofl autor (cached)
+
+    # Author info (cached)
     author_info: Optional[Dict] = None
-    
-    # Reactions al comentario
+
+    # Reactions to the comment
     reactions: Dict[str, int] = {}  # {"clap": 5, "fire": 2}
-    
-    # Estado
+
+    # Status
     is_edited: bool = False
     is_deleted: bool = False
     
@@ -83,7 +83,7 @@ class Comment(BaseModel):
 
 
 class CommentCreate(BaseModel):
-    """Create comentario"""
+    """Create comment"""
     author_id: str
     target_id: str
     target_type: str = "player"
@@ -91,14 +91,14 @@ class CommentCreate(BaseModel):
 
 
 class CommentUpdate(BaseModel):
-    """Update comentario"""
+    """Update comment"""
     content: str
 
 
 # ============== REACTION ==============
 
 class Reaction(BaseModel):
-    """Reaction a un partido o comentario"""
+    """Reaction to a match or comment"""
     reaction_id: str = Field(default_factory=lambda: f"reaction_{uuid.uuid4().hex[:8]}")
     user_id: str
     target_id: str        # Match o Comment ID
@@ -117,7 +117,7 @@ class ReactionCreate(BaseModel):
 
 
 class ReactionSummary(BaseModel):
-    """Resumen de reactions"""
+    """Reactions summary"""
     target_id: str
     total: int = 0
     by_type: Dict[str, int] = {}  # {"clap": 10, "fire": 5}
@@ -127,18 +127,18 @@ class ReactionSummary(BaseModel):
 # ============== ACTIVITY FEED ==============
 
 class ActivityFeedItem(BaseModel):
-    """Item del feed de actividad"""
+    """Activity feed item"""
     activity_id: str = Field(default_factory=lambda: f"activity_{uuid.uuid4().hex[:8]}")
-    jugador_id: str
+    player_id: str
     activity_type: ActivityType
-    
-    # Info of the player
-    jugador_info: Optional[Dict] = None
-    
+
+    # Player info
+    player_info: Optional[Dict] = None
+
     # Activity-specific data
-    data: Dict = {}  # Ej: {"match_id": "...", "opponent": "...", "score": "11-5"}
-    
-    # Description generada
+    data: Dict = {}  # E.g.: {"match_id": "...", "opponent": "...", "score": "11-5"}
+
+    # Generated description
     description: str = ""
     
     # Reactions
@@ -148,8 +148,8 @@ class ActivityFeedItem(BaseModel):
 
 
 class ActivityFeedCreate(BaseModel):
-    """Create actividad en feed"""
-    jugador_id: str
+    """Create feed activity"""
+    player_id: str
     activity_type: ActivityType
     data: Dict = {}
     description: str = ""
@@ -158,7 +158,7 @@ class ActivityFeedCreate(BaseModel):
 # ============== NOTIFICATION ==============
 
 class NotificationType(str, Enum):
-    """Tipos de notification"""
+    """Notification types"""
     MATCH_PENDING = "match_pending"
     MATCH_CONFIRMED = "match_confirmed"
     NEW_FOLLOWER = "new_follower"
@@ -173,20 +173,20 @@ class NotificationType(str, Enum):
 
 
 class Notification(BaseModel):
-    """Notification para usuario"""
+    """User notification"""
     notification_id: str = Field(default_factory=lambda: f"notif_{uuid.uuid4().hex[:8]}")
     user_id: str
     type: NotificationType
     title: str
     message: str
-    
-    # Data adicionales
-    data: Dict = {}  # Ej: {"match_id": "...", "from_user": "..."}
-    
-    # Estado
+
+    # Additional data
+    data: Dict = {}  # E.g.: {"match_id": "...", "from_user": "..."}
+
+    # Status
     is_read: bool = False
-    is_pushed: bool = False  # Si ya se sent por WebSocket
-    
+    is_pushed: bool = False  # If already sent via WebSocket
+
     # Navigation
     action_url: Optional[str] = None
     
@@ -196,6 +196,7 @@ class Notification(BaseModel):
 
 class NotificationCreate(BaseModel):
     """Create notification"""
+
     user_id: str
     type: NotificationType
     title: str
