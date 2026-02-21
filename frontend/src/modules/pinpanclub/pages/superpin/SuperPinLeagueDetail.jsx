@@ -205,9 +205,10 @@ export default function SuperPinLeagueDetail() {
               <Button 
                 variant="outline" 
                 onClick={() => setShowCreateTournamentModal(true)}
-                className="border-yellow-500 text-yellow-600 hover:bg-yellow-50"
+                className="border-indigo-500 text-indigo-600 hover:bg-indigo-50"
+                data-testid="create-playoff-trigger-btn"
               >
-                <Trophy className="h-4 w-4 mr-2" /> {t('superpin.tournaments.createTournament')}
+                <Trophy className="h-4 w-4 mr-2" /> Create Playoff
               </Button>
             )}
           </div>
