@@ -23,7 +23,8 @@ import {
   ShoppingBag,
   Lock,
   AlertCircle,
-  GraduationCap
+  GraduationCap,
+  ClipboardList
 } from 'lucide-react';
 
 export default function CartDrawer() {
