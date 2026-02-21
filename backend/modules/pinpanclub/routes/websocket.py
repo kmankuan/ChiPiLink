@@ -689,7 +689,7 @@ class NotificationManager:
         if user_id in self.user_connections:
             try:
                 await self.user_connections[user_id].close()
-            except:
+            except Exception:
                 pass
         
         self.user_connections[user_id] = websocket
