@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from .inventory import router as inventory_router
 from .stock_orders import router as stock_orders_router
 from .analytics import router as analytics_router
+from .alerts import router as alerts_router
 
 # Re-use store routes that are already textbook-specific
 from modules.store.routes.inventory_import import router as inventory_import_router
