@@ -275,7 +275,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Matches & Challenges */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Recent Matches - Tabs for Super Pin and Rapid Pin */}
+          {/* Recent Matches - Tabs for League and Rapid Pin */}
           {sections.recent_matches?.enabled !== false && 
            checkVisibility(sections.recent_matches?.visibility, user) && (
             <Card>
@@ -298,7 +298,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                     </TabsTrigger>
                   </TabsList>
                   
-                  {/* Super Pin Matches */}
+                  {/* League Matches */}
                   <TabsContent value="superpin">
                     {feedData?.recent_matches?.filter(m => m.type === 'superpin').length > 0 ? (
                       <div className="space-y-3">
@@ -342,7 +342,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                           className="w-full mt-2"
                           onClick={() => navigate('/pinpanclub/superpin/ranking')}
                         >
-                          {t('pinpanclub.viewAll')} Super Pin
+                          {t('pinpanclub.viewAll')} League
                           <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
                       </div>

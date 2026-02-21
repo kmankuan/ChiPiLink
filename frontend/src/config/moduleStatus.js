@@ -42,7 +42,7 @@ export const MODULE_NAMES = {
   orders: 'My Orders',
   my_students: 'My Students',
   pinpanclub: 'PinPanClub',
-  super_pin: 'Super Pin',
+  super_pin: 'PinPan League',
   rapid_pin: 'Rapid Pin',
   events: 'Events',
   gallery: 'Gallery',
