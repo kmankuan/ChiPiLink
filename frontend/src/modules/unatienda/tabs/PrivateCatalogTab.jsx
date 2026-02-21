@@ -62,7 +62,7 @@ COLUMN_DEFS.archived = COLUMN_DEFS.all;
 
 function getDefaultWidths() {
   const widths = { select: 40, actions: 80 };
-  for (const key of ['pca', 'public', 'all']) {
+  for (const key of ['sysbook', 'public', 'all']) {
     COLUMN_DEFS[key].forEach(c => { if (!widths[c.key]) widths[c.key] = c.width; });
   }
   return widths;
