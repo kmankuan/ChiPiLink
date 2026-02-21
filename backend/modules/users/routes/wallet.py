@@ -726,11 +726,47 @@ async def bulk_archive_transactions(data: dict, admin=Depends(get_admin_user)):
     if not transaction_ids:
         raise HTTPException(status_code=400, detail="No transactions specified")
 
-    r = await db.wallet_transactions.update_many(
+    r = await db.chipi_transactions.update_many(
         {"transaction_id": {"$in": transaction_ids}},
         {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-unarchive")
+async def bulk_unarchive_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Unarchive transactions"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    r = await db.chipi_transactions.update_many(
+        {"transaction_id": {"$in": transaction_ids}},
+        {"$unset": {"archived": "", "archived_at": ""}}
+    )
+    return {"status": "unarchived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-delete")
+async def bulk_delete_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Permanently delete transactions (admin only)"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    r = await db.chipi_transactions.delete_many(
+        {"transaction_id": {"$in": transaction_ids}}
+    )
+    return {"status": "deleted", "count": r.deleted_count}
+
+
+@router.delete("/admin/transactions/{transaction_id}")
+async def delete_single_transaction(transaction_id: str, admin=Depends(get_admin_user)):
+    """Permanently delete a single transaction (admin only)"""
+    r = await db.chipi_transactions.delete_one({"transaction_id": transaction_id})
+    if r.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return {"status": "deleted", "transaction_id": transaction_id}
 
 
 
