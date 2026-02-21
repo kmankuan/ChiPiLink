@@ -1,0 +1,55 @@
+{
+  "summary": "Sysbook separation testing complete. All backend APIs and frontend UI working correctly. Backend /api/sysbook/* endpoints properly filter to PCA products (25 total). Frontend shows SYSBOOK navigation group with Inventory, Stock Movements, Analytics pages. Original Unatienda section still works.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: /api/sysbook/inventory/dashboard returns 25 PCA products (correct)",
+    "Backend: /api/sysbook/inventory/products returns only is_private_catalog=True products",
+    "Backend: /api/sysbook/analytics/overview returns KPI data",
+    "Backend: /api/sysbook/analytics/grade-summary returns grade breakdown",
+    "Backend: /api/sysbook/analytics/subject-summary returns subject data",
+    "Backend: /api/sysbook/analytics/stock-trends returns movement trends",
+    "Backend: /api/sysbook/stock-orders returns only PCA catalog_type orders",
+    "Backend: Original /api/store/* endpoints still work (not broken)",
+    "Frontend: SYSBOOK navigation group visible in admin sidebar with Inventory, Stock Movements, Analytics items",
+    "Frontend: Sysbook Inventory page shows 25 products with correct stats (685 stock, 5 grades)",
+    "Frontend: Sysbook Inventory shows only All and Archive tabs (no Public/Textbooks tabs)",
+    "Frontend: Sysbook Analytics page shows KPI cards (Products=25, Total Stock=707, Value=$22,620.37)",
+    "Frontend: Sysbook Analytics shows grade breakdown chart, subject chart, and movement trends chart",
+    "Frontend: Sysbook Stock Movements page shows stock orders with Shipment/Return/Adjustment buttons",
+    "Frontend: Original Unatienda section still works (27 products including both PCA and public)"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_sysbook_separation.py",
+    "/app/test_reports/pytest/pytest_results_sysbook_separation.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Backend Sysbook router (/api/sysbook/*) properly mounted with PCA_FILTER = {is_private_catalog: True}",
+    "Frontend SysbookInventoryTab passes sysbook=true prop to PrivateCatalogTab for API routing",
+    "AdminDashboard sidebar correctly groups Sysbook items under 'Sysbook' navigation group",
+    "All data-testid attributes present for testing (sysbook-analytics, sysbook-stock-movements, create-shipment-btn, etc.)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_sysbook_separation.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {"email": "admin@chipi.co", "password": "admin"},
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+  "seed_data_creation": "None - used existing 25 PCA products in store_products collection",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Sysbook (School Textbooks renamed) separation is complete. Database has 25 PCA products (is_private_catalog=True), 2 public products. Total active products: 27. Backend has /api/sysbook/* routes that filter to PCA only. Frontend has modules/sysbook/ with SysbookInventoryTab, SysbookStockMovementsTab, SysbookAnalyticsTab. Admin sidebar shows SYSBOOK group. Unatienda section remains for managing all products (unified view)."
+}
