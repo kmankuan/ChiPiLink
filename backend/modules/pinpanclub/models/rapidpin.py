@@ -80,9 +80,9 @@ class RapidPinSeasonCreate(BaseModel):
     """Create Rapid Pin season"""
     name: str
     description: Optional[str] = None
-    fecha_inicio: str  # ISO format
-    fecha_fin: str     # ISO format - deadline to close ranking
-    
+    start_date: str  # ISO format
+    end_date: str     # ISO format - deadline to close ranking
+
     # Configurable prizes
     player_prizes: Optional[List[RapidPinPrize]] = None
     referee_prizes: Optional[List[RapidPinPrize]] = None
@@ -92,8 +92,8 @@ class RapidPinSeasonUpdate(BaseModel):
     """Update season"""
     name: Optional[str] = None
     description: Optional[str] = None
-    fecha_fin: Optional[str] = None
-    estado: Optional[RapidPinSeasonStatus] = None
+    end_date: Optional[str] = None
+    status: Optional[RapidPinSeasonStatus] = None
     player_prizes: Optional[List[RapidPinPrize]] = None
     referee_prizes: Optional[List[RapidPinPrize]] = None
 
@@ -101,23 +101,23 @@ class RapidPinSeasonUpdate(BaseModel):
 class RapidPinSeason(BaseModel):
     """Complete Rapid Pin season"""
     model_config = ConfigDict(from_attributes=True)
-    
+
     season_id: str
     name: str
     description: Optional[str] = None
-    fecha_inicio: str
-    fecha_fin: str
-    estado: RapidPinSeasonStatus = RapidPinSeasonStatus.ACTIVE
-    
+    start_date: str
+    end_date: str
+    status: RapidPinSeasonStatus = RapidPinSeasonStatus.ACTIVE
+
     # Prizes
     player_prizes: List[RapidPinPrize] = []
     referee_prizes: List[RapidPinPrize] = []
-    
+
     # Statistics
     total_matches: int = 0
     total_players: int = 0
     total_referees: int = 0
-    
+
     # Timestamps
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
@@ -131,59 +131,59 @@ class RapidPinMatchCreate(BaseModel):
     season_id: str
     player_a_id: str
     player_b_id: str
-    arbitro_id: str
-    
+    referee_id: str
+
     # Result
-    winner_id: str  # Winner ID (jugador_a or jugador_b)
-    score_ganador: int = 11  # Winner's score
-    score_perdedor: int = 0  # Loser's score
-    
+    winner_id: str  # Winner ID (player_a or player_b)
+    score_winner: int = 11  # Winner's score
+    score_loser: int = 0  # Loser's score
+
     # Who registers the match
-    registrado_por_id: str  # One of the 3 participants
-    
+    registered_by_id: str  # One of the 3 participants
+
     # Optional notes
-    notas: Optional[str] = None
+    notes: Optional[str] = None
 
 
 class RapidPinMatch(BaseModel):
     """Complete Rapid Pin match"""
     model_config = ConfigDict(from_attributes=True)
-    
+
     match_id: str
     season_id: str
-    
+
     # Participants
     player_a_id: str
     player_b_id: str
-    arbitro_id: str
-    
+    referee_id: str
+
     # Participant info (cached)
     player_a_info: Optional[Dict] = None
     player_b_info: Optional[Dict] = None
-    arbitro_info: Optional[Dict] = None
-    
+    referee_info: Optional[Dict] = None
+
     # Result
     winner_id: str
     loser_id: str
-    score_ganador: int
-    score_perdedor: int
-    
+    score_winner: int
+    score_loser: int
+
     # Validation status
-    estado: RapidPinMatchStatus = RapidPinMatchStatus.PENDING
-    registrado_por_id: str
-    confirmado_por_id: Optional[str] = None  # Second person who confirms
-    
+    status: RapidPinMatchStatus = RapidPinMatchStatus.PENDING
+    registered_by_id: str
+    confirmed_by_id: Optional[str] = None  # Second person who confirms
+
     # Points awarded (only when validated)
-    puntos_ganador: int = 0
-    puntos_perdedor: int = 0
-    puntos_arbitro: int = 0
-    
+    points_winner: int = 0
+    points_loser: int = 0
+    points_referee: int = 0
+
     # Notes
-    notas: Optional[str] = None
-    
+    notes: Optional[str] = None
+
     # Timestamps
-    fecha_partido: Optional[Any] = None
-    fecha_confirmacion: Optional[Any] = None
+    match_date: Optional[Any] = None
+    confirmation_date: Optional[Any] = None
     created_at: Optional[Any] = None
 
 
@@ -192,30 +192,30 @@ class RapidPinMatch(BaseModel):
 class RapidPinRankingEntry(BaseModel):
     """Rapid Pin ranking entry"""
     model_config = ConfigDict(from_attributes=True)
-    
+
     ranking_id: str
     season_id: str
-    jugador_id: str
-    
+    player_id: str
+
     # Position
-    posicion: int = 0
-    
+    position: int = 0
+
     # Total points (victories + defeats + refereeing)
-    puntos_totales: int = 0
-    
+    total_points: int = 0
+
     # Statistics as player
-    partidos_jugados: int = 0
-    partidos_ganados: int = 0
-    partidos_perdidos: int = 0
-    puntos_como_jugador: int = 0  # Only victories + defeats
-    
+    matches_played: int = 0
+    matches_won: int = 0
+    matches_lost: int = 0
+    points_as_player: int = 0  # Only victories + defeats
+
     # Statistics as referee
-    partidos_arbitrados: int = 0
-    puntos_como_arbitro: int = 0
-    
+    matches_refereed: int = 0
+    points_as_referee: int = 0
+
     # Player info
-    jugador_info: Optional[Dict] = None
-    
+    player_info: Optional[Dict] = None
+
     # Timestamps
     last_activity: Optional[Any] = None
     updated_at: Optional[Any] = None
@@ -225,10 +225,10 @@ class RapidPinRankingTable(BaseModel):
     """Complete ranking table"""
     season_id: str
     season_name: str
-    estado: RapidPinSeasonStatus
-    fecha_fin: str
-    total_participantes: int
-    total_partidos: int
+    status: RapidPinSeasonStatus
+    end_date: str
+    total_participants: int
+    total_matches: int
     entries: List[RapidPinRankingEntry]
     last_updated: Optional[Any] = None
 
@@ -237,10 +237,10 @@ class RapidPinRankingTable(BaseModel):
 
 class RapidPinSeasonResult(BaseModel):
     """Final season result"""
-    jugador_id: str
-    jugador_info: Optional[Dict] = None
-    posicion_final: int
-    puntos_finales: int
+    player_id: str
+    player_info: Optional[Dict] = None
+    final_position: int
+    final_points: int
     role: str  # "player" or "referee"
     prize: Optional[RapidPinPrize] = None
 
@@ -249,7 +249,7 @@ class RapidPinSeasonFinalResults(BaseModel):
     """Final results of a closed season"""
     season_id: str
     season_name: str
-    fecha_cierre: str
+    closing_date: str
     player_results: List[RapidPinSeasonResult] = []
     referee_results: List[RapidPinSeasonResult] = []
     total_matches: int = 0
@@ -335,56 +335,56 @@ class RapidPinMatchQueueCreate(BaseModel):
 class RapidPinMatchQueue(BaseModel):
     """Match in queue / Challenge"""
     model_config = ConfigDict(from_attributes=True)
-    
+
     queue_id: str = Field(default_factory=lambda: f"queue_{uuid.uuid4().hex[:12]}")
     season_id: str
-    
+
     # Players
     player1_id: str  # Challenger / Player 1
     player2_id: str  # Opponent / Player 2
     player1_info: Optional[Dict] = None
     player2_info: Optional[Dict] = None
-    
+
     # Referee (when assigned)
     referee_id: Optional[str] = None
     referee_info: Optional[Dict] = None
-    
+
     # Status
     status: RapidPinQueueStatus = RapidPinQueueStatus.CHALLENGE_PENDING
-    
+
     # Timestamps
     created_at: Optional[Any] = None
     created_by_id: str = ""
     created_by_role: str = "player"  # player, moderator, admin
-    
+
     # Acceptance
     accepted_at: Optional[Any] = None
     accepted_by_id: Optional[str] = None  # Who accepted (player 2 or admin/mod)
-    
+
     # Referee
     assigned_at: Optional[Any] = None
     assigned_by_id: Optional[str] = None  # Who assigned (referee themselves or admin/mod)
-    
+
     # Completed
     completed_at: Optional[Any] = None
-    
+
     # Cancelled/Declined
     cancelled_at: Optional[Any] = None
     cancelled_by_id: Optional[str] = None
     decline_reason: Optional[str] = None
-    
+
     # Notes
     notes: Optional[str] = None
-    
+
     # Match ID when completed
     match_id: Optional[str] = None
-    
+
     # === Date negotiation ===
     proposed_date: Optional[str] = None           # Proposed date (ISO format)
     proposed_by_id: Optional[str] = None          # Who proposed the current date
     date_history: List[Dict] = []                 # History of date proposals
     agreed_date: Optional[str] = None             # Final agreed date
-    
+
     # === Public interactions ===
     likes_count: int = 0
     comments_count: int = 0
@@ -402,16 +402,16 @@ class RapidPinQueueAssign(BaseModel):
 
 
 class RapidPinQueueComplete(BaseModel):
-    """Completar partido from queue con resultado"""
+    """Complete match from queue with result"""
     winner_id: str
-    score_ganador: int = 11
-    score_perdedor: int = 0
+    score_winner: int = 11
+    score_loser: int = 0
 
 
 # ============== DATE NEGOTIATION MODELS ==============
 
 class DateProposal(BaseModel):
-    """Propuesta de fecha"""
+    """Date proposal"""
     proposal_id: str = Field(default_factory=lambda: f"prop_{uuid.uuid4().hex[:8]}")
     queue_id: str
     proposed_by_id: str
@@ -424,15 +424,15 @@ class DateProposal(BaseModel):
 
 
 class DateProposalCreate(BaseModel):
-    """Create propuesta de fecha"""
+    """Create date proposal"""
     proposed_date: str  # ISO format (YYYY-MM-DDTHH:MM)
     message: Optional[str] = None
 
 
 class DateProposalResponse(BaseModel):
-    """Responder a propuesta de fecha"""
-    action: str  # "accept", "counter", "queue" (poner in queue)
-    counter_date: Optional[str] = None  # Only si action = "counter"
+    """Respond to date proposal"""
+    action: str  # "accept", "counter", "queue" (put in queue)
+    counter_date: Optional[str] = None  # Only if action = "counter"
     message: Optional[str] = None
 
 
@@ -444,12 +444,12 @@ class ChallengeReaction(BaseModel):
     queue_id: str
     user_id: str
     user_info: Optional[Dict] = None
-    reaction_type: str = "like"  # Extensible a otros tipos
+    reaction_type: str = "like"  # Extensible to other types
     created_at: Optional[Any] = None
 
 
 class ChallengeComment(BaseModel):
-    """Comentario en un reto"""
+    """Comment on a challenge"""
     comment_id: str = Field(default_factory=lambda: f"comment_{uuid.uuid4().hex[:8]}")
     queue_id: str
     user_id: str
@@ -457,19 +457,19 @@ class ChallengeComment(BaseModel):
     content: str
     is_moderated: bool = False        # If under moderation
     is_approved: bool = True          # If approved (default: True for direct publication)
-    is_hidden: bool = False           # Si fue ocultado por moderador
+    is_hidden: bool = False           # If hidden by moderator
     moderation_reason: Optional[str] = None
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
 
 
 class ChallengeCommentCreate(BaseModel):
-    """Create comentario"""
+    """Create comment"""
     content: str = Field(..., max_length=500)  # Will be validated with configurable limit
 
 
 class ChallengeCommentModerationConfig(BaseModel):
-    """Configuration de moderation de comentarios"""
+    """Comment moderation configuration"""
     config_id: str = "rapidpin_comment_config"
     max_comment_length: int = 280
     require_approval_for_new_users: bool = False
@@ -479,4 +479,3 @@ class ChallengeCommentModerationConfig(BaseModel):
         "en": "Remember to keep a respectful environment. Inappropriate comments may result in sanctions.",
         "zh": "请保持尊重的环境。不当评论可能会导致处罚。"
     }
-
