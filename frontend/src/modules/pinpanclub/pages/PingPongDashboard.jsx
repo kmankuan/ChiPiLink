@@ -224,6 +224,17 @@ export default function PingPongDashboard() {
                   <Swords className="h-4 w-4 mr-1" />
                   Arena
                 </Button>
+                {/* Hall of Fame */}
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => navigate('/pinpanclub/hall-of-fame')}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
+                  data-testid="hall-of-fame-btn"
+                >
+                  <Award className="h-4 w-4 mr-1" />
+                  Hall of Fame
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
                   Players
