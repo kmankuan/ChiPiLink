@@ -206,6 +206,10 @@ function AppRouter() {
       <Route path="/pinpanclub/arena/:tournamentId" element={<><Header /><ArenaDetail /></>} />
       <Route path="/arena/:tournamentId" element={<ArenaPublic />} />
       
+      {/* Hall of Fame & Referee Routes */}
+      <Route path="/pinpanclub/hall-of-fame" element={<><Header /><HallOfFame /></>} />
+      <Route path="/pinpanclub/referee-settings" element={<><Header /><RefereeSettings /></>} />
+      
       {/* Weekly Challenges Route */}
       <Route path="/pinpanclub/challenges" element={<><Header /><WeeklyChallengesPage /></>} />
       
