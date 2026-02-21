@@ -90,6 +90,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `GET /api/pinpanclub/referee/hall-of-fame` — Global leaderboard (mode filter)
 - `POST /api/pinpanclub/referee/hall-of-fame/refresh` — Rebuild (admin)
 
+### Stock Alerts System (Feb 21, 2026)
+- **Backend**: New `/api/sysbook/alerts/*` endpoints — settings (configurable threshold), list/dismiss alerts, check-stock scan, auto-resolve on stock recovery
+- **Frontend**: `SysbookAlertsTab` with settings panel (threshold, push/in-app toggles), alert list with severity badges, dismiss/dismiss-all, check stock trigger
+- **Event Integration**: `create_stock_alert_if_needed` hook wired into Sysbook inventory adjust-stock routes
+- **OneSignal Push**: Graceful integration — sends push when configured, silently skips when not
+- **DB Collections**: `sysbook_alerts` (alerts), `sysbook_settings` (configuration)
+- **Naming Cleanup**: All `pca`/`catalog` references renamed to `sysbook` internally (backend, frontend, DB documents)
+- **Testing**: 100% pass rate (iteration_184)
+
 ### Sysbook Module — School Textbook Management System (Feb 21, 2026)
 - **Separated from Unatienda** into a dedicated system called "Sysbook"
 - **Backend**: New `/api/sysbook/` route prefix with inventory, stock-orders, and analytics endpoints, all scoped to `is_private_catalog: True`
