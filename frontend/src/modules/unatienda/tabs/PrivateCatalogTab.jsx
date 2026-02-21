@@ -901,7 +901,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         description: formData.description, image_url: formData.image_url,
         active: formData.active, featured: formData.featured
       };
-      let url = `${API}/api/store/private-catalog/admin/products`;
+      let url = sysbook ? `${API_PREFIX}/products` : `${API}/api/store/private-catalog/admin/products`;
       let method = 'POST';
       if (editingProduct) { url += `/${editingProduct.book_id}`; method = 'PUT'; }
       const response = await fetch(url, { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
