@@ -423,6 +423,8 @@
     "adminDesc": "Manage leagues, rankings and tournaments",
     "ranking": {
       "title": "Standings",
+      "noPlayers": "No players in the ranking yet",
+      "noPlayersHint": "Players will appear when they play their first match",
       "position": "Position",
       "player": "Player",
       "points": "Points",
