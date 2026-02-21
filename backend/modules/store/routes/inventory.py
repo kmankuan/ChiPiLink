@@ -361,8 +361,7 @@ async def bulk_delete_products(data: dict, admin: dict = Depends(get_admin_user)
     product_ids = data.get("product_ids", [])
     if not product_ids:
         raise HTTPException(status_code=400, detail="No products specified")
-    r = await db.store_products.delete_many({"product_id": {"$in": product_ids}})
-    await db.inventory_items.delete_many({"product_id": {"$in": product_ids}})
+    r = await db.store_products.delete_many({"book_id": {"$in": product_ids}})
     return {"status": "deleted", "count": r.deleted_count}
 
 
@@ -374,8 +373,21 @@ async def bulk_archive_products(data: dict, admin: dict = Depends(get_admin_user
     if not product_ids:
         raise HTTPException(status_code=400, detail="No products specified")
     r = await db.store_products.update_many(
-        {"product_id": {"$in": product_ids}},
-        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+        {"book_id": {"$in": product_ids}},
+        {"$set": {"archived": True, "active": False, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/products/bulk-unarchive")
+async def bulk_unarchive_products(data: dict, admin: dict = Depends(get_admin_user)):
+    """Unarchive products - restore to active"""
+    product_ids = data.get("product_ids", [])
+    if not product_ids:
+        raise HTTPException(status_code=400, detail="No products specified")
+    r = await db.store_products.update_many(
+        {"book_id": {"$in": product_ids}},
+        {"$set": {"active": True}, "$unset": {"archived": "", "archived_at": ""}}
+    )
+    return {"status": "unarchived", "count": r.modified_count}
 
