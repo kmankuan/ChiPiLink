@@ -132,8 +132,8 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           {/* Store */}
           <ModuleTile icon={Store} label={t('modules.unatienda', 'Unatienda')} to="/unatienda" bg="bg-emerald-600" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
 
-          {/* Super Pin */}
-          <ModuleTile icon={Trophy} label="Super Pin" to="/pinpanclub/superpin/ranking" bg="bg-amber-500" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
+          {/* PinPan League */}
+          <ModuleTile icon={Trophy} label="PinPan League" to="/pinpanclub/superpin/ranking" bg="bg-amber-500" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
 
           {/* Rapid Pin */}
           <ModuleTile icon={Zap} label="Rapid Pin" to="/rapidpin" bg="bg-red-600" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />

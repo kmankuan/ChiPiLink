@@ -18,7 +18,7 @@ import {
 
 const MODULES = [
   { key: 'unatienda', icon: Store, label: 'Unatienda', to: '/unatienda', accent: '#059669' },
-  { key: 'super_pin', icon: Trophy, label: 'Super Pin', to: '/pinpanclub/superpin/ranking', accent: '#d97706' },
+  { key: 'super_pin', icon: Trophy, label: 'PinPan League', to: '/pinpanclub/superpin/ranking', accent: '#d97706' },
   { key: 'rapid_pin', icon: Zap, label: 'Rapid Pin', to: '/rapidpin', accent: '#dc2626' },
   { key: 'events', icon: Calendar, label: 'Eventos', to: '/eventos', accent: '#0284c7' },
   { key: 'gallery', icon: Image, label: 'Galeria', to: '/galeria', accent: '#7c3aed' },
