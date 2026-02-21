@@ -89,7 +89,16 @@ class ArenaService(BaseService):
         await self.tournament_repo.update_tournament(tournament_id, {
             "status": TournamentStatus.REGISTRATION_OPEN.value
         })
-        return await self.get_tournament(tournament_id)
+        tournament = await self.get_tournament(tournament_id)
+        # Notify existing participants
+        if tournament:
+            await self._notify_participants(
+                tournament,
+                f"Registration Open: {tournament.get('name', '')}",
+                "Registration is now open! Share with your friends.",
+                action_url=f"/arena/{tournament_id}"
+            )
+        return tournament
 
     async def close_registration(self, tournament_id: str) -> Optional[Dict]:
         await self.tournament_repo.update_tournament(tournament_id, {
