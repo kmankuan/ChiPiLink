@@ -801,7 +801,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     let ok = 0, fail = 0;
     for (const id of selectedIds) {
       try {
-        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/archive`, {
+        const r = await fetch(productApiUrl(id, 'archive'), {
           method: 'POST', headers: { Authorization: `Bearer ${token}` }
         });
         if (r.ok) ok++; else fail++;
@@ -817,7 +817,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     let ok = 0, fail = 0;
     for (const id of selectedIds) {
       try {
-        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/restore`, {
+        const r = await fetch(productApiUrl(id, 'restore'), {
           method: 'POST', headers: { Authorization: `Bearer ${token}` }
         });
         if (r.ok) ok++; else fail++;
@@ -834,7 +834,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     let ok = 0, fail = 0;
     for (const id of selectedIds) {
       try {
-        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/permanent`, {
+        const r = await fetch(productApiUrl(id, 'permanent'), {
           method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
         });
         if (r.ok) ok++; else fail++;
@@ -850,7 +850,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     let ok = 0, fail = 0;
     for (const id of selectedIds) {
       try {
-        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}`, {
+        const r = await fetch(productApiUrl(id), {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ active })
