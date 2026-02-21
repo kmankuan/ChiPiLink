@@ -1,6 +1,6 @@
 /**
  * ArbiterPanel Component - Panel de control para árbitros
- * Permite agregar/quitar puntos y controlar el partido
+ * Allows adding/removing points and controlling the match
  */
 
 import { useState } from 'react';
