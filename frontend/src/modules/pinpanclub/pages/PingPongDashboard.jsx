@@ -212,6 +212,17 @@ export default function PingPongDashboard() {
                     </span>
                   )}
                 </Button>
+                {/* PinPan Arena */}
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => navigate('/pinpanclub/arena')}
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                  data-testid="arena-btn"
+                >
+                  <Swords className="h-4 w-4 mr-1" />
+                  Arena
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
                   Players
