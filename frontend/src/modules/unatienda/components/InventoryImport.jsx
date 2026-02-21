@@ -21,8 +21,9 @@ import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-export default function InventoryImport({ token, onImportComplete }) {
+export default function InventoryImport({ token, onImportComplete, apiBase }) {
   const { t } = useTranslation();
+  const importApiBase = apiBase || `${API}/api/store`;
   const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
