@@ -24,6 +24,7 @@ router = APIRouter(prefix="/sysbook", tags=["Sysbook"])
 router.include_router(inventory_router)
 router.include_router(stock_orders_router)
 router.include_router(analytics_router)
+router.include_router(alerts_router)
 
 # Re-mounted store routes (already PCA-scoped)
 router.include_router(inventory_import_router)
