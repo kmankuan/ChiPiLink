@@ -104,7 +104,7 @@ export default function SuperPinRanking() {
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
               <Trophy className="h-8 w-8 text-yellow-400" />
-              Super Pin Ranking
+              PinPan League
             </h1>
           </div>
           <div className="flex gap-2">
