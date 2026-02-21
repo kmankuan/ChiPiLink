@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /root/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+plugins: asyncio-1.3.0, anyio-4.12.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 14 items
+
+backend/tests/test_sysbook_separation.py::TestSysbookInventoryDashboard::test_dashboard_returns_pca_only_stats PASSED [  7%]
+backend/tests/test_sysbook_separation.py::TestSysbookInventoryDashboard::test_dashboard_grade_breakdown_exists PASSED [ 14%]
+backend/tests/test_sysbook_separation.py::TestSysbookInventoryProducts::test_products_returns_only_pca PASSED [ 21%]
+backend/tests/test_sysbook_separation.py::TestSysbookInventoryProducts::test_products_pagination PASSED [ 28%]
+backend/tests/test_sysbook_separation.py::TestSysbookInventoryProducts::test_products_search PASSED [ 35%]
+backend/tests/test_sysbook_separation.py::TestSysbookAnalyticsOverview::test_analytics_overview_returns_kpis PASSED [ 42%]
+backend/tests/test_sysbook_separation.py::TestSysbookAnalyticsGradeSummary::test_grade_summary_returns_breakdown PASSED [ 50%]
+backend/tests/test_sysbook_separation.py::TestSysbookAnalyticsSubjectSummary::test_subject_summary_returns_breakdown PASSED [ 57%]
+backend/tests/test_sysbook_separation.py::TestSysbookAnalyticsStockTrends::test_stock_trends_returns_movement_data PASSED [ 64%]
+backend/tests/test_sysbook_separation.py::TestSysbookStockOrders::test_stock_orders_returns_pca_only PASSED [ 71%]
+backend/tests/test_sysbook_separation.py::TestSysbookStockOrders::test_stock_orders_pending_summary PASSED [ 78%]
+backend/tests/test_sysbook_separation.py::TestUnatiendaStillWorks::test_store_products_endpoint PASSED [ 85%]
+backend/tests/test_sysbook_separation.py::TestUnatiendaStillWorks::test_store_inventory_dashboard PASSED [ 92%]
+backend/tests/test_sysbook_separation.py::TestUnatiendaStillWorks::test_private_catalog_admin_products PASSED [100%]
+
+============================== 14 passed in 2.37s ==============================
