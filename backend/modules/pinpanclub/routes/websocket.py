@@ -272,7 +272,7 @@ async def send_match_state(client_id: str, match_id: str):
     from main import db
     
     match = await db.pingpong_matches.find_one(
-        {"partido_id": match_id},
+        {"match_id": match_id},
         {"_id": 0, "historial_puntos": 0}
     )
     
@@ -355,16 +355,16 @@ async def handle_client_message(client_id: str, data: dict):
 async def handle_point(match_id: str, data: dict, arbiter_id: str):
     """Handle point scored by arbiter"""
     from main import db
-    from routes.pingpong import calcular_sets_necesarios, calcular_estadisticas_partido
+    from routes.pingpong import calculate_sets_needed, calcular_estadisticas_partido
     
-    jugador = data.get("jugador")  # "a" or "b"
+    player_side = data.get("player_side")  # "a" or "b"
     tipo_punto = data.get("tipo", "normal")
     
-    if jugador not in ["a", "b"]:
+    if player_side not in ["a", "b"]:
         await manager.send_personal(arbiter_id, {"type": "error", "message": "Jugador invalid"})
         return
     
-    match = await db.pingpong_matches.find_one({"partido_id": match_id})
+    match = await db.pingpong_matches.find_one({"match_id": match_id})
     if not match:
         await manager.send_personal(arbiter_id, {"type": "error", "message": "Match not found"})
         return
@@ -374,74 +374,74 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
         return
     
     # Update points
-    puntos_a = match["points_player_a"]
-    puntos_b = match["points_player_b"]
+    points_a = match["points_player_a"]
+    points_b = match["points_player_b"]
     
-    if jugador == "a":
-        puntos_a += 1
+    if player_side == "a":
+        points_a += 1
     else:
-        puntos_b += 1
+        points_b += 1
     
     # Record in history
     punto_registro = {
         "tiempo": datetime.now(timezone.utc).isoformat(),
-        "set": match["set_actual"],
-        "punto_a": puntos_a,
-        "punto_b": puntos_b,
-        "anotador": jugador,
+        "set": match["current_set"],
+        "point_a": points_a,
+        "point_b": points_b,
+        "scorer": player_side,
         "tipo": tipo_punto,
         "saque": match["saque"]
     }
     
     # Check if set is won
-    puntos_para_ganar = match["puntos_por_set"]
-    diferencia_minima = match["diferencia_minima"]
-    sets_para_ganar = calcular_sets_necesarios(match["tipo_partido"])
+    points_to_win = match["points_per_set"]
+    difference_minima = match["difference_minima"]
+    sets_to_win = calculate_sets_needed(match["match_type"])
     
     set_ganado = False
-    ganador_set = None
+    set_winner = None
     partido_terminado = False
     match_winner = None
     
-    if puntos_a >= puntos_para_ganar or puntos_b >= puntos_para_ganar:
-        diferencia = abs(puntos_a - puntos_b)
-        if diferencia >= diferencia_minima:
+    if points_a >= points_to_win or points_b >= points_to_win:
+        difference = abs(points_a - points_b)
+        if difference >= difference_minima:
             set_ganado = True
-            ganador_set = "a" if puntos_a > puntos_b else "b"
+            set_winner = "a" if points_a > points_b else "b"
     
-    sets_a = match["sets_jugador_a"]
-    sets_b = match["sets_jugador_b"]
-    set_actual = match["set_actual"]
+    sets_a = match["sets_player_side_a"]
+    sets_b = match["sets_player_side_b"]
+    current_set = match["current_set"]
     sets_detalle = match.get("sets_detalle", [])
     
     if set_ganado:
         sets_detalle.append({
-            "set": set_actual,
-            "puntos_a": puntos_a,
-            "puntos_b": puntos_b,
-            "ganador": ganador_set
+            "set": current_set,
+            "points_a": points_a,
+            "points_b": points_b,
+            "ganador": set_winner
         })
         
-        if ganador_set == "a":
+        if set_winner == "a":
             sets_a += 1
         else:
             sets_b += 1
         
-        if sets_a >= sets_para_ganar:
+        if sets_a >= sets_to_win:
             partido_terminado = True
             match_winner = "a"
-        elif sets_b >= sets_para_ganar:
+        elif sets_b >= sets_to_win:
             partido_terminado = True
             match_winner = "b"
         else:
-            set_actual += 1
-            puntos_a = 0
-            puntos_b = 0
+            current_set += 1
+            points_a = 0
+            points_b = 0
     
     # Calculateste serve change
-    total_puntos_set = puntos_a + puntos_b
+    total_puntos_set = points_a + points_b
     cambio_saque_cada = 2
-    if puntos_a >= 10 and puntos_b >= 10:
+    if points_a >= 10 and points_b >= 10:
         cambio_saque_cada = 1
     
     if match["primer_saque"] == "a":
@@ -451,11 +451,11 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     
     # Prepare update
     update_data = {
-        "points_player_a": puntos_a,
-        "points_player_b": puntos_b,
-        "sets_jugador_a": sets_a,
-        "sets_jugador_b": sets_b,
-        "set_actual": set_actual,
+        "points_player_a": points_a,
+        "points_player_b": points_b,
+        "sets_player_side_a": sets_a,
+        "sets_player_side_b": sets_b,
+        "current_set": current_set,
         "sets_detalle": sets_detalle,
         "saque": saque
     }
@@ -472,7 +472,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     
     # Update database
     await db.pingpong_matches.update_one(
-        {"partido_id": match_id},
+        {"match_id": match_id},
         {
             "$set": update_data,
             "$push": {"historial_puntos": punto_registro}
@@ -480,7 +480,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     )
     
     # Get updated match with player info
-    updated_match = await db.pingpong_matches.find_one({"partido_id": match_id}, {"_id": 0, "historial_puntos": 0})
+    updated_match = await db.pingpong_matches.find_one({"match_id": match_id}, {"_id": 0, "historial_puntos": 0})
     
     player_a = await db.pingpong_players.find_one(
         {"player_id": updated_match["player_a_id"]},
@@ -496,21 +496,21 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     
     # Determine special situations
     situacion = []
-    puntos_para_set = match["puntos_por_set"]
+    puntos_para_set = match["points_per_set"]
     
-    if puntos_a >= puntos_para_set - 1 and puntos_a > puntos_b:
-        if sets_a == sets_para_ganar - 1:
-            situacion.append({"tipo": "match_point", "jugador": "a"})
+    if points_a >= puntos_para_set - 1 and points_a > points_b:
+        if sets_a == sets_to_win - 1:
+            situacion.append({"tipo": "match_point", "player_side": "a"})
         else:
-            situacion.append({"tipo": "set_point", "jugador": "a"})
+            situacion.append({"tipo": "set_point", "player_side": "a"})
     
-    if puntos_b >= puntos_para_set - 1 and puntos_b > puntos_a:
-        if sets_b == sets_para_ganar - 1:
-            situacion.append({"tipo": "match_point", "jugador": "b"})
+    if points_b >= puntos_para_set - 1 and points_b > points_a:
+        if sets_b == sets_to_win - 1:
+            situacion.append({"tipo": "match_point", "player_side": "b"})
         else:
-            situacion.append({"tipo": "set_point", "jugador": "b"})
+            situacion.append({"tipo": "set_point", "player_side": "b"})
     
-    if puntos_a >= puntos_para_set - 1 and puntos_b >= puntos_para_set - 1 and puntos_a == puntos_b:
+    if points_a >= puntos_para_set - 1 and points_b >= puntos_para_set - 1 and points_a == points_b:
         situacion.append({"tipo": "deuce"})
     
     # Broadcast update to all viewers
@@ -518,13 +518,13 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
         "type": "point_scored",
         "match": updated_match,
         "point": {
-            "jugador": jugador,
+            "player_side": player_side,
             "tipo": tipo_punto,
-            "puntos_a": puntos_a,
-            "puntos_b": puntos_b
+            "points_a": points_a,
+            "points_b": points_b
         },
         "set_ganado": set_ganado,
-        "ganador_set": ganador_set,
+        "set_winner": set_winner,
         "partido_terminado": partido_terminado,
         "match_winner": match_winner,
         "situacion": situacion,
@@ -538,7 +538,7 @@ async def handle_undo(match_id: str, arbiter_id: str):
     """Handle undo last point"""
     from main import db
     
-    match = await db.pingpong_matches.find_one({"partido_id": match_id})
+    match = await db.pingpong_matches.find_one({"match_id": match_id})
     if not match:
         await manager.send_personal(arbiter_id, {"type": "error", "message": "Match not found"})
         return
@@ -550,23 +550,23 @@ async def handle_undo(match_id: str, arbiter_id: str):
     
     ultimo_punto = historial.pop()
     
-    puntos_a = ultimo_punto["punto_a"] - (1 if ultimo_punto["anotador"] == "a" else 0)
-    puntos_b = ultimo_punto["punto_b"] - (1 if ultimo_punto["anotador"] == "b" else 0)
+    points_a = ultimo_punto["point_a"] - (1 if ultimo_punto["scorer"] == "a" else 0)
+    points_b = ultimo_punto["point_b"] - (1 if ultimo_punto["scorer"] == "b" else 0)
     
     update_data = {
-        "points_player_a": puntos_a,
-        "points_player_b": puntos_b,
+        "points_player_a": points_a,
+        "points_player_b": points_b,
         "historial_puntos": historial,
         "saque": ultimo_punto["saque"]
     }
     
     await db.pingpong_matches.update_one(
-        {"partido_id": match_id},
+        {"match_id": match_id},
         {"$set": update_data}
     )
     
     # Get updated match
-    updated_match = await db.pingpong_matches.find_one({"partido_id": match_id}, {"_id": 0, "historial_puntos": 0})
+    updated_match = await db.pingpong_matches.find_one({"match_id": match_id}, {"_id": 0, "historial_puntos": 0})
     
     player_a = await db.pingpong_players.find_one(
         {"player_id": updated_match["player_a_id"]},
@@ -592,7 +592,7 @@ async def handle_start_match(match_id: str, arbiter_id: str):
     from main import db
     
     result = await db.pingpong_matches.update_one(
-        {"partido_id": match_id, "status": {"$in": ["pendiente", "pausado"]}},
+        {"match_id": match_id, "status": {"$in": ["pendiente", "pausado"]}},
         {"$set": {"status": "en_curso", "start_date": datetime.now(timezone.utc)}}
     )
     
@@ -600,7 +600,7 @@ async def handle_start_match(match_id: str, arbiter_id: str):
         await manager.send_personal(arbiter_id, {"type": "error", "message": "No se puede iniciar the match"})
         return
     
-    updated_match = await db.pingpong_matches.find_one({"partido_id": match_id}, {"_id": 0, "historial_puntos": 0})
+    updated_match = await db.pingpong_matches.find_one({"match_id": match_id}, {"_id": 0, "historial_puntos": 0})
     
     player_a = await db.pingpong_players.find_one(
         {"player_id": updated_match["player_a_id"]},
@@ -626,7 +626,7 @@ async def handle_pause_match(match_id: str, arbiter_id: str):
     from main import db
     
     result = await db.pingpong_matches.update_one(
-        {"partido_id": match_id, "status": "en_curso"},
+        {"match_id": match_id, "status": "en_curso"},
         {"$set": {"status": "pausado"}}
     )
     
@@ -643,13 +643,13 @@ async def handle_pause_match(match_id: str, arbiter_id: str):
 
 async def handle_timeout(match_id: str, data: dict, arbiter_id: str):
     """Handle timeout request"""
-    jugador = data.get("jugador")
+    player_side = data.get("player_side")
     duracion = data.get("duracion", 60)
     
     await manager.broadcast_to_match(match_id, {
         "type": "timeout",
         "match_id": match_id,
-        "jugador": jugador,
+        "player_side": player_side,
         "duracion": duracion,
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
