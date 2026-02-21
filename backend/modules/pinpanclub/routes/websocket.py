@@ -151,6 +151,22 @@ class ConnectionManager:
         for client_id in disconnected:
             self.disconnect(client_id)
     
+    async def broadcast_to_tournament(self, tournament_id: str, message: dict):
+        """Broadcast message to all clients watching a specific tournament"""
+        if tournament_id in self.tournament_connections:
+            disconnected = []
+            for client_id in self.tournament_connections[tournament_id]:
+                try:
+                    if client_id in self.active_connections:
+                        await self.active_connections[client_id].send_json(message)
+                except Exception as e:
+                    logger.error(f"Error broadcasting to {client_id}: {e}")
+                    disconnected.append(client_id)
+            for client_id in disconnected:
+                self.disconnect(client_id)
+        # Also notify global watchers (TV mode)
+        await self.broadcast_global(message)
+    
     def get_stats(self) -> dict:
         """Get connection statistics"""
         return {
