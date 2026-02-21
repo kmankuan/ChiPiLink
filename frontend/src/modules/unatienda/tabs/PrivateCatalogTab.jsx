@@ -645,7 +645,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
-        all = (data.products || []).map(p => ({ ...p, _catalog: 'pca' }));
+        all = (data.products || []).map(p => ({ ...p, _catalog: 'sysbook' }));
       } else {
         // Legacy mode: merge PCA + public products
         let pcaUrl = `${API}/api/store/private-catalog/admin/products?limit=500`;
