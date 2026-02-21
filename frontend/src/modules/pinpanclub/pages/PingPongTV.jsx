@@ -54,6 +54,10 @@ export default function PingPongTV() {
   const [recentResults, setRecentResults] = useState([]);
   const [upcomingMatches, setUpcomingMatches] = useState([]);
   
+  // Arena tournament state
+  const [arenaTournament, setArenaTournament] = useState(null);
+  const [arenaMatches, setArenaMatches] = useState([]);
+  
   // Sponsors state
   const [sponsors, setSponsors] = useState({
     header_left: [],
