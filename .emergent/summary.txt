@@ -1,65 +1,56 @@
 <analysis>**original_problem_statement:**
-The user's initial request was to build a rich and powerful tournament management feature. This evolved into a major refactoring and unification effort. The core goal became integrating the new tournament system (PinPan Arena) with existing features like SuperPin and RapidPin to create a cohesive PinPanClub experience. The latest request is to further unify the platform by creating a global referee system and an all-time player leaderboard to increase user engagement.
+The user's initial request was to build a rich tournament management feature (PinPan Arena). This evolved into a major refactoring and unification effort to create a cohesive PinPanClub experience by integrating existing features.
+
+Recent work has focused on:
+1.  Implementing a unified referee system and a global Hall of Fame leaderboard.
+2.  A massive codebase refactoring to enforce an English-only standard for all database fields, collections, and variable names.
+3.  Enhancing the analytics dashboard with tournament and referee data.
+4.  Fixing bugs related to archive/delete functionality in Wallet Management and the Textbook Catalog.
+5.  The current task is to fix a bug where the Textbook Catalog displays incorrect statistics after a CSV import.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application now has a unified PinPanClub module featuring:
--   **PinPan Arena:** A full-featured tournament management system for single/double elimination brackets, including creation, registration, live bracket visualization, and automated winner advancement.
--   **PinPan League:** The former SuperPin feature, refactored and renamed, for round-robin league play. It is now integrated with Arena, allowing moderators to create playoff tournaments directly from league standings.
--   **RapidPin:** For quick, informal matches.
--   **PinPan Live & TV:** A real-time spectator view (migrated from polling to WebSockets) and a public TV display mode, both of which now support displaying live Arena tournament brackets.
--   A public, shareable link for each tournament bracket.
--   Push notifications for key tournament events (registration opened, brackets generated, tournament complete).
--   A fragmented referee system exists within the League and RapidPin modules but is not a global, tracked feature.
+The application is a full-featured club management platform (PinPanClub) with modules for tournaments (PinPan Arena), leagues (PinPan League), and quick matches (RapidPin). It includes real-time spectator views (PinPan Live & TV), a global referee system with profiles, and an all-time Hall of Fame leaderboard. The entire codebase has been refactored to use English as the standard language, removing all Spanish identifiers from backend and frontend code, as well as the database. The application also features inventory management (Textbook Catalog) and wallet/transaction tracking.
 
 **Last working item**:
-- **Last item agent was working:** The agent was performing a detailed investigation of the existing, fragmented referee implementations across the , , and  modules. This was in preparation for building a unified, global referee system and an all-time leaderboard, as requested and approved by the user.
-- **Status:** NOT STARTED
+- **Last item agent was working:** The agent was investigating a bug where the statistics displayed on the Textbook Catalog page were incorrect. The user reported uploading 143 products via CSV, but the UI showed a total of 338 products, while a database check revealed only 33 products exist. The agent had just identified the correct frontend component () and was about to analyze its data fetching and calculation logic.
+- **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** both
+- **Which testing method agent to use?** backend testing agent
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-None.
+- **Issue 1: Incorrect statistics in Textbook Catalog after CSV import. (Priority: P0)**
+    - **Description:** The key performance indicators (KPIs) like total products, grades, and low stock on the Textbook Catalog page () are displaying wildly inaccurate numbers. This issue appeared after the user used the Import CSV function.
+    - **Attempted fixes:** The agent has confirmed the discrepancy between the UI stats and the actual database count. The agent initially looked at the wrong dashboard file but has now correctly located the relevant frontend component, . No code changes have been made yet.
+    - **Next debug checklist:**
+        1.  Examine  to see how the KPI stats are fetched and calculated.
+        2.  Identify the specific backend API endpoint that serves these stats (likely from  or a similar file).
+        3.  Test the identified backend endpoint directly using  to verify the raw data it returns.
+        4.  If the backend data is incorrect, investigate the  and the CSV import logic to see if it's corrupting a statistics cache or writing to an unexpected location.
+        5.  If the backend data is correct, the bug is in the frontend's data processing or rendering logic within .
+    - **Why fix this issue and what will be achieved with the fix?** To provide the user with accurate and reliable inventory metrics, which are critical for managing their catalog.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Both
 
 **In progress Task List**:
 None.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **(P0) Implement Unified Referee System & Global Leaderboard:**
-        *   **Feature 1: Unified Referee System:**
-            *   **Backend:**
-                *   Create a central  model/service to allow admins to toggle referee requirements globally or per-module (Arena, League, RapidPin).
-                *   Enhance the  model (or create a new  collection) to track referee-specific stats like matches officiated, user ratings, etc.
-                *   Implement API endpoints for managing referee settings (admin-only) and fetching referee profiles.
-            *   **Frontend:**
-                *   Develop an admin UI to manage the global referee settings.
-                *   Integrate a referee profile/stats section into the user's main profile page.
-                *   Add a post-match UI for players to rate the referee, feeding into their profile stats.
-        *   **Feature 2: All-Time Hall of Fame Leaderboard:**
-            *   **Backend:**
-                *   Develop a service that runs aggregation pipelines across all game modes (Arena, League, RapidPin) to compute and cache an all-time player ranking.
-                *   Create a new API endpoint to serve the paginated leaderboard data.
-            *   **Frontend:**
-                *   Build a new Hall of Fame page to display the global, all-time player leaderboard.
-*   **Future Tasks:**
     *   **(P3)** Build an on-demand landing page redesign tool.
+*   **Future Tasks:**
     *   **(P4)** Extend Monday.com synchronization to the general product inventory.
 
 **Completed work in this session**
-- **Feature - PinPan Arena Tournament Module (DONE):** Built a complete tournament system from scratch, including backend models/services for the tournament lifecycle and frontend components for creation, a hub to list tournaments, and a detailed view with bracket visualization.
-- **Refactor - Feature Unification (DONE):**
-    - Renamed all user-facing instances of SuperPin to PinPan League for clarity.
-    - Integrated the League with the new Arena by replacing the old tournament creation with a Create Playoff feature, which seeds an Arena tournament with top league players.
-    - Renamed the Spectator feature to PinPan Live and updated corresponding UI elements.
-- **Enhancement - Real-Time & Sharing Features (DONE):**
-    - Migrated the  component from HTTP polling to WebSockets for live match updates.
-    - Created a public, shareable page for tournament brackets.
-    - Added a new Tournament mode to the  dashboard to display live Arena brackets.
-    - Implemented push notifications for major tournament events (registration, start, completion).
-- **Testing (DONE):** All new features and refactoring were successfully validated using the testing agent, and any reported issues were fixed.
+- **Refactoring - Spanish to English (DONE):** Executed a full-stack refactoring to eliminate Spanish from the codebase. This included migrating database fields (e.g.,  -> ), updating all backend models, services, and routers, and updating all frontend components and API calls.
+- **Feature - Referee System & Hall of Fame (DONE):** Implemented a unified referee system with admin settings and a global Hall of Fame leaderboard, complete with new backend aggregation pipelines and frontend pages.
+- **Enhancement - Analytics Dashboard (DONE):** Rewrote the analytics dashboard to include data from the new Arena and Referee modules, and updated all labels to English.
+- **Bug Fix - Wallet Transactions (DONE):** Fixed a critical bug where archiving transactions wrote to the wrong database collection. Also added missing delete functionality.
+- **Bug Fix - Textbook Catalog (DONE):** Fixed a bug where archive/delete actions failed due to incorrect field identifiers (). Also added a missing Unarchive feature to the UI.
+- All completed items were successfully validated by the testing agent with a 100% pass rate.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -71,68 +62,77 @@ None.
 
 
 **Key Technical Concepts**
-- **Modular Unification:** The main theme of the work was to unify disparate features (, ) into a cohesive experience under the  umbrella with clear naming (, ) and direct integrations ( ->  playoffs).
-- **WebSocket Broadcasting:** The existing WebSocket infrastructure was extended to support dedicated channels for each tournament (), allowing for real-time broadcasting of match results to all connected clients (e.g., , ).
-- **Public Routes:** A pattern for creating unauthenticated, public-facing pages was established with  to allow sharing of tournament progress.
-- **Asynchronous Notifications:** The existing  (OneSignal) was leveraged to send push notifications for key tournament lifecycle events, handled in the backend .
+- **Bulk Code Refactoring:** Used  and custom Python scripts for large-scale, automated renaming of variables and fields across the entire codebase to enforce a coding standard.
+- **Database Migrations:** Created and executed a Python script to perform live schema changes in MongoDB (renaming fields like  to ) across multiple collections.
+- **MongoDB Aggregation:** Heavily used for calculating complex, cross-collection statistics for the Hall of Fame leaderboard and the enhanced analytics dashboard.
 
 **key DB schema**
--   ****: (NEW) Stores tournament configuration, including name, format, status, and settings.
--   ****: (NEW) A mapping collection linking users to the tournaments they have joined.
--   ****: (NEW) Contains data for every match within a tournament, detailing the round, players, score, and winner.
--   ****: Existing collection, to be analyzed for storing or linking to new global referee statistics.
+- ****: (NEW) Stores global configuration for the referee system.
+- ****: (NEW) Tracks statistics for individual referees.
+- ****: (NEW) Caches data for the all-time player leaderboard.
+- ****: (MODIFIED) All fields refactored from Spanish to English (e.g.,  -> ). Archive/delete logic now functions correctly.
+- ****: (MODIFIED) Confirmed as the correct collection for transactions; archive/delete logic fixed.
+
+**changes in tech stack**
+None.
 
 **All files of reference**
--   **For upcoming task (Referee/Leaderboard):**
-    -   : The core service for standard matches, a candidate for centralizing referee logic.
-    -   : The user model, which may be extended to store referee stats.
-    -   : Likely location for the new admin panel for referee settings.
-    -   : Where the new Hall of Fame leaderboard page will be created.
--   **Recently created:**
-    -   All files in .
-    -   .
+- **For the current issue:**
+    - : The UI component displaying the incorrect inventory stats.
+    - : Contains product management and CSV import logic.
+    - : Likely contains the API endpoint serving the incorrect stats.
+- **Recently created/modified:**
+    - All files in .
+    - .
+    - .
+    - .
+    - .
+    - .
+
+**key api endpoints**
+- **Under Investigation:**  - The suspected source of the incorrect statistics for the Textbook Catalog.
+- **Recently Added/Fixed:**
+    - : New endpoints for the referee system and leaderboard.
+    - , : New and fixed endpoints for wallet management.
+    - , : Fixed endpoints for inventory management.
 
 **Critical Info for New Agent**
--   The user's primary focus has shifted from feature creation to feature unification and engagement. The next tasks (unified referees, global leaderboard) are critical to this goal.
--   The user has explicitly approved the plan to build the unified referee system and the Hall of Fame leaderboard. Your first action should be to start implementing the backend for these features.
--   When implementing the referee system, the key is to create a *centralized* service and data model, avoiding the fragmented pattern of the old implementation. The system should be manageable by admins via a new settings toggle.
+- The immediate priority is to fix the incorrect inventory statistics on the Textbook Catalog page. Do not move on to other tasks until this is resolved and verified.
+- The user is attentive to detail. Acknowledge any mistakes (like the previous agent's repeated Import CSV suggestion) and address user feedback directly.
+- The massive Spanish-to-English refactoring is complete and tested, but be aware that edge cases might still exist. The current bug could potentially be an unexpected side effect of this refactoring.
 
 **documents and test reports created in this job**
--   
--   
--    (Updated)
+- : Multiple reports were generated, confirming fixes for wallet, textbook catalog, referee, and refactoring tasks.
+- : Updated multiple times to reflect completed work.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Go with the enhancement (shareable pages, TV mode, etc.) and the Next Action Items.
-2.  **User:** I remember we have referees role build for each game, I am thinking will be fine if we convert this as core feature for across PinPanClub, but leaving option for moderator and admin toggle of or on for each game, by default activated for all. Can you review this referees feature and maybe need improve it more? (PENDING)
-3.  **Agent:** Agreed to investigate the referee feature.
-4.  **Agent:** Completed the investigation across PinPanClub, RapidPin, and SuperPin matches.
-5.  **Agent:** Presented findings, confirming referees are used but not tracked globally or consistently.
-6.  **User:** Yes, if you can add something more about referees you can do it, the purpose is adding this role to adding more engagement for the game, the game and effort not only 2 players. (PENDING)
-7.  **Agent:** Understood the user's philosophy and proposed a plan for a unified referee system with profiles/ratings and a global Hall of Fame leaderboard.
-8.  **Agent:** Started investigating the codebase to implement the approved plan.
+1.  **User:** Reports that the Textbook Catalog has the same archive/delete problem as the wallet. (Image provided).
+2.  **Agent:** Acknowledges and investigates. (Fixes bug).
+3.  **Agent:** Finishes task.
+4.  **User:** Points out two issues: 1) Agent repeated a suggestion for an Import CSV button that already exists. 2) The stats on the Textbook Catalog page are wrong after a CSV upload. (Image provided).
+5.  **Agent:** Apologizes for the oversight and begins investigating the incorrect stats. The agent's investigation is the current .
 
 **Project Health Check:**
-*   **Broken:** None
-*   **Mocked:** None
+- **Broken:** The statistics display on the Textbook Catalog page is providing incorrect data.
+- **Mocked:** None.
 
 **3rd Party Integrations**
-*   OneSignal (Push Notifications)
-*   Monday.com API v2
-*   Google Photos, Gmail, Telegram Bot API
-*   OpenAI & Anthropic LLMs
-*   OpenAI TTS (via Emergent LLM Key) & ElevenLabs TTS (via User API Key)
-*    &  for WebSockets
+- OneSignal (Push Notifications)
+- Monday.com API v2
+- Google Photos, Gmail, Telegram Bot API
+- OpenAI & Anthropic LLMs
+- OpenAI TTS (via Emergent LLM Key) & ElevenLabs TTS (via User API Key)
+-  &  for WebSockets
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** None
+- **Testing agent used after significant changes:** YES. All major refactoring and bug fixes in this session were validated by the testing agent.
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None.
+- **Known regressions:** None from the completed work. The current stats bug is a new issue.
 
 **Credentials to test flow:**
-*   **Email:** 
-*   **Password:** 
+- **Email:** 
+- **Password:** 
 
 **What agent forgot to execute**
-The agent has followed the user's requests and is currently in the planning/investigation phase for the next approved set of tasks. Nothing was forgotten.</analysis>
+- The agent proposed an Import CSV feature enhancement without realizing it already existed. The user pointed this out, and the agent acknowledged the mistake before moving on to the user's reported bug.</analysis>

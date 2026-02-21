@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://hall-of-fame-2.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://inventory-kpi-debug.preview.emergentagent.com')
 
 # Test credentials
 TEST_CLIENT = {
