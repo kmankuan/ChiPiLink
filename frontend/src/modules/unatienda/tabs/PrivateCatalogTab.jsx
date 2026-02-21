@@ -744,9 +744,14 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const pageProducts = catalogPagination.paginated;
 
   // Inline update
+  const productApiUrl = useCallback((bookId, action = '') => {
+    const base = sysbook ? `${API_PREFIX}/products` : `${API}/api/store/private-catalog/admin/products`;
+    return bookId ? `${base}/${bookId}${action ? `/${action}` : ''}` : base;
+  }, [sysbook, API_PREFIX]);
+
   const updateProductField = useCallback(async (bookId, field, value) => {
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${bookId}`, {
+      const response = await fetch(productApiUrl(bookId), {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ [field]: value })
@@ -758,7 +763,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         onRefresh?.();
       } else { toast.error(data.detail || 'Error updating'); throw new Error(); }
     } catch (e) { toast.error('Error updating'); throw e; }
-  }, [token, onRefresh]);
+  }, [token, onRefresh, productApiUrl]);
 
   const handleArchive = async (book_id) => {
     if (!confirm('Move this product to archive?')) return;
