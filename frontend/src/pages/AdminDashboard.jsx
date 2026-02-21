@@ -84,8 +84,10 @@ const CommunityFeedModule = lazy(() => import('@/modules/community/CommunityFeed
 const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
 const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModule'));
 
-// School Textbooks modules
-const TextbookCatalogModule = lazy(() => import('@/modules/school-textbooks/TextbookCatalogModule'));
+// School Textbooks modules → Sysbook
+const SysbookInventoryTab = lazy(() => import('@/modules/sysbook/SysbookInventoryTab'));
+const SysbookStockMovementsTab = lazy(() => import('@/modules/sysbook/SysbookStockMovementsTab'));
+const SysbookAnalyticsTab = lazy(() => import('@/modules/sysbook/SysbookAnalyticsTab'));
 const StudentsSchoolsModule = lazy(() => import('@/modules/school-textbooks/StudentsSchoolsModule'));
 const PreSaleImportTab = lazy(() => import('@/modules/unatienda/tabs/PreSaleImportTab'));
 const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/MondayTextbookSyncModule'));
