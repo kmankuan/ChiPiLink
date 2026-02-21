@@ -174,6 +174,12 @@ export default function PingPongTV() {
           wsRef.current.send(JSON.stringify({ type: 'pong' }));
         }
         break;
+      
+      case 'arena_update':
+        // Tournament update from Arena
+        if (data.tournament) setArenaTournament(data.tournament);
+        if (data.matches) setArenaMatches(data.matches);
+        break;
         
       default:
         console.log('Unknown message type:', data.type);
