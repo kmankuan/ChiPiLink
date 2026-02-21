@@ -338,6 +338,8 @@ export default function AdminDashboard() {
         return <SysbookStockMovementsTab />;
       case 'sysbook-analytics':
         return <SysbookAnalyticsTab />;
+      case 'sysbook-alerts':
+        return <SysbookAlertsTab />;
       case 'students-schools':
         return <StudentsSchoolsModule />;
       case 'presale-import':
