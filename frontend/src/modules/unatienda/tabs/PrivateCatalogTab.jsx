@@ -696,7 +696,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
       if (catalogType === 'archived') return isArchived;
       if (isArchived) return false; // hide archived from all other views
       // Catalog type filter
-      if (catalogType === 'pca' && p._catalog !== 'pca') return false;
+      if (catalogType === 'sysbook' && p._catalog !== 'sysbook') return false;
       if (catalogType === 'public' && p._catalog !== 'public') return false;
       // Text search
       if (searchTerm) {
@@ -932,7 +932,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const statsProducts = useMemo(() => {
     return products.filter(p => {
       if (p.archived) return false;
-      if (catalogType === 'pca' && p._catalog !== 'pca') return false;
+      if (catalogType === 'sysbook' && p._catalog !== 'sysbook') return false;
       if (catalogType === 'public' && p._catalog !== 'public') return false;
       return true;
     });
