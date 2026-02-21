@@ -36,9 +36,10 @@ export default function PingPongTV() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  // Display mode: single, multi, dashboard
+  // Display mode: single, multi, dashboard, tournament
   const [mode, setMode] = useState(searchParams.get('mode') || 'dashboard');
   const [matchId, setMatchId] = useState(searchParams.get('match'));
+  const [tournamentId, setTournamentId] = useState(searchParams.get('tournament'));
   
   // WebSocket state
   const wsRef = useRef(null);
