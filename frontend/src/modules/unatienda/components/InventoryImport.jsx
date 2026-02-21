@@ -34,7 +34,7 @@ export default function InventoryImport({ token, onImportComplete, apiBase }) {
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await fetch(`${API}/api/store/inventory-import/template`, {
+      const response = await fetch(`${importApiBase}/inventory-import/template`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -80,7 +80,7 @@ export default function InventoryImport({ token, onImportComplete, apiBase }) {
       formData.append('file', selectedFile);
       formData.append('duplicate_mode', duplicateMode);
 
-      const response = await fetch(`${API}/api/store/inventory-import/preview`, {
+      const response = await fetch(`${importApiBase}/inventory-import/preview`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -109,7 +109,7 @@ export default function InventoryImport({ token, onImportComplete, apiBase }) {
       formData.append('file', selectedFile);
       formData.append('duplicate_mode', duplicateMode);
 
-      const response = await fetch(`${API}/api/store/inventory-import/execute`, {
+      const response = await fetch(`${importApiBase}/inventory-import/execute`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
