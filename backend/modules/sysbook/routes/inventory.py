@@ -234,6 +234,7 @@ async def sysbook_batch_adjust(batch: BatchStockAdjustment, admin: dict = Depend
         }
         await db.inventory_movements.insert_one(movement)
         movement.pop("_id", None)
+        await create_stock_alert_if_needed(adj.book_id, product.get("name", ""), new_qty, product.get("grade", ""), product.get("code", ""))
         results.append({"book_id": adj.book_id, "old_quantity": old_qty, "new_quantity": new_qty})
     return {"success": True, "results": results}
 
