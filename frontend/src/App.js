@@ -180,7 +180,7 @@ function AppRouter() {
       {/* PinpanClub Mobile Arbiter */}
       <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<><Header /><PingPongMobileArbiter /></>} />
       
-      {/* Super Pin Routes */}
+      {/* PinPan League Routes (formerly Super Pin) */}
       <Route path="/pinpanclub/superpin/admin" element={<><Header /><SuperPinAdmin /></>} />
       <Route path="/pinpanclub/superpin/league/:ligaId" element={<><Header /><SuperPinLeagueDetail /></>} />
       <Route path="/pinpanclub/superpin/match/:partidoId" element={<><Header /><SuperPinMatch /></>} />
