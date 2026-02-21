@@ -273,7 +273,7 @@ export default function AdminDashboard() {
           if (!item.permission) return true;
           return hasPermission(item.permission);
         })
-        .map(i => ({ ...i, label: t(i.labelKey) })),
+        .map(i => ({ ...i, label: t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey) })),
     })).filter(g => g.items.length > 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAdmin, hasPermission, i18n.language]);
