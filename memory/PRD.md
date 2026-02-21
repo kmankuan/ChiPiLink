@@ -64,6 +64,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Frontend**: Dark theme dashboard with 4 tabs (Overview, Arena, Game Modes, Players), stacked bar charts, KPI cards, mode distribution bars
 - **Testing**: 100% frontend, 94% backend (1 transient network timeout)
 
+### Bugfix - Wallet Transactions Delete & Archive (Feb 21, 2026)
+- **Fixed**: Archive wrote to wrong collection (`wallet_transactions` instead of `chipi_transactions`), causing archived items to remain visible
+- **Added**: `bulk-delete`, `bulk-unarchive`, `single-delete` API endpoints for admin
+- **Frontend**: Delete button with destructive confirmation dialog, Restore button for archived items, Archive toggle filter
+- **Testing**: 100% (12/12 backend, all frontend)
+
 ## Key API Endpoints
 
 ### RapidPin (English field names)
