@@ -117,10 +117,13 @@ async def check_stock_levels(admin: dict = Depends(get_admin_user)):
 
     # Find all low/out of stock products
     low_products = await db.store_products.find(
-        {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}],
-         "$or": [
-             {"inventory_quantity": {"$lte": threshold}},
-             {"inventory_quantity": {"$exists": False}},
+        {**SYSBOOK_FILTER, "active": True,
+         "$and": [
+             {"$or": [{"archived": {"$exists": False}}, {"archived": False}]},
+             {"$or": [
+                 {"inventory_quantity": {"$lte": threshold}},
+                 {"inventory_quantity": {"$exists": False}},
+             ]},
          ]},
         {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1, "grade": 1, "code": 1}
     ).to_list(500)
