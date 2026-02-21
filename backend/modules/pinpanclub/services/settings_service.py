@@ -405,8 +405,8 @@ class PinPanSettingsService(BaseService):
             p["rapidpin_points"] = e.get("total_points", 0)
             # Extract name from jugador_info
             info = e.get("last_info") or {}
-            if not p["player_name"] and (info.get("apodo") or info.get("nombre")):
-                p["player_name"] = info.get("apodo") or info.get("nombre", "")
+            if not p["player_name"] and (info.get("nickname") or info.get("nombre")):
+                p["player_name"] = info.get("nickname") or info.get("nombre", "")
 
         # 4. Referee profiles
         ref_entries = await self.referee_col.find({}, {"_id": 0}).to_list(length=10000)

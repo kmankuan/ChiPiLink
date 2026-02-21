@@ -112,7 +112,7 @@ async def get_player_challenges(
     stats = await challenge_service.get_player_stats(jugador_id)
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "challenges": challenges,
         "stats": stats
     }
@@ -122,7 +122,7 @@ async def get_player_challenges(
 async def get_active_challenges(jugador_id: str):
     """Get retos active de a player"""
     challenges = await challenge_service.get_player_challenges(jugador_id, "in_progress")
-    return {"jugador_id": jugador_id, "active_challenges": challenges}
+    return {"player_id": jugador_id, "active_challenges": challenges}
 
 
 @router.get("/player/{jugador_id}/stats")
@@ -131,7 +131,7 @@ async def get_player_challenge_stats(jugador_id: str):
     stats = await challenge_service.get_player_stats(jugador_id)
     rank = await challenge_service.get_player_rank(jugador_id)
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "stats": stats,
         "rank": rank
     }
@@ -162,7 +162,7 @@ async def get_player_rank(jugador_id: str):
     
     # Get leaderboard entry
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
-        {"jugador_id": jugador_id},
+        {"player_id": jugador_id},
         {"_id": 0}
     )
     
@@ -201,7 +201,7 @@ async def get_player_rank(jugador_id: str):
         progress = 100
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "total_points": total_points,
         "challenges_completed": challenges_completed,
         "current_streak": current_streak,

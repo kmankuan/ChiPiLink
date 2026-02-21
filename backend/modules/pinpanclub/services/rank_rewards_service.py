@@ -183,7 +183,7 @@ class RankRewardsService(BaseService):
         
         # Verify si ya received esta recompensa
         existing_reward = await db.pinpanclub_rank_rewards.find_one({
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "rank_id": new_rank["id"]
         })
         
@@ -208,17 +208,17 @@ class RankRewardsService(BaseService):
         
         # Get player info
         player = await db.pingpong_players.find_one(
-            {"jugador_id": jugador_id},
-            {"_id": 0, "name": 1, "apodo": 1}
+            {"player_id": jugador_id},
+            {"_id": 0, "name": 1, "nickname": 1}
         )
-        player_name = player.get("apodo") or player.get("name", "Jugador") if player else "Jugador"
+        player_name = player.get("nickname") or player.get("name", "Jugador") if player else "Jugador"
         
         # Get localized rank name
         rank_name = rank["name"].get(lang, rank["name"].get("es", rank["id"]))
         
         # Register the reward
         reward_record = {
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "rank_id": rank["id"],
             "rank_name": rank_name,
             "rank_icon": rank["icon"],
@@ -241,7 +241,7 @@ class RankRewardsService(BaseService):
             bonus_points = reward.get("value", 0)
             if bonus_points > 0:
                 await db.pinpanclub_challenges_leaderboard.update_one(
-                    {"jugador_id": jugador_id},
+                    {"player_id": jugador_id},
                     {"$inc": {"total_points": bonus_points}},
                     upsert=True
                 )
@@ -253,7 +253,7 @@ class RankRewardsService(BaseService):
                 
                 new_badge = {
                     "badge_id": f"rank_{rank['id']}_{jugador_id[:8]}",
-                    "jugador_id": jugador_id,
+                    "player_id": jugador_id,
                     "name": badge_name,
                     "icon": badge_data["icon"],
                     "rarity": badge_data.get("rarity", "rare"),
@@ -269,7 +269,7 @@ class RankRewardsService(BaseService):
             if reward.get("perks"):
                 perks_granted = reward["perks"]
                 await db.pinpanclub_player_perks.update_one(
-                    {"jugador_id": jugador_id},
+                    {"player_id": jugador_id},
                     {
                         "$addToSet": {"perks": {"$each": perks_granted}},
                         "$set": {"updated_at": now}
@@ -281,7 +281,7 @@ class RankRewardsService(BaseService):
             if reward.get("title"):
                 title = reward["title"].get(lang, reward["title"].get("es"))
                 await db.pingpong_players.update_one(
-                    {"jugador_id": jugador_id},
+                    {"player_id": jugador_id},
                     {"$set": {"special_title": title, "title_rank": rank["id"]}}
                 )
         
@@ -343,7 +343,7 @@ class RankRewardsService(BaseService):
         
         return {
             "promoted": True,
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "old_rank": None,  # Will be filled by caller
             "new_rank": {
                 "id": rank["id"],
@@ -362,7 +362,7 @@ class RankRewardsService(BaseService):
     async def get_player_rank_history(self, jugador_id: str) -> List[Dict]:
         """Get historial de rangos alcanzados por un jugador"""
         cursor = db.pinpanclub_rank_rewards.find(
-            {"jugador_id": jugador_id},
+            {"player_id": jugador_id},
             {"_id": 0}
         ).sort("granted_at", 1)
         

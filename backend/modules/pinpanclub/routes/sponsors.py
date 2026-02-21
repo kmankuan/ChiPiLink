@@ -132,7 +132,7 @@ DEFAULT_SPONSOR_SPACES = [
     {
         "space_id": "header_left",
         "name": "Patrocinador Especial Izquierdo",
-        "posicion": "header_left",
+        "position": "header_left",
         "ancho": "150px",
         "alto": "60px",
         "visible": True,
@@ -143,7 +143,7 @@ DEFAULT_SPONSOR_SPACES = [
     {
         "space_id": "header_right",
         "name": "Patrocinador Especial Derecho",
-        "posicion": "header_right",
+        "position": "header_right",
         "ancho": "150px",
         "alto": "60px",
         "visible": True,
@@ -154,7 +154,7 @@ DEFAULT_SPONSOR_SPACES = [
     {
         "space_id": "banner_bottom",
         "name": "Banner Principal Inferior",
-        "posicion": "banner_bottom",
+        "position": "banner_bottom",
         "ancho": "100%",
         "alto": "100px",
         "visible": True,
@@ -168,7 +168,7 @@ DEFAULT_SPONSOR_SPACES = [
     {
         "space_id": "banner_top",
         "name": "Banner Superior",
-        "posicion": "banner_top",
+        "position": "banner_top",
         "ancho": "100%",
         "alto": "80px",
         "visible": False,
@@ -215,7 +215,7 @@ async def listar_patrocinadores(
     if tipo:
         query["tipo"] = tipo
     if posicion:
-        query["posicion"] = posicion
+        query["position"] = posicion
     if activo is not None:
         query["active"] = activo
     
@@ -230,8 +230,8 @@ async def listar_patrocinadores(
     # Filter by date range
     valid_sponsors = []
     for s in sponsors:
-        fecha_inicio = s.get("fecha_inicio")
-        fecha_fin = s.get("fecha_fin")
+        fecha_inicio = s.get("start_date")
+        fecha_fin = s.get("end_date")
         
         if fecha_inicio and fecha_inicio > now:
             continue
@@ -413,15 +413,15 @@ async def obtener_sponsors_para_tv():
     }
     
     for s in sponsors:
-        fecha_inicio = s.get("fecha_inicio")
-        fecha_fin = s.get("fecha_fin")
+        fecha_inicio = s.get("start_date")
+        fecha_fin = s.get("end_date")
         
         if fecha_inicio and fecha_inicio > now:
             continue
         if fecha_fin and fecha_fin < now:
             continue
         
-        posicion = s.get("posicion", "banner_bottom")
+        posicion = s.get("position", "banner_bottom")
         if posicion in by_position:
             by_position[posicion].append(s)
     

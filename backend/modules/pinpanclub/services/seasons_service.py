@@ -228,12 +228,12 @@ class RankingSeasonsService(BaseService):
     ) -> Optional[Dict]:
         """Otorgar recompensa de fin de temporada a un participante"""
         now = datetime.now(timezone.utc).isoformat()
-        jugador_id = participant["jugador_id"]
+        jugador_id = participant["player_id"]
         
         # Verify if already received season reward
         existing = await db.pinpanclub_season_rewards.find_one({
             "season_id": season["season_id"],
-            "jugador_id": jugador_id
+            "player_id": jugador_id
         })
         
         if existing:
@@ -255,7 +255,7 @@ class RankingSeasonsService(BaseService):
             # Create badge in badges collection
             await db.pinpanclub_superpin_badges.insert_one({
                 "badge_id": f"season_{season['season_id']}_{jugador_id[:8]}",
-                "jugador_id": jugador_id,
+                "player_id": jugador_id,
                 "name": badge_name,
                 "icon": tier["badge"]["icon"],
                 "rarity": tier["badge"].get("rarity"),
@@ -268,14 +268,14 @@ class RankingSeasonsService(BaseService):
         if tier.get("title"):
             title_earned = tier["title"].get(lang, tier["title"].get("es"))
             await db.pingpong_players.update_one(
-                {"jugador_id": jugador_id},
+                {"player_id": jugador_id},
                 {"$set": {"season_title": title_earned, "season_title_id": season["season_id"]}}
             )
         
         # Otorgar puntos bonus al leaderboard global
         if tier.get("bonus_points", 0) > 0:
             await db.pinpanclub_challenges_leaderboard.update_one(
-                {"jugador_id": jugador_id},
+                {"player_id": jugador_id},
                 {"$inc": {"total_points": tier["bonus_points"]}},
                 upsert=True
             )
@@ -283,7 +283,7 @@ class RankingSeasonsService(BaseService):
         # Guardar perks
         if tier.get("perks"):
             await db.pinpanclub_player_perks.update_one(
-                {"jugador_id": jugador_id},
+                {"player_id": jugador_id},
                 {
                     "$addToSet": {"perks": {"$each": tier["perks"]}},
                     "$set": {"updated_at": now}
@@ -295,7 +295,7 @@ class RankingSeasonsService(BaseService):
         reward = {
             "reward_id": f"sr_{season['season_id']}_{jugador_id[:8]}",
             "season_id": season["season_id"],
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "final_position": position,
             "tier_name": tier["tier_name"],
             "bonus_points": tier.get("bonus_points", 0),
@@ -306,7 +306,7 @@ class RankingSeasonsService(BaseService):
                 "name": season["name"].get(lang, season["name"].get("es")),
                 "season_number": season.get("season_number")
             },
-            "jugador_info": participant.get("jugador_info"),
+            "player_info": participant.get("player_info"),
             "granted_at": now,
             "is_notified": False
         }
@@ -386,7 +386,7 @@ class RankingSeasonsService(BaseService):
             season_id = season["season_id"]
         
         participant = await db.pinpanclub_season_participants.find_one(
-            {"season_id": season_id, "jugador_id": jugador_id},
+            {"season_id": season_id, "player_id": jugador_id},
             {"_id": 0}
         )
         
@@ -421,8 +421,8 @@ class RankingSeasonsService(BaseService):
         
         # Get player info
         player = await db.pingpong_players.find_one(
-            {"jugador_id": jugador_id},
-            {"_id": 0, "name": 1, "apodo": 1}
+            {"player_id": jugador_id},
+            {"_id": 0, "name": 1, "nickname": 1}
         )
         
         # Update o crear participante
@@ -432,15 +432,15 @@ class RankingSeasonsService(BaseService):
             },
             "$set": {
                 "last_activity": now,
-                "jugador_info": {
+                "player_info": {
                     "name": player.get("name") if player else None,
-                    "apodo": player.get("apodo") if player else None
+                    "nickname": player.get("nickname") if player else None
                 }
             },
             "$setOnInsert": {
                 "participant_id": f"sp_{season['season_id']}_{jugador_id[:8]}",
                 "season_id": season["season_id"],
-                "jugador_id": jugador_id,
+                "player_id": jugador_id,
                 "joined_at": now
             }
         }
@@ -449,7 +449,7 @@ class RankingSeasonsService(BaseService):
             update_ops["$inc"]["challenges_completed"] = 1
         
         await db.pinpanclub_season_participants.update_one(
-            {"season_id": season["season_id"], "jugador_id": jugador_id},
+            {"season_id": season["season_id"], "player_id": jugador_id},
             update_ops,
             upsert=True
         )
@@ -470,7 +470,7 @@ class RankingSeasonsService(BaseService):
     async def get_player_season_rewards(self, jugador_id: str) -> List[Dict]:
         """Get all recompensas de temporada de un jugador"""
         cursor = db.pinpanclub_season_rewards.find(
-            {"jugador_id": jugador_id},
+            {"player_id": jugador_id},
             {"_id": 0}
         ).sort("granted_at", -1)
         

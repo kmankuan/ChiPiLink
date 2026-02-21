@@ -296,7 +296,7 @@ async def get_tournament_brackets(tournament_id: str):
     return {
         "tournament_id": tournament.get("tournament_id") or tournament.get("torneo_id"),
         "name": tournament.get("name"),
-        "status": tournament.get("status") or tournament.get("estado"),
+        "status": tournament.get("status") or tournament.get("status"),
         "brackets": tournament.get("brackets", []),
         "participants": tournament.get("participants") or tournament.get("participantes", []),
         "final_results": tournament.get("final_results") or tournament.get("resultados_finales", [])

@@ -29,7 +29,7 @@ async def get_player_rank_history(jugador_id: str):
     """Get historial de rangos y recompensas de a player"""
     history = await rank_rewards_service.get_player_rank_history(jugador_id)
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "history": history,
         "total_promotions": len(history)
     }
@@ -72,7 +72,7 @@ async def get_current_rank_info(
     
     # Get puntos actuales
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
-        {"jugador_id": jugador_id},
+        {"player_id": jugador_id},
         {"_id": 0}
     )
     
@@ -109,7 +109,7 @@ async def get_current_rank_info(
         points_to_next = next_rank_data["min_points"] - total_points
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "total_points": total_points,
         "current_rank": {
             "id": current_rank["id"],

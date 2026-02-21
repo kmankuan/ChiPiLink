@@ -135,7 +135,7 @@ async def get_player_current_season_stats(jugador_id: str):
     if not stats:
         season = await seasons_service.get_current_season()
         return {
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "season_id": season["season_id"] if season else None,
             "participating": False,
             "season_points": 0,
@@ -144,7 +144,7 @@ async def get_player_current_season_stats(jugador_id: str):
         }
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "participating": True,
         **stats
     }
@@ -157,13 +157,13 @@ async def get_player_season_stats(jugador_id: str, season_id: str):
     
     if not stats:
         return {
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "season_id": season_id,
             "participating": False
         }
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "participating": True,
         **stats
     }
@@ -175,7 +175,7 @@ async def get_player_season_rewards(jugador_id: str):
     rewards = await seasons_service.get_player_season_rewards(jugador_id)
     
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "rewards": rewards,
         "total": len(rewards)
     }

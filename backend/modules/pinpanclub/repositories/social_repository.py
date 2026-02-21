@@ -203,7 +203,7 @@ class ActivityFeedRepository(BaseRepository):
     async def get_player_feed(self, jugador_id: str, limit: int = 20) -> List[Dict]:
         """Get actividad de un jugador"""
         return await self.find_many(
-            query={"jugador_id": jugador_id},
+            query={"player_id": jugador_id},
             sort=[("created_at", -1)],
             limit=limit
         )
@@ -213,9 +213,9 @@ class ActivityFeedRepository(BaseRepository):
         following_ids: List[str], 
         limit: int = 50
     ) -> List[Dict]:
-        """Get feed de jugadores seguidos"""
+        """Get feed de players seguidos"""
         return await self.find_many(
-            query={"jugador_id": {"$in": following_ids}},
+            query={"player_id": {"$in": following_ids}},
             sort=[("created_at", -1)],
             limit=limit
         )

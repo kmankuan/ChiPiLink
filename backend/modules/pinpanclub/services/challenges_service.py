@@ -165,7 +165,7 @@ class ChallengeService(BaseService):
         
         progress_data = {
             "challenge_id": challenge_id,
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "challenge_info": {
                 "name": challenge.get("name"),
                 "description": challenge.get("description"),
@@ -173,9 +173,9 @@ class ChallengeService(BaseService):
                 "target_value": challenge.get("target_value"),
                 "points_reward": challenge.get("points_reward")
             },
-            "jugador_info": {
+            "player_info": {
                 "name": player.get("name"),
-                "apodo": player.get("apodo")
+                "nickname": player.get("nickname")
             } if player else None,
             "target_value": challenge.get("target_value", 0),
             "expires_at": expires_at.isoformat()
@@ -249,7 +249,7 @@ class ChallengeService(BaseService):
         player = await self.player_repo.get_by_id(jugador_id)
         lb_entry = await self.leaderboard_repo.get_or_create(
             jugador_id,
-            {"name": player.get("name"), "apodo": player.get("apodo")} if player else None
+            {"name": player.get("name"), "nickname": player.get("nickname")} if player else None
         )
         
         await self.leaderboard_repo.update_stats(
@@ -305,7 +305,7 @@ class ChallengeService(BaseService):
             
             # Get updated points
             updated_entry = await db.pinpanclub_challenges_leaderboard.find_one(
-                {"jugador_id": jugador_id},
+                {"player_id": jugador_id},
                 {"_id": 0, "total_points": 1}
             )
             new_total_points = updated_entry.get("total_points", 0) if updated_entry else 0
@@ -370,7 +370,7 @@ class ChallengeService(BaseService):
     
     async def get_player_rank(self, jugador_id: str) -> Optional[int]:
         """Get position de un jugador en el leaderboard"""
-        entry = await self.leaderboard_repo.find_one({"jugador_id": jugador_id})
+        entry = await self.leaderboard_repo.find_one({"player_id": jugador_id})
         return entry.get("rank") if entry else None
 
 

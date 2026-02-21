@@ -87,14 +87,14 @@ async def register_match(data: RapidPinMatchCreate):
 @router.post("/matches/{match_id}/confirm", response_model=RapidPinMatch)
 async def confirm_match(
     match_id: str,
-    confirmado_por_id: str
+    confirmed_by_id: str
 ):
     """
     Confirmar a match pendiente.
     Solo puede confirmar un participante diferente al que lo registered.
     """
     try:
-        return await rapidpin_service.confirm_match(match_id, confirmado_por_id)
+        return await rapidpin_service.confirm_match(match_id, confirmed_by_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -183,7 +183,7 @@ async def get_scoring_config():
     return {
         "scoring": RAPID_PIN_SCORING,
         "rules": {
-            "participants": "2 jugadores + 1 referee",
+            "participants": "2 players + 1 referee",
             "validation": "Requiere confirmation de 1 participante adicional",
             "points_victory": RAPID_PIN_SCORING["victory"],
             "points_defeat": RAPID_PIN_SCORING["defeat"],
@@ -202,7 +202,7 @@ async def create_challenge(
     notes: Optional[str] = None
 ):
     """
-    Crear challenge de jugador a jugador.
+    Create player-to-player challenge.
     El oponente debe aceptar antes de que se busque referee.
     """
     try:
@@ -350,8 +350,8 @@ async def assign_referee(
 async def complete_queue_match(
     queue_id: str,
     winner_id: str,
-    score_ganador: int = 11,
-    score_perdedor: int = 0
+    score_winner: int = 11,
+    score_loser: int = 0
 ):
     """
     Completar partido con resultado.
@@ -361,8 +361,8 @@ async def complete_queue_match(
         return await rapidpin_service.complete_queue_match(
             queue_id=queue_id,
             winner_id=winner_id,
-            score_ganador=score_ganador,
-            score_perdedor=score_perdedor
+            score_winner=score_winner,
+            score_loser=score_loser
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -406,7 +406,7 @@ async def create_challenge_with_date(
 ):
     """
     Crear challenge con propuesta de fecha inicial.
-    El reto inicia en estado date_negotiation.
+    Challenge starts in date_negotiation status.
     """
     try:
         return await rapidpin_service.create_challenge_with_date(

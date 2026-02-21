@@ -180,7 +180,7 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
 
 @router.get("/players")
 async def get_monday_players(admin: dict = Depends(get_admin_user)):
-    """Get jugadores desde Monday.com (para selesson en partidos)"""
+    """Get players desde Monday.com (para selesson en partidos)"""
     config = await monday_service.get_config()
     if not config.players_board_id:
         return {"players": [], "message": "Board of players no configurado en Monday.com"}
@@ -203,7 +203,7 @@ async def get_sync_stats(admin: dict = Depends(get_admin_user)):
     player_repo = PlayerRepository()
     match_repo = MatchRepository()
     
-    # Contar jugadores
+    # Contar players
     total_players = await player_repo.count({"active": True})
     synced_players = await player_repo.count({
         "active": True,

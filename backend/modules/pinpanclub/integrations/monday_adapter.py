@@ -45,7 +45,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
         async def on_player_created(event: Event):
             config = await self._get_sync_config()
             if config.get("auto_sync_players"):
-                await self.sync_player(event.payload.get("jugador_id"))
+                await self.sync_player(event.payload.get("player_id"))
 
     async def _get_sync_config(self) -> Dict:
         """Get sync configuration (auto_sync flags + board IDs)"""
@@ -72,8 +72,8 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
         if not board_id:
             return None
 
-        player = await db.pinpanclub_jugadores.find_one(
-            {"jugador_id": jugador_id}, {"_id": 0}
+        player = await db.pinpanclub_players.find_one(
+            {"player_id": jugador_id}, {"_id": 0}
         )
         if not player:
             return None
@@ -82,7 +82,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
             return player["monday_item_id"]
 
         full_name = f"{player.get('nombre', '')} {player.get('apellido', '')}".strip()
-        if player.get("apodo"):
+        if player.get("nickname"):
             full_name += f" ({player['apodo']})"
 
         column_values = {
@@ -94,8 +94,8 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
 
         monday_id = await self.client.create_item(board_id, full_name, column_values)
         if monday_id:
-            await db.pinpanclub_jugadores.update_one(
-                {"jugador_id": jugador_id},
+            await db.pinpanclub_players.update_one(
+                {"player_id": jugador_id},
                 {"$set": {"monday_item_id": monday_id}}
             )
             logger.info(f"Player synced to Monday: {jugador_id} -> {monday_id}")
@@ -119,8 +119,8 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
 
         player_a = match.get("player_a_info", {})
         player_b = match.get("player_b_info", {})
-        nombre_a = player_a.get("apodo") or player_a.get("name", "Player A")
-        nombre_b = player_b.get("apodo") or player_b.get("name", "Player B")
+        nombre_a = player_a.get("nickname") or player_a.get("name", "Player A")
+        nombre_b = player_b.get("nickname") or player_b.get("name", "Player B")
         item_name = f"{nombre_a} vs {nombre_b}"
 
         estado_map = {
@@ -133,7 +133,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
             "text": nombre_a,
             "text4": nombre_b,
             "text0": "",
-            "status": {"label": estado_map.get(match.get("estado"), "Pendiente")},
+            "status": {"label": estado_map.get(match.get("status"), "Pendiente")},
             "text6": match.get("mesa", ""),
             "text7": match.get("ronda", ""),
         }
@@ -190,18 +190,18 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
 
     async def sync_all_players(self) -> Dict:
         """Sync all un-synced players"""
-        players = await db.pinpanclub_jugadores.find(
+        players = await db.pinpanclub_players.find(
             {"monday_item_id": {"$exists": False}}, {"_id": 0}
         ).to_list(500)
         synced, failed = 0, 0
         for p in players:
             try:
-                if await self.sync_player(p["jugador_id"]):
+                if await self.sync_player(p["player_id"]):
                     synced += 1
                 else:
                     failed += 1
             except Exception as e:
-                logger.error(f"Error syncing player {p['jugador_id']}: {e}")
+                logger.error(f"Error syncing player {p['player_id']}: {e}")
                 failed += 1
         return {"synced": synced, "failed": failed}
 
@@ -245,7 +245,7 @@ class PinPanClubMondayAdapter(BaseMondayAdapter):
                 if match:
                     await db.pinpanclub_partidos.update_one(
                         {"monday_item_id": item_id},
-                        {"$set": {"estado": "finalizado"}}
+                        {"$set": {"status": "finalizado"}}
                     )
                     return {"status": "updated", "partido_id": match.get("partido_id")}
 

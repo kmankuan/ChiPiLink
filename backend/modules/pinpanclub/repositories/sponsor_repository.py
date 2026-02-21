@@ -40,7 +40,7 @@ class SponsorRepository(BaseRepository):
     async def get_by_position(self, posicion: str) -> List[Dict]:
         """Get patrocinadores por position"""
         return await self.find_many(
-            query={"active": True, "posicion": posicion},
+            query={"active": True, "position": posicion},
             sort=[("orden", 1)]
         )
     

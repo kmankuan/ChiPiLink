@@ -22,7 +22,7 @@ async def get_player_achievements(jugador_id: str):
     """Get logros de a player"""
     achievements = await achievements_service.get_player_achievements(jugador_id)
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "achievements": achievements,
         "total": len(achievements)
     }
@@ -36,7 +36,7 @@ async def check_achievements(jugador_id: str):
     """
     awarded = await achievements_service.check_and_award_achievements(jugador_id)
     return {
-        "jugador_id": jugador_id,
+        "player_id": jugador_id,
         "awarded": awarded,
         "count": len(awarded)
     }

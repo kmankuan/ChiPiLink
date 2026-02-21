@@ -72,7 +72,7 @@ class AwardedPrizeRepository(BaseRepository):
         status: str = None,
         limit: int = 50
     ) -> List[Dict]:
-        query = {"jugador_id": jugador_id}
+        query = {"player_id": jugador_id}
         if status:
             query["status"] = status
         return await self.find_many(

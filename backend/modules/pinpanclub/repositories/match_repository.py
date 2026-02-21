@@ -24,7 +24,7 @@ class MatchRepository(BaseRepository):
     async def create(self, match_data: Dict) -> Dict:
         """Create new match"""
         match_data["partido_id"] = str(uuid.uuid4())
-        match_data["estado"] = "pendiente"
+        match_data["status"] = "pendiente"
         match_data["points_player_a"] = 0
         match_data["points_player_b"] = 0
         match_data["sets_jugador_a"] = 0
@@ -41,14 +41,14 @@ class MatchRepository(BaseRepository):
     async def get_active_matches(self) -> List[Dict]:
         """Get partidos activos (en curso o pausados)"""
         return await self.find_many(
-            query={"estado": {"$in": ["en_curso", "pausado"]}},
+            query={"status": {"$in": ["en_curso", "pausado"]}},
             sort=[("created_at", -1)]
         )
     
     async def get_by_state(self, estado: str, limit: int = 50) -> List[Dict]:
         """Get partidos by status"""
         return await self.find_many(
-            query={"estado": estado},
+            query={"status": estado},
             limit=limit,
             sort=[("created_at", -1)]
         )
@@ -100,8 +100,8 @@ class MatchRepository(BaseRepository):
     async def start_match(self, partido_id: str, fecha_inicio: str) -> bool:
         """Start match"""
         return await self.update_match(partido_id, {
-            "estado": "en_curso",
-            "fecha_inicio": fecha_inicio
+            "status": "en_curso",
+            "start_date": fecha_inicio
         })
     
     async def finish_match(
@@ -112,20 +112,20 @@ class MatchRepository(BaseRepository):
     ) -> bool:
         """Finalizar partido"""
         return await self.update_match(partido_id, {
-            "estado": "finalizado",
+            "status": "finalizado",
             "winner_id": winner_id,
-            "fecha_fin": fecha_fin
+            "end_date": fecha_fin
         })
     
     async def cancel_match(self, partido_id: str) -> bool:
         """Cancelar partido"""
-        return await self.update_match(partido_id, {"estado": "cancelado"})
+        return await self.update_match(partido_id, {"status": "cancelado"})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
         """Get matches not synced with Monday.com"""
         return await self.find_many(
             query={
-                "estado": {"$in": ["pendiente", "en_curso", "pausado"]},
+                "status": {"$in": ["pendiente", "en_curso", "pausado"]},
                 "$or": [
                     {"monday_item_id": {"$exists": False}},
                     {"monday_item_id": None}
@@ -137,7 +137,7 @@ class MatchRepository(BaseRepository):
         """Get partidos finalizados that hasn monday_item_id"""
         return await self.find_many(
             query={
-                "estado": "finalizado",
+                "status": "finalizado",
                 "monday_item_id": {"$exists": True, "$ne": None}
             }
         )

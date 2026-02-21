@@ -39,8 +39,8 @@ class RapidPinSeasonRepository(BaseRepository):
     async def get_active_seasons(self) -> List[Dict]:
         """Get active seasons"""
         return await self.find_many(
-            query={"estado": "active"},
-            sort=[("fecha_inicio", -1)]
+            query={"status": "active"},
+            sort=[("start_date", -1)]
         )
     
     async def get_all_seasons(self) -> List[Dict]:
@@ -55,7 +55,7 @@ class RapidPinSeasonRepository(BaseRepository):
         return await self.update(
             season_id,
             {
-                "estado": "closed",
+                "status": "closed",
                 "closed_at": datetime.now(timezone.utc).isoformat(),
                 "final_results": final_results
             }
@@ -119,7 +119,7 @@ class RapidPinMatchRepository(BaseRepository):
         """Get partidos de una temporada"""
         query = {"season_id": season_id}
         if estado:
-            query["estado"] = estado
+            query["status"] = estado
         
         return await self.find_many(
             query=query,
@@ -136,13 +136,13 @@ class RapidPinMatchRepository(BaseRepository):
         return await self.find_many(
             query={
                 "season_id": season_id,
-                "estado": "pending",
+                "status": "pending",
                 "$or": [
                     {"player_a_id": user_id},
                     {"player_b_id": user_id},
-                    {"arbitro_id": user_id}
+                    {"referee_id": user_id}
                 ],
-                "registrado_por_id": {"$ne": user_id}  # No puede confirmar su propio registro
+                "registered_by_id": {"$ne": user_id}  # No puede confirmar su propio registro
             },
             sort=[("created_at", -1)]
         )
@@ -151,13 +151,13 @@ class RapidPinMatchRepository(BaseRepository):
         """Get TODOS the matches pendientes de confirmation donde the user participa (all seasons)"""
         return await self.find_many(
             query={
-                "estado": "pending",
+                "status": "pending",
                 "$or": [
                     {"player_a_id": user_id},
                     {"player_b_id": user_id},
-                    {"arbitro_id": user_id}
+                    {"referee_id": user_id}
                 ],
-                "registrado_por_id": {"$ne": user_id}  # No puede confirmar su propio registro
+                "registered_by_id": {"$ne": user_id}  # No puede confirmar su propio registro
             },
             sort=[("created_at", -1)]
         )
@@ -172,33 +172,33 @@ class RapidPinMatchRepository(BaseRepository):
         return await self.find_many(
             query={
                 "season_id": season_id,
-                "estado": "validated",
+                "status": "validated",
                 "$or": [
                     {"player_a_id": jugador_id},
                     {"player_b_id": jugador_id},
-                    {"arbitro_id": jugador_id}
+                    {"referee_id": jugador_id}
                 ]
             },
-            sort=[("fecha_partido", -1)],
+            sort=[("match_date", -1)],
             limit=limit
         )
     
     async def confirm_match(
         self,
         match_id: str,
-        confirmado_por_id: str
+        confirmed_by_id: str
     ) -> bool:
         """Confirm a pending match"""
         result = await self._collection.update_one(
             {
                 self.ID_FIELD: match_id,
-                "estado": "pending"
+                "status": "pending"
             },
             {
                 "$set": {
-                    "estado": "validated",
-                    "confirmado_por_id": confirmado_por_id,
-                    "fecha_confirmacion": datetime.now(timezone.utc).isoformat()
+                    "status": "validated",
+                    "confirmed_by_id": confirmed_by_id,
+                    "confirmation_date": datetime.now(timezone.utc).isoformat()
                 }
             }
         )
@@ -208,7 +208,7 @@ class RapidPinMatchRepository(BaseRepository):
         """Contar partidos validados en una temporada"""
         return await self._collection.count_documents({
             "season_id": season_id,
-            "estado": "validated"
+            "status": "validated"
         })
 
 
@@ -237,7 +237,7 @@ class RapidPinRankingRepository(BaseRepository):
         """Get o crear entrada de ranking para un jugador"""
         existing = await self.find_one({
             "season_id": season_id,
-            "jugador_id": jugador_id
+            "player_id": jugador_id
         })
         
         if existing:
@@ -246,16 +246,16 @@ class RapidPinRankingRepository(BaseRepository):
         # Create nueva entrada
         ranking_data = {
             "season_id": season_id,
-            "jugador_id": jugador_id,
-            "jugador_info": jugador_info,
-            "posicion": 0,
-            "puntos_totales": 0,
-            "partidos_jugados": 0,
-            "partidos_ganados": 0,
-            "partidos_perdidos": 0,
-            "puntos_como_jugador": 0,
-            "partidos_arbitrados": 0,
-            "puntos_como_arbitro": 0
+            "player_id": jugador_id,
+            "player_info": jugador_info,
+            "position": 0,
+            "total_points": 0,
+            "matches_played": 0,
+            "matches_won": 0,
+            "matches_lost": 0,
+            "points_as_player": 0,
+            "matches_refereed": 0,
+            "points_as_referee": 0
         }
         
         return await self.create(ranking_data)
@@ -268,18 +268,18 @@ class RapidPinRankingRepository(BaseRepository):
         """Get ranking de un jugador specific"""
         return await self.find_one({
             "season_id": season_id,
-            "jugador_id": jugador_id
+            "player_id": jugador_id
         })
     
     async def get_season_ranking(
         self,
         season_id: str,
-        sort_by: str = "puntos_totales"
+        sort_by: str = "total_points"
     ) -> List[Dict]:
         """Get ranking completo de una temporada"""
         return await self.find_many(
             query={"season_id": season_id},
-            sort=[(sort_by, -1), ("partidos_jugados", -1)]
+            sort=[(sort_by, -1), ("matches_played", -1)]
         )
     
     async def get_referee_ranking(self, season_id: str) -> List[Dict]:
@@ -287,9 +287,9 @@ class RapidPinRankingRepository(BaseRepository):
         return await self.find_many(
             query={
                 "season_id": season_id,
-                "partidos_arbitrados": {"$gt": 0}
+                "matches_refereed": {"$gt": 0}
             },
-            sort=[("partidos_arbitrados", -1), ("puntos_como_arbitro", -1)]
+            sort=[("matches_refereed", -1), ("points_as_referee", -1)]
         )
     
     async def update_player_stats(
@@ -300,15 +300,15 @@ class RapidPinRankingRepository(BaseRepository):
     ) -> bool:
         """Update statistics de jugador after de un partido"""
         inc_data = {
-            "puntos_totales": points,
-            "puntos_como_jugador": points,
-            "partidos_jugados": 1
+            "total_points": points,
+            "points_as_player": points,
+            "matches_played": 1
         }
         
         if is_winner:
-            inc_data["partidos_ganados"] = 1
+            inc_data["matches_won"] = 1
         else:
-            inc_data["partidos_perdidos"] = 1
+            inc_data["matches_lost"] = 1
         
         result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
@@ -332,9 +332,9 @@ class RapidPinRankingRepository(BaseRepository):
             {self.ID_FIELD: ranking_id},
             {
                 "$inc": {
-                    "puntos_totales": points,
-                    "puntos_como_arbitro": points,
-                    "partidos_arbitrados": 1
+                    "total_points": points,
+                    "points_as_referee": points,
+                    "matches_refereed": 1
                 },
                 "$set": {
                     "last_activity": datetime.now(timezone.utc).isoformat(),
@@ -353,7 +353,7 @@ class RapidPinRankingRepository(BaseRepository):
         for idx, ranking in enumerate(rankings, start=1):
             await self._collection.update_one(
                 {self.ID_FIELD: ranking["ranking_id"]},
-                {"$set": {"posicion": idx}}
+                {"$set": {"position": idx}}
             )
         
         return True
@@ -362,12 +362,12 @@ class RapidPinRankingRepository(BaseRepository):
         """Get conteo de participantes uniques"""
         players = await self._collection.count_documents({
             "season_id": season_id,
-            "partidos_jugados": {"$gt": 0}
+            "matches_played": {"$gt": 0}
         })
         
         referees = await self._collection.count_documents({
             "season_id": season_id,
-            "partidos_arbitrados": {"$gt": 0}
+            "matches_refereed": {"$gt": 0}
         })
         
         return {"players": players, "referees": referees}

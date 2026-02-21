@@ -94,12 +94,12 @@ async def get_analytics_dashboard():
     # Enrich with player info
     top_active_players = []
     for entry in top_players_raw:
-        player = await db.pingpong_players.find_one({"jugador_id": entry["_id"]}, {"_id": 0})
+        player = await db.pingpong_players.find_one({"player_id": entry["_id"]}, {"_id": 0})
         if player:
             top_active_players.append({
-                "jugador_id": entry["_id"],
+                "player_id": entry["_id"],
                 "name": player.get("name"),
-                "apodo": player.get("apodo"),
+                "nickname": player.get("nickname"),
                 "matches_count": entry["matches_count"]
             })
     
@@ -111,11 +111,11 @@ async def get_analytics_dashboard():
     
     recent_achievements = []
     for badge in recent_badges:
-        player = await db.pingpong_players.find_one({"jugador_id": badge.get("jugador_id")}, {"_id": 0})
+        player = await db.pingpong_players.find_one({"player_id": badge.get("player_id")}, {"_id": 0})
         recent_achievements.append({
             "name": badge.get("name"),
             "icon": badge.get("icon"),
-            "player_name": player.get("apodo") or player.get("name") if player else "Unknown"
+            "player_name": player.get("nickname") or player.get("name") if player else "Unknown"
         })
     
     # Challenge leaderboard
@@ -125,10 +125,10 @@ async def get_analytics_dashboard():
     ).sort("total_points", -1).limit(10).to_list(length=10)
     
     for entry in challenge_lb:
-        player = await db.pingpong_players.find_one({"jugador_id": entry.get("jugador_id")}, {"_id": 0})
-        entry["jugador_info"] = {
+        player = await db.pingpong_players.find_one({"player_id": entry.get("player_id")}, {"_id": 0})
+        entry["player_info"] = {
             "name": player.get("name") if player else "?",
-            "apodo": player.get("apodo") if player else None
+            "nickname": player.get("nickname") if player else None
         }
     
     # Popular challenges
@@ -175,7 +175,7 @@ async def get_analytics_dashboard():
     # New players this week
     new_players = await db.pingpong_players.find(
         {"created_at": {"$gte": week_ago.isoformat()}},
-        {"_id": 0, "name": 1, "apodo": 1}
+        {"_id": 0, "name": 1, "nickname": 1}
     ).limit(5).to_list(length=5)
     
     # Activity ranking
@@ -184,15 +184,15 @@ async def get_analytics_dashboard():
     for player in all_players:
         matches_week = await db.pinpanclub_rapidpin_matches.count_documents({
             "$or": [
-                {"player_a_id": player.get("jugador_id")},
-                {"player_b_id": player.get("jugador_id")}
+                {"player_a_id": player.get("player_id")},
+                {"player_b_id": player.get("player_id")}
             ],
             "created_at": {"$gte": week_ago.isoformat()}
         })
         activity_ranking.append({
-            "jugador_id": player.get("jugador_id"),
+            "player_id": player.get("player_id"),
             "name": player.get("name"),
-            "apodo": player.get("apodo"),
+            "nickname": player.get("nickname"),
             "elo_rating": player.get("elo_rating", 1000),
             "matches_this_week": matches_week
         })
@@ -254,10 +254,10 @@ async def get_analytics_summary():
     
     top_players = []
     for entry in top_raw:
-        player = await db.pingpong_players.find_one({"jugador_id": entry["_id"]}, {"_id": 0})
+        player = await db.pingpong_players.find_one({"player_id": entry["_id"]}, {"_id": 0})
         if player:
             top_players.append({
-                "name": player.get("apodo") or player.get("name"),
+                "name": player.get("nickname") or player.get("name"),
                 "matches": entry["matches_count"]
             })
     

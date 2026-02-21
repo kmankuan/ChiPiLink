@@ -234,7 +234,7 @@ class MatchService(BaseService):
             {
                 "partido_id": partido_id,
                 "winner_id": winner_id,
-                "fecha_fin": fecha_fin,
+                "end_date": fecha_fin,
                 "player_a_id": match.player_a_id,
                 "player_b_id": match.player_b_id
             },

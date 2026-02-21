@@ -53,7 +53,7 @@ class AchievementsService(BaseService):
     async def get_player_achievements(self, jugador_id: str) -> List[Dict]:
         """Get logros de un jugador"""
         cursor = db.pinpanclub_player_achievements.find(
-            {"jugador_id": jugador_id},
+            {"player_id": jugador_id},
             {"_id": 0}
         )
         return await cursor.to_list(length=100)
@@ -92,13 +92,13 @@ class AchievementsService(BaseService):
         """Get statistics de retos of the player"""
         # Challenges completados total
         completed_total = await db.pinpanclub_challenges_progress.count_documents({
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "status": "completed"
         })
         
         # Points totales
         leaderboard_entry = await db.pinpanclub_challenges_leaderboard.find_one(
-            {"jugador_id": jugador_id},
+            {"player_id": jugador_id},
             {"_id": 0}
         )
         total_points = leaderboard_entry.get("total_points", 0) if leaderboard_entry else 0
@@ -108,7 +108,7 @@ class AchievementsService(BaseService):
         
         # Challenges por dificultad
         pipeline = [
-            {"$match": {"jugador_id": jugador_id, "status": "completed"}},
+            {"$match": {"player_id": jugador_id, "status": "completed"}},
             {"$lookup": {
                 "from": "pinpanclub_challenges_definitions",
                 "localField": "challenge_id",
@@ -154,7 +154,7 @@ class AchievementsService(BaseService):
         
         # Count challenges completed this week
         completed = await db.pinpanclub_challenges_progress.count_documents({
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "challenge_id": {"$in": week["challenges"]},
             "status": "completed"
         })
@@ -191,13 +191,13 @@ class AchievementsService(BaseService):
         
         # Get player info
         player = await db.pingpong_players.find_one(
-            {"jugador_id": jugador_id},
-            {"_id": 0, "name": 1, "apodo": 1}
+            {"player_id": jugador_id},
+            {"_id": 0, "name": 1, "nickname": 1}
         )
         
         player_achievement = {
             "player_achievement_id": f"pa_{jugador_id[:6]}_{achievement['achievement_id']}",
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "achievement_id": achievement["achievement_id"],
             "achievement_info": {
                 "name": achievement["name"],
@@ -206,9 +206,9 @@ class AchievementsService(BaseService):
                 "rarity": achievement["rarity"],
                 "points_reward": achievement.get("points_reward", 0)
             },
-            "jugador_info": {
+            "player_info": {
                 "name": player.get("name") if player else None,
-                "apodo": player.get("apodo") if player else None
+                "nickname": player.get("nickname") if player else None
             },
             "earned_at": now,
             "level": 1,
@@ -220,7 +220,7 @@ class AchievementsService(BaseService):
         # Update leaderboard points if there is reward
         if achievement.get("points_reward", 0) > 0:
             await db.pinpanclub_challenges_leaderboard.update_one(
-                {"jugador_id": jugador_id},
+                {"player_id": jugador_id},
                 {"$inc": {"total_points": achievement["points_reward"]}},
                 upsert=True
             )

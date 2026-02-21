@@ -50,7 +50,7 @@ class ChallengeDefinitionRepository(BaseRepository):
 
 
 class PlayerChallengeRepository(BaseRepository):
-    """Repository for progreso de jugadores en retos"""
+    """Repository for progreso de players en retos"""
     
     COLLECTION_NAME = "pinpanclub_player_challenges"
     ID_FIELD = "progress_id"
@@ -75,7 +75,7 @@ class PlayerChallengeRepository(BaseRepository):
         challenge_id: str
     ) -> Optional[Dict]:
         return await self.find_one({
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "challenge_id": challenge_id,
             "status": {"$in": ["in_progress", "available"]}
         })
@@ -107,7 +107,7 @@ class PlayerChallengeRepository(BaseRepository):
         status: str = None,
         limit: int = 20
     ) -> List[Dict]:
-        query = {"jugador_id": jugador_id}
+        query = {"player_id": jugador_id}
         if status:
             query["status"] = status
         return await self.find_many(
@@ -120,7 +120,7 @@ class PlayerChallengeRepository(BaseRepository):
         """Get retos activos of the player"""
         return await self.find_many(
             query={
-                "jugador_id": jugador_id,
+                "player_id": jugador_id,
                 "status": "in_progress"
             },
             sort=[("expires_at", 1)]
@@ -128,14 +128,14 @@ class PlayerChallengeRepository(BaseRepository):
     
     async def get_completed_count(self, jugador_id: str) -> int:
         return await self._collection.count_documents({
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "status": "completed"
         })
     
     async def get_total_points(self, jugador_id: str) -> int:
         """Get total de puntos ganados por retos"""
         pipeline = [
-            {"$match": {"jugador_id": jugador_id, "status": "completed"}},
+            {"$match": {"player_id": jugador_id, "status": "completed"}},
             {"$lookup": {
                 "from": "pinpanclub_challenge_definitions",
                 "localField": "challenge_id",
@@ -227,14 +227,14 @@ class ChallengeLeaderboardRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def get_or_create(self, jugador_id: str, jugador_info: Dict = None) -> Dict:
-        existing = await self.find_one({"jugador_id": jugador_id})
+        existing = await self.find_one({"player_id": jugador_id})
         if existing:
             return existing
         
         data = {
             "entry_id": f"lb_{uuid.uuid4().hex[:8]}",
-            "jugador_id": jugador_id,
-            "jugador_info": jugador_info,
+            "player_id": jugador_id,
+            "player_info": jugador_info,
             "challenges_completed": 0,
             "total_points": 0,
             "current_streak": 0,
@@ -250,7 +250,7 @@ class ChallengeLeaderboardRepository(BaseRepository):
         points: int = 0
     ) -> bool:
         result = await self._collection.update_one(
-            {"jugador_id": jugador_id},
+            {"player_id": jugador_id},
             {
                 "$inc": {
                     "challenges_completed": challenges_completed,

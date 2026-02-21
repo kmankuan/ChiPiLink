@@ -206,7 +206,7 @@ class ArenaService(BaseService):
                 ranking_entries = await rp_service.ranking_repo.get_season_ranking(season_id)
                 rank_map = {}
                 for entry in ranking_entries:
-                    rank_map[entry.get("jugador_id", "")] = entry.get("posicion", 999)
+                    rank_map[entry.get("player_id", "")] = entry.get("position", 999)
                 for p in participants:
                     p["seed"] = rank_map.get(p["player_id"], 999)
                 participants.sort(key=lambda x: x.get("seed", 999))

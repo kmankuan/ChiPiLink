@@ -132,7 +132,7 @@ async def get_player_prizes(
 ):
     """Get premios de a player"""
     prizes = await prize_service.get_player_prizes(jugador_id, status)
-    return {"jugador_id": jugador_id, "prizes": prizes, "total": len(prizes)}
+    return {"player_id": jugador_id, "prizes": prizes, "total": len(prizes)}
 
 
 @router.get("/season/{season_id}")

@@ -56,8 +56,8 @@ class SocialService(BaseService):
         follow_data = {
             "follower_id": follower_id,
             "following_id": following_id,
-            "follower_info": {"name": follower.get("name"), "apodo": follower.get("apodo")} if follower else None,
-            "following_info": {"name": following.get("name"), "apodo": following.get("apodo")} if following else None
+            "follower_info": {"name": follower.get("name"), "nickname": follower.get("nickname")} if follower else None,
+            "following_info": {"name": following.get("name"), "nickname": following.get("nickname")} if following else None
         }
         
         result = await self.follow_repo.create(follow_data)
@@ -76,7 +76,7 @@ class SocialService(BaseService):
         await self.create_activity(ActivityFeedCreate(
             jugador_id=follower_id,
             activity_type=ActivityType.NEW_FOLLOWER,
-            data={"following_id": following_id, "following_name": following.get("apodo") or following.get("name")},
+            data={"following_id": following_id, "following_name": following.get("nickname") or following.get("name")},
             description=f"Ahora sigue a {following.get('apodo') or following.get('nombre')}"
         ))
         
@@ -117,7 +117,7 @@ class SocialService(BaseService):
         comment_data = data.model_dump()
         comment_data["author_info"] = {
             "name": author.get("name"),
-            "apodo": author.get("apodo")
+            "nickname": author.get("nickname")
         } if author else None
         
         result = await self.comment_repo.create(comment_data)
@@ -212,12 +212,12 @@ class SocialService(BaseService):
     
     async def create_activity(self, data: ActivityFeedCreate) -> ActivityFeedItem:
         """Create actividad en el feed"""
-        player = await self.player_repo.get_by_id(data.jugador_id)
+        player = await self.player_repo.get_by_id(data.player_id)
         
         activity_data = data.model_dump()
-        activity_data["jugador_info"] = {
+        activity_data["player_info"] = {
             "name": player.get("name"),
-            "apodo": player.get("apodo")
+            "nickname": player.get("nickname")
         } if player else None
         
         result = await self.feed_repo.create(activity_data)
@@ -229,7 +229,7 @@ class SocialService(BaseService):
         return [ActivityFeedItem(**r) for r in results]
     
     async def get_following_feed(self, jugador_id: str, limit: int = 50) -> List[ActivityFeedItem]:
-        """Get feed de jugadores seguidos"""
+        """Get feed de players seguidos"""
         # Get IDs of followed players
         following = await self.follow_repo.get_following(jugador_id, limit=100)
         following_ids = [f["following_id"] for f in following]

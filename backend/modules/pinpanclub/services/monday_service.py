@@ -53,7 +53,7 @@ class MondayService(BaseService):
         async def on_player_created(event: Event):
             config = await self.get_config()
             if config.auto_sync_players and config.players_board_id:
-                await self.sync_player(event.payload["jugador_id"])
+                await self.sync_player(event.payload["player_id"])
     
     async def get_config(self) -> MondayConfig:
         """Get configuration de Monday.com"""
@@ -119,7 +119,7 @@ class MondayService(BaseService):
         return result.get("data", {}).get("boards", [])
     
     async def get_board_items(self, board_id: str) -> List[Dict]:
-        """Get items de un board specific (jugadores)"""
+        """Get items de un board specific (players)"""
         query = f'''
         query {{
             boards(ids: [{board_id}]) {{
@@ -170,7 +170,7 @@ class MondayService(BaseService):
         return players
     
     async def get_players_from_monday(self) -> List[Dict]:
-        """Get jugadores desde el board configurado de Monday.com"""
+        """Get players desde el board configurado de Monday.com"""
         config = await self.get_config()
         if not config.players_board_id:
             return []
@@ -242,7 +242,7 @@ class MondayService(BaseService):
             return player["monday_item_id"]
         
         full_name = f"{player.get('nombre', '')} {player.get('apellido', '')}"
-        if player.get("apodo"):
+        if player.get("nickname"):
             full_name += f" ({player['apodo']})"
         
         column_values = {
@@ -278,8 +278,8 @@ class MondayService(BaseService):
         player_a = match.get("player_a_info", {})
         player_b = match.get("player_b_info", {})
         
-        nombre_a = player_a.get("apodo") or player_a.get("name", "Jugador A")
-        nombre_b = player_b.get("apodo") or player_b.get("name", "Jugador B")
+        nombre_a = player_a.get("nickname") or player_a.get("name", "Jugador A")
+        nombre_b = player_b.get("nickname") or player_b.get("name", "Jugador B")
         
         item_name = f"{nombre_a} vs {nombre_b}"
         
@@ -295,7 +295,7 @@ class MondayService(BaseService):
             "text": nombre_a,
             "text4": nombre_b,
             "text0": "",
-            "status": {"label": estado_map.get(match.get("estado"), "Pendiente")},
+            "status": {"label": estado_map.get(match.get("status"), "Pendiente")},
             "text6": match.get("mesa", ""),
             "text7": match.get("ronda", "")
         }
@@ -368,13 +368,13 @@ class MondayService(BaseService):
         
         for player in players:
             try:
-                result = await self.sync_player(player["jugador_id"])
+                result = await self.sync_player(player["player_id"])
                 if result:
                     synced += 1
                 else:
                     failed += 1
             except Exception as e:
-                self.log_error(f"Error syncing player {player['jugador_id']}", e)
+                self.log_error(f"Error syncing player {player['player_id']}", e)
                 failed += 1
         
         return {"synced": synced, "failed": failed}

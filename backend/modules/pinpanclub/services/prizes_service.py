@@ -124,7 +124,7 @@ class PrizeService(BaseService):
         
         award_data = {
             "prize_id": prize_id,
-            "jugador_id": jugador_id,
+            "player_id": jugador_id,
             "season_id": season_id,
             "challenge_id": challenge_id,
             "prize_info": {
@@ -134,9 +134,9 @@ class PrizeService(BaseService):
                 "icon": prize.get("icon"),
                 "value": prize.get("value")
             },
-            "jugador_info": {
+            "player_info": {
                 "name": player.get("name"),
-                "apodo": player.get("apodo")
+                "nickname": player.get("nickname")
             } if player else None,
             "awarded_for": awarded_for,
             "position": position
@@ -207,7 +207,7 @@ class PrizeService(BaseService):
                     try:
                         award = await self.award_prize(
                             prize_id=prize.prize_id,
-                            jugador_id=ranking.get("jugador_id"),
+                            jugador_id=ranking.get("player_id"),
                             awarded_for=f"Position #{idx} en temporada",
                             position=idx,
                             season_id=season_id
@@ -238,15 +238,15 @@ class PrizeService(BaseService):
             if cond_type == "position":
                 actual_value = position
             elif cond_type == "matches_played":
-                actual_value = ranking.get("partidos_jugados", 0)
+                actual_value = ranking.get("matches_played", 0)
             elif cond_type == "matches_won":
-                actual_value = ranking.get("partidos_ganados", 0)
+                actual_value = ranking.get("matches_won", 0)
             elif cond_type == "matches_refereed":
-                actual_value = ranking.get("partidos_arbitrados", 0)
+                actual_value = ranking.get("matches_refereed", 0)
             elif cond_type == "streak":
                 actual_value = ranking.get("best_streak", 0)
             elif cond_type == "participation":
-                actual_value = 1 if ranking.get("partidos_jugados", 0) > 0 else 0
+                actual_value = 1 if ranking.get("matches_played", 0) > 0 else 0
             
             if actual_value is None:
                 continue

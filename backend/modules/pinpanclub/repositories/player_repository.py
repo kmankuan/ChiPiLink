@@ -1,6 +1,6 @@
 """
 PinpanClub - Player Repository
-Acceso a datos de jugadores
+Acceso a datos de players
 """
 from typing import List, Optional, Dict
 from core.base import BaseRepository
@@ -11,23 +11,23 @@ import uuid
 
 class PlayerRepository(BaseRepository):
     """
-    Repository para jugadores de PinpanClub.
-    Maneja todas las operations de base de datos para jugadores.
+    Repository para players de PinpanClub.
+    Maneja todas las operations de base de datos para players.
     """
     
     COLLECTION_NAME = PinpanClubCollections.PLAYERS
-    ID_FIELD = "jugador_id"
+    ID_FIELD = "player_id"
     
     def __init__(self):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, player_data: Dict) -> Dict:
         """Create new player"""
-        player_data["jugador_id"] = str(uuid.uuid4())
+        player_data["player_id"] = str(uuid.uuid4())
         player_data["elo_rating"] = player_data.get("elo_rating", 1000)
-        player_data["partidos_jugados"] = 0
-        player_data["partidos_ganados"] = 0
-        player_data["partidos_perdidos"] = 0
+        player_data["matches_played"] = 0
+        player_data["matches_won"] = 0
+        player_data["matches_lost"] = 0
         player_data["active"] = True
         
         return await self.insert_one(player_data)
@@ -46,9 +46,9 @@ class PlayerRepository(BaseRepository):
         )
     
     async def get_rankings(self, limit: int = 50) -> List[Dict]:
-        """Get ranking de jugadores por ELO"""
+        """Get ranking de players por ELO"""
         return await self.find_many(
-            query={"active": True, "partidos_jugados": {"$gt": 0}},
+            query={"active": True, "matches_played": {"$gt": 0}},
             limit=limit,
             sort=[("elo_rating", -1)]
         )
@@ -66,9 +66,9 @@ class PlayerRepository(BaseRepository):
         """Update statistics after de un partido"""
         update = {
             "$inc": {
-                "partidos_jugados": 1,
-                "partidos_ganados": 1 if won else 0,
-                "partidos_perdidos": 0 if won else 1,
+                "matches_played": 1,
+                "matches_won": 1 if won else 0,
+                "matches_lost": 0 if won else 1,
                 "elo_rating": elo_change
             }
         }
@@ -80,12 +80,12 @@ class PlayerRepository(BaseRepository):
         return result.modified_count > 0
     
     async def search(self, query: str, limit: int = 20) -> List[Dict]:
-        """Search jugadores by name o apodo"""
+        """Search players by name o apodo"""
         search_filter = {
             "$or": [
                 {"name": {"$regex": query, "$options": "i"}},
                 {"apellido": {"$regex": query, "$options": "i"}},
-                {"apodo": {"$regex": query, "$options": "i"}}
+                {"nickname": {"$regex": query, "$options": "i"}}
             ],
             "active": True
         }

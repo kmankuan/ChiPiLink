@@ -1,6 +1,6 @@
 """
 PinpanClub - Player Service
-Business logic para jugadores
+Business logic para players
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,8 +13,8 @@ from ..models import PlayerCreate, PlayerUpdate, Player
 
 class PlayerService(BaseService):
     """
-    Service for management of jugadores.
-    Contiene toda la business logic relacionada con jugadores.
+    Service for management of players.
+    Contiene toda la business logic relacionada con players.
     """
     
     MODULE_NAME = "pinpanclub"
@@ -35,13 +35,13 @@ class PlayerService(BaseService):
         await self.emit_event(
             PinpanClubEvents.PLAYER_CREATED,
             {
-                "jugador_id": result["jugador_id"],
+                "player_id": result["player_id"],
                 "name": result["name"],
                 "elo_rating": result["elo_rating"]
             }
         )
         
-        self.log_info(f"Player created: {result['jugador_id']}")
+        self.log_info(f"Player created: {result['player_id']}")
         return Player(**result)
     
     async def get_player(self, jugador_id: str) -> Optional[Player]:
@@ -59,7 +59,7 @@ class PlayerService(BaseService):
         return [Player(**r) for r in results]
     
     async def get_rankings(self, limit: int = 50) -> List[Player]:
-        """Get ranking de jugadores"""
+        """Get ranking de players"""
         results = await self.repository.get_rankings(limit)
         return [Player(**r) for r in results]
     
@@ -82,7 +82,7 @@ class PlayerService(BaseService):
         if success:
             await self.emit_event(
                 PinpanClubEvents.PLAYER_UPDATED,
-                {"jugador_id": jugador_id, "updated_fields": list(update_data.keys())}
+                {"player_id": jugador_id, "updated_fields": list(update_data.keys())}
             )
             return await self.get_player(jugador_id)
         
@@ -115,7 +115,7 @@ class PlayerService(BaseService):
         await self.emit_event(
             PinpanClubEvents.PLAYER_ELO_CHANGED,
             {
-                "jugador_id": jugador_id,
+                "player_id": jugador_id,
                 "old_elo": player.elo_rating,
                 "new_elo": player.elo_rating + elo_change,
                 "change": elo_change,
@@ -127,7 +127,7 @@ class PlayerService(BaseService):
         return await self.get_player(jugador_id)
     
     async def search_players(self, query: str) -> List[Player]:
-        """Search jugadores"""
+        """Search players"""
         results = await self.repository.search(query)
         return [Player(**r) for r in results]
     
