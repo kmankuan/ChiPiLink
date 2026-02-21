@@ -71,6 +71,13 @@ See CHANGELOG.md for full history of all phases.
 - **Feature - Admin Impersonation ("View as User")**: Admin can click the Eye icon next to any non-admin user in the Users management tab to generate a 30-minute impersonation token. The admin is redirected to the user-facing view with a visible amber banner showing "Viewing as [User Name]" with an Exit button. All impersonation events are logged in the `impersonation_logs` MongoDB collection for audit. Key files: `core/auth.py` (token creation), `auth/routes/users.py` (endpoint), `AuthContext.js` (state management), `ImpersonationBanner.jsx` (UI), `RegisteredUsersTab.jsx` (Eye button).
 - Testing: 100% pass rate (8/8 backend + all frontend elements verified)
 
+### Phase 7d - Cart Orders Link + Chat Fixes + Topic Presets Admin (Complete - Feb 21, 2026)
+- **Cart Drawer "My Orders" link**: Added "Ver mis pedidos" button in empty cart state and "Pedidos" button in cart footer when items present. Both navigate to `/pedidos` page.
+- **CRM Chat & OrderChat mobile fix**: Both modals now have `mb-16 sm:mb-0` margin to sit above the bottom navigation bar on mobile. Submit buttons are now visible.
+- **Topic Presets Admin**: CRM topic quick-select presets (the chips shown in "New Topic" form) are now configurable by admin. Backend: `crm_topic_presets` MongoDB collection, `GET/PUT /api/store/crm-chat/admin/topic-presets` endpoints. Frontend: Admin can add/hide/remove/save presets in the Messages config panel. CrmChat fetches presets from API instead of using hardcoded values.
+- **Support vs Messages clarification**: "Support" opens CRM multi-topic chat (general support via Monday.com board 5931665026). "Messages" opens OrderChat (per-order conversation thread via Monday.com Updates on the specific order item).
+- Testing: 100% pass rate (10/10 backend + all frontend verified)
+
 ## Upcoming Tasks
 None - all P1 and P2 tasks from the backlog are now complete.
 
