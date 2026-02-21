@@ -220,13 +220,24 @@ export default function CartDrawer() {
                 Proceder al Pago
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={clearCart}
-                className="w-full"
-              >
-                Vaciar Carrito
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={clearCart}
+                  className="flex-1"
+                >
+                  Vaciar Carrito
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => { closeCart(); navigate('/pedidos'); }}
+                  className="flex-1 gap-1.5"
+                  data-testid="cart-my-orders-footer-btn"
+                >
+                  <ClipboardList className="h-3.5 w-3.5" />
+                  Pedidos
+                </Button>
+              </div>
             </div>
           </div>
         )}
