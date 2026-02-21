@@ -89,6 +89,7 @@ const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModu
 const SysbookInventoryTab = lazy(() => import('@/modules/sysbook/SysbookInventoryTab'));
 const SysbookStockMovementsTab = lazy(() => import('@/modules/sysbook/SysbookStockMovementsTab'));
 const SysbookAnalyticsTab = lazy(() => import('@/modules/sysbook/SysbookAnalyticsTab'));
+const SysbookAlertsTab = lazy(() => import('@/modules/sysbook/SysbookAlertsTab'));
 const StudentsSchoolsModule = lazy(() => import('@/modules/school-textbooks/StudentsSchoolsModule'));
 const PreSaleImportTab = lazy(() => import('@/modules/unatienda/tabs/PreSaleImportTab'));
 const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/MondayTextbookSyncModule'));
