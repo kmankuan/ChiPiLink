@@ -90,8 +90,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `GET /api/pinpanclub/referee/hall-of-fame` — Global leaderboard (mode filter)
 - `POST /api/pinpanclub/referee/hall-of-fame/refresh` — Rebuild (admin)
 
+### Bugfix - Textbook Catalog Incorrect Statistics (Feb 21, 2026)
+- **Root Cause**: `PrivateCatalogTab.jsx` fetched both PCA and public products, then merged them. When duplicates were found (same book_id), instead of skipping them, the code renamed their IDs and added them again — inflating the count. Stats were also calculated from the full merged array instead of the filtered view per catalog tab.
+- **Fix**: (1) Changed merge logic to skip duplicate book_ids. (2) Added `statsProducts` useMemo that filters by catalog type. (3) Updated BoardHeader stats to use `statsProducts`.
+- **Testing**: 100% pass rate (backend and frontend)
+
 ## Future/Backlog Tasks
-- **(P3)** Tournament statistics & analytics dashboard
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
 - **(P5)** Open Graph meta tags for social sharing previews
