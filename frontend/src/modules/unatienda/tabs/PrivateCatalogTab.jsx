@@ -652,14 +652,13 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         }));
       } catch { /* public store may not have products */ }
 
-      // Merge — avoid duplicates by book_id
+      // Merge — skip duplicates by book_id (PCA takes priority)
       const seen = new Set();
       const all = [];
       for (const p of pcaProducts) { seen.add(p.book_id); all.push(p); }
       for (const p of pubProducts) {
-        let id = p.book_id;
-        if (seen.has(id)) { id = `${id}_pub_${seen.size}`; p.book_id = id; }
-        seen.add(id);
+        if (seen.has(p.book_id)) continue; // Skip duplicates already in PCA
+        seen.add(p.book_id);
         all.push(p);
       }
 
