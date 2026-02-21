@@ -180,6 +180,9 @@ function CrmConfigPanel({ token }) {
   const [saving, setSaving] = useState(false);
   const [webhookRegistering, setWebhookRegistering] = useState(false);
   const [webhookId, setWebhookId] = useState('');
+  const [presets, setPresets] = useState([]);
+  const [newPreset, setNewPreset] = useState('');
+  const [savingPresets, setSavingPresets] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -194,13 +197,20 @@ function CrmConfigPanel({ token }) {
           setEmailCol(data.email_column_id || '');
           setWebhookId(data.webhook_id || '');
         }
-        // Try to load columns if board is configured
         const colRes = await fetch(`${API}/api/store/crm-chat/admin/config/board-columns`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (colRes.ok) {
           const colData = await colRes.json();
           setColumns(colData.columns || []);
+        }
+        // Load topic presets
+        const presetsRes = await fetch(`${API}/api/store/crm-chat/admin/topic-presets`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (presetsRes.ok) {
+          const presetsData = await presetsRes.json();
+          setPresets(presetsData.presets || []);
         }
       } catch (e) {
         console.error('Error loading config:', e);
