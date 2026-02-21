@@ -25,6 +25,8 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 | **PinPan Live** | `/pinpanclub/live/:matchId` | Watch — follow a match in real-time via WebSocket |
 | **PinPan TV** | `/tv` | Big screen display — live scores, brackets, rankings |
 | **Public Tournament** | `/arena/:tournamentId` | Shareable public tournament view (no auth) |
+| **Hall of Fame** | `/pinpanclub/hall-of-fame` | All-time global player leaderboard |
+| **Referee Settings** | `/pinpanclub/referee-settings` | Admin referee config per game mode |
 
 ## What's Been Implemented
 
@@ -35,45 +37,55 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Integration**: Seeding from League (SuperPin) rankings or RapidPin seasons
 
 ### Phase 8b - Naming Unification & Feature Merge (Feb 21, 2026)
-- **Renamed SuperPin → PinPan League** across all user-facing labels
+- **Renamed SuperPin -> PinPan League** across all user-facing labels
 - **Merged SuperPin Tournament into Arena**: League "Create Playoff" creates Arena tournaments
-- **Migrated PingPongSpectator → PinPan Live**: Polling → WebSocket with fallback
+- **Migrated PingPongSpectator -> PinPan Live**: Polling -> WebSocket with fallback
 
 ### Phase 8c - Enhancement & Real-time Features (Feb 21, 2026)
-- **Public Shareable Tournament Page** (`/arena/:tournamentId`):
-  - No-auth-required view with purple gradient hero header
-  - WhatsApp share button, Copy Link button, native Share API support
-  - Auto-refresh via polling + WebSocket connection for live updates
-  - Shows tournament bracket, participants, standings, champion banner
-- **WebSocket Broadcast for Arena**:
-  - New endpoint: `/api/pinpanclub/ws/arena/{tournament_id}`
-  - Tournament-specific connection tracking in ConnectionManager
-  - `broadcast_arena_update()` called after every match result submission
-  - Removes MongoDB `_id` before JSON serialization
-- **Arena Tournament Mode in PinPan TV**:
-  - 4th display mode ("Tournament") added alongside Partido/Multi/Dashboard
-  - Dark-themed bracket visualization, live match highlight, standings
-  - Auto-fetches active tournament or accepts `?tournament=ID` param
-  - Receives arena_update WebSocket messages for real-time refresh
-- **Tournament Push Notifications** (OneSignal):
-  - Registration opened: notifies participants
-  - Brackets generated / tournament started: notifies all participants
-  - Tournament completed: notifies with champion name
-  - Fire-and-forget pattern (won't fail if OneSignal unconfigured)
-- **Share from ArenaDetail**: Share/Copy buttons in tournament detail header
+- Public Shareable Tournament Page, WebSocket Broadcast for Arena
+- Arena Tournament Mode in PinPan TV, Push Notifications (OneSignal)
+- Share from ArenaDetail
 
-## Key API Endpoints (PinPan Arena)
-- `GET /api/pinpanclub/arena/tournaments` — List tournaments
-- `POST /api/pinpanclub/arena/tournaments` — Create tournament (admin/mod)
-- `GET /api/pinpanclub/arena/tournaments/{id}` — Get tournament details (public)
-- `PUT /api/pinpanclub/arena/tournaments/{id}` — Update tournament
-- `DELETE /api/pinpanclub/arena/tournaments/{id}` — Delete tournament (admin)
-- `POST .../open-registration` | `close-registration` | `register` | `withdraw`
-- `POST .../apply-seeding` | `generate-brackets` | `generate-knockout`
-- `POST .../matches/{match_id}/result` — Submit result (auto-advances + broadcasts)
-- `POST .../rapidpin-match` — Submit RapidPin spontaneous match
+### Phase 9 - Unified Referee System & Hall of Fame (Feb 21, 2026)
+- **Unified Referee System:**
+  - Global `referee_settings` with per-game-type config (Arena, League, RapidPin, Casual)
+  - Admin can toggle referee requirement, set points awarded, enable/disable self-ref per game type
+  - Referee profiles with match counts, points, streaks, avg ratings, and badges
+  - Badge system: First Whistle, Regular Ref, Veteran Ref, Iron Whistle, Five Star, Week Warrior, All-Rounder
+  - Post-match referee rating (1-5 stars) by players
+  - 10 new API endpoints under `/api/pinpanclub/referee/`
+- **All-Time "Hall of Fame" Leaderboard:**
+  - Aggregates player stats across Arena, League, RapidPin, and Referee contributions
+  - Combined total points, match wins, tournament titles
+  - Filterable by mode: All, Arena, League, RapidPin, Referees
+  - Admin "Rebuild" button to refresh aggregation from all data sources
+- **Frontend:**
+  - HallOfFame.jsx page with amber/gold hero header, 5 filter tabs
+  - RefereeSettings.jsx admin page with toggle switches per game type
+  - Navigation: "Hall of Fame" button in PinPanClub dashboard header
+  - Navigation: "Referee Settings" in admin Settings dropdown
+
+## Key API Endpoints
+
+### PinPan Arena
+- `GET/POST /api/pinpanclub/arena/tournaments` — List/Create
+- `GET/PUT/DELETE /api/pinpanclub/arena/tournaments/{id}` — CRUD
+- `POST .../open-registration | close-registration | register | withdraw`
+- `POST .../apply-seeding | generate-brackets | generate-knockout`
+- `POST .../matches/{match_id}/result` — Submit result
 - `POST .../complete` — Finalize tournament
-- `WS /api/pinpanclub/ws/arena/{tournament_id}` — WebSocket for live updates
+- `WS /api/pinpanclub/ws/arena/{tournament_id}` — Live updates
+
+### Referee & Hall of Fame
+- `GET /api/pinpanclub/referee/settings` — Get global referee config
+- `PUT /api/pinpanclub/referee/settings/{game_type}` — Update config (admin)
+- `GET /api/pinpanclub/referee/profiles` — Referee leaderboard
+- `GET /api/pinpanclub/referee/profiles/{player_id}` — Referee profile
+- `POST /api/pinpanclub/referee/record-activity` — Record referee match
+- `POST /api/pinpanclub/referee/rate` — Rate a referee
+- `GET /api/pinpanclub/referee/hall-of-fame` — Global leaderboard (mode filter)
+- `GET /api/pinpanclub/referee/hall-of-fame/{player_id}` — Player stats
+- `POST /api/pinpanclub/referee/hall-of-fame/refresh` — Rebuild (admin)
 
 ## Future/Backlog Tasks
 - **(P3)** Tournament statistics & analytics dashboard
@@ -82,10 +94,11 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **(P5)** Open Graph meta tags for social sharing previews
 
 ## Key Files
-- `/app/frontend/src/modules/pinpanclub/pages/arena/` — Arena frontend pages (Hub, Create, Detail, Public)
-- `/app/frontend/src/modules/pinpanclub/pages/PingPongTV.jsx` — TV with Tournament mode
-- `/app/frontend/src/modules/pinpanclub/pages/PingPongSpectator.jsx` — PinPan Live (WebSocket)
+- `/app/backend/modules/pinpanclub/routes/referee.py` — Referee & Hall of Fame API routes
+- `/app/backend/modules/pinpanclub/services/settings_service.py` — Referee & Leaderboard service
+- `/app/backend/modules/pinpanclub/models/settings.py` — Referee & Leaderboard models
+- `/app/frontend/src/modules/pinpanclub/pages/HallOfFame.jsx` — Hall of Fame page
+- `/app/frontend/src/modules/pinpanclub/pages/RefereeSettings.jsx` — Referee Settings admin page
+- `/app/frontend/src/modules/pinpanclub/pages/arena/` — Arena frontend pages
 - `/app/backend/modules/pinpanclub/routes/arena.py` — Arena API routes
-- `/app/backend/modules/pinpanclub/services/arena_service.py` — Arena engine + broadcast + notifications
-- `/app/backend/modules/pinpanclub/routes/websocket.py` — WebSocket (arena endpoint + broadcast)
-- `/app/backend/modules/pinpanclub/models/arena.py` — Arena data models
+- `/app/backend/modules/pinpanclub/services/arena_service.py` — Arena engine
