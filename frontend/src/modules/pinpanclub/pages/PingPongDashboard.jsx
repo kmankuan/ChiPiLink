@@ -261,6 +261,10 @@ export default function PingPongDashboard() {
                         <BarChart3 className="h-4 w-4 mr-2 text-indigo-500" />
                         Analytics Dashboard
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/pinpanclub/referee-settings')}>
+                        <Scale className="h-4 w-4 mr-2 text-purple-500" />
+                        Referee Settings
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
                         <img 
