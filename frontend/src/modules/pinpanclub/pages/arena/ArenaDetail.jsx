@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Trophy, Users, Swords, Zap, Grid3X3, Crown,
   Play, CheckCircle, Clock, UserPlus, UserMinus, Shuffle,
-  ChevronRight, Medal, Award, Loader2
+  ChevronRight, Medal, Award, Loader2, Share2, Copy
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
