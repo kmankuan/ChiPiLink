@@ -25,13 +25,12 @@ const RARITY_LABELS = {
   legendary: 'Legendary'
 };
 
-export default function PlayerBadges({ playerId, playerId, compact = false }) {
+export default function PlayerBadges({ playerId, compact = false }) {
   const { t } = useTranslation();
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Support both new and legacy prop names
-  const playerIdToUse = playerId || playerId;
+
+  const playerIdToUse = playerId;
 
   useEffect(() => {
     if (playerIdToUse) {
