@@ -104,6 +104,18 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Fix**: (1) Changed merge logic to skip duplicate book_ids. (2) Added `statsProducts` useMemo that filters by catalog type. (3) Updated BoardHeader stats to use `statsProducts`.
 - **Testing**: 100% pass rate (backend and frontend)
 
+## Architecture — Sysbook vs Unatienda
+
+| Aspect | Unatienda (Store) | Sysbook (School Textbooks) |
+|--------|-------------------|---------------------------|
+| **Backend Prefix** | `/api/store/` | `/api/sysbook/` |
+| **Product Scope** | ALL products (public + PCA) | PCA only (`is_private_catalog: True`) |
+| **Sidebar Group** | Commerce > Unatienda | Sysbook |
+| **Inventory View** | Unified (PCA + Public tabs) | Textbook-only (All + Archive tabs) |
+| **Stock Movements** | Shared (all catalogs) | PCA-scoped |
+| **Analytics** | — | Stock trends, grade/subject breakdowns |
+| **Students** | — | Students & Schools |
+
 ## Future/Backlog Tasks
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
