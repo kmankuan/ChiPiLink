@@ -23,7 +23,7 @@ VALID_TRANSITIONS = {
     "adjustment": {"requested": "applied"},
 }
 
-CATALOG_TYPE = "pca"
+CATALOG_TYPE = "sysbook"
 
 
 class StockOrderItem(BaseModel):

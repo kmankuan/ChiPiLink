@@ -11,7 +11,7 @@ from core.database import db
 
 router = APIRouter(prefix="/analytics", tags=["Sysbook - Analytics"])
 
-PCA_FILTER = {"is_private_catalog": True}
+SYSBOOK_FILTER = {"is_private_catalog": True}
 
 
 @router.get("/stock-trends")
@@ -26,17 +26,17 @@ async def stock_trends(
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
 
     # Get PCA book_ids for filtering movements
-    pca_ids = [
+    sysbook_ids = [
         p["book_id"]
-        async for p in db.store_products.find(PCA_FILTER, {"book_id": 1, "_id": 0})
+        async for p in db.store_products.find(SYSBOOK_FILTER, {"book_id": 1, "_id": 0})
     ]
 
     pipeline = [
         {"$match": {
             "timestamp": {"$gte": since},
             "$or": [
-                {"catalog_type": "pca"},
-                {"book_id": {"$in": pca_ids}},
+                {"catalog_type": "sysbook"},
+                {"book_id": {"$in": sysbook_ids}},
             ],
         }},
         {"$addFields": {
@@ -64,7 +64,7 @@ async def grade_summary(admin: dict = Depends(get_admin_user)):
     Inventory breakdown by grade — product count, total stock, total value, low/out of stock.
     """
     pipeline = [
-        {"$match": {**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
+        {"$match": {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
         {"$group": {
             "_id": {"$ifNull": ["$grade", "Unassigned"]},
             "product_count": {"$sum": 1},
@@ -96,7 +96,7 @@ async def grade_summary(admin: dict = Depends(get_admin_user)):
 async def subject_summary(admin: dict = Depends(get_admin_user)):
     """Inventory breakdown by subject."""
     pipeline = [
-        {"$match": {**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
+        {"$match": {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
         {"$group": {
             "_id": {"$ifNull": ["$subject", "Unassigned"]},
             "product_count": {"$sum": 1},
@@ -119,12 +119,12 @@ async def subject_summary(admin: dict = Depends(get_admin_user)):
 async def analytics_overview(admin: dict = Depends(get_admin_user)):
     """High-level Sysbook analytics overview combining all metrics."""
     # Totals
-    total = await db.store_products.count_documents({**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]})
-    archived = await db.store_products.count_documents({**PCA_FILTER, "archived": True})
+    total = await db.store_products.count_documents({**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]})
+    archived = await db.store_products.count_documents({**SYSBOOK_FILTER, "archived": True})
 
     # Stock value
     val_pipeline = [
-        {"$match": {**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
+        {"$match": {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
         {"$group": {
             "_id": None,
             "total_stock": {"$sum": {"$ifNull": ["$inventory_quantity", 0]}},
@@ -144,7 +144,7 @@ async def analytics_overview(admin: dict = Depends(get_admin_user)):
 
     # Pending stock orders
     pending_orders = await db.stock_orders.count_documents({
-        "catalog_type": "pca",
+        "catalog_type": "sysbook",
         "status": {"$nin": ["received", "approved", "rejected", "applied"]}
     })
 

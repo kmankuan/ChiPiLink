@@ -1,6 +1,6 @@
 """
 Sysbook — Textbook Inventory Routes
-Dashboard, product list, CRUD, bulk operations — all scoped to is_private_catalog=True.
+Dashboard, product list, CRUD, bulk operations — all scoped to is_private_catalog=True (Sysbook products).
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -13,7 +13,7 @@ from core.database import db
 
 router = APIRouter(prefix="/inventory", tags=["Sysbook - Inventory"])
 
-PCA_FILTER = {"is_private_catalog": True}
+SYSBOOK_FILTER = {"is_private_catalog": True}
 
 
 class StockAdjustment(BaseModel):
@@ -31,7 +31,7 @@ class BatchStockAdjustment(BaseModel):
 async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):
     """Textbook inventory overview — PCA products only."""
     pipeline = [
-        {"$match": {**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
+        {"$match": {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
         {"$group": {
             "_id": None,
             "total_products": {"$sum": 1},
@@ -62,16 +62,16 @@ async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):
 
     recent = await db.inventory_movements.find(
         {"$or": [
-            {"catalog_type": "pca"},
+            {"catalog_type": "sysbook"},
             {"book_id": {"$in": [
-                p["book_id"] async for p in db.store_products.find(PCA_FILTER, {"book_id": 1, "_id": 0})
+                p["book_id"] async for p in db.store_products.find(SYSBOOK_FILTER, {"book_id": 1, "_id": 0})
             ]}}
         ]},
         {"_id": 0}
     ).sort("timestamp", -1).limit(20).to_list(20)
 
     grade_pipeline = [
-        {"$match": {**PCA_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
+        {"$match": {**SYSBOOK_FILTER, "active": True, "$or": [{"archived": {"$exists": False}}, {"archived": False}]}},
         {"$group": {
             "_id": {"$ifNull": ["$grade", "unassigned"]},
             "count": {"$sum": 1},
@@ -101,7 +101,7 @@ async def sysbook_list_products(
     admin: dict = Depends(get_admin_user),
 ):
     """List textbook products with filters."""
-    query = {**PCA_FILTER}
+    query = {**SYSBOOK_FILTER}
     if search:
         query["$or"] = [
             {"name": {"$regex": search, "$options": "i"}},
@@ -155,7 +155,7 @@ async def sysbook_update_product(book_id: str, updates: dict, admin: dict = Depe
     updates["is_private_catalog"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     result = await db.store_products.update_one(
-        {"book_id": book_id, **PCA_FILTER}, {"$set": updates}
+        {"book_id": book_id, **SYSBOOK_FILTER}, {"$set": updates}
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -166,7 +166,7 @@ async def sysbook_update_product(book_id: str, updates: dict, admin: dict = Depe
 @router.post("/products/{book_id}/adjust-stock")
 async def sysbook_adjust_stock(book_id: str, adj: StockAdjustment, admin: dict = Depends(get_admin_user)):
     """Adjust stock for a single textbook product."""
-    product = await db.store_products.find_one({"book_id": book_id, **PCA_FILTER}, {"_id": 0})
+    product = await db.store_products.find_one({"book_id": book_id, **SYSBOOK_FILTER}, {"_id": 0})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -187,7 +187,7 @@ async def sysbook_adjust_stock(book_id: str, adj: StockAdjustment, admin: dict =
         "new_quantity": new_qty,
         "reason": adj.reason,
         "notes": adj.notes,
-        "catalog_type": "pca",
+        "catalog_type": "sysbook",
         "admin_id": admin.get("user_id"),
         "admin_name": admin.get("name", "Admin"),
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -202,7 +202,7 @@ async def sysbook_batch_adjust(batch: BatchStockAdjustment, admin: dict = Depend
     """Batch stock adjustment for textbook products."""
     results = []
     for adj in batch.adjustments:
-        product = await db.store_products.find_one({"book_id": adj.book_id, **PCA_FILTER}, {"_id": 0})
+        product = await db.store_products.find_one({"book_id": adj.book_id, **SYSBOOK_FILTER}, {"_id": 0})
         if not product:
             results.append({"book_id": adj.book_id, "error": "not found"})
             continue
@@ -222,7 +222,7 @@ async def sysbook_batch_adjust(batch: BatchStockAdjustment, admin: dict = Depend
             "new_quantity": new_qty,
             "reason": adj.reason,
             "notes": adj.notes,
-            "catalog_type": "pca",
+            "catalog_type": "sysbook",
             "admin_id": admin.get("user_id"),
             "admin_name": admin.get("name", "Admin"),
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -237,7 +237,7 @@ async def sysbook_batch_adjust(batch: BatchStockAdjustment, admin: dict = Depend
 async def sysbook_archive_product(book_id: str, admin: dict = Depends(get_admin_user)):
     """Archive a textbook product."""
     result = await db.store_products.update_one(
-        {"book_id": book_id, **PCA_FILTER},
+        {"book_id": book_id, **SYSBOOK_FILTER},
         {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     if result.matched_count == 0:
@@ -249,7 +249,7 @@ async def sysbook_archive_product(book_id: str, admin: dict = Depends(get_admin_
 async def sysbook_restore_product(book_id: str, admin: dict = Depends(get_admin_user)):
     """Restore a textbook product from archive."""
     result = await db.store_products.update_one(
-        {"book_id": book_id, **PCA_FILTER},
+        {"book_id": book_id, **SYSBOOK_FILTER},
         {"$set": {"archived": False}, "$unset": {"archived_at": ""}}
     )
     if result.matched_count == 0:
@@ -261,12 +261,12 @@ async def sysbook_restore_product(book_id: str, admin: dict = Depends(get_admin_
 async def sysbook_delete_product(book_id: str, hard_delete: bool = False, admin: dict = Depends(get_admin_user)):
     """Delete a textbook product. Default = soft delete."""
     if hard_delete:
-        result = await db.store_products.delete_one({"book_id": book_id, **PCA_FILTER})
+        result = await db.store_products.delete_one({"book_id": book_id, **SYSBOOK_FILTER})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Product not found")
     else:
         result = await db.store_products.update_one(
-            {"book_id": book_id, **PCA_FILTER},
+            {"book_id": book_id, **SYSBOOK_FILTER},
             {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
@@ -277,7 +277,7 @@ async def sysbook_delete_product(book_id: str, hard_delete: bool = False, admin:
 @router.delete("/products/{book_id}/permanent")
 async def sysbook_permanent_delete(book_id: str, admin: dict = Depends(get_admin_user)):
     """Permanently delete from archive."""
-    result = await db.store_products.delete_one({"book_id": book_id, **PCA_FILTER, "archived": True})
+    result = await db.store_products.delete_one({"book_id": book_id, **SYSBOOK_FILTER, "archived": True})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found or not archived")
     return {"success": True}
@@ -290,7 +290,7 @@ async def sysbook_bulk_archive(body: dict, admin: dict = Depends(get_admin_user)
     if not book_ids:
         raise HTTPException(status_code=400, detail="No book_ids provided")
     r = await db.store_products.update_many(
-        {"book_id": {"$in": book_ids}, **PCA_FILTER},
+        {"book_id": {"$in": book_ids}, **SYSBOOK_FILTER},
         {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"status": "archived", "count": r.modified_count}
@@ -302,7 +302,7 @@ async def sysbook_bulk_delete(body: dict, admin: dict = Depends(get_admin_user))
     book_ids = body.get("book_ids", [])
     if not book_ids:
         raise HTTPException(status_code=400, detail="No book_ids provided")
-    r = await db.store_products.delete_many({"book_id": {"$in": book_ids}, **PCA_FILTER, "archived": True})
+    r = await db.store_products.delete_many({"book_id": {"$in": book_ids}, **SYSBOOK_FILTER, "archived": True})
     return {"status": "deleted", "count": r.deleted_count}
 
 
@@ -313,7 +313,7 @@ async def sysbook_bulk_unarchive(body: dict, admin: dict = Depends(get_admin_use
     if not book_ids:
         raise HTTPException(status_code=400, detail="No book_ids provided")
     r = await db.store_products.update_many(
-        {"book_id": {"$in": book_ids}, **PCA_FILTER},
+        {"book_id": {"$in": book_ids}, **SYSBOOK_FILTER},
         {"$set": {"archived": False}, "$unset": {"archived_at": ""}}
     )
     return {"status": "unarchived", "count": r.modified_count}
