@@ -523,7 +523,27 @@ class ArenaService(BaseService):
         # Check if tournament is complete
         await self._check_tournament_completion(tournament_id)
 
-        return await self.get_tournament(tournament_id)
+        # Broadcast update via WebSocket
+        updated_tournament = await self.get_tournament(tournament_id)
+        updated_matches = await self.get_tournament_matches(tournament_id)
+        await self._broadcast_arena_update(tournament_id, updated_tournament, updated_matches)
+
+        return updated_tournament
+
+    async def _broadcast_arena_update(self, tournament_id: str, tournament: dict = None, matches: list = None):
+        """Broadcast arena update via WebSocket (fire and forget)"""
+        try:
+            from ..routes.websocket import broadcast_arena_update
+            # Clean _id from tournament and matches for JSON serialization
+            if tournament and "_id" in tournament:
+                del tournament["_id"]
+            if matches:
+                for m in matches:
+                    if "_id" in m:
+                        del m["_id"]
+            await broadcast_arena_update(tournament_id, tournament, matches)
+        except Exception as e:
+            self.log_warning(f"WebSocket broadcast failed: {e}")
 
     async def _advance_winner_elimination(self, tid: str, match: Dict, winner_id: str, tournament: Dict):
         """Advance winner to next round in elimination bracket"""
