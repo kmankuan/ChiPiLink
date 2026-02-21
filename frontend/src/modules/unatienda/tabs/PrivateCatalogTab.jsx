@@ -501,9 +501,13 @@ function MovementHistoryPanel({ token }) {
   );
 }
 
-export default function PrivateCatalogTab({ token, onRefresh }) {
+export default function PrivateCatalogTab({ token, onRefresh, sysbook = false }) {
   const navigate = useNavigate();
   const { t: translate } = useTranslation();
+
+  // API prefix: Sysbook uses dedicated /api/sysbook/ routes
+  const API_PREFIX = sysbook ? `${API}/api/sysbook/inventory` : null;
+
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({ grades: [], subjects: [] });
   const [loading, setLoading] = useState(true);
