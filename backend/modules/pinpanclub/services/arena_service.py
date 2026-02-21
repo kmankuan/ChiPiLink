@@ -125,7 +125,7 @@ class ArenaService(BaseService):
 
         # Get player info
         player = await self.player_repo.get_by_id(player_id)
-        player_name = player.get("nombre", player.get("name", "Unknown")) if player else "Unknown"
+        player_name = player.get("name", player.get("nickname", "Unknown")) if player else "Unknown"
         player_avatar = player.get("avatar_url", None) if player else None
 
         participant = {
