@@ -16,86 +16,71 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 
 ## What's Been Implemented
 
-### Phase 1-5z (Complete)
-See CHANGELOG.md for full history of all phases.
+### Phase 1-7d (Complete)
+See CHANGELOG.md for full history of all phases up to 7d.
 
-### Phase 6a - Critical Order Submission NameError Fix (Complete - Feb 20, 2026)
-- Fixed `NameError` in `textbook_order_service.py` (`year` → `current_year`)
-- Made post-payment steps non-blocking with try/except wrappers
-- Frontend refreshes wallet balance before/after order submission
+### Phase 8a - PinPan Arena: Unified Tournament System (Complete - Feb 21, 2026)
+- **New Module**: PinPan Arena — a unified tournament management system built within PinPanClub
+- **4 Tournament Formats**:
+  - Single Elimination: Classic bracket with seeded pairings, byes, third-place match
+  - Round Robin: Everyone plays everyone, standings table with points
+  - Group + Knockout: Group stage with round-robin, then elimination bracket for qualifiers
+  - RapidPin Mode: Spontaneous matches within a time window, points-based ranking
+- **Backend** (new files):
+  - `/app/backend/modules/pinpanclub/models/arena.py` — Tournament, ArenaMatch, TournamentParticipant models
+  - `/app/backend/modules/pinpanclub/repositories/arena_repository.py` — ArenaTournamentRepository, ArenaMatchRepository
+  - `/app/backend/modules/pinpanclub/services/arena_service.py` — Full tournament engine (create, register, seed, generate brackets, submit results, auto-advance, completion detection)
+  - `/app/backend/modules/pinpanclub/routes/arena.py` — 18 API endpoints under `/api/pinpanclub/arena/`
+  - MongoDB collections: `pinpanclub_arena_tournaments`, `pinpanclub_arena_matches`
+- **Frontend** (new files):
+  - `/app/frontend/src/modules/pinpanclub/pages/arena/ArenaHub.jsx` — Tournament listing with search & filter
+  - `/app/frontend/src/modules/pinpanclub/pages/arena/ArenaCreate.jsx` — Create tournament form (format, settings, seeding, schedule)
+  - `/app/frontend/src/modules/pinpanclub/pages/arena/ArenaDetail.jsx` — Tournament detail with bracket visualization, participant list, admin controls, result submission
+  - Routes: `/pinpanclub/arena`, `/pinpanclub/arena/create`, `/pinpanclub/arena/:tournamentId`
+- **Integration with Existing Modules**:
+  - Seeding from SuperPin league rankings or RapidPin season rankings
+  - Uses existing PinPanClub player system
+  - Arena button added to PingPongDashboard header (alongside SuperPin & RapidPin)
+  - Role-based access: Admin & Moderator can create/manage tournaments; users can register/view
+- **Testing**: 85% backend (18/21, 3 skipped due to no test players), 100% frontend
 
-### Phase 6b - Archive Fix + Delete Orders + Admin Alert (Complete - Feb 20, 2026)
-- Fixed archive writing to wrong collection
-- Added delete endpoint for textbook orders
-- Admin alert notification on post-order failure
-
-### Phase 6c - Draft Filter + Double-Submit Prevention (Complete - Feb 20, 2026)
-- Filtered "draft" orders from admin view
-- Created `useGuardedAction` hook for preventing duplicate submissions
-
-### Phase 6d - Admin Sidebar Reorganization (Complete - Feb 20, 2026)
-- New "School Textbooks" sidebar group consolidating textbook features
-- Messages moved to Commerce, Wallet Sync moved to Wallet module
-
-### Phase 6e - Push Notifications for Student Access Requests (Complete - Feb 20, 2026)
-- OneSignal push notifications for admin and parent users on access request events
-
-### Phase 6f - URL State Persistence + Performance (Complete - Feb 20, 2026)
-- URL-based state persistence with `useSearchParams` in public store views
-- Admin module prefetching and backend parallel startup
-
-### Phase 6g - Mobile UX Enhancements (Complete - Feb 20, 2026)
-- Dynamic header in public store for textbook section (back button, lock icon)
-- Clear distinction between public retail and private textbook sections
-
-### Phase 7a - Global StatusAnimation + Full Sync Stop Button (Complete - Feb 20, 2026)
-- **StatusAnimation shared component**: Extracted duplicated `StatusAnimation` from `MosaicCommunityLanding.jsx` and `LayoutPreviewModule.jsx` into a single shared component at `/app/frontend/src/components/ui/StatusAnimation.jsx`. Includes CSS keyframe injection (one-time via JS), `LottieAnimation` helper, and `ANIMATION_OPTIONS` dropdown list. Both consumer files now import from the shared resource.
-- **Full Sync Stop Button**: Converted Monday.com full sync from synchronous to background task pattern. Added `GET /full-sync/status` (polling progress), `POST /full-sync/cancel` (graceful cancellation via `_full_sync_cancel` flag). Frontend shows real-time progress bar (processed/total, created/updated/failed counts) and a red Stop button (Square icon) during sync. Dashboard widget also updated for async response.
-- Testing: 100% pass rate (15/15 tests)
-
-### Phase 7b - Sync History Log + Board Verification + Infinite Sync Fix (Complete - Feb 20, 2026)
-- **Sync History Log**: Added `_log_sync()` method to `monday_txb_inventory_adapter.py` using `txb_inventory_sync_history` MongoDB collection (max 50 entries, auto-cleanup). Each entry records: timestamp, trigger, status, created/updated/failed counts, total, processed, duration_s, error. API endpoint: `GET /api/store/monday/txb-inventory/sync-history`. Frontend `TxbInventoryTab.jsx` shows a scrollable history panel with status icons, timestamps, and duration.
-- **Infinite 2-Way Sync Loop Prevention**: Fixed critical potential bug where orders imported from Monday.com (pre-sale) could be re-synced back to Monday.com, creating duplicates. Three guards added:
-  1. `sync-all` query now excludes orders with `monday_item_ids` set (not just `monday_item_id`)
-  2. `_send_to_monday()` skips creating new Monday.com item if order already has `monday_item_ids`
-  3. Pre-sale import now sets both `monday_item_id` (singular) and `monday_item_ids` (array) for consistency
-- **Board Integration Verification**: All 3 Monday.com board integrations confirmed working:
-  - Orders Board (18397140868): Auto-sync enabled, 10 synced orders
-  - Textbooks Board (18397140920): Full sync with cancel support, 15/25 textbooks tracked
-  - Messages/CRM Board (5931665026): Customer chat via Updates/Replies
-- Testing: 94% backend (15/16, 1 transient), 100% frontend. Critical sync fix verified via direct MongoDB query.
-
-### Phase 7c - CRM Submit Button Fix + Draft Filter + Admin Impersonation (Complete - Feb 20, 2026)
-- **Bug Fix - CRM Chat submit button hidden on mobile**: The "New Topic" modal's submit button was obscured by the bottom navigation bar. Added `mb-16 sm:mb-0` margin and adjusted `maxHeight` to `calc(80vh - 4rem)` so the modal sits above the bottom nav on mobile.
-- **Bug Fix - Draft orders visible to users**: The `get_by_user()` method in `textbook_order_repository.py` now filters out `status: "draft"` orders, matching the admin-side behavior.
-- **Feature - Admin Impersonation ("View as User")**: Admin can click the Eye icon next to any non-admin user in the Users management tab to generate a 30-minute impersonation token. The admin is redirected to the user-facing view with a visible amber banner showing "Viewing as [User Name]" with an Exit button. All impersonation events are logged in the `impersonation_logs` MongoDB collection for audit. Key files: `core/auth.py` (token creation), `auth/routes/users.py` (endpoint), `AuthContext.js` (state management), `ImpersonationBanner.jsx` (UI), `RegisteredUsersTab.jsx` (Eye button).
-- Testing: 100% pass rate (8/8 backend + all frontend elements verified)
-
-### Phase 7d - Cart Orders Link + Chat Fixes + Topic Presets Admin (Complete - Feb 21, 2026)
-- **Cart Drawer "My Orders" link**: Added "Ver mis pedidos" button in empty cart state and "Pedidos" button in cart footer when items present. Both navigate to `/pedidos` page.
-- **CRM Chat & OrderChat mobile fix**: Both modals now have `mb-16 sm:mb-0` margin to sit above the bottom navigation bar on mobile. Submit buttons are now visible.
-- **Topic Presets Admin**: CRM topic quick-select presets (the chips shown in "New Topic" form) are now configurable by admin. Backend: `crm_topic_presets` MongoDB collection, `GET/PUT /api/store/crm-chat/admin/topic-presets` endpoints. Frontend: Admin can add/hide/remove/save presets in the Messages config panel. CrmChat fetches presets from API instead of using hardcoded values.
-- **Support vs Messages clarification**: "Support" opens CRM multi-topic chat (general support via Monday.com board 5931665026). "Messages" opens OrderChat (per-order conversation thread via Monday.com Updates on the specific order item).
-- Testing: 100% pass rate (10/10 backend + all frontend verified)
+## Key API Endpoints (PinPan Arena)
+- `GET /api/pinpanclub/arena/tournaments` — List tournaments
+- `GET /api/pinpanclub/arena/tournaments/{id}` — Get tournament details
+- `POST /api/pinpanclub/arena/tournaments` — Create tournament (admin/mod)
+- `PUT /api/pinpanclub/arena/tournaments/{id}` — Update tournament
+- `DELETE /api/pinpanclub/arena/tournaments/{id}` — Delete tournament (admin)
+- `POST /api/pinpanclub/arena/tournaments/{id}/open-registration` — Open registration
+- `POST /api/pinpanclub/arena/tournaments/{id}/close-registration` — Close registration
+- `POST /api/pinpanclub/arena/tournaments/{id}/register` — Self-register
+- `POST /api/pinpanclub/arena/tournaments/{id}/register/{player_id}` — Register player (admin)
+- `POST /api/pinpanclub/arena/tournaments/{id}/withdraw` — Withdraw
+- `POST /api/pinpanclub/arena/tournaments/{id}/apply-seeding` — Apply seeding
+- `POST /api/pinpanclub/arena/tournaments/{id}/generate-brackets` — Start tournament
+- `POST /api/pinpanclub/arena/tournaments/{id}/generate-knockout` — Group→Knockout transition
+- `GET /api/pinpanclub/arena/tournaments/{id}/matches` — List matches
+- `POST /api/pinpanclub/arena/tournaments/{id}/matches/{match_id}/result` — Submit result
+- `POST /api/pinpanclub/arena/tournaments/{id}/rapidpin-match` — Submit RapidPin match
+- `POST /api/pinpanclub/arena/tournaments/{id}/complete` — Complete tournament
 
 ## Upcoming Tasks
-None - all P1 and P2 tasks from the backlog are now complete.
+None — tournament system complete.
 
 ## Future/Backlog Tasks
+- **(P2)** WebSocket real-time updates for Arena brackets/scores
+- **(P2)** Tournament push notifications via OneSignal  
+- **(P3)** Tournament statistics & analytics dashboard
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
 
 ## Monday.com Board Configuration
-- **Orders Board ID**: 18397140868 (textbook orders, with subitems per book)
-- **Textbooks Board ID**: 18397140920 (textbook inventory, full sync + stock sync)
-- **CRM Board ID**: 5931665026 (customer chat, Updates = topics, Replies = messages)
-- Monday.com API Token: configured in backend/.env
+- **Orders Board ID**: 18397140868
+- **Textbooks Board ID**: 18397140920
+- **CRM Board ID**: 5931665026
 
 ## Key Files
-- `/app/frontend/src/components/ui/StatusAnimation.jsx` - Shared status animation system
-- `/app/frontend/src/components/ui/ProgressIcons.jsx` - Progress icon themes (Chinese-themed)
-- `/app/frontend/src/modules/monday/components/TxbInventoryTab.jsx` - Monday.com sync config with Stop button
-- `/app/frontend/src/hooks/useGuardedAction.js` - Reusable hook for preventing duplicate submissions
-- `/app/frontend/src/modules/admin/views/dashboard/DashboardModule.jsx` - Admin sidebar and navigation
-- `/app/backend/modules/store/integrations/monday_txb_inventory_adapter.py` - Monday.com sync adapter
-- `/app/backend/modules/store/routes/monday_sync.py` - Monday.com sync API routes
+- `/app/frontend/src/modules/pinpanclub/pages/arena/` — Arena frontend pages
+- `/app/backend/modules/pinpanclub/routes/arena.py` — Arena API routes
+- `/app/backend/modules/pinpanclub/services/arena_service.py` — Arena business logic
+- `/app/backend/modules/pinpanclub/models/arena.py` — Arena data models
+- `/app/backend/modules/pinpanclub/repositories/arena_repository.py` — Arena data access
