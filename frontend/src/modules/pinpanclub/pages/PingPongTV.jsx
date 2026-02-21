@@ -298,8 +298,46 @@ export default function PingPongTV() {
     const params = new URLSearchParams();
     params.set('mode', mode);
     if (matchId) params.set('match', matchId);
+    if (tournamentId) params.set('tournament', tournamentId);
     setSearchParams(params, { replace: true });
-  }, [mode, matchId, setSearchParams]);
+  }, [mode, matchId, tournamentId, setSearchParams]);
+
+  // Fetch arena tournament data when in tournament mode
+  useEffect(() => {
+    if (mode !== 'tournament') return;
+    
+    const fetchTournamentData = async () => {
+      try {
+        // If a specific tournament is selected, fetch it
+        if (tournamentId) {
+          const [tRes, mRes] = await Promise.all([
+            fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${tournamentId}`),
+            fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${tournamentId}/matches`),
+          ]);
+          if (tRes.ok) setArenaTournament(await tRes.json());
+          if (mRes.ok) setArenaMatches(await mRes.json());
+        } else {
+          // Fetch the most active tournament
+          const res = await fetch(`${API_URL}/api/pinpanclub/arena/tournaments/active`);
+          if (res.ok) {
+            const active = await res.json();
+            if (active.length > 0) {
+              setTournamentId(active[0].tournament_id);
+              setArenaTournament(active[0]);
+              const mRes = await fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${active[0].tournament_id}/matches`);
+              if (mRes.ok) setArenaMatches(await mRes.json());
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching tournament data:', e);
+      }
+    };
+    
+    fetchTournamentData();
+    const interval = setInterval(fetchTournamentData, 15000);
+    return () => clearInterval(interval);
+  }, [mode, tournamentId]);
 
   // Fullscreen handling
   useEffect(() => {
