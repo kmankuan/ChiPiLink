@@ -200,6 +200,7 @@ function AppRouter() {
       <Route path="/pinpanclub/arena" element={<><Header /><ArenaHub /></>} />
       <Route path="/pinpanclub/arena/create" element={<><Header /><ArenaCreate /></>} />
       <Route path="/pinpanclub/arena/:tournamentId" element={<><Header /><ArenaDetail /></>} />
+      <Route path="/arena/:tournamentId" element={<ArenaPublic />} />
       
       {/* Weekly Challenges Route */}
       <Route path="/pinpanclub/challenges" element={<><Header /><WeeklyChallengesPage /></>} />
