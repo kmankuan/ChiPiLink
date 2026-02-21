@@ -100,7 +100,7 @@ const PREFETCH_MODULES = [
   () => import('@/modules/unatienda/tabs/MessagesTab'),
   () => import('@/modules/unatienda/UnatiendaModule'),
   () => import('@/modules/wallet/WalletModule'),
-  () => import('@/modules/school-textbooks/TextbookCatalogModule'),
+  () => import('@/modules/sysbook/SysbookInventoryTab'),
   () => import('@/modules/school-textbooks/StudentsSchoolsModule'),
 ];
 
