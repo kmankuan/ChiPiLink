@@ -47,6 +47,9 @@ from modules.auth import auth_refactored_router
 from modules.store import init_module as init_store
 from modules.store import store_refactored_router
 
+# Sysbook Module (School Textbook Management)
+from modules.sysbook import sysbook_router
+
 # Landing Page Builder Module
 from modules.landing.routes import router as landing_router
 
