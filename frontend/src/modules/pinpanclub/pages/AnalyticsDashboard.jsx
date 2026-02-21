@@ -219,12 +219,12 @@ export default function AnalyticsDashboard() {
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-400" />
-                    Super Pin vs Rapid Pin
+                    League vs Rapid Pin
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ComparisonChart
-                    label1="Super Pin"
+                    label1="League"
                     value1={stats?.superpin_matches || 0}
                     label2="Rapid Pin"
                     value2={stats?.rapid_pin_matches || 0}
@@ -346,7 +346,7 @@ function DistributionChart({ superpin, rapidpin, challenges }) {
   return (
     <div className="space-y-4">
       <div className="space-y-3">
-        <ProgressBar label="Super Pin" value={superpin} total={total} color="from-green-500 to-green-600" />
+        <ProgressBar label="League" value={superpin} total={total} color="from-green-500 to-green-600" />
         <ProgressBar label="Rapid Pin" value={rapidpin} total={total} color="from-orange-500 to-orange-600" />
         <ProgressBar label="Retos" value={challenges} total={total} color="from-purple-500 to-purple-600" />
       </div>

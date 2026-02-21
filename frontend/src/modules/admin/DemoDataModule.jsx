@@ -229,7 +229,7 @@ export default function DemoDataModule() {
               />
               <StatCard 
                 icon={Gamepad2} 
-                title="Super Pin" 
+                title="PinPan League" 
                 value={stats?.pinpanclub?.superpin_matches || 0}
                 color="bg-green-500"
                 subtitle={t("demoData.matches")}
