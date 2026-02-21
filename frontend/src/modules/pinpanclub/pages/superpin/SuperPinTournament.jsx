@@ -17,7 +17,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinTournament() {
   const { t } = useTranslation();
-  const { torneoId } = useParams();
+  const { tournamentId } = useParams();
   const navigate = useNavigate();
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,11 +27,11 @@ export default function SuperPinTournament() {
 
   useEffect(() => {
     fetchTournament();
-  }, [torneoId]);
+  }, [tournamentId]);
 
   const fetchTournament = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments/${torneoId}/brackets`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments/${tournamentId}/brackets`);
       if (response.ok) {
         const data = await response.json();
         setTournament(data);
@@ -47,7 +47,7 @@ export default function SuperPinTournament() {
     setGenerating(true);
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments/${torneoId}/generate-brackets`, {
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments/${tournamentId}/generate-brackets`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -70,7 +70,7 @@ export default function SuperPinTournament() {
         score_b: scoreB
       });
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/tournaments/${torneoId}/matches/${matchId}/result?${params}`,
+        `${API_URL}/api/pinpanclub/superpin/tournaments/${tournamentId}/matches/${matchId}/result?${params}`,
         {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
