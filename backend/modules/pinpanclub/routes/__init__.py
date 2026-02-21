@@ -21,6 +21,7 @@ from .rank_rewards import router as rank_rewards_router
 from .seasons import router as seasons_router
 from .public_feed import router as public_feed_router
 from .arena import router as arena_router
+from .referee import router as referee_router
 
 # Main module router
 router = APIRouter(prefix="/pinpanclub", tags=["PinpanClub"])
@@ -43,6 +44,7 @@ router.include_router(rank_rewards_router)
 router.include_router(seasons_router)
 router.include_router(public_feed_router)
 router.include_router(arena_router)
+router.include_router(referee_router)
 
 # Re-export for backwards compatibility with old routes
 pinpanclub_router = router
