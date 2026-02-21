@@ -64,7 +64,8 @@ import {
   Upload,
   RefreshCw,
   ClipboardList,
-  Truck
+  Truck,
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
