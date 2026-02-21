@@ -187,12 +187,12 @@ function AppRouter() {
       
       {/* PinPan League Routes (formerly Super Pin) */}
       <Route path="/pinpanclub/superpin/admin" element={<><Header /><SuperPinAdmin /></>} />
-      <Route path="/pinpanclub/superpin/league/:ligaId" element={<><Header /><SuperPinLeagueDetail /></>} />
-      <Route path="/pinpanclub/superpin/match/:partidoId" element={<><Header /><SuperPinMatch /></>} />
+      <Route path="/pinpanclub/superpin/league/:leagueId" element={<><Header /><SuperPinLeagueDetail /></>} />
+      <Route path="/pinpanclub/superpin/match/:matchId" element={<><Header /><SuperPinMatch /></>} />
       <Route path="/pinpanclub/superpin/ranking" element={<><Header /><SuperPinRanking /></>} />
-      <Route path="/pinpanclub/superpin/ranking/:ligaId" element={<><Header /><SuperPinRanking /></>} />
-      <Route path="/pinpanclub/superpin/tournament/:torneoId" element={<><Header /><SuperPinTournament /></>} />
-      <Route path="/pinpanclub/superpin/player/:jugadorId" element={<><Header /><PlayerProfile /></>} />
+      <Route path="/pinpanclub/superpin/ranking/:leagueId" element={<><Header /><SuperPinRanking /></>} />
+      <Route path="/pinpanclub/superpin/tournament/:tournamentId" element={<><Header /><SuperPinTournament /></>} />
+      <Route path="/pinpanclub/superpin/player/:playerId" element={<><Header /><PlayerProfile /></>} />
       <Route path="/pinpanclub/superpin/compare" element={<><Header /><PlayerComparison /></>} />
       
       {/* Rapid Pin Routes */}
