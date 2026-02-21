@@ -539,7 +539,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   // Column order per catalog type (persisted)
   const [columnOrders, setColumnOrders] = useState(() => {
     const orders = {};
-    for (const type of ['pca', 'public', 'all', 'archived']) {
+    for (const type of ['sysbook', 'public', 'all', 'archived']) {
       orders[type] = loadColumnOrder(type) || COLUMN_DEFS[type].map(c => c.key);
     }
     return orders;
