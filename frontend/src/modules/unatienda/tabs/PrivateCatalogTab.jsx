@@ -653,7 +653,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         if (selectedSubject) pcaUrl += `&subject=${encodeURIComponent(selectedSubject)}`;
         const pcaRes = await fetch(pcaUrl, { headers: { Authorization: `Bearer ${token}` } });
         const pcaData = await pcaRes.json();
-        const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'pca' }));
+        const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'sysbook' }));
 
         let pubProducts = [];
         try {
