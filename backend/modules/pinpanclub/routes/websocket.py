@@ -30,6 +30,8 @@ class ConnectionManager:
         self.match_connections: Dict[str, Set[str]] = {}
         # Connections for global updates (all matches)
         self.global_connections: Set[str] = set()
+        # Connections grouped by tournament (for Arena broadcasts)
+        self.tournament_connections: Dict[str, Set[str]] = {}
         # Connection metadata
         self.connection_info: Dict[str, dict] = {}
     
