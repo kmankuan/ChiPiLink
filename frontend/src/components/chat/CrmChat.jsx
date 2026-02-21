@@ -283,8 +283,17 @@ function NewTopicForm({ studentId, token, onBack, onCreated, isAdmin }) {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [quickSubjects, setQuickSubjects] = useState([]);
 
-  const QUICK_SUBJECTS = ['Order Question', 'Payment Issue', 'Delivery Update', 'General Inquiry', 'Grade Change'];
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API}/api/store/crm-chat/topic-presets`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.presets) setQuickSubjects(d.presets); })
+      .catch(() => {});
+  }, [token]);
 
   const handleCreate = async () => {
     if (!subject.trim() || !message.trim()) {
