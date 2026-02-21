@@ -364,10 +364,22 @@ export default function InventoryTab({ token }) {
       )}
 
       {/* Bulk Action Bar */}
-      <BulkActionBar count={productSelection.count} onClear={productSelection.clear}
-        onArchive={() => setConfirmBulk('archive')}
-        onDelete={() => setConfirmBulk('delete')}
-        loading={bulkLoading} />
+      {productSelection.count > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-background border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3" data-testid="bulk-action-bar">
+          <span className="text-sm font-medium">{productSelection.count} selected</span>
+          <div className="h-5 w-px bg-border" />
+          <Button size="sm" variant="outline" onClick={() => setConfirmBulk('archive')} data-testid="bulk-archive-products-btn">
+            <Archive className="h-4 w-4 mr-1.5" /> Archive
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setConfirmBulk('unarchive')} data-testid="bulk-unarchive-products-btn">
+            Restore
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => setConfirmBulk('delete')} data-testid="bulk-delete-products-btn">
+            <Trash2 className="h-4 w-4 mr-1.5" /> Delete
+          </Button>
+          <Button size="sm" variant="ghost" onClick={productSelection.clear}>Cancel</Button>
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!confirmBulk}
@@ -376,10 +388,12 @@ export default function InventoryTab({ token }) {
           setBulkLoading(true);
           try {
             const ids = Array.from(productSelection.selected);
-            const endpoint = confirmBulk === 'archive' ? 'bulk-archive' : 'bulk-delete';
+            const endpointMap = { archive: 'bulk-archive', unarchive: 'bulk-unarchive', delete: 'bulk-delete' };
+            const endpoint = endpointMap[confirmBulk] || 'bulk-delete';
             await axios.post(`${API_URL}/api/store/inventory/products/${endpoint}`,
               { product_ids: ids }, { headers: { Authorization: `Bearer ${token}` } });
-            toast.success(`${ids.length} product(s) ${confirmBulk === 'archive' ? 'archived' : 'deleted'}`);
+            const labels = { archive: 'archived', unarchive: 'restored', delete: 'deleted' };
+            toast.success(`${ids.length} product(s) ${labels[confirmBulk] || 'processed'}`);
             productSelection.clear();
             setConfirmBulk(null);
             fetchData();
@@ -388,12 +402,16 @@ export default function InventoryTab({ token }) {
         }}
         title={confirmBulk === 'archive'
           ? `Archive ${productSelection.count} product(s)?`
+          : confirmBulk === 'unarchive'
+          ? `Restore ${productSelection.count} product(s)?`
           : `Delete ${productSelection.count} product(s)?`}
         description={confirmBulk === 'archive'
           ? 'Products will be hidden from the store but data is preserved.'
-          : 'This will permanently remove the selected products and their inventory data.'}
-        variant={confirmBulk === 'archive' ? 'warning' : 'destructive'}
-        confirmLabel={confirmBulk === 'archive' ? 'Archive' : 'Delete Permanently'}
+          : confirmBulk === 'unarchive'
+          ? 'Products will be restored and visible in the store again.'
+          : 'This will permanently remove the selected products. This cannot be undone.'}
+        variant={confirmBulk === 'delete' ? 'destructive' : confirmBulk === 'archive' ? 'warning' : 'default'}
+        confirmLabel={confirmBulk === 'archive' ? 'Archive' : confirmBulk === 'unarchive' ? 'Restore' : 'Delete Permanently'}
         loading={bulkLoading}
       />
     </div>
