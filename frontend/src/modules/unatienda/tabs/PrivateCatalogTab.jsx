@@ -962,8 +962,8 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         hasActiveFilters={!!(searchTerm || selectedGrade || selectedSubject || statusFilter !== 'all')}
         onClearFilters={() => { setSearchTerm(''); setSelectedGrade(''); setSelectedSubject(''); setStatusFilter('all'); }}
         stats={[
-          { label: 'total', value: products.length, color: 'default' },
-          { label: 'active', value: products.filter(p => p.active !== false).length, color: 'default' },
+          { label: 'total', value: statsProducts.length, color: 'default' },
+          { label: 'active', value: statsProducts.filter(p => p.active !== false).length, color: 'default' },
           { label: 'stock', value: totalStock, color: 'green' },
           ...(lowStockCount > 0 ? [{ label: 'low stock', value: lowStockCount, color: 'amber', highlight: true }] : []),
           ...(outOfStockCount > 0 ? [{ label: 'out of stock', value: outOfStockCount, color: 'red', highlight: true }] : []),
