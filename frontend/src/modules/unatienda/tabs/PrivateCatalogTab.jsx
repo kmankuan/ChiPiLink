@@ -768,7 +768,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const handleArchive = async (book_id) => {
     if (!confirm('Move this product to archive?')) return;
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/archive`, {
+      const response = await fetch(productApiUrl(book_id, 'archive'), {
         method: 'POST', headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) { toast.success('Product archived'); fetchProducts(); onRefresh?.(); }
@@ -777,7 +777,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
 
   const handleRestore = async (book_id) => {
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/restore`, {
+      const response = await fetch(productApiUrl(book_id, 'restore'), {
         method: 'POST', headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) { toast.success('Product restored'); fetchProducts(); onRefresh?.(); }
@@ -787,7 +787,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const handlePermanentDelete = async (book_id) => {
     if (!confirm('Permanently delete this product? This cannot be undone.')) return;
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/permanent`, {
+      const response = await fetch(productApiUrl(book_id, 'permanent'), {
         method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) { toast.success('Product permanently deleted'); fetchProducts(); onRefresh?.(); }
