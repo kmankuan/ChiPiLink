@@ -54,6 +54,13 @@ class PinpanClubCollections:
     ARENA_TOURNAMENTS = "pinpanclub_arena_tournaments"
     ARENA_MATCHES = "pinpanclub_arena_matches"
 
+    # Settings & Referee System
+    SETTINGS = "pinpanclub_settings"
+    REFEREE_PROFILES = "pinpanclub_referee_profiles"
+    REFEREE_RATINGS = "pinpanclub_referee_ratings"
+    ARENA_LEADERBOARD = "pinpanclub_arena_leaderboard"
+    HALL_OF_FAME = "pinpanclub_hall_of_fame"
+
 
 # =============================================================================
 # COMMUNITY MODULE COLLECTIONS
