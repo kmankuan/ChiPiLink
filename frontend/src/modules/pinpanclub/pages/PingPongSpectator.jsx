@@ -1,28 +1,33 @@
 /**
- * Ping Pong Spectator Page - Vista para espectadores
- * Actualización en tiempo real del partido
+ * PinPan Live - Real-time Match Spectator
+ * Uses WebSocket for live updates with polling fallback
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import axios from 'axios';
-import { ArrowLeft, Loader2, Maximize2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Loader2, Maximize2, Wifi, WifiOff } from 'lucide-react';
 import ScoreBoard from '../components/ScoreBoard';
-import { useTranslation } from 'react-i18next';
+import { PINPANCLUB_WS } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongSpectator() {
-  const { t } = useTranslation();
   const { matchId } = useParams();
   const navigate = useNavigate();
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [wsConnected, setWsConnected] = useState(false);
 
+  const wsRef = useRef(null);
+  const reconnectRef = useRef(null);
+  const pollRef = useRef(null);
+  const attemptsRef = useRef(0);
+
+  // Initial HTTP fetch
   const fetchMatch = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/pinpanclub/matches/${matchId}/live`);
@@ -35,32 +40,90 @@ export default function PingPongSpectator() {
     }
   }, [matchId]);
 
-  useEffect(() => {
-    if (matchId) {
-      fetchMatch();
-      
-      // Poll every 2 seconds for live updates
-      const interval = setInterval(fetchMatch, 2000);
-      return () => clearInterval(interval);
+  // WebSocket connection
+  const connectWS = useCallback(() => {
+    if (!matchId) return;
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+
+    try {
+      const wsUrl = PINPANCLUB_WS.spectator(matchId);
+      wsRef.current = new WebSocket(wsUrl);
+
+      wsRef.current.onopen = () => {
+        setWsConnected(true);
+        attemptsRef.current = 0;
+        // Stop polling when WS connected
+        if (pollRef.current) {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+        }
+      };
+
+      wsRef.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'match_state' || data.type === 'point_scored' || data.type === 'point_undone') {
+            setMatch(data.match);
+            setLastUpdate(new Date());
+          } else if (data.type === 'ping') {
+            wsRef.current?.send(JSON.stringify({ type: 'pong' }));
+          }
+        } catch (e) {
+          console.error('WS parse error:', e);
+        }
+      };
+
+      wsRef.current.onclose = () => {
+        setWsConnected(false);
+        // Reconnect with backoff
+        const delay = Math.min(1000 * Math.pow(2, attemptsRef.current), 15000);
+        reconnectRef.current = setTimeout(() => {
+          attemptsRef.current += 1;
+          connectWS();
+        }, delay);
+        // Start polling as fallback
+        if (!pollRef.current) {
+          pollRef.current = setInterval(fetchMatch, 3000);
+        }
+      };
+
+      wsRef.current.onerror = () => {
+        // Will trigger onclose
+      };
+    } catch (e) {
+      console.error('WS connection error:', e);
+      // Fallback to polling
+      if (!pollRef.current) {
+        pollRef.current = setInterval(fetchMatch, 3000);
+      }
     }
   }, [matchId, fetchMatch]);
 
+  useEffect(() => {
+    if (matchId) {
+      fetchMatch();
+      connectWS();
+    }
+    return () => {
+      wsRef.current?.close();
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [matchId, fetchMatch, connectWS]);
+
+  // Fullscreen
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
   }, []);
 
   if (loading) {
@@ -74,27 +137,19 @@ export default function PingPongSpectator() {
   if (!match) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
-        <p className="text-muted-foreground">Partido no encontrado</p>
-        <Button onClick={() => navigate('/pinpanclub')}>Volver al Dashboard</Button>
+        <p className="text-muted-foreground">Match not found</p>
+        <Button onClick={() => navigate('/pinpanclub')}>Back to Dashboard</Button>
       </div>
     );
   }
 
-  // TV Mode (Fullscreen)
   if (isFullscreen) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
         <div className="w-full max-w-6xl">
-          <ScoreBoard 
-            match={match} 
-            size="tv"
-            showStats={true}
-            className="bg-gray-800/50 backdrop-blur border-gray-700"
-          />
-          
-          {/* Exit fullscreen hint */}
+          <ScoreBoard match={match} size="tv" showStats={true} className="bg-gray-800/50 backdrop-blur border-gray-700" />
           <div className="text-center mt-4 text-gray-500 text-sm">
-            Presiona ESC para salir de pantalla completa
+            Press ESC to exit fullscreen
           </div>
         </div>
       </div>
@@ -103,28 +158,34 @@ export default function PingPongSpectator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🏓</span>
-              <h1 className="font-bold text-xl">Partido en Vivo</h1>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')} data-testid="live-back-btn">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 className="font-bold text-xl" data-testid="live-title">PinPan Live</h1>
               {match.estado === 'en_curso' && (
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                  EN VIVO
+                  LIVE
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={fetchMatch}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Actualizar
-              </Button>
-              <Button size="sm" onClick={toggleFullscreen}>
-                <Maximize2 className="h-4 w-4 mr-2" />
-                Pantalla Completa
+              {wsConnected ? (
+                <span className="flex items-center gap-1 text-xs text-green-600" data-testid="ws-status">
+                  <Wifi className="h-3 w-3" /> Real-time
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs text-amber-500" data-testid="ws-status-fallback">
+                  <WifiOff className="h-3 w-3" /> Polling
+                </span>
+              )}
+              <Button size="sm" variant="outline" onClick={toggleFullscreen} data-testid="fullscreen-btn">
+                <Maximize2 className="h-4 w-4 mr-1" />
+                Fullscreen
               </Button>
             </div>
           </div>
@@ -132,23 +193,15 @@ export default function PingPongSpectator() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Main Scoreboard */}
         <div className="max-w-4xl mx-auto">
-          <ScoreBoard 
-            match={match} 
-            size="large"
-            showStats={true}
-          />
-          
-          {/* Last Update */}
+          <ScoreBoard match={match} size="large" showStats={true} />
           <div className="text-center mt-4 text-sm text-muted-foreground">
-            Última actualización: {lastUpdate?.toLocaleTimeString('es-PA')}
-            <span className="mx-2">•</span>
-            Actualización automática cada 2 segundos
+            Last update: {lastUpdate?.toLocaleTimeString()}
+            <span className="mx-2">·</span>
+            {wsConnected ? 'Real-time via WebSocket' : 'Auto-refresh every 3s'}
           </div>
         </div>
 
-        {/* Match Info */}
         {match.ronda && (
           <div className="text-center mt-6">
             <span className="text-lg text-muted-foreground">{match.ronda}</span>
