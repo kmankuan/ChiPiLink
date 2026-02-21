@@ -74,7 +74,7 @@ export default function PingPongArbiter() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.open(`/pingpong/spectator/${matchId}`, '_blank')}
+              onClick={() => window.open(`/pinpanclub/live/${matchId}`, '_blank')}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Abrir Vista Espectador

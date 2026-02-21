@@ -569,7 +569,7 @@ export default function PingPongDashboard() {
                     <Button 
                       size="sm" 
                       variant="secondary"
-                      onClick={() => navigate(`/pinpanclub/spectator/${match.partido_id}`)}
+                      onClick={() => navigate(`/pinpanclub/live/${match.partido_id}`)}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Ver
