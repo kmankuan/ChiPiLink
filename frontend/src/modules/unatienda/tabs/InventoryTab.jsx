@@ -298,7 +298,7 @@ export default function InventoryTab({ token }) {
                 </thead>
                 <tbody>
                   {pageProducts.map((p) => {
-                    const qty = p.inventory_quantity ?? p.cantidad_inventario ?? 0;
+                    const qty = p.inventory_quantity ?? 0;
                     const name = p.name || p.nombre || 'Unnamed';
                     const cat = p.category || p.categoria || '\u2014';
                     const price = p.price ?? p.precio ?? 0;
