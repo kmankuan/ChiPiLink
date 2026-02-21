@@ -1,6 +1,6 @@
 """
-System for Premios Avanzado - Modelos
-Premios configurables more there de badges: physical, descuentos, privilegios
+Advanced Prize System - Models
+Configurable prizes beyond badges: physical, discounts, privileges
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -10,81 +10,81 @@ import uuid
 
 
 class PrizeType(str, Enum):
-    """Tipos de premio"""
-    BADGE = "badge"              # Badge digital
-    PHYSICAL = "physical"        # Prize physical (trofeo, medalla, etc.)
+    """Prize types"""
+    BADGE = "badge"              # Digital badge
+    PHYSICAL = "physical"        # Physical prize (trophy, medal, etc.)
     DISCOUNT = "discount"        # Store/service discount
-    PRIVILEGE = "privilege"      # Privilegio especial (acceso VIP, etc.)
-    POINTS = "points"            # Points canjeables
-    CUSTOM = "custom"            # Prize personalizado
+    PRIVILEGE = "privilege"      # Special privilege (VIP access, etc.)
+    POINTS = "points"            # Redeemable points
+    CUSTOM = "custom"            # Custom prize
 
 
 class PrizeStatus(str, Enum):
-    """Estado dthe prize"""
+    """Prize status"""
     AVAILABLE = "available"      # Available to win
-    CLAIMED = "claimed"          # Reclamado by player
-    DELIVERED = "delivered"      # Entregado
-    EXPIRED = "expired"          # Expirado
+    CLAIMED = "claimed"          # Claimed by player
+    DELIVERED = "delivered"      # Delivered
+    EXPIRED = "expired"          # Expired
 
 
 class PrizeConditionType(str, Enum):
-    """Tipos de condition to win premio"""
-    POSITION = "position"        # By ranking position (1°, 2°, 3°...)
-    PARTICIPATION = "participation"  # By participar
+    """Prize winning condition types"""
+    POSITION = "position"        # By ranking position (1st, 2nd, 3rd...)
+    PARTICIPATION = "participation"  # By participating
     MATCHES_PLAYED = "matches_played"  # By number of matches played
     MATCHES_WON = "matches_won"  # By number of wins
-    MATCHES_REFEREED = "matches_refereed"  # By arbitrajes
+    MATCHES_REFEREED = "matches_refereed"  # By refereeing
     STREAK = "streak"            # By win streak
-    CHALLENGE = "challenge"      # By completar un reto
+    CHALLENGE = "challenge"      # By completing a challenge
 
 
 # ============== PRIZE DEFINITION ==============
 
 class PrizeCondition(BaseModel):
-    """Condition to win un premio"""
+    """Condition to win a prize"""
     type: PrizeConditionType
-    value: int  # Ej: position=1, matches_played=10
+    value: int  # E.g.: position=1, matches_played=10
     comparison: str = "eq"  # eq, gte, lte
 
 
 class PrizeDefinition(BaseModel):
-    """Definition de un premio configurable"""
+    """Configurable prize definition"""
     prize_id: str = Field(default_factory=lambda: f"prize_{uuid.uuid4().hex[:8]}")
     name: str
     description: Optional[str] = None
     type: PrizeType = PrizeType.BADGE
     icon: str = "🏆"
-    
-    # Value dthe prize
-    value: Optional[str] = None  # Description ofl valor (ej: "20% descuento")
+
+    # Prize value
+    value: Optional[str] = None  # Value description (e.g. "20% discount")
     points_value: int = 0        # Points value if applicable
-    
+
     # Conditions to win
     conditions: List[PrizeCondition] = []
-    
-    # Aplicable a
+
+    # Applicable to
     for_players: bool = True
     for_referees: bool = False
-    
+
     # Limits
-    max_winners: Optional[int] = None  # None = sin limit
-    quantity_available: Optional[int] = None  # For premios physical
-    
-    # Vigencia
+    max_winners: Optional[int] = None  # None = no limit
+    quantity_available: Optional[int] = None  # For physical prizes
+
+    # Validity
     valid_from: Optional[str] = None
     valid_until: Optional[str] = None
-    
+
     # Metadata
     image_url: Optional[str] = None
     redemption_instructions: Optional[str] = None
-    
+
     # Timestamps
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
 
 
 class PrizeDefinitionCreate(BaseModel):
-    """Create definition de premio"""
+    """Create prize definition"""
     name: str
     description: Optional[str] = None
     type: PrizeType = PrizeType.BADGE
@@ -105,24 +105,24 @@ class PrizeDefinitionCreate(BaseModel):
 # ============== AWARDED PRIZE ==============
 
 class AwardedPrize(BaseModel):
-    """Premio otorgado a un jugador"""
+    """Prize awarded to a player"""
     award_id: str = Field(default_factory=lambda: f"award_{uuid.uuid4().hex[:8]}")
     prize_id: str
-    jugador_id: str
+    player_id: str
     season_id: Optional[str] = None
     challenge_id: Optional[str] = None
-    
-    # Info ofl premio (cached)
+
+    # Prize info (cached)
     prize_info: Optional[Dict] = None
-    jugador_info: Optional[Dict] = None
-    
-    # Estado
+    player_info: Optional[Dict] = None
+
+    # Status
     status: PrizeStatus = PrizeStatus.CLAIMED
-    
+
     # Award details
-    awarded_for: str  # Description of por what se granted
-    position: Optional[int] = None  # Si fue por position
-    
+    awarded_for: str  # Description of why it was granted
+    position: Optional[int] = None  # If by position
+
     # Timestamps
     awarded_at: Optional[Any] = None
     claimed_at: Optional[Any] = None
@@ -133,7 +133,7 @@ class AwardedPrize(BaseModel):
 # ============== PRIZE CATALOG ==============
 
 class PrizeCatalog(BaseModel):
-    """Catalog de premios disponibles"""
+    """Available prize catalog"""
     catalog_id: str
     name: str
     description: Optional[str] = None
@@ -146,14 +146,14 @@ class PrizeCatalog(BaseModel):
 # ============== DEFAULT PRIZES ==============
 
 def get_default_prize_catalog() -> List[Dict]:
-    """Catalog de premios by default"""
+    """Default prize catalog"""
     return [
         {
-            "name": "Champion de Temporada",
-            "description": "Premio al primer lugar from ranking",
+            "name": "Season Champion",
+            "description": "First place in ranking",
             "type": "physical",
             "icon": "🥇",
-            "value": "Trofeo dorado + Camiseta personalizada",
+            "value": "Golden trophy + Custom t-shirt",
             "conditions": [{"type": "position", "value": 1, "comparison": "eq"}],
             "for_players": True,
             "for_referees": False,
@@ -161,55 +161,55 @@ def get_default_prize_catalog() -> List[Dict]:
         },
         {
             "name": "Runner-up",
-            "description": "Premio al segundo lugar",
+            "description": "Second place",
             "type": "physical",
             "icon": "🥈",
-            "value": "Medalla de plata",
+            "value": "Silver medal",
             "conditions": [{"type": "position", "value": 2, "comparison": "eq"}],
             "for_players": True,
             "max_winners": 1
         },
         {
-            "name": "Tercer Lugar",
-            "description": "Premio al tercer lugar",
+            "name": "Third Place",
+            "description": "Third place",
             "type": "physical",
             "icon": "🥉",
-            "value": "Medalla de bronce",
+            "value": "Bronze medal",
             "conditions": [{"type": "position", "value": 3, "comparison": "eq"}],
             "for_players": True,
             "max_winners": 1
         },
         {
-            "name": "Jugador Activo",
-            "description": "Por jugar 10+ partidos en the season",
+            "name": "Active Player",
+            "description": "Played 10+ matches in the season",
             "type": "badge",
             "icon": "🏓",
             "conditions": [{"type": "matches_played", "value": 10, "comparison": "gte"}],
             "for_players": True
         },
         {
-            "name": "Mejor Referee",
-            "description": "Referee con more partidos dirigidos",
+            "name": "Best Referee",
+            "description": "Referee with most matches officiated",
             "type": "privilege",
             "icon": "⚖️",
-            "value": "Acceso VIP a torneos",
+            "value": "VIP tournament access",
             "conditions": [{"type": "position", "value": 1, "comparison": "eq"}],
             "for_players": False,
             "for_referees": True,
             "max_winners": 1
         },
         {
-            "name": "Colaborador",
-            "description": "Por arbitrar 5+ partidos",
+            "name": "Collaborator",
+            "description": "Refereed 5+ matches",
             "type": "discount",
             "icon": "👨‍⚖️",
-            "value": "10% descuento en inscripciones",
+            "value": "10% registration discount",
             "conditions": [{"type": "matches_refereed", "value": 5, "comparison": "gte"}],
             "for_referees": True
         },
         {
-            "name": "Racha Imparable",
-            "description": "Por ganar 5 partidos seguidos",
+            "name": "Unstoppable Streak",
+            "description": "Won 5 matches in a row",
             "type": "badge",
             "icon": "🔥",
             "conditions": [{"type": "streak", "value": 5, "comparison": "gte"}],
