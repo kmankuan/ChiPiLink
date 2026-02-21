@@ -90,6 +90,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `GET /api/pinpanclub/referee/hall-of-fame` — Global leaderboard (mode filter)
 - `POST /api/pinpanclub/referee/hall-of-fame/refresh` — Rebuild (admin)
 
+### Sysbook Module — School Textbook Management System (Feb 21, 2026)
+- **Separated from Unatienda** into a dedicated system called "Sysbook"
+- **Backend**: New `/api/sysbook/` route prefix with inventory, stock-orders, and analytics endpoints, all scoped to `is_private_catalog: True`
+- **Frontend**: New `modules/sysbook/` with `SysbookInventoryTab`, `SysbookStockMovementsTab`, `SysbookAnalyticsTab`
+- **Sidebar**: Renamed "School Textbooks" → "SYSBOOK" with: Inventory, Stock Movements, Analytics, Students & Schools, Pre-Sale Import, Monday.com Sync, Form Settings
+- **Naming**: "Catalog" renamed to "Inventory" globally within Sysbook
+- **Analytics Enhancement**: Added inventory analytics dashboard with KPI cards, stock-by-grade chart, stock-by-subject chart, and movement trends chart
+- **Testing**: 100% pass rate (backend and frontend, iteration_183)
+
 ### Bugfix - Textbook Catalog Incorrect Statistics (Feb 21, 2026)
 - **Root Cause**: `PrivateCatalogTab.jsx` fetched both PCA and public products, then merged them. When duplicates were found (same book_id), instead of skipping them, the code renamed their IDs and added them again — inflating the count. Stats were also calculated from the full merged array instead of the filtered view per catalog tab.
 - **Fix**: (1) Changed merge logic to skip duplicate book_ids. (2) Added `statsProducts` useMemo that filters by catalog type. (3) Updated BoardHeader stats to use `statsProducts`.
