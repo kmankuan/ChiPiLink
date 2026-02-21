@@ -1,0 +1,54 @@
+{
+  "summary": "Textbook Catalog Statistics Fix - Verified that the fix is working correctly. Backend APIs return accurate product counts (PCA: 25, Total: 27). Frontend displays correct filtered stats per catalog tab (All=27, Textbooks=25, Public=2). Dashboard summary also shows correct numbers.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: /api/store/private-catalog/admin/products returns 25 PCA products (correct)",
+    "Backend: /api/store/products returns 27 active products (correct)",
+    "Backend: /api/store/inventory/dashboard returns total_products=27, out_of_stock=3, low_stock=2 (correct)",
+    "Backend: /api/store/inventory/products returns 27 products (correct)",
+    "Frontend: Dashboard shows Productos=27, School Textbooks=25, Public Products=2 (correct)",
+    "Frontend: Catalog All tab shows '27 total | 27 active | 686 stock | 2 low stock | 3 out of stock | 5 grades'",
+    "Frontend: Catalog Public tab shows '2 total | 2 active | 1 stock | 1 low stock | 1 out of stock'",
+    "Frontend: Pagination shows '1-27 of 27' on All tab (no duplicates)",
+    "Frontend: No duplicate products visible in table (unique book_ids)",
+    "Frontend: Stats recalculate correctly when switching between tabs"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_catalog_stats_fix.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "The fix in PrivateCatalogTab.jsx (lines 655-664) correctly skips duplicate book_ids instead of renaming them",
+    "The statsProducts useMemo (lines 913-922) correctly filters products by catalog type before calculating stats",
+    "BoardHeader stats now use statsProducts instead of raw products array (lines 965-971)",
+    "Database has 33 total products: 25 PCA + 8 non-PCA, with 27 active (6 inactive)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_catalog_stats_fix.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {"email": "admin@chipi.co", "password": "admin"},
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+  "seed_data_creation": "None - used existing products in store_products collection",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The statistics bug is fixed. Database has 33 products total (25 PCA, 8 non-PCA). Active products: 27. The frontend correctly merges PCA and public products, skipping duplicates, and displays accurate stats per catalog view (All/Textbooks/Public/Archive tabs). Key files: PrivateCatalogTab.jsx handles the merge logic and stats calculation.",
+  "rca_of_the_issue": {
+    "root_cause": "The fetchProducts function was merging PCA and public products but when duplicates were found (same book_id), it was renaming the IDs and adding them again instead of skipping them. This inflated the count. Additionally, stats were calculated from the full merged array instead of the filtered view per catalog type.",
+    "fix_applied": "1) Changed merge logic from renaming duplicate IDs to skipping them (lines 655-664). 2) Added statsProducts useMemo that filters products by catalog type for accurate stats (lines 913-922). 3) Updated BoardHeader stats to use statsProducts instead of raw products array.",
+    "verification": "Verified All tab shows 27 products, Textbooks tab shows 25, Public tab shows 2. Dashboard summary matches: Productos=27, School Textbooks=25, Public Products=2."
+  }
+}
