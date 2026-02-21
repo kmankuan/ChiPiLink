@@ -418,8 +418,8 @@
     "inactive": "Inactive"
   },
   "superpin": {
-    "title": "Super Pin",
-    "admin": "Super Pin - Admin",
+    "title": "PinPan League",
+    "admin": "PinPan League - Admin",
     "adminDesc": "Manage leagues, rankings and tournaments",
     "ranking": {
       "title": "Standings",
