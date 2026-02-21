@@ -266,7 +266,17 @@ class ArenaService(BaseService):
         })
 
         self.log_info(f"Brackets generated for tournament {tournament_id} (format: {fmt})")
-        return await self.get_tournament(tournament_id)
+        tournament = await self.get_tournament(tournament_id)
+
+        # Notify participants that tournament has started
+        await self._notify_participants(
+            tournament,
+            f"Tournament Started: {tournament.get('name', '')}",
+            "Brackets are live! Check your first match.",
+            action_url=f"/arena/{tournament_id}"
+        )
+
+        return tournament
 
     async def _generate_single_elimination(self, tid: str, tournament: Dict, participants: List[Dict]) -> Dict:
         """Generate single elimination bracket"""
