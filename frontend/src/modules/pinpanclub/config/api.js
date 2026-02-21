@@ -65,7 +65,16 @@ export const PINPANCLUB_API = {
     syncMatches: `${API_URL}${BASE_PATH}/monday/sync/matches/active`,
     syncResults: `${API_URL}${BASE_PATH}/monday/sync/results`,
     test: `${API_URL}${BASE_PATH}/monday/test`,
-  }
+  },
+
+  // Referee & Hall of Fame
+  refereeSettings: `${API_URL}${BASE_PATH}/referee/settings`,
+  refereeSettingsByType: (type) => `${API_URL}${BASE_PATH}/referee/settings/${type}`,
+  refereeProfiles: `${API_URL}${BASE_PATH}/referee/profiles`,
+  refereeProfileById: (id) => `${API_URL}${BASE_PATH}/referee/profiles/${id}`,
+  refereeRate: `${API_URL}${BASE_PATH}/referee/rate`,
+  hallOfFame: `${API_URL}${BASE_PATH}/referee/hall-of-fame`,
+  hallOfFameRefresh: `${API_URL}${BASE_PATH}/referee/hall-of-fame/refresh`,
 };
 
 // ============== WEBSOCKET ENDPOINTS ==============
