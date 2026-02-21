@@ -663,7 +663,7 @@ export default function PingPongDashboard() {
                 <Trophy className="h-5 w-5 text-purple-500" />
                 Torneos Próximos
               </h2>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/arena')}>
                 Ver todos
               </Button>
             </div>
