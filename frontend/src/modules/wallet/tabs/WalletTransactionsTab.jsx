@@ -1,11 +1,9 @@
 /**
- * WalletTransactionsTab — Transaction history
- * Sensitive data: archive only (no permanent delete). Preserves financial records.
+ * WalletTransactionsTab — Transaction history with archive & delete
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -16,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-  ArrowUpCircle, ArrowDownCircle, Search, RefreshCw, Loader2, Archive
+  ArrowUpCircle, ArrowDownCircle, Archive, Trash2, ArchiveRestore
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
@@ -24,12 +22,10 @@ import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
-import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletTransactionsTab() {
-  const { t } = useTranslation();
   const token = localStorage.getItem('auth_token');
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -38,7 +34,7 @@ export default function WalletTransactionsTab() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [showArchived, setShowArchived] = useState(false);
-  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null); // 'archive' | 'delete' | 'unarchive'
   const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchTransactions = useCallback(async () => {
@@ -46,7 +42,7 @@ export default function WalletTransactionsTab() {
     try {
       const res = await axios.get(`${API_URL}/api/wallet/admin/transactions?limit=500`, { headers });
       setTransactions(res.data.transactions || []);
-    } catch (err) {
+    } catch {
       toast.error('Error loading transactions');
     } finally {
       setLoading(false);
@@ -68,22 +64,28 @@ export default function WalletTransactionsTab() {
   const paginated = pagination.paginated;
   const selection = useTableSelection(paginated, 'transaction_id');
 
-  const handleBulkArchive = () => {
-    if (selection.count === 0) return;
-    setConfirmArchive(true);
-  };
+  const selectedIds = () => Array.from(selection.selected);
+  const hasArchivedSelected = paginated.some(tx => selection.isSelected(tx.transaction_id) && tx.archived);
 
-  const executeBulkArchive = async () => {
+  const executeBulkAction = async (action) => {
     setBulkLoading(true);
     try {
-      await axios.post(`${API_URL}/api/wallet/admin/transactions/bulk-archive`,
-        { transaction_ids: Array.from(selection.selected) }, { headers });
-      toast.success(`${selection.count} transaction(s) archived`);
+      const ids = selectedIds();
+      if (action === 'archive') {
+        await axios.post(`${API_URL}/api/wallet/admin/transactions/bulk-archive`, { transaction_ids: ids }, { headers });
+        toast.success(`${ids.length} transaction(s) archived`);
+      } else if (action === 'unarchive') {
+        await axios.post(`${API_URL}/api/wallet/admin/transactions/bulk-unarchive`, { transaction_ids: ids }, { headers });
+        toast.success(`${ids.length} transaction(s) restored`);
+      } else if (action === 'delete') {
+        await axios.post(`${API_URL}/api/wallet/admin/transactions/bulk-delete`, { transaction_ids: ids }, { headers });
+        toast.success(`${ids.length} transaction(s) permanently deleted`);
+      }
       selection.clear();
-      setConfirmArchive(false);
+      setConfirmAction(null);
       fetchTransactions();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Archive failed');
+      toast.error(err.response?.data?.detail || `${action} failed`);
     } finally {
       setBulkLoading(false);
     }
@@ -141,7 +143,7 @@ export default function WalletTransactionsTab() {
           </TableHeader>
           <TableBody>
             {paginated.map(tx => (
-              <TableRow key={tx.transaction_id} className={tx.archived ? 'opacity-50' : ''} data-testid={`txn-row-${tx.transaction_id}`}>
+              <TableRow key={tx.transaction_id} className={tx.archived ? 'opacity-50 bg-muted/30' : ''} data-testid={`txn-row-${tx.transaction_id}`}>
                 <TableCell>
                   <Checkbox checked={selection.isSelected(tx.transaction_id)}
                     onCheckedChange={() => selection.toggle(tx.transaction_id)} />
@@ -164,7 +166,7 @@ export default function WalletTransactionsTab() {
                       ? <><ArrowUpCircle className="h-3 w-3" /> Deposit</>
                       : <><ArrowDownCircle className="h-3 w-3" /> Charge</>}
                   </Badge>
-                  {tx.archived && <Badge variant="outline" className="ml-1 text-[10px]">Archived</Badge>}
+                  {tx.archived && <Badge variant="outline" className="ml-1 text-[10px] text-amber-600 border-amber-300">Archived</Badge>}
                 </TableCell>
                 <TableCell className={`text-right font-semibold ${
                   tx.transaction_type === 'deposit' ? 'text-green-600' : 'text-red-600'
@@ -191,20 +193,60 @@ export default function WalletTransactionsTab() {
         canPrev={pagination.canPrev} canNext={pagination.canNext}
       />
 
-      {/* Bulk Action Bar — Archive only (no delete for financial records) */}
-      <BulkActionBar count={selection.count} onClear={selection.clear}
-        onArchive={handleBulkArchive}
-        loading={bulkLoading} />
+      {/* Bulk Action Bar — Archive + Delete */}
+      {selection.count > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-background border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3" data-testid="bulk-action-bar">
+          <span className="text-sm font-medium">{selection.count} selected</span>
+          <div className="h-5 w-px bg-border" />
+          {hasArchivedSelected ? (
+            <Button size="sm" variant="outline" onClick={() => setConfirmAction('unarchive')} data-testid="bulk-unarchive-btn">
+              <ArchiveRestore className="h-4 w-4 mr-1.5" /> Restore
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={() => setConfirmAction('archive')} data-testid="bulk-archive-btn">
+              <Archive className="h-4 w-4 mr-1.5" /> Archive
+            </Button>
+          )}
+          <Button size="sm" variant="destructive" onClick={() => setConfirmAction('delete')} data-testid="bulk-delete-btn">
+            <Trash2 className="h-4 w-4 mr-1.5" /> Delete
+          </Button>
+          <Button size="sm" variant="ghost" onClick={selection.clear}>Cancel</Button>
+        </div>
+      )}
 
       {/* Confirm Archive */}
       <ConfirmDialog
-        open={confirmArchive}
-        onClose={() => setConfirmArchive(false)}
-        onConfirm={executeBulkArchive}
+        open={confirmAction === 'archive'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => executeBulkAction('archive')}
         title={`Archive ${selection.count} transaction(s)?`}
-        description="Archived transactions are hidden from view but preserved for financial records. This action can be reversed."
+        description="Archived transactions are hidden from view but preserved for records. This action can be reversed."
         variant="warning"
         confirmLabel="Archive"
+        loading={bulkLoading}
+      />
+
+      {/* Confirm Unarchive */}
+      <ConfirmDialog
+        open={confirmAction === 'unarchive'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => executeBulkAction('unarchive')}
+        title={`Restore ${selection.count} transaction(s)?`}
+        description="These transactions will be visible again in the main list."
+        variant="default"
+        confirmLabel="Restore"
+        loading={bulkLoading}
+      />
+
+      {/* Confirm Delete */}
+      <ConfirmDialog
+        open={confirmAction === 'delete'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => executeBulkAction('delete')}
+        title={`Permanently delete ${selection.count} transaction(s)?`}
+        description="This action cannot be undone. The transaction records will be permanently removed from the database."
+        variant="destructive"
+        confirmLabel="Delete Permanently"
         loading={bulkLoading}
       />
     </div>
