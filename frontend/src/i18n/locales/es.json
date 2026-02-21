@@ -423,6 +423,8 @@
     "adminDesc": "Gestiona ligas, rankings y torneos",
     "ranking": {
       "title": "Clasificación",
+      "noPlayers": "No hay jugadores en el ranking todavía",
+      "noPlayersHint": "Los jugadores aparecerán cuando jueguen su primer partido",
       "position": "Posición",
       "player": "Jugador",
       "points": "Puntos",
