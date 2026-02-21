@@ -842,7 +842,12 @@ class ArenaService(BaseService):
         }
         await self._update_rr_standings(tournament_id, fake_match, winner_id, score_a, score_b)
 
-        return await self.get_tournament(tournament_id)
+        # Broadcast update via WebSocket
+        updated_tournament = await self.get_tournament(tournament_id)
+        updated_matches = await self.get_tournament_matches(tournament_id)
+        await self._broadcast_arena_update(tournament_id, updated_tournament, updated_matches)
+
+        return updated_tournament
 
     # ============== COMPLETION ==============
 
