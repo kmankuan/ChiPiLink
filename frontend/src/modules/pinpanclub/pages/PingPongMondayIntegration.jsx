@@ -136,10 +136,10 @@ export default function PingPongMondayIntegration() {
       const headers = getAuthHeaders();
       const response = await axios.post(`${BACKEND_URL}/api/pinpanclub/monday/sync/players`, {}, { headers });
       setSyncResults({ type: 'players', ...response.data });
-      toast.success(`${response.data.synced_count} jugadores sincronizados`);
+      toast.success(`${response.data.synced_count} players synced`);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error sincronizando jugadores');
+      toast.error(error.response?.data?.detail || 'Error syncing players');
     } finally {
       setSyncing(false);
     }
@@ -210,7 +210,7 @@ export default function PingPongMondayIntegration() {
             Monday.com + PinpanClub
           </h2>
           <p className="text-muted-foreground">
-            Sincroniza jugadores, partidos y resultados con Monday.com
+            Sync players, matches and results with Monday.com
           </p>
         </div>
         <div className="flex gap-2">
@@ -362,7 +362,7 @@ export default function PingPongMondayIntegration() {
                   Sincronizar Jugadores
                 </CardTitle>
                 <CardDescription>
-                  Envía la lista de jugadores activos a Monday.com
+                  Send active players list a Monday.com
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -538,7 +538,7 @@ export default function PingPongMondayIntegration() {
                     <p className="text-sm text-muted-foreground text-center">
                       {stats.players.total > 0 
                         ? `${Math.round((stats.players.synced / stats.players.total) * 100)}% sincronizado`
-                        : 'Sin jugadores'
+                        : 'No players'
                       }
                     </p>
                   </div>
@@ -622,7 +622,7 @@ export default function PingPongMondayIntegration() {
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Board de Jugadores
+                  Players Board
                 </Label>
                 <Select
                   value={config.players_board_id || "none"}
@@ -641,7 +641,7 @@ export default function PingPongMondayIntegration() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Aquí se crearán los jugadores del club
+                  Club players will be created here
                 </p>
               </div>
 
@@ -728,7 +728,7 @@ export default function PingPongMondayIntegration() {
               
               <div className="flex items-center justify-between">
                 <Label htmlFor="auto-players" className="text-sm font-normal">
-                  Sincronizar jugadores automáticamente
+                  Auto-sync players
                 </Label>
                 <Switch
                   id="auto-players"
@@ -791,7 +791,7 @@ export default function PingPongMondayIntegration() {
             <p>1. Asegúrate de que la API Key de Monday.com esté configurada en el sistema</p>
             <p>2. Haz clic en "Configurar" y selecciona los tableros donde quieres sincronizar:</p>
             <ul className="list-disc list-inside ml-4">
-              <li><strong>Board de Jugadores:</strong> Lista de jugadores del club con su ELO y nivel</li>
+              <li><strong>Players Board:</strong> Club player list with ELO and level</li>
               <li><strong>Board de Partidos:</strong> Registro de partidos con resultados en vivo</li>
               <li><strong>Board de Torneos:</strong> (Opcional) Seguimiento de torneos</li>
             </ul>

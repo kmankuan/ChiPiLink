@@ -31,7 +31,7 @@ export default function PingPongMatch() {
     player_a_id: '',
     player_b_id: '',
     tipo_partido: 'mejor_de_3',
-    puntos_por_set: 11,
+    points_per_set: 11,
     diferencia_minima: 2,
     mesa: '',
     ronda: '',
@@ -47,7 +47,7 @@ export default function PingPongMatch() {
       const response = await axios.get(`${API_URL}/api/pinpanclub/players?activo=true`);
       setPlayers(response.data);
     } catch (error) {
-      toast.error('Error al cargar jugadores');
+      toast.error('Error loading players');
     }
   };
 
@@ -55,12 +55,12 @@ export default function PingPongMatch() {
     e.preventDefault();
     
     if (!formData.player_a_id || !formData.player_b_id) {
-      toast.error('Debes seleccionar ambos jugadores');
+      toast.error('You must select both players');
       return;
     }
     
     if (formData.player_a_id === formData.player_b_id) {
-      toast.error('Los jugadores deben ser diferentes');
+      toast.error('Players must be different');
       return;
     }
 
@@ -68,7 +68,7 @@ export default function PingPongMatch() {
     try {
       const response = await axios.post(`${API_URL}/api/pinpanclub/matches`, formData);
       toast.success('Partido creado');
-      navigate(`/pingpong/arbiter/${response.data.partido_id}`);
+      navigate(`/pingpong/arbiter/${response.data.match_id}`);
     } catch (error) {
       toast.error('Error al crear partido');
     } finally {
@@ -110,7 +110,7 @@ export default function PingPongMatch() {
                     onValueChange={(value) => setFormData({ ...formData, player_a_id: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar jugador" />
+                      <SelectValue placeholder="Select player" />
                     </SelectTrigger>
                     <SelectContent>
                       {players.map((player) => (
@@ -133,7 +133,7 @@ export default function PingPongMatch() {
                     onValueChange={(value) => setFormData({ ...formData, player_b_id: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar jugador" />
+                      <SelectValue placeholder="Select player" />
                     </SelectTrigger>
                     <SelectContent>
                       {players.map((player) => (
@@ -173,8 +173,8 @@ export default function PingPongMatch() {
                 <div className="space-y-2">
                   <Label>Puntos por Set</Label>
                   <Select
-                    value={formData.puntos_por_set.toString()}
-                    onValueChange={(value) => setFormData({ ...formData, puntos_por_set: parseInt(value) })}
+                    value={formData.points_per_set.toString()}
+                    onValueChange={(value) => setFormData({ ...formData, points_per_set: parseInt(value) })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -227,7 +227,7 @@ export default function PingPongMatch() {
               {players.length < 2 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
                   <p className="text-yellow-800 mb-2">
-                    Necesitas al menos 2 jugadores registrados
+                    You need at least 2 registered players
                   </p>
                   <Button 
                     type="button" 

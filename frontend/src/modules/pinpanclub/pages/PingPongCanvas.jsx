@@ -194,7 +194,7 @@ export default function PingPongCanvas() {
   const handleWsMessage = (data) => {
     if (data.type === 'point_scored' || data.type === 'match_state') {
       setAllMatches(prev => prev.map(m => 
-        m.partido_id === data.match?.partido_id ? { ...m, ...data.match } : m
+        m.match_id === data.match?.match_id ? { ...m, ...data.match } : m
       ));
     } else if (data.type === 'active_matches') {
       setActiveMatches(data.matches || []);
@@ -272,7 +272,7 @@ export default function PingPongCanvas() {
   useEffect(() => {
     if (layout.length === 0 && activeMatches.length > 0 && !currentLayoutId) {
       const newLayout = activeMatches.map((match, index) => ({
-        i: `widget_${match.partido_id}`,
+        i: `widget_${match.match_id}`,
         x: (index % 3) * 4,
         y: Math.floor(index / 3) * 3,
         ...DEFAULT_WIDGET_SIZE
@@ -280,7 +280,7 @@ export default function PingPongCanvas() {
       
       const newWidgetMatches = {};
       activeMatches.forEach(match => {
-        newWidgetMatches[`widget_${match.partido_id}`] = match.partido_id;
+        newWidgetMatches[`widget_${match.match_id}`] = match.match_id;
       });
       
       setLayout(newLayout);
@@ -459,7 +459,7 @@ export default function PingPongCanvas() {
         >
           {layout.map(item => {
             const matchId = widgetMatches[item.i];
-            const match = allMatches.find(m => m.partido_id === matchId);
+            const match = allMatches.find(m => m.match_id === matchId);
             
             return (
               <div key={item.i} className="relative">
@@ -548,9 +548,9 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                 <div className="space-y-2">
                   {allMatches.map(m => (
                     <button
-                      key={m.partido_id}
+                      key={m.match_id}
                       onClick={() => {
-                        onAssignMatch(m.partido_id);
+                        onAssignMatch(m.match_id);
                         setShowMatchSelector(false);
                       }}
                       className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
@@ -645,9 +645,9 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
           <div className="space-y-2 max-h-48 overflow-auto">
             {allMatches.map(m => (
               <button
-                key={m.partido_id}
+                key={m.match_id}
                 onClick={() => {
-                  onAssignMatch(m.partido_id);
+                  onAssignMatch(m.match_id);
                   setShowMatchSelector(false);
                 }}
                 className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
@@ -656,7 +656,7 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                   {m.player_a_info?.nickname || 'A'} vs {m.player_b_info?.nickname || 'B'}
                 </div>
                 <div className="text-xs text-white/60">
-                  Mesa {m.mesa || '?'} • {m.points_player_a}-{m.puntos_player_b}
+                  Mesa {m.mesa || '?'} • {m.points_player_a}-{m.points_player_b}
                 </div>
               </button>
             ))}
@@ -711,7 +711,7 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
           </span>
           <span className="text-2xl text-white/40">:</span>
           <span className={`text-6xl font-black ${match.saque === 'b' ? 'text-yellow-400' : 'text-white'}`}>
-            {match.puntos_player_b}
+            {match.points_player_b}
           </span>
         </div>
         <div className="text-sm text-white/60 mt-2">
@@ -795,7 +795,7 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
           {match.saque === 'b' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-black text-white">{match.puntos_player_b}</span>
+          <span className="text-3xl font-black text-white">{match.points_player_b}</span>
           <span className="text-lg font-bold text-red-400">{match.sets_player_b}</span>
         </div>
       </div>
@@ -812,7 +812,7 @@ function SmallMatchDisplay({ match, playerA, playerB }) {
       <div className="flex items-center justify-center gap-2">
         <span className="text-2xl font-black text-white">{match.points_player_a}</span>
         <span className="text-white/40">:</span>
-        <span className="text-2xl font-black text-white">{match.puntos_player_b}</span>
+        <span className="text-2xl font-black text-white">{match.points_player_b}</span>
       </div>
       <div className="text-xs text-white/40">
         {match.sets_player_a}-{match.sets_player_b}

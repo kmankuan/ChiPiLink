@@ -219,13 +219,13 @@ export default function PingPongTV() {
     
     // Set won
     if (data.set_ganado) {
-      triggerSpecialEvent('set_won', { ganador: data.set_winner });
+      triggerSpecialEvent('set_won', { winner: data.set_winner });
       if (soundEnabled) playSound('setWin');
     }
     
     // Match finished
-    if (data.partido_terminado) {
-      triggerSpecialEvent('match_won', { ganador: data.match_winner });
+    if (data.match_finished) {
+      triggerSpecialEvent('match_won', { winner: data.match_winner });
       if (soundEnabled) playSound('gameOver');
     }
   };

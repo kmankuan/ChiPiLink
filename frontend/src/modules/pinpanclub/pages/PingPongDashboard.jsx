@@ -508,7 +508,7 @@ export default function PingPongDashboard() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      {rapidPinData.season.total_players || 0} jugadores
+                      {rapidPinData.season.total_players || 0} players
                     </span>
                     <span className="flex items-center gap-1">
                       <Scale className="w-4 h-4" />
@@ -588,20 +588,20 @@ export default function PingPongDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeMatches.map((match) => (
-                <div key={match.partido_id} className="relative">
+                <div key={match.match_id} className="relative">
                   <ScoreBoard match={match} size="medium" showStats={false} />
                   <div className="absolute top-2 right-2 flex gap-2">
                     <Button 
                       size="sm" 
                       variant="secondary"
-                      onClick={() => navigate(`/pinpanclub/live/${match.partido_id}`)}
+                      onClick={() => navigate(`/pinpanclub/live/${match.match_id}`)}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Ver
                     </Button>
                     <Button 
                       size="sm"
-                      onClick={() => navigate(`/pinpanclub/arbiter/${match.partido_id}`)}
+                      onClick={() => navigate(`/pinpanclub/arbiter/${match.match_id}`)}
                     >
                       <Gavel className="h-4 w-4 mr-1" />
                       Arbitrar
@@ -629,7 +629,7 @@ export default function PingPongDashboard() {
             <CardContent className="p-0">
               {rankings.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
-                  No hay jugadores en el ranking aún
+                  No players in the ranking yet aún
                 </div>
               ) : (
                 <div className="divide-y">
@@ -753,9 +753,9 @@ export default function PingPongDashboard() {
                   
                   return (
                     <div 
-                      key={match.partido_id}
+                      key={match.match_id}
                       className="p-4 flex items-center justify-between hover:bg-muted/50 cursor-pointer"
-                      onClick={() => navigate(`/pingpong/match/${match.partido_id}`)}
+                      onClick={() => navigate(`/pingpong/match/${match.match_id}`)}
                     >
                       <div className="flex items-center gap-4">
                         <div className={`font-semibold ${ganadorA ? 'text-green-600' : ''}`}>
