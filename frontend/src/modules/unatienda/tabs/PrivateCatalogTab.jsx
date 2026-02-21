@@ -636,34 +636,44 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      // Fetch PCA (private) products
-      let pcaUrl = `${API}/api/store/private-catalog/admin/products?limit=500`;
-      if (selectedGrade) pcaUrl += `&grade=${encodeURIComponent(selectedGrade)}`;
-      if (selectedSubject) pcaUrl += `&subject=${encodeURIComponent(selectedSubject)}`;
-      const pcaRes = await fetch(pcaUrl, { headers: { Authorization: `Bearer ${token}` } });
-      const pcaData = await pcaRes.json();
-      const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'pca' }));
+      let all = [];
 
-      // Fetch public products
-      let pubProducts = [];
-      try {
-        const pubRes = await fetch(`${API}/api/store/products?limit=500`, { headers: { Authorization: `Bearer ${token}` } });
-        const pubData = await pubRes.json();
-        pubProducts = (pubData.products || pubData || []).map((p, idx) => ({
-          ...p,
-          book_id: p.product_id && p.product_id !== p.name ? p.product_id : (p.book_id || `pub_${idx}`),
-          _catalog: 'public',
-        }));
-      } catch { /* public store may not have products */ }
+      if (sysbook) {
+        // Sysbook mode: fetch from dedicated Sysbook inventory API
+        let url = `${API_PREFIX}/products?limit=500`;
+        if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
+        if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        all = (data.products || []).map(p => ({ ...p, _catalog: 'pca' }));
+      } else {
+        // Legacy mode: merge PCA + public products
+        let pcaUrl = `${API}/api/store/private-catalog/admin/products?limit=500`;
+        if (selectedGrade) pcaUrl += `&grade=${encodeURIComponent(selectedGrade)}`;
+        if (selectedSubject) pcaUrl += `&subject=${encodeURIComponent(selectedSubject)}`;
+        const pcaRes = await fetch(pcaUrl, { headers: { Authorization: `Bearer ${token}` } });
+        const pcaData = await pcaRes.json();
+        const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'pca' }));
 
-      // Merge — skip duplicates by book_id (PCA takes priority)
-      const seen = new Set();
-      const all = [];
-      for (const p of pcaProducts) { seen.add(p.book_id); all.push(p); }
-      for (const p of pubProducts) {
-        if (seen.has(p.book_id)) continue; // Skip duplicates already in PCA
-        seen.add(p.book_id);
-        all.push(p);
+        let pubProducts = [];
+        try {
+          const pubRes = await fetch(`${API}/api/store/products?limit=500`, { headers: { Authorization: `Bearer ${token}` } });
+          const pubData = await pubRes.json();
+          pubProducts = (pubData.products || pubData || []).map((p, idx) => ({
+            ...p,
+            book_id: p.product_id && p.product_id !== p.name ? p.product_id : (p.book_id || `pub_${idx}`),
+            _catalog: 'public',
+          }));
+        } catch { /* public store may not have products */ }
+
+        // Merge — skip duplicates by book_id (PCA takes priority)
+        const seen = new Set();
+        for (const p of pcaProducts) { seen.add(p.book_id); all.push(p); }
+        for (const p of pubProducts) {
+          if (seen.has(p.book_id)) continue;
+          seen.add(p.book_id);
+          all.push(p);
+        }
       }
 
       setProducts(all);
@@ -671,7 +681,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         grades: [...new Set(all.map(p => p.grade).filter(Boolean))].sort(),
         subjects: [...new Set(all.map(p => p.subject).filter(Boolean))].sort(),
       });
-    } catch { toast.error('Error loading catalog'); } finally { setLoading(false); }
+    } catch { toast.error('Error loading inventory'); } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchProducts(); }, [token, selectedGrade, selectedSubject]);
