@@ -794,6 +794,7 @@ export default function PingPongTV() {
         {mode === 'single' && renderSingleMatch()}
         {mode === 'multi' && renderMultiMatch()}
         {mode === 'dashboard' && renderDashboard()}
+        {mode === 'tournament' && renderTournament()}
       </main>
 
       {/* QR Overlay */}
