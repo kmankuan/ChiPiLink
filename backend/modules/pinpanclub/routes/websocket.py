@@ -35,25 +35,30 @@ class ConnectionManager:
         # Connection metadata
         self.connection_info: Dict[str, dict] = {}
     
-    async def connect(self, websocket: WebSocket, client_id: str, client_type: str = "spectator", match_id: str = None):
+    async def connect(self, websocket: WebSocket, client_id: str, client_type: str = "spectator", match_id: str = None, tournament_id: str = None):
         """Accept a new WebSocket connection"""
         await websocket.accept()
         self.active_connections[client_id] = websocket
         self.connection_info[client_id] = {
             "type": client_type,  # spectator, arbiter, tv, admin
             "match_id": match_id,
+            "tournament_id": tournament_id,
             "connected_at": datetime.now(timezone.utc).isoformat()
         }
         
         # Add to appropriate group
+        if tournament_id:
+            if tournament_id not in self.tournament_connections:
+                self.tournament_connections[tournament_id] = set()
+            self.tournament_connections[tournament_id].add(client_id)
         if match_id:
             if match_id not in self.match_connections:
                 self.match_connections[match_id] = set()
             self.match_connections[match_id].add(client_id)
-        else:
+        if not match_id and not tournament_id:
             self.global_connections.add(client_id)
         
-        logger.info(f"WebSocket connected: {client_id} ({client_type}) - Match: {match_id or 'global'}")
+        logger.info(f"WebSocket connected: {client_id} ({client_type}) - Match: {match_id or 'global'} Tournament: {tournament_id or 'none'}")
         
         # Send connection confirmation
         await self.send_personal(client_id, {
@@ -61,6 +66,7 @@ class ConnectionManager:
             "client_id": client_id,
             "client_type": client_type,
             "match_id": match_id,
+            "tournament_id": tournament_id,
             "timestamp": datetime.now(timezone.utc).isoformat()
         })
     
