@@ -95,6 +95,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Unatienda Cleanup**: Removed CatalogTypeSelector from StockOrdersTab (now public-only), removed all textbook/PCA references, simplified catalog filter
 - **Testing**: 100% pass rate (iteration_185)
 
+### Per-Product Custom Alert Thresholds (Feb 22, 2026)
+- **Backend**: PUT `/api/sysbook/inventory/products/{book_id}` accepts `low_stock_threshold` (int or null to clear). Uses `$unset` to properly remove field when null. `check_stock_levels` and `create_stock_alert_if_needed` both check per-product threshold before falling back to global.
+- **Frontend**: New `ThresholdCell` inline editable component in inventory table. Shows global threshold (muted) when no custom set, custom value with asterisk (*) and violet styling when set. Click to edit, Enter to save, empty to clear back to global.
+- **Column**: Added "Alert" column (with AlertTriangle icon) to `COLUMN_DEFS.sysbook` between Stock and Pre-sale. `effectiveCatalogType` ensures sysbook columns show in "All" tab when in sysbook mode.
+- **DB**: `store_products.low_stock_threshold` (optional Number) — per-product override for global threshold
+- **Testing**: 100% pass rate (iteration_186)
+
 ### Stock Alerts System (Feb 21, 2026)
 - **Backend**: New `/api/sysbook/alerts/*` endpoints — settings (configurable threshold), list/dismiss alerts, check-stock scan, auto-resolve on stock recovery
 - **Frontend**: `SysbookAlertsTab` with settings panel (threshold, push/in-app toggles), alert list with severity badges, dismiss/dismiss-all, check stock trigger
