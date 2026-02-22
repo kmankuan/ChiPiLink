@@ -110,28 +110,32 @@ async def dismiss_all_alerts(admin: dict = Depends(get_admin_user)):
 async def check_stock_levels(admin: dict = Depends(get_admin_user)):
     """
     Manually trigger a stock level check.
-    Scans all Sysbook products and creates alerts for any below threshold.
+    Scans all Sysbook products and creates alerts for any below their threshold.
+    Per-product threshold (low_stock_threshold field) takes priority over global.
     """
     settings = await db.sysbook_settings.find_one({"type": "alert_settings"}, {"_id": 0})
-    threshold = (settings or {}).get("global_low_stock_threshold", DEFAULT_SETTINGS["global_low_stock_threshold"])
+    global_threshold = (settings or {}).get("global_low_stock_threshold", DEFAULT_SETTINGS["global_low_stock_threshold"])
 
-    # Find all low/out of stock products
-    low_products = await db.store_products.find(
+    # Fetch ALL active sysbook products (we check threshold per product)
+    all_products = await db.store_products.find(
         {**SYSBOOK_FILTER, "active": True,
-         "$and": [
-             {"$or": [{"archived": {"$exists": False}}, {"archived": False}]},
-             {"$or": [
-                 {"inventory_quantity": {"$lte": threshold}},
-                 {"inventory_quantity": {"$exists": False}},
-             ]},
-         ]},
-        {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1, "grade": 1, "code": 1}
+         "$or": [{"archived": {"$exists": False}}, {"archived": False}]},
+        {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1, "grade": 1, "code": 1, "low_stock_threshold": 1}
     ).to_list(500)
+
+    # Filter to those below their effective threshold
+    low_products = []
+    for p in all_products:
+        effective = p.get("low_stock_threshold") if p.get("low_stock_threshold") is not None else global_threshold
+        qty = p.get("inventory_quantity", 0)
+        if qty <= effective:
+            p["_effective_threshold"] = effective
+            low_products.append(p)
 
     # Create alerts for products not already alerted (avoid duplicates)
     existing = set()
     async for a in db.sysbook_alerts.find(
-        {"source": "sysbook", "dismissed": {"$ne": True}, "alert_type": "low_stock"},
+        {"source": "sysbook", "dismissed": {"$ne": True}},
         {"book_id": 1, "_id": 0}
     ):
         existing.add(a.get("book_id"))
@@ -141,6 +145,7 @@ async def check_stock_levels(admin: dict = Depends(get_admin_user)):
         if p["book_id"] in existing:
             continue
         qty = p.get("inventory_quantity", 0)
+        eff = p["_effective_threshold"]
         alert = {
             "alert_id": f"alert_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{p['book_id'][-6:]}",
             "source": "sysbook",
@@ -151,8 +156,9 @@ async def check_stock_levels(admin: dict = Depends(get_admin_user)):
             "product_code": p.get("code", ""),
             "grade": p.get("grade", ""),
             "current_quantity": qty,
-            "threshold": threshold,
-            "message": f"{'Out of stock' if qty <= 0 else 'Low stock'}: {p.get('name', 'Unknown')} — {qty} units (threshold: {threshold})",
+            "threshold": eff,
+            "is_custom_threshold": p.get("low_stock_threshold") is not None,
+            "message": f"{'Out of stock' if qty <= 0 else 'Low stock'}: {p.get('name', 'Unknown')} — {qty} units (threshold: {eff})",
             "dismissed": False,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
