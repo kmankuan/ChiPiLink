@@ -239,11 +239,11 @@ async def get_products_by_grade(
 
 
 @router.get("/summary")
-async def get_catalog_summary(
+async def get_sysbook_summary(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Get summary of the private catalog for the user.
+    Get summary of the Sysbook catalog for the user.
     Shows available products for each linked student.
     """
     # Verify access
@@ -298,7 +298,7 @@ async def get_catalog_summary(
 # ============== ADMIN ENDPOINTS ==============
 
 @router.get("/admin/products")
-async def admin_get_private_catalog_products(
+async def admin_get_sysbook_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
     active: Optional[bool] = None,
@@ -307,7 +307,7 @@ async def admin_get_private_catalog_products(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Get all products from the private catalog.
+    Admin: Get all products from the Sysbook catalog.
     """
     query = {"is_sysbook": True}
     
@@ -334,16 +334,16 @@ async def admin_get_private_catalog_products(
 
 
 @router.post("/admin/products")
-async def admin_create_private_catalog_product(
+async def admin_create_sysbook_product(
     product: dict,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Create product in the private catalog.
+    Admin: Create product in the Sysbook catalog.
     """
     import uuid
     
-    # Ensure it's private catalog
+    # Ensure it's Sysbook catalog
     product["is_sysbook"] = True
     product["book_id"] = product.get("book_id") or f"book_{uuid.uuid4().hex[:12]}"
     product["active"] = product.get("active", True)
@@ -356,13 +356,13 @@ async def admin_create_private_catalog_product(
 
 
 @router.put("/admin/products/{book_id}")
-async def admin_update_private_catalog_product(
+async def admin_update_sysbook_product(
     book_id: str,
     updates: dict,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Update product in the private catalog.
+    Admin: Update product in the Sysbook catalog.
     """
     # Ensure is_sysbook cannot be changed
     updates["is_sysbook"] = True
@@ -382,13 +382,13 @@ async def admin_update_private_catalog_product(
 
 
 @router.delete("/admin/products/{book_id}")
-async def admin_delete_private_catalog_product(
+async def admin_delete_sysbook_product(
     book_id: str,
     hard_delete: bool = False,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Delete product from the private catalog.
+    Admin: Delete product from the Sysbook catalog.
     By default does soft delete (active=False).
     """
     if hard_delete:
