@@ -88,7 +88,7 @@ function StepIndicator({ statuses, current }) {
 }
 
 /* ============ Product Picker ============ */
-function ProductPicker({ items, setItems, token, catalogType }) {
+function ProductPicker({ items, setItems, token, inventoryType }) {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -98,7 +98,7 @@ function ProductPicker({ items, setItems, token, catalogType }) {
     setSearching(true);
     try {
       const params = { search: q, limit: 10 };
-      if (catalogType) params.inventory_source = catalogType;
+      if (inventoryType) params.inventory_source = inventoryType;
       const { data } = await axios.get(`${API_URL}/api/store/inventory/products`, {
         headers: { Authorization: `Bearer ${token}` },
         params,
@@ -106,7 +106,7 @@ function ProductPicker({ items, setItems, token, catalogType }) {
       setResults(data.products || []);
     } catch { setResults([]); }
     finally { setSearching(false); }
-  }, [token, catalogType]);
+  }, [token, inventoryType]);
 
   useEffect(() => {
     const t = setTimeout(() => doSearch(search), 300);
@@ -199,7 +199,7 @@ function CreateShipmentDialog({ open, onClose, onCreated, token }) {
             <div><Label className="text-xs">Supplier *</Label><Input value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="Supplier name" className="h-9 text-xs" data-testid="shipment-supplier" /></div>
             <div><Label className="text-xs">Expected Date</Label><Input type="date" value={expectedDate} onChange={e => setExpectedDate(e.target.value)} className="h-9 text-xs" data-testid="shipment-date" /></div>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} catalogType="public" />
+          <ProductPicker items={items} setItems={setItems} token={token} inventoryType="public" />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Additional details..." rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
@@ -375,7 +375,7 @@ function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
               {ADJUSTMENT_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} catalogType="public" />
+          <ProductPicker items={items} setItems={setItems} token={token} inventoryType="public" />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
@@ -583,9 +583,9 @@ export default function StockOrdersTab({ token }) {
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [counts, setCounts] = useState({});
-  const [catalogCounts, setCatalogCounts] = useState({});
+  const [inventoryCounts, setCatalogCounts] = useState({});
   const [loading, setLoading] = useState(true);
-  const [catalogFilter, setCatalogFilter] = useState('public');
+  const [inventoryFilter, setCatalogFilter] = useState('public');
   const [filter, setFilter] = useState('all'); // all | shipment | return | adjustment
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -602,17 +602,17 @@ export default function StockOrdersTab({ token }) {
       if (filter !== 'all') params.order_type = filter;
       if (statusFilter) params.status = statusFilter;
       if (search) params.search = search;
-      if (catalogFilter !== 'all') params.inventory_source = catalogFilter;
+      if (inventoryFilter !== 'all') params.inventory_source = inventoryFilter;
       const { data } = await axios.get(`${API_URL}/api/store/stock-orders`, {
         headers: { Authorization: `Bearer ${token}` }, params,
       });
       setOrders(data.orders);
       setTotal(data.total);
       setCounts(data.counts);
-      setCatalogCounts(data.catalog_counts || {});
+      setCatalogCounts(data.inventory_counts || {});
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  }, [token, filter, statusFilter, search, catalogFilter]);
+  }, [token, filter, statusFilter, search, inventoryFilter]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
@@ -628,7 +628,7 @@ export default function StockOrdersTab({ token }) {
   const returnCount = orders.filter(o => o.type === 'return').length;
   const adjustmentCount = orders.filter(o => o.type === 'adjustment').length;
 
-  const defaultCatalog = 'public';
+  const defaultInventory = 'public';
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
@@ -651,7 +651,7 @@ export default function StockOrdersTab({ token }) {
             ],
           },
         ]}
-        hasActiveFilters={!!(search || filter !== 'all' || statusFilter || catalogFilter !== 'all')}
+        hasActiveFilters={!!(search || filter !== 'all' || statusFilter || inventoryFilter !== 'all')}
         onClearFilters={() => { setSearch(''); setFilter('all'); setStatusFilter(''); setCatalogFilter('all'); }}
         stats={[
           { label: 'total', value: total, color: 'blue' },
@@ -689,7 +689,7 @@ export default function StockOrdersTab({ token }) {
       {/* Orders List */}
       {orders.length === 0 ? (
         <div className="text-center py-12 text-sm text-muted-foreground" data-testid="empty-orders">
-          {catalogFilter !== 'all'
+          {inventoryFilter !== 'all'
             ? 'No public store stock movements yet.'
             : 'No stock movements yet. Create a shipment, return, or adjustment to get started.'}
         </div>
@@ -713,7 +713,7 @@ export default function StockOrdersTab({ token }) {
                     <span className="text-xs font-mono font-bold">{order.order_id}</span>
                     <Badge className={`text-[9px] ${STATUS_COLORS[order.status]}`}>{order.status}</Badge>
                     {catBadge && (
-                      <Badge variant="outline" className={`text-[9px] ${catBadge.className}`} data-testid={`catalog-badge-${order.order_id}`}>
+                      <Badge variant="outline" className={`text-[9px] ${catBadge.className}`} data-testid={`inventory-badge-${order.order_id}`}>
                         {catBadge.label}
                       </Badge>
                     )}
