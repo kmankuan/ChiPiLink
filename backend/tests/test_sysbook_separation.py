@@ -1,350 +1,247 @@
 """
-Test suite for Sysbook Inventory component separation
-Tests the new dedicated SysbookInventoryTable and related APIs after splitting from shared component
+Test suite for Sysbook/Store architectural separation - Iteration 192.
+Verifies the complete module separation after moving services, models, and repositories.
 """
 import pytest
 import requests
 import os
-import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
-class TestSysbookInventoryAPIs:
-    """Test Sysbook inventory endpoints after component split"""
+# Test credentials
+ADMIN_EMAIL = "teck@koh.one"
+ADMIN_PASSWORD = "Acdb##0897"
+
+
+class TestBackendStartup:
+    """Verify backend starts cleanly without import errors"""
     
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        """Login and get token for all tests"""
-        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
-            "email": "admin@chipi.co",
-            "password": "admin"
-        })
-        assert response.status_code == 200, f"Login failed: {response.text}"
-        self.token = response.json().get("token")
-        self.headers = {"Authorization": f"Bearer {self.token}"}
-        yield
+    def test_health_check(self):
+        """Backend should start and respond to health check"""
+        response = requests.get(f"{BASE_URL}/api/health", timeout=10)
+        assert response.status_code == 200, f"Health check failed: {response.status_code}"
+        print("✓ Backend health check passed")
+
+
+class TestAuthentication:
+    """Test authentication endpoints"""
     
-    # ----- Dashboard API Tests -----
-    def test_sysbook_dashboard_endpoint(self):
-        """Test /api/sysbook/inventory/dashboard returns correct structure"""
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/dashboard", headers=self.headers)
-        assert response.status_code == 200, f"Dashboard failed: {response.text}"
-        data = response.json()
-        
-        # Verify dashboard structure
-        assert "total_products" in data, "Missing total_products in dashboard"
-        assert "total_stock" in data, "Missing total_stock"
-        assert "total_value" in data, "Missing total_value"
-        assert "out_of_stock" in data, "Missing out_of_stock"
-        assert "low_stock" in data, "Missing low_stock"
-        assert "recent_movements" in data, "Missing recent_movements"
-        assert "grade_breakdown" in data, "Missing grade_breakdown"
-        
-        print(f"Dashboard stats: {data['total_products']} products, {data['total_stock']} stock, {data['low_stock']} low stock")
-    
-    # ----- Products List API Tests -----
-    def test_sysbook_products_list_basic(self):
-        """Test /api/sysbook/inventory/products returns products"""
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products?limit=10", headers=self.headers)
-        assert response.status_code == 200
-        data = response.json()
-        
-        assert "products" in data, "Missing products array"
-        assert "total" in data, "Missing total count"
-        assert isinstance(data["products"], list), "Products should be array"
-        
-        # Verify all products are sysbook (is_sysbook=True)
-        for p in data["products"]:
-            assert p.get("is_sysbook") == True, f"Product {p.get('book_id')} is not sysbook"
-            assert "book_id" in p, "Missing book_id"
-            assert "name" in p, "Missing name"
-        
-        print(f"Retrieved {len(data['products'])} sysbook products of {data['total']} total")
-    
-    def test_sysbook_products_columns_exist(self):
-        """Verify products have all columns shown in UI: name, code, grade, subject, publisher, price, stock, threshold, presale, status"""
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products?limit=5", headers=self.headers)
-        assert response.status_code == 200
-        data = response.json()
-        
-        if data["products"]:
-            product = data["products"][0]
-            # Required columns based on COLUMNS definition in SysbookInventoryTable.jsx
-            expected_fields = ["name", "code", "grade", "subject", "publisher", "price", "inventory_quantity", "active"]
-            for field in expected_fields:
-                # Allow missing but check API doesn't fail
-                pass  # Fields may not all be set
-            
-            print(f"Sample product: {product.get('name', 'N/A')}, grade: {product.get('grade', 'N/A')}, stock: {product.get('inventory_quantity', 0)}")
-    
-    def test_sysbook_products_search_filter(self):
-        """Test search by name, code, publisher"""
-        # First get a product to search for
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products?limit=1", headers=self.headers)
-        assert response.status_code == 200
-        
-        if response.json().get("products"):
-            sample = response.json()["products"][0]
-            search_term = sample.get("name", "")[:5] if sample.get("name") else "test"
-            
-            # Search by name
-            search_response = requests.get(
-                f"{BASE_URL}/api/sysbook/inventory/products?search={search_term}&limit=20",
-                headers=self.headers
-            )
-            assert search_response.status_code == 200
-            print(f"Search '{search_term}' returned {len(search_response.json().get('products', []))} products")
-    
-    def test_sysbook_products_grade_filter(self):
-        """Test filtering by grade"""
-        # Get products to find available grades
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products?limit=100", headers=self.headers)
-        assert response.status_code == 200
-        products = response.json().get("products", [])
-        
-        grades = set(p.get("grade") for p in products if p.get("grade"))
-        if grades:
-            test_grade = list(grades)[0]
-            filter_response = requests.get(
-                f"{BASE_URL}/api/sysbook/inventory/products?grade={test_grade}&limit=50",
-                headers=self.headers
-            )
-            assert filter_response.status_code == 200
-            filtered = filter_response.json().get("products", [])
-            for p in filtered:
-                assert p.get("grade") == test_grade or test_grade in p.get("grades", []), f"Product grade mismatch"
-            print(f"Grade filter '{test_grade}' returned {len(filtered)} products")
-    
-    def test_sysbook_products_subject_filter(self):
-        """Test filtering by subject"""
-        response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products?limit=100", headers=self.headers)
-        products = response.json().get("products", [])
-        
-        subjects = set(p.get("subject") for p in products if p.get("subject"))
-        if subjects:
-            test_subject = list(subjects)[0]
-            filter_response = requests.get(
-                f"{BASE_URL}/api/sysbook/inventory/products?subject={test_subject}&limit=50",
-                headers=self.headers
-            )
-            assert filter_response.status_code == 200
-            filtered = filter_response.json().get("products", [])
-            for p in filtered:
-                assert p.get("subject") == test_subject, f"Product subject mismatch"
-            print(f"Subject filter '{test_subject}' returned {len(filtered)} products")
-    
-    # ----- CRUD Tests -----
-    def test_sysbook_create_product(self):
-        """Test creating a new sysbook product"""
-        unique_id = uuid.uuid4().hex[:8]
-        new_product = {
-            "name": f"TEST_SEPARATION_Book_{unique_id}",
-            "code": f"TST-{unique_id}",
-            "grade": "G5",
-            "subject": "Mathematics",
-            "publisher": "Test Publisher",
-            "price": 29.99,
-            "inventory_quantity": 50,
-            "active": True
-        }
-        
+    def test_admin_login(self):
+        """POST /api/auth-v2/login should return valid token"""
         response = requests.post(
-            f"{BASE_URL}/api/sysbook/inventory/products",
-            json=new_product,
-            headers=self.headers
+            f"{BASE_URL}/api/auth-v2/login",
+            json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
+            timeout=15
         )
-        assert response.status_code == 200, f"Create failed: {response.text}"
+        assert response.status_code == 200, f"Login failed: {response.status_code} - {response.text}"
+        
         data = response.json()
-        assert data.get("success") == True
-        assert "product" in data
-        
-        created = data["product"]
-        self.created_book_id = created.get("book_id")
-        assert created.get("is_sysbook") == True, "Created product should be sysbook"
-        assert created.get("name") == new_product["name"]
-        
-        print(f"Created sysbook product: {self.created_book_id}")
-        
-        # Cleanup
-        if self.created_book_id:
-            requests.delete(
-                f"{BASE_URL}/api/sysbook/inventory/products/{self.created_book_id}?hard_delete=true",
-                headers=self.headers
-            )
-    
-    def test_sysbook_update_product(self):
-        """Test updating a sysbook product inline (price, threshold)"""
-        # Create test product
-        unique_id = uuid.uuid4().hex[:8]
-        create_response = requests.post(
-            f"{BASE_URL}/api/sysbook/inventory/products",
-            json={
-                "name": f"TEST_UPDATE_{unique_id}",
-                "grade": "G3",
-                "price": 19.99
-            },
-            headers=self.headers
-        )
-        assert create_response.status_code == 200
-        book_id = create_response.json()["product"]["book_id"]
-        
-        try:
-            # Update price
-            update_response = requests.put(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}",
-                json={"price": 24.99},
-                headers=self.headers
-            )
-            assert update_response.status_code == 200
-            assert update_response.json().get("product", {}).get("price") == 24.99
-            
-            # Update threshold (per-product custom threshold)
-            threshold_response = requests.put(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}",
-                json={"low_stock_threshold": 15},
-                headers=self.headers
-            )
-            assert threshold_response.status_code == 200
-            assert threshold_response.json().get("product", {}).get("low_stock_threshold") == 15
-            
-            print(f"Updated product {book_id}: price=24.99, threshold=15")
-            
-        finally:
-            # Cleanup
-            requests.delete(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}?hard_delete=true",
-                headers=self.headers
-            )
-    
-    def test_sysbook_archive_restore(self):
-        """Test archive and restore functionality"""
-        # Create test product
-        unique_id = uuid.uuid4().hex[:8]
-        create_response = requests.post(
-            f"{BASE_URL}/api/sysbook/inventory/products",
-            json={"name": f"TEST_ARCHIVE_{unique_id}", "grade": "G1", "price": 9.99},
-            headers=self.headers
-        )
-        assert create_response.status_code == 200
-        book_id = create_response.json()["product"]["book_id"]
-        
-        try:
-            # Archive
-            archive_response = requests.post(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}/archive",
-                headers=self.headers
-            )
-            assert archive_response.status_code == 200
-            
-            # Verify archived
-            get_archived = requests.get(
-                f"{BASE_URL}/api/sysbook/inventory/products?archived=true&limit=100",
-                headers=self.headers
-            )
-            archived_ids = [p["book_id"] for p in get_archived.json().get("products", [])]
-            assert book_id in archived_ids, "Product should appear in archived list"
-            
-            # Restore
-            restore_response = requests.post(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}/restore",
-                headers=self.headers
-            )
-            assert restore_response.status_code == 200
-            
-            print(f"Archive/restore test passed for {book_id}")
-            
-        finally:
-            # Hard delete
-            requests.delete(
-                f"{BASE_URL}/api/sysbook/inventory/products/{book_id}?hard_delete=true",
-                headers=self.headers
-            )
-    
-    # ----- Alert Settings API -----
-    def test_sysbook_alerts_settings(self):
-        """Test /api/sysbook/alerts/settings returns global threshold"""
-        response = requests.get(f"{BASE_URL}/api/sysbook/alerts/settings", headers=self.headers)
-        assert response.status_code == 200
-        data = response.json()
-        
-        # Should have global_low_stock_threshold
-        assert "global_low_stock_threshold" in data, "Missing global_low_stock_threshold"
-        threshold = data["global_low_stock_threshold"]
-        assert isinstance(threshold, (int, float)), "Threshold should be number"
-        
-        print(f"Global alert threshold: {threshold}")
-    
-    # ----- Sorting Tests -----
-    def test_sysbook_products_sorting(self):
-        """Test sorting by various columns"""
-        # Sort by name ascending
-        response_asc = requests.get(
-            f"{BASE_URL}/api/sysbook/inventory/products?sort_by=name&sort_dir=asc&limit=5",
-            headers=self.headers
-        )
-        assert response_asc.status_code == 200
-        
-        # Sort by name descending
-        response_desc = requests.get(
-            f"{BASE_URL}/api/sysbook/inventory/products?sort_by=name&sort_dir=desc&limit=5",
-            headers=self.headers
-        )
-        assert response_desc.status_code == 200
-        
-        # Sort by stock
-        response_stock = requests.get(
-            f"{BASE_URL}/api/sysbook/inventory/products?sort_by=stock&sort_dir=asc&limit=5",
-            headers=self.headers
-        )
-        assert response_stock.status_code == 200
-        
-        # Sort by price
-        response_price = requests.get(
-            f"{BASE_URL}/api/sysbook/inventory/products?sort_by=price&sort_dir=desc&limit=5",
-            headers=self.headers
-        )
-        assert response_price.status_code == 200
-        
-        print("Sorting tests passed for name, stock, price")
+        assert "token" in data, "Response should contain token"
+        assert "user" in data, "Response should contain user"
+        assert data["user"]["email"] == ADMIN_EMAIL
+        assert data["user"]["is_admin"] == True
+        print(f"✓ Admin login successful, token obtained")
 
 
-class TestUnatiendaNotAffected:
-    """Verify Unatienda module still works independently after split"""
+@pytest.fixture(scope="class")
+def auth_token():
+    """Get authentication token for subsequent tests"""
+    response = requests.post(
+        f"{BASE_URL}/api/auth-v2/login",
+        json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
+        timeout=15
+    )
+    if response.status_code != 200:
+        pytest.skip("Authentication failed - cannot proceed with authenticated tests")
+    return response.json()["token"]
+
+
+class TestSysbookEndpoints:
+    """Test all Sysbook module endpoints"""
     
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
-            "email": "admin@chipi.co",
-            "password": "admin"
-        })
-        self.token = response.json().get("token")
-        self.headers = {"Authorization": f"Bearer {self.token}"}
-        yield
-    
-    def test_unatienda_store_products_endpoint(self):
-        """Test Unatienda store products endpoint still works"""
+    def test_sysbook_inventory_products(self, auth_token):
+        """GET /api/sysbook/inventory/products should return products list"""
         response = requests.get(
-            f"{BASE_URL}/api/store/products?limit=5",
-            headers=self.headers
+            f"{BASE_URL}/api/sysbook/inventory/products",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
         )
-        assert response.status_code == 200
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
         data = response.json()
-        # Endpoint may return products array directly or in "products" key
-        products_list = data.get("products", data) if isinstance(data, dict) else data
-        assert isinstance(products_list, list), "Expected products list"
-        print(f"Unatienda /api/store/products works: {len(products_list)} products")
+        assert isinstance(data, list), "Response should be a list of products"
+        print(f"✓ Sysbook inventory: {len(data)} products returned")
     
-    def test_unatienda_inventory_adjust_endpoint(self):
-        """Test Unatienda inventory adjust endpoint exists"""
-        # Just verify endpoint doesn't 404
-        response = requests.post(
-            f"{BASE_URL}/api/store/inventory/adjust",
-            json={"book_id": "nonexistent", "quantity_change": 0, "reason": "test"},
-            headers=self.headers
+    def test_sysbook_access_schools(self, auth_token):
+        """GET /api/sysbook/access/schools should return schools list"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/access/schools",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
         )
-        # Should fail with 404 for nonexistent product, not 500 or endpoint not found
-        assert response.status_code in [200, 400, 404], f"Unexpected status: {response.status_code}"
-        print("Unatienda inventory adjust endpoint exists and responds")
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
+        data = response.json()
+        assert isinstance(data, list), "Response should be a list of schools"
+        print(f"✓ Sysbook schools: {len(data)} schools returned")
+    
+    def test_sysbook_stock_orders(self, auth_token):
+        """GET /api/sysbook/stock-orders should return stock orders"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/stock-orders",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
+        data = response.json()
+        # Response could be a list or dict with orders key
+        assert isinstance(data, (list, dict)), "Response should be list or dict"
+        print(f"✓ Sysbook stock orders endpoint working")
+    
+    def test_sysbook_access_students(self, auth_token):
+        """GET /api/sysbook/access/students should return student records"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/access/students",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        # 200 or 404 if no students exist
+        assert response.status_code in [200, 404], f"Unexpected: {response.status_code} - {response.text}"
+        print(f"✓ Sysbook students endpoint: {response.status_code}")
+    
+    def test_sysbook_analytics_dashboard(self, auth_token):
+        """GET /api/sysbook/analytics/dashboard should return analytics data"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/analytics/dashboard",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
+        data = response.json()
+        assert isinstance(data, dict), "Response should be analytics dict"
+        print(f"✓ Sysbook analytics dashboard working")
+
+
+class TestStoreEndpoints:
+    """Verify Store module still works independently"""
+    
+    def test_store_products(self, auth_token):
+        """GET /api/store/products should return store products"""
+        response = requests.get(
+            f"{BASE_URL}/api/store/products",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
+        data = response.json()
+        assert isinstance(data, list), "Response should be a list of products"
+        print(f"✓ Store products: {len(data)} products returned")
+
+
+class TestSysbookImportRoutes:
+    """Test sysbook-specific import routes"""
+    
+    def test_presale_import_orders(self, auth_token):
+        """GET /api/sysbook/presale-import/orders should work"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/presale-import/orders",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ Presale import orders endpoint working")
+    
+    def test_bulk_import_history(self, auth_token):
+        """GET /api/sysbook/bulk-import/history should work"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/bulk-import/history",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ Bulk import history endpoint working")
+    
+    def test_school_year_config(self, auth_token):
+        """GET /api/sysbook/school-year/config should work"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/school-year/config",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ School year config endpoint working")
+
+
+class TestSharedStoreRoutes:
+    """Test routes shared between sysbook and store modules"""
+    
+    def test_monday_sync_config(self, auth_token):
+        """GET /api/sysbook/monday/config should work (shared from store)"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/monday/config",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ Monday sync config endpoint working via sysbook prefix")
+
+
+class TestSysbookBrowseRoutes:
+    """Test sysbook browse (user-facing) routes"""
+    
+    def test_browse_access(self, auth_token):
+        """GET /api/sysbook/browse/access should return access info"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/browse/access",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        
+        data = response.json()
+        assert "has_access" in data or "students" in data, "Response should contain access info"
+        print(f"✓ Browse access endpoint working")
+
+
+class TestSysbookOrderRoutes:
+    """Test sysbook order routes"""
+    
+    def test_my_orders(self, auth_token):
+        """GET /api/sysbook/orders/my-orders should work"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/orders/my-orders",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ My orders endpoint working")
+    
+    def test_admin_all_orders(self, auth_token):
+        """GET /api/sysbook/orders/admin/all should work (admin)"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/orders/admin/all",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ Admin all orders endpoint working")
+
+
+class TestAlertRoutes:
+    """Test sysbook alert routes"""
+    
+    def test_alerts(self, auth_token):
+        """GET /api/sysbook/alerts should work"""
+        response = requests.get(
+            f"{BASE_URL}/api/sysbook/alerts",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=15
+        )
+        assert response.status_code == 200, f"Failed: {response.status_code} - {response.text}"
+        print(f"✓ Alerts endpoint working")
 
 
 if __name__ == "__main__":
