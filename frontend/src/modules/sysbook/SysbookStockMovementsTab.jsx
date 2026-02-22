@@ -134,6 +134,28 @@ export default function SysbookStockMovementsTab() {
     } catch (e) { toast.error(e.response?.data?.detail || 'Error transitioning'); }
   };
 
+  const handleDelete = async (orderId) => {
+    if (!window.confirm('Delete this stock order?')) return;
+    setDeleting(true);
+    try {
+      await axios.delete(`${SYSBOOK_API}/stock-orders/${orderId}`, { headers });
+      toast.success('Order deleted');
+      setSelectedOrder(null);
+      fetchOrders();
+      fetchPending();
+    } catch (e) { toast.error(e.response?.data?.detail || 'Error deleting'); } finally { setDeleting(false); }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm('Delete ALL stock orders? This cannot be undone.')) return;
+    try {
+      const { data } = await axios.delete(`${SYSBOOK_API}/stock-orders/clear/all`, { headers });
+      toast.success(`Deleted ${data.deleted_count} orders`);
+      fetchOrders();
+      fetchPending();
+    } catch (e) { toast.error(e.response?.data?.detail || 'Error clearing'); }
+  };
+
   const addItem = () => setCreateItems(prev => [...prev, { book_id: '', product_name: '', expected_qty: 0 }]);
   const removeItem = (idx) => setCreateItems(prev => prev.filter((_, i) => i !== idx));
   const updateItem = (idx, field, value) => setCreateItems(prev => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item));
