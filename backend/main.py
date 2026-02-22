@@ -329,8 +329,6 @@ async def startup_event():
     asyncio.create_task(_deferred_init())
     logger.info("Core startup complete, deferred init running in background")
 
-    logger.info("All modules loaded successfully")
-
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown"""
