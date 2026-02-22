@@ -221,7 +221,6 @@ const navGroups = [
       { id: 'migration', labelKey: 'nav.migration', icon: ArrowRightLeft, permission: 'admin.site_config', adminOnly: true },
       { id: 'modules', labelKey: 'nav.moduleStatus', icon: LayoutGrid, permission: 'admin.site_config', adminOnly: true },
       { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
-      { id: 'cleanup', labelKey: 'nav.dataCleanup', fallbackLabel: 'Data Cleanup', icon: Trash2, permission: 'admin.site_config', adminOnly: true },
     ],
   },
 ];
