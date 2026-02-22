@@ -219,10 +219,15 @@ async def _send_low_stock_push(alerts: list):
 async def create_stock_alert_if_needed(book_id: str, product_name: str, new_quantity: int, grade: str = "", code: str = ""):
     """
     Called after stock adjustments to create alert if below threshold.
-    This is the hook used by Sysbook inventory routes.
+    Per-product low_stock_threshold takes priority over global.
     """
     settings = await db.sysbook_settings.find_one({"type": "alert_settings"}, {"_id": 0})
-    threshold = (settings or {}).get("global_low_stock_threshold", DEFAULT_SETTINGS["global_low_stock_threshold"])
+    global_threshold = (settings or {}).get("global_low_stock_threshold", DEFAULT_SETTINGS["global_low_stock_threshold"])
+
+    # Check per-product threshold
+    product = await db.store_products.find_one({"book_id": book_id}, {"_id": 0, "low_stock_threshold": 1})
+    product_threshold = (product or {}).get("low_stock_threshold")
+    threshold = product_threshold if product_threshold is not None else global_threshold
 
     if new_quantity > threshold:
         # Auto-resolve existing alerts if stock is now above threshold
