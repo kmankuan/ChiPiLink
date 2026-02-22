@@ -56,6 +56,7 @@ export default function SysbookStockMovementsTab() {
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [transitionNotes, setTransitionNotes] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const [products, setProducts] = useState([]);
 
