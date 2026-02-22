@@ -90,6 +90,11 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `GET /api/pinpanclub/referee/hall-of-fame` — Global leaderboard (mode filter)
 - `POST /api/pinpanclub/referee/hall-of-fame/refresh` — Rebuild (admin)
 
+### Sysbook Dashboard & Unatienda Cleanup (Feb 22, 2026)
+- **Sysbook Dashboard**: Admin landing page combining KPIs (products, stock, value, alerts, movements, pending orders), active alerts panel, grade health bars, recent activity, quick action buttons
+- **Unatienda Cleanup**: Removed CatalogTypeSelector from StockOrdersTab (now public-only), removed all textbook/PCA references, simplified catalog filter
+- **Testing**: 100% pass rate (iteration_185)
+
 ### Stock Alerts System (Feb 21, 2026)
 - **Backend**: New `/api/sysbook/alerts/*` endpoints — settings (configurable threshold), list/dismiss alerts, check-stock scan, auto-resolve on stock recovery
 - **Frontend**: `SysbookAlertsTab` with settings panel (threshold, push/in-app toggles), alert list with severity badges, dismiss/dismiss-all, check stock trigger
