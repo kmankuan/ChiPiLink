@@ -291,6 +291,13 @@ class BulkDeleteRequest(BaseModel):
     order_ids: List[str]
 
 
+@router.delete("/clear/all")
+async def clear_all_stock_orders(admin: dict = Depends(get_admin_user)):
+    """Delete ALL sysbook stock orders. Use with caution."""
+    result = await db.stock_orders.delete_many({"inventory_source": CATALOG_TYPE})
+    return {"deleted_count": result.deleted_count}
+
+
 @router.delete("/{order_id}")
 async def delete_stock_order(order_id: str, admin: dict = Depends(get_admin_user)):
     """Delete a single stock order"""
@@ -298,20 +305,3 @@ async def delete_stock_order(order_id: str, admin: dict = Depends(get_admin_user
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Order not found")
     return {"deleted": True, "order_id": order_id}
-
-
-@router.post("/bulk-delete")
-async def bulk_delete_stock_orders(body: BulkDeleteRequest, admin: dict = Depends(get_admin_user)):
-    """Delete multiple stock orders at once"""
-    result = await db.stock_orders.delete_many({
-        "order_id": {"$in": body.order_ids},
-        "inventory_source": CATALOG_TYPE,
-    })
-    return {"deleted_count": result.deleted_count}
-
-
-@router.delete("/clear/all")
-async def clear_all_stock_orders(admin: dict = Depends(get_admin_user)):
-    """Delete ALL sysbook stock orders. Use with caution."""
-    result = await db.stock_orders.delete_many({"inventory_source": CATALOG_TYPE})
-    return {"deleted_count": result.deleted_count}
