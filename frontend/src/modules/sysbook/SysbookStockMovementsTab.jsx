@@ -291,6 +291,11 @@ export default function SysbookStockMovementsTab() {
                   </Button>
                 </div>
               )}
+              <div className="pt-2 border-t">
+                <Button variant="destructive" size="sm" onClick={() => handleDelete(selectedOrder.order_id)} disabled={deleting} className="w-full gap-1" data-testid="delete-order-btn">
+                  <XCircle className="h-4 w-4" /> {deleting ? 'Deleting...' : 'Delete Order'}
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
