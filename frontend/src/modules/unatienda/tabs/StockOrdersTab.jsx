@@ -585,7 +585,7 @@ export default function StockOrdersTab({ token }) {
   const [counts, setCounts] = useState({});
   const [catalogCounts, setCatalogCounts] = useState({});
   const [loading, setLoading] = useState(true);
-  const [catalogFilter, setCatalogFilter] = useState('all'); // all | public | pca
+  const [catalogFilter, setCatalogFilter] = useState('public');
   const [filter, setFilter] = useState('all'); // all | shipment | return | adjustment
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
