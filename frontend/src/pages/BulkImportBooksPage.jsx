@@ -99,7 +99,7 @@ const translations = {
   },
   en: {
     title: 'Bulk Book Import',
-    subtitle: 'Import books to the PCA private catalog from spreadsheet data',
+    subtitle: 'Import books to the Sysbook catalog from spreadsheet data',
     backButton: 'Back to Catalog',
     step1: 'Step 1: Paste Data',
     step1Desc: 'Copy rows from Google Sheets or Excel and paste them here',

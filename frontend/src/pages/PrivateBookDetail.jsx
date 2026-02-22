@@ -1,5 +1,5 @@
 /**
- * Private Book Detail - Product detail page for the private catalog
+ * Private Book Detail - Product detail page for the Sysbook catalog
  * Solo accesible para usuarios con estudiantes vinculados
  */
 import { useState, useEffect } from 'react';
