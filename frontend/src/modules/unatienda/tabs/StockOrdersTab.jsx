@@ -753,7 +753,7 @@ export default function StockOrdersTab({ token }) {
       {/* Dialogs */}
       <CreateShipmentDialog open={showShipment} onClose={() => setShowShipment(false)} onCreated={fetchOrders} token={token} />
       <CreateReturnDialog open={showReturn} onClose={() => setShowReturn(false)} onCreated={fetchOrders} token={token} />
-      <CreateAdjustmentDialog open={showAdjustment} onClose={() => setShowAdjustment(false)} onCreated={fetchOrders} token={token} defaultCatalog={defaultCatalog} />
+      <CreateAdjustmentDialog open={showAdjustment} onClose={() => setShowAdjustment(false)} onCreated={fetchOrders} token={token} />
       <TransitionDialog order={transitionOrder} open={!!transitionOrder} onClose={() => setTransitionOrder(null)} onDone={fetchOrders} token={token} />
       <OrderDetailDialog order={detailOrder} open={!!detailOrder} onClose={() => setDetailOrder(null)} />
     </div>
