@@ -334,6 +334,8 @@ export default function AdminDashboard() {
       case 'analytics':
         return <StoreAnalyticsModule />;
       // Sysbook
+      case 'sysbook-dashboard':
+        return <SysbookDashboardTab onNavigate={(section) => setActiveModule(section)} />;
       case 'sysbook-inventory':
         return <SysbookInventoryTab />;
       case 'sysbook-stock-movements':
