@@ -608,6 +608,9 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   // Catalog type filter
   const [catalogType, setCatalogType] = useState('all');
 
+  // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
+  const effectiveCatalogType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
+
   // Column order per catalog type (persisted)
   const [columnOrders, setColumnOrders] = useState(() => {
     const orders = {};
