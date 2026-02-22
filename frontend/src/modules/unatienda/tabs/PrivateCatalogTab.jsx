@@ -606,7 +606,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const [globalThreshold, setGlobalThreshold] = useState(10);
 
   // Catalog type filter
-  const [catalogType, setCatalogType] = useState('all');
+  const [catalogType, setViewType] = useState('all');
 
   // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
   const effectiveViewType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
@@ -1056,7 +1056,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
           { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
         ]}
         activeTab={catalogType}
-        onTabChange={(v) => { setCatalogType(v); setSelectedIds(new Set()); }}
+        onTabChange={(v) => { setViewType(v); setSelectedIds(new Set()); }}
         search={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="Search by name, code, publisher..."
