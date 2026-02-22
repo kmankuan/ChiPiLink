@@ -11,7 +11,7 @@ from core.config import MONDAY_API_KEY
 from core.database import db
 from ..services.monday_sync_service import monday_sync_service
 from ..services.monday_config_service import monday_config_service
-from ..models.textbook_order import DEFAULT_STATUS_MAPPING
+from modules.sysbook.models.textbook_order import DEFAULT_STATUS_MAPPING
 
 import httpx
 import json
