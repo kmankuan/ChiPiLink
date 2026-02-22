@@ -640,7 +640,7 @@ export default function StockOrdersTab({ token }) {
         subtitle="Manage shipments, returns, and stock adjustments"
         tabs={[
           { value: 'all', label: 'All', icon: Layers },
-          { value: 'pca', label: 'Textbooks', icon: BookOpen },
+          { value: 'public', label: 'Public Store', icon: Store },
           { value: 'public', label: 'Public', icon: Store },
         ]}
         activeTab={catalogFilter}
