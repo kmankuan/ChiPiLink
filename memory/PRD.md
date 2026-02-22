@@ -96,14 +96,18 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Testing**: 100% pass rate (iteration_185)
 
 ### Codebase Cleanup — "Catalog" → "Inventory" Rename (Feb 22, 2026)
-- **File Rename**: `PrivateCatalogTab.jsx` → `UnifiedInventoryTab.jsx`, component `PrivateCatalogTab` → `UnifiedInventoryTab`
-- **Internal Variables**: `catalogType`→`viewType`, `CatalogTable`→`InventoryTable`, `catalogPagination`→`pagination`, `_catalog`→`_source`, `effectiveCatalogType`→`effectiveViewType`
-- **Imports Updated**: `SysbookInventoryTab.jsx`, `TextbookCatalogModule.jsx` — both now import `UnifiedInventoryTab`
-- **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`, `checkPrivateCatalogAccess`→`checkTextbookAccess`
-- **Comments**: All "catalog type" references updated to "view type" or "inventory"
-- **User-facing**: "private PCA catalog" → "inventory" in dialog
-- **Not changed (by design)**: DB fields (`is_private_catalog`, `catalog_type`) and API URLs (`/api/store/private-catalog/`) — these are established cross-module identifiers
-- **Testing**: Visual + lint verification, 0 errors
+- **File Rename**: `PrivateCatalogTab.jsx` → `UnifiedInventoryTab.jsx` (intermediate step, later deleted)
+- **Internal Variables**: `catalogType`→`viewType`, `CatalogTable`→`InventoryTable`, etc.
+- **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`
+- **Comments & Strings**: All user-facing "PCA catalog" references updated
+
+### Sysbook/Unatienda Component Split (Feb 22, 2026)
+- **Created**: `frontend/src/modules/sysbook/SysbookInventoryTable.jsx` — Standalone ~600-line inventory table component dedicated to Sysbook. Uses only `/api/sysbook/inventory/` endpoints. No `sysbook` prop, no Unatienda fallback, no `_source` tagging.
+- **Updated**: `SysbookInventoryTab.jsx` now imports from `SysbookInventoryTable` (no cross-module dependency)
+- **Deleted**: `UnifiedInventoryTab.jsx` (shared component no longer needed), `TextbookCatalogModule.jsx` (dead code)
+- **Unatienda unaffected**: `InventoryTab.jsx` at `modules/unatienda/tabs/` remains its own independent component
+- **localStorage**: Sysbook column order key changed from `chipi_inv_col_order` to `sysbook_inv_col_order`
+- **Testing**: 100% pass rate (iteration_187) — both backend and frontend
 
 ### Per-Product Custom Alert Thresholds (Feb 22, 2026)
 - **Backend**: PUT `/api/sysbook/inventory/products/{book_id}` accepts `low_stock_threshold` (int or null to clear). Uses `$unset` to properly remove field when null. `check_stock_levels` and `create_stock_alert_if_needed` both check per-product threshold before falling back to global.
