@@ -66,7 +66,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
     setLoading(true);
     setSchoolsError(false);
     try {
-      const { data } = await axios.get(`${API_URL}/api/store/textbook-access/schools`);
+      const { data } = await axios.get(`${API_URL}/api/sysbook/access/schools`);
       setSchools(data?.schools || []);
     } catch (err) {
       console.error('Failed to load schools:', err);
@@ -101,7 +101,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
 
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/api/store/textbook-access/students`, {
+      await axios.post(`${API_URL}/api/sysbook/access/students`, {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         school_id: form.school_id,
@@ -344,7 +344,7 @@ export default function SchoolTextbooksView({
   const fetchAllStudents = useCallback(async () => {
     if (!token) return;
     try {
-      const { data } = await axios.get(`${API_URL}/api/store/textbook-access/my-students`, {
+      const { data } = await axios.get(`${API_URL}/api/sysbook/access/my-students`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAllStudents(data?.students || []);
@@ -371,7 +371,7 @@ export default function SchoolTextbooksView({
     setStudentLoading(prev => ({ ...prev, [studentId]: true }));
     try {
       const res = await axios.get(
-        `${API_URL}/api/store/textbook-orders/student/${studentId}`,
+        `${API_URL}/api/sysbook/orders/student/${studentId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setStudentOrders(prev => ({ ...prev, [studentId]: res.data }));
@@ -448,7 +448,7 @@ export default function SchoolTextbooksView({
       } catch {}
 
       const res = await axios.post(
-        `${API_URL}/api/store/textbook-orders/submit`,
+        `${API_URL}/api/sysbook/orders/submit`,
         {
           student_id: studentId,
           items: selectedList.map(b => ({ book_id: b.book_id, quantity: 1 })),
@@ -486,7 +486,7 @@ export default function SchoolTextbooksView({
     setRequestingReorder(true);
     try {
       await axios.post(
-        `${API_URL}/api/store/textbook-orders/${orderData.order_id}/reorder/${reorderItem.book_id}`,
+        `${API_URL}/api/sysbook/orders/${orderData.order_id}/reorder/${reorderItem.book_id}`,
         { reason: reorderReason || '' },
         { headers: { Authorization: `Bearer ${token}` } }
       );

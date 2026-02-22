@@ -141,7 +141,7 @@ export default function Unatienda() {
 
   const checkTextbookAccess = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/store/sysbook-catalog/access`, {
+      const response = await axios.get(`${API_URL}/api/sysbook/browse/access`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTextbookAccess(response.data);

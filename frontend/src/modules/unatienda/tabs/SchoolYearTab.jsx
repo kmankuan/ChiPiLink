@@ -65,8 +65,8 @@ export default function SchoolYearTab({ token }) {
     setLoading(true);
     try {
       const [configRes, statusRes] = await Promise.all([
-        fetch(`${API}/api/store/school-year/config`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/api/store/school-year/status`, { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${API}/api/sysbook/school-year/config`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/api/sysbook/school-year/status`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       if (configRes.ok) {
         const data = await configRes.json();
@@ -95,7 +95,7 @@ export default function SchoolYearTab({ token }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`${API}/api/store/school-year/config`, {
+      const res = await fetch(`${API}/api/sysbook/school-year/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(form)
@@ -117,7 +117,7 @@ export default function SchoolYearTab({ token }) {
   const handleTriggerAutoEnrollment = async () => {
     setTriggering(true);
     try {
-      const res = await fetch(`${API}/api/store/school-year/trigger-auto-enrollment`, {
+      const res = await fetch(`${API}/api/sysbook/school-year/trigger-auto-enrollment`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

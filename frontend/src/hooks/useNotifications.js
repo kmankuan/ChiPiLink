@@ -21,7 +21,7 @@ export function useNotifications() {
       return;
     }
     try {
-      const res = await fetch(`${API}/api/store/textbook-orders/notifications/unread`, {
+      const res = await fetch(`${API}/api/sysbook/orders/notifications/unread`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -37,7 +37,7 @@ export function useNotifications() {
   const markOrderRead = useCallback(async (orderId) => {
     if (!token) return;
     try {
-      await fetch(`${API}/api/store/textbook-orders/${orderId}/updates/mark-read`, {
+      await fetch(`${API}/api/sysbook/orders/${orderId}/updates/mark-read`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });

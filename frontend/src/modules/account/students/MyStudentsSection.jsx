@@ -431,8 +431,8 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
     
     try {
       const [schoolsRes, studentsRes] = await Promise.all([
-        api().get('/api/store/textbook-access/schools'),
-        api().get('/api/store/textbook-access/my-students')
+        api().get('/api/sysbook/access/schools'),
+        api().get('/api/sysbook/access/my-students')
       ]);
       
       setSchools(schoolsRes.data?.schools || []);
@@ -476,7 +476,7 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
     
     setSubmitting(true);
     try {
-      await api().post('/api/store/textbook-access/students', {
+      await api().post('/api/sysbook/access/students', {
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
         school_id: formData.school_id,
@@ -539,7 +539,7 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
     setEditSaving(true);
     try {
       await api().put(
-        `/api/store/textbook-access/students/${editStudent.student_id}`,
+        `/api/sysbook/access/students/${editStudent.student_id}`,
         editForm
       );
       toast.success(lang === 'es' ? 'Perfil actualizado' : 'Profile updated');

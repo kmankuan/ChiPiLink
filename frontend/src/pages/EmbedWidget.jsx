@@ -156,7 +156,7 @@ function LinkStudentView({ token, onStudentLinked }) {
     }
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/api/store/textbook-access/students`, form, {
+      await axios.post(`${API_URL}/api/sysbook/access/students`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Student linked successfully!');
@@ -255,7 +255,7 @@ function TextbookOrdersView({ token, students }) {
     setCart({});
     try {
       const sid = student.student_id || student._id || student.id;
-      const { data } = await axios.get(`${API_URL}/api/store/textbook-orders/student/${sid}`, {
+      const { data } = await axios.get(`${API_URL}/api/sysbook/orders/student/${sid}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrder(data);
@@ -295,7 +295,7 @@ function TextbookOrdersView({ token, students }) {
     setSubmitting(true);
     try {
       const sid = selectedStudent.student_id || selectedStudent._id || selectedStudent.id;
-      await axios.post(`${API_URL}/api/store/textbook-orders/submit`, {
+      await axios.post(`${API_URL}/api/sysbook/orders/submit`, {
         student_id: sid,
         items: selectedItems.map(([book_id, quantity]) => ({ book_id, quantity }))
       }, { headers: { Authorization: `Bearer ${token}` } });
@@ -518,7 +518,7 @@ function OrdersView({ token, students }) {
         for (const s of students) {
           const sid = s.student_id || s._id;
           try {
-            const { data } = await axios.get(`${API_URL}/api/store/textbook-orders/student/${sid}`, {
+            const { data } = await axios.get(`${API_URL}/api/sysbook/orders/student/${sid}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (data && data.items?.length > 0) {
@@ -819,7 +819,7 @@ export default function EmbedWidget() {
   // Load students after auth
   useEffect(() => {
     if (!token) return;
-    axios.get(`${API_URL}/api/store/textbook-access/my-students`, {
+    axios.get(`${API_URL}/api/sysbook/access/my-students`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(r => setStudents(r.data?.students || r.data || []))
@@ -841,7 +841,7 @@ export default function EmbedWidget() {
 
   const reloadStudents = () => {
     if (!token) return;
-    axios.get(`${API_URL}/api/store/textbook-access/my-students`, {
+    axios.get(`${API_URL}/api/sysbook/access/my-students`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(r => setStudents(r.data?.students || r.data || []))

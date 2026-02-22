@@ -159,7 +159,7 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
 
   const fetchStudentOrders = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/store/textbook-orders/my-orders`, {
+      const response = await axios.get(`${API_URL}/api/sysbook/orders/my-orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -184,7 +184,7 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
     try {
       // Get or create order for this student - returns available books
       const response = await axios.get(
-        `${API_URL}/api/store/textbook-orders/student/${student.student_id || student.sync_id}`,
+        `${API_URL}/api/sysbook/orders/student/${student.student_id || student.sync_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -313,7 +313,7 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
       });
 
       const response = await axios.post(
-        `${API_URL}/api/store/textbook-orders/submit`,
+        `${API_URL}/api/sysbook/orders/submit`,
         {
           student_id: selectedStudent.student_id,
           items: orderItems,
@@ -351,7 +351,7 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
     setReorderingBook(bookId);
     try {
       await axios.post(
-        `${API_URL}/api/store/textbook-orders/${currentOrderId}/reorder/${bookId}`,
+        `${API_URL}/api/sysbook/orders/${currentOrderId}/reorder/${bookId}`,
         { reason, book_id: bookId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

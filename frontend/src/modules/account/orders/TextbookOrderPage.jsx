@@ -82,7 +82,7 @@ export default function TextbookOrderPage({ embedded = false }) {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/store/textbook-access/my-students`, {
+        const res = await fetch(`${API_URL}/api/sysbook/access/my-students`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -123,7 +123,7 @@ export default function TextbookOrderPage({ embedded = false }) {
   const fetchOrder = async (studentId) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/store/textbook-orders/student/${studentId}`, {
+      const res = await fetch(`${API_URL}/api/sysbook/orders/student/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -149,7 +149,7 @@ export default function TextbookOrderPage({ embedded = false }) {
     
     try {
       const res = await fetch(
-        `${API_URL}/api/store/textbook-orders/${order.order_id}/items/${bookId}?quantity=${newQuantity}`,
+        `${API_URL}/api/sysbook/orders/${order.order_id}/items/${bookId}?quantity=${newQuantity}`,
         {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` }
@@ -191,7 +191,7 @@ export default function TextbookOrderPage({ embedded = false }) {
     
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/api/store/textbook-orders/${order.order_id}/submit`, {
+      const res = await fetch(`${API_URL}/api/sysbook/orders/${order.order_id}/submit`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -226,7 +226,7 @@ export default function TextbookOrderPage({ embedded = false }) {
     
     try {
       const res = await fetch(
-        `${API_URL}/api/store/textbook-orders/${order.order_id}/reorder/${reorderBook.book_id}`,
+        `${API_URL}/api/sysbook/orders/${order.order_id}/reorder/${reorderBook.book_id}`,
         {
           method: 'POST',
           headers: {
@@ -259,7 +259,7 @@ export default function TextbookOrderPage({ embedded = false }) {
 
   const fetchOrderHistory = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/store/textbook-orders/my-orders`, {
+      const res = await fetch(`${API_URL}/api/sysbook/orders/my-orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

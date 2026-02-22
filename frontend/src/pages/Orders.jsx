@@ -64,7 +64,7 @@ export default function Orders() {
 
   const fetchTextbookOrders = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/store/textbook-orders/my-orders`, {
+      const response = await fetch(`${API_URL}/api/sysbook/orders/my-orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {

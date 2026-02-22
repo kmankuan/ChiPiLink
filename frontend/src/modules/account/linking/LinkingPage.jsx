@@ -134,13 +134,13 @@ export default function LinkingPage({ embedded = false }) {
       
       // Load schools first (doesn't require auth)
       console.log('[LinkingPage] Fetching schools...');
-      const schoolsRes = await api.get('/api/store/textbook-access/schools');
+      const schoolsRes = await api.get('/api/sysbook/access/schools');
       console.log('[LinkingPage] Schools loaded:', schoolsRes.data?.schools?.length || 0);
       setSchools(schoolsRes.data?.schools || []);
       
       // Then load students (requires auth)
       console.log('[LinkingPage] Fetching my-students...');
-      const studentsRes = await api.get('/api/store/textbook-access/my-students');
+      const studentsRes = await api.get('/api/sysbook/access/my-students');
       console.log('[LinkingPage] Students loaded:', studentsRes.data?.students?.length || 0);
       setStudents(studentsRes.data?.students || []);
       
@@ -241,7 +241,7 @@ export default function LinkingPage({ embedded = false }) {
         relation_other: formData.relation_type === 'other' ? formData.relation_other.trim() : null
       };
 
-      await api.post('/api/store/textbook-access/students', payload);
+      await api.post('/api/sysbook/access/students', payload);
       
       toast.success('Student linked successfully!');
       closeDialog();

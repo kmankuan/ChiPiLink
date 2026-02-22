@@ -55,7 +55,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/orders`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -71,7 +71,7 @@ export default function PreSaleImportTab({ token: propToken }) {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch(`${API}/api/store/textbook-access/admin/all-students`, {
+      const res = await fetch(`${API}/api/sysbook/access/admin/all-students`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -83,7 +83,7 @@ export default function PreSaleImportTab({ token: propToken }) {
 
   const fetchSuggestions = async () => {
     try {
-      const res = await fetch(`${API}/api/store/presale-import/suggestions?status=pending`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/suggestions?status=pending`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -96,7 +96,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleConfirmSuggestion = async (suggestionId) => {
     setConfirmingId(suggestionId);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/suggestions/${suggestionId}/confirm`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/suggestions/${suggestionId}/confirm`, {
         method: 'POST', headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -114,7 +114,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleRejectSuggestion = async (suggestionId) => {
     setConfirmingId(suggestionId);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/suggestions/${suggestionId}/reject`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/suggestions/${suggestionId}/reject`, {
         method: 'POST', headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -131,7 +131,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleUnlink = async (orderId) => {
     setUnlinking(orderId);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/unlink`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/unlink`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ order_id: orderId })
@@ -150,7 +150,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handlePreview = async () => {
     setPreviewing(true);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/preview`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/preview`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -174,7 +174,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleImport = async () => {
     setImporting(true);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/execute`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
@@ -198,7 +198,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleManualLink = async (order, student) => {
     setLinking(true);
     try {
-      const res = await fetch(`${API}/api/store/presale-import/link`, {
+      const res = await fetch(`${API}/api/sysbook/presale-import/link`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({

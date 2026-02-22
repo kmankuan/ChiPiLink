@@ -232,7 +232,7 @@ export default function BulkImportBooksPage() {
   useEffect(() => {
     const fetchGrades = async () => {
       try {
-        const res = await fetch(`${API}/api/store/bulk-import/grados`, {
+        const res = await fetch(`${API}/api/sysbook/bulk-import/grados`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
@@ -254,7 +254,7 @@ export default function BulkImportBooksPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/store/bulk-import/books/preview`, {
+      const res = await fetch(`${API}/api/sysbook/bulk-import/books/preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ export default function BulkImportBooksPage() {
 
     setImporting(true);
     try {
-      const res = await fetch(`${API}/api/store/bulk-import/books/import`, {
+      const res = await fetch(`${API}/api/sysbook/bulk-import/books/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -284,7 +284,7 @@ export default function TextbookAccessAdminTab({ token }) {
       if (filterSchool && filterSchool !== 'all') params.append('school_id', filterSchool);
       if (filterYear && filterYear !== 'all') params.append('year', filterYear);
       
-      const res = await fetch(`${API}/api/store/textbook-access/admin/requests?${params}`, {
+      const res = await fetch(`${API}/api/sysbook/access/admin/requests?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -301,7 +301,7 @@ export default function TextbookAccessAdminTab({ token }) {
 
   const fetchSchools = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/store/textbook-access/admin/schools`, {
+      const res = await fetch(`${API}/api/sysbook/access/admin/schools`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -357,7 +357,7 @@ export default function TextbookAccessAdminTab({ token }) {
     setProcessing(true);
     try {
       const res = await fetch(
-        `${API}/api/store/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`,
+        `${API}/api/sysbook/access/admin/requests/${request.student_id}/${request.year}/approve`,
         {
           method: 'POST',
           headers: {
@@ -406,7 +406,7 @@ export default function TextbookAccessAdminTab({ token }) {
     setProcessing(true);
     try {
       const res = await fetch(
-        `${API}/api/store/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`,
+        `${API}/api/sysbook/access/admin/requests/${request.student_id}/${request.year}/approve`,
         {
           method: 'POST',
           headers: {

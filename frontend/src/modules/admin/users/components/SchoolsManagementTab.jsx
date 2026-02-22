@@ -134,7 +134,7 @@ export default function SchoolsManagementTab({ token }) {
   const fetchSchools = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/store/textbook-access/schools`);
+      const res = await fetch(`${API}/api/sysbook/access/schools`);
       if (res.ok) {
         const data = await res.json();
         setSchools(data.schools || []);
@@ -181,8 +181,8 @@ export default function SchoolsManagementTab({ token }) {
     setSaving(true);
     try {
       const url = editingSchool 
-        ? `${API}/api/store/textbook-access/admin/schools/${editingSchool.school_id}`
-        : `${API}/api/store/textbook-access/admin/schools`;
+        ? `${API}/api/sysbook/access/admin/schools/${editingSchool.school_id}`
+        : `${API}/api/sysbook/access/admin/schools`;
       
       const method = editingSchool ? 'PUT' : 'POST';
       
@@ -219,7 +219,7 @@ export default function SchoolsManagementTab({ token }) {
     if (!window.confirm(t.deleteConfirm)) return;
 
     try {
-      const res = await fetch(`${API}/api/store/textbook-access/admin/schools/${school.school_id}`, {
+      const res = await fetch(`${API}/api/sysbook/access/admin/schools/${school.school_id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

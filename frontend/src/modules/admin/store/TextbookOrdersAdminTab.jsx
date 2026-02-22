@@ -124,13 +124,13 @@ export default function TextbookOrdersAdminTab() {
       if (filterGrade !== 'all') params.append('grade', filterGrade);
 
       const [ordersRes, statsRes, reordersRes] = await Promise.all([
-        fetch(`${API}/api/store/textbook-orders/admin/all?${params}`, {
+        fetch(`${API}/api/sysbook/orders/admin/all?${params}`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(`${API}/api/store/textbook-orders/admin/stats`, {
+        fetch(`${API}/api/sysbook/orders/admin/stats`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(`${API}/api/store/textbook-orders/admin/pending-reorders`, {
+        fetch(`${API}/api/sysbook/orders/admin/pending-reorders`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -161,7 +161,7 @@ export default function TextbookOrdersAdminTab() {
     const token = localStorage.getItem('auth_token');
     
     try {
-      const res = await fetch(`${API}/api/store/textbook-orders/admin/${orderId}/status?status=${newStatus}`, {
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/status?status=${newStatus}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -187,7 +187,7 @@ export default function TextbookOrdersAdminTab() {
     
     try {
       const res = await fetch(
-        `${API}/api/store/textbook-orders/admin/${selectedReorder.order_id}/items/${selectedReorder.item.book_id}/approve-reorder`,
+        `${API}/api/sysbook/orders/admin/${selectedReorder.order_id}/items/${selectedReorder.item.book_id}/approve-reorder`,
         {
           method: 'PUT',
           headers: {
@@ -238,7 +238,7 @@ export default function TextbookOrdersAdminTab() {
     setBulkLoading(true);
     try {
       const token = localStorage.getItem('auth_token');
-      await fetch(`${API}/api/store/textbook-orders/admin/bulk-archive`, {
+      await fetch(`${API}/api/sysbook/orders/admin/bulk-archive`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ order_ids: Array.from(orderSelection.selected) }),
@@ -255,7 +255,7 @@ export default function TextbookOrdersAdminTab() {
     setBulkLoading(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API}/api/store/textbook-orders/admin/bulk-delete`, {
+      const res = await fetch(`${API}/api/sysbook/orders/admin/bulk-delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ order_ids: Array.from(orderSelection.selected) }),

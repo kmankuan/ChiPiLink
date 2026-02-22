@@ -39,7 +39,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
   const fetchUpdates = async () => {
     if (!orderId || !token) return;
     try {
-      const res = await fetch(`${API}/api/store/textbook-orders/${orderId}/updates`, {
+      const res = await fetch(`${API}/api/sysbook/orders/${orderId}/updates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -68,7 +68,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
     if (!message.trim() || sending) return;
     setSending(true);
     try {
-      const res = await fetch(`${API}/api/store/textbook-orders/${orderId}/updates`, {
+      const res = await fetch(`${API}/api/sysbook/orders/${orderId}/updates`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ message: message.trim() })

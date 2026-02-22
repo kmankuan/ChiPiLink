@@ -62,10 +62,10 @@ export default function AllStudentsTab({ token }) {
     setLoading(true);
     try {
       const [studentsRes, schoolsRes] = await Promise.all([
-        fetch(`${API}/api/store/textbook-access/admin/all-students`, {
+        fetch(`${API}/api/sysbook/access/admin/all-students`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(`${API}/api/store/textbook-access/schools`)
+        fetch(`${API}/api/sysbook/access/schools`)
       ]);
 
       if (studentsRes.ok) {
