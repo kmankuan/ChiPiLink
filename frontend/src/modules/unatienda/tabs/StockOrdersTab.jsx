@@ -375,7 +375,7 @@ function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
               {ADJUSTMENT_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} catalogType={catalogType} />
+          <ProductPicker items={items} setItems={setItems} token={token} catalogType="public" />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
