@@ -584,7 +584,7 @@ export default function SuperAppLanding() {
   }
 
   // Determine which layout to render
-  const selectedLayout = uiStyle?.layout || 'living_grid';
+  const selectedLayout = uiStyle?.layout || 'mosaic_community';
   const LayoutComponent = LAYOUT_COMPONENTS[selectedLayout];
 
   return (

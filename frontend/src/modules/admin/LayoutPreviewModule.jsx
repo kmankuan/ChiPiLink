@@ -672,7 +672,7 @@ export default function LayoutPreviewModule() {
       }
       if (styleRes.ok) {
         const styleData = await styleRes.json();
-        setActiveLayout(styleData?.public?.layout || styleData?.layout || 'living_grid');
+        setActiveLayout(styleData?.public?.layout || styleData?.layout || 'mosaic_community');
       }
       if (statusRes.ok) {
         const statusData = await statusRes.json();
