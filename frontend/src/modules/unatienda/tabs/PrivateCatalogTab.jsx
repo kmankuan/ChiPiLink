@@ -307,7 +307,7 @@ function renderCellContent(col, product, { updateProductField, onAdjustStock, gl
 }
 
 /* ── Shared Table Component (Dynamic Columns) ── */
-function CatalogTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop, globalThreshold }) {
+function InventoryTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop, globalThreshold }) {
   const totalWidth = columns.reduce((s, c) => s + (columnWidths[c.key] || c.width), 0) + (columnWidths.select || 40) + (columnWidths.actions || 80);
   const allSelected = products.length > 0 && products.every(p => selectedIds.has(p.book_id));
   const someSelected = products.some(p => selectedIds.has(p.book_id)) && !allSelected;
@@ -833,8 +833,8 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     return result;
   }, [products, searchTerm, statusFilter, sortConfig, catalogType]);
 
-  const catalogPagination = usePagination(sortedProducts, 50);
-  const pageProducts = catalogPagination.paginated;
+  const pagination = usePagination(sortedProducts, 50);
+  const pageProducts = pagination.paginated;
 
   // Inline update
   const productApiUrl = useCallback((bookId, action = '') => {
@@ -1149,7 +1149,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
                 </div>
               )}
               <div className="scrollable-table-container flex-1" data-testid="pca-table-fullscreen-container">
-                <CatalogTable products={sortedProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
+                <InventoryTable products={sortedProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
@@ -1181,7 +1181,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
             </CardHeader>
             <CardContent className="p-0 overflow-hidden">
               <div className="scrollable-table-container h-[500px]" style={{ maxWidth: '100%', width: '100%' }} data-testid="pca-table-scroll-container">
-                <CatalogTable products={pageProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
+                <InventoryTable products={pageProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
@@ -1192,9 +1192,9 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
             </CardContent>
           </Card>
           <TablePagination
-            page={catalogPagination.page} totalPages={catalogPagination.totalPages} totalItems={catalogPagination.totalItems}
-            pageSize={catalogPagination.pageSize} onPageChange={catalogPagination.setPage} onPageSizeChange={catalogPagination.setPageSize}
-            canPrev={catalogPagination.canPrev} canNext={catalogPagination.canNext}
+            page={pagination.page} totalPages={pagination.totalPages} totalItems={pagination.totalItems}
+            pageSize={pagination.pageSize} onPageChange={pagination.setPage} onPageSizeChange={pagination.setPageSize}
+            canPrev={pagination.canPrev} canNext={pagination.canNext}
             pageSizeOptions={[25, 50, 100, 200]}
           />
         </>
