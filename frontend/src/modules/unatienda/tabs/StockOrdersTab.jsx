@@ -28,7 +28,7 @@ const CATALOG_TABS = [
   { key: 'public', label: 'Public Store', icon: Store, color: 'bg-emerald-600' },
 ];
 
-const CATALOG_BADGE = {
+const PRODUCT_TYPE_BADGE = {
   public: { label: 'Public', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200' },
   sysbook: { label: 'Sysbook', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
 };
@@ -514,7 +514,7 @@ function TransitionDialog({ order, open, onClose, onDone, token }) {
 function OrderDetailDialog({ order, open, onClose }) {
   if (!order) return null;
   const meta = TYPE_META[order.type];
-  const catBadge = CATALOG_BADGE[order.product_type];
+  const catBadge = PRODUCT_TYPE_BADGE[order.product_type];
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
@@ -700,7 +700,7 @@ export default function StockOrdersTab({ token }) {
             const Icon = meta.icon;
             const next = NEXT_STATUS[order.type]?.[order.status];
             const isFinal = !next;
-            const catBadge = CATALOG_BADGE[order.product_type];
+            const catBadge = PRODUCT_TYPE_BADGE[order.product_type];
 
             return (
               <div key={order.order_id} className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/30 transition cursor-pointer"
