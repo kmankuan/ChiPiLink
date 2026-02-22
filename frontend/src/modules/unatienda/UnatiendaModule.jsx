@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Store, ShoppingCart, Warehouse, Truck, Settings, Database, CreditCard } from 'lucide-react';
 
 import InventoryTab from './tabs/InventoryTab';
-import PublicCatalogTab from './tabs/PublicCatalogTab';
+import PublicInventoryTab from './tabs/PublicInventoryTab';
 import StockOrdersTab from './tabs/StockOrdersTab';
 import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 import ConfigurationTab from './tabs/ConfigurationTab';
@@ -19,10 +19,10 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const TAB_GROUPS = [
   {
-    label: 'Catalog',
+    label: 'Inventory',
     tabs: [
       { id: 'inventory', label: 'Inventory', icon: Warehouse },
-      { id: 'public-catalog', label: 'Public Store', icon: Store },
+      { id: 'public-inventory', label: 'Public Store', icon: Store },
       { id: 'stock-orders', label: 'Stock Mov.', icon: Truck, testId: 'stock-orders-tab-trigger' },
     ],
   },
@@ -127,7 +127,7 @@ export default function UnatiendaModule() {
 
       <div data-testid="unatienda-content">
         {activeTab === 'inventory' && <InventoryTab token={token} onRefresh={fetchStats} />}
-        {activeTab === 'public-catalog' && <PublicCatalogTab token={token} onRefresh={fetchStats} />}
+        {activeTab === 'public-inventory' && <PublicInventoryTab token={token} onRefresh={fetchStats} />}
         {activeTab === 'stock-orders' && <StockOrdersTab token={token} />}
         {activeTab === 'store-checkout-form' && <StoreCheckoutFormConfigTab token={token} />}
         {activeTab === 'configuration' && <ConfigurationTab token={token} />}
