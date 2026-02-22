@@ -209,6 +209,7 @@ class TextbookMondayAdapter(BaseMondayAdapter):
         if not monday_item_ids:
             return {"synced": False, "reason": "Order not linked to Monday.com"}
 
+        from modules.sysbook.models.textbook_order import DEFAULT_STATUS_MAPPING
         status_mapping = await self.get_status_mapping() or DEFAULT_STATUS_MAPPING
         board_config = await self.get_board_config()
         sub_mapping = board_config.get("subitem_column_mapping", {})
