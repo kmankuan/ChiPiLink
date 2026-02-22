@@ -108,7 +108,7 @@ async def get_inventory_products(
     search: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     stock_filter: Optional[str] = Query(None, description="all|low|out|in"),
-    product_type: Optional[str] = Query(None, description="public|sysbook - filter by catalog type"),
+    inventory_source: Optional[str] = Query(None, description="public|sysbook - filter by catalog type"),
     sort_by: Optional[str] = Query("name", description="name|stock|price|updated"),
     sort_dir: Optional[str] = Query("asc"),
     skip: int = Query(0, ge=0),
@@ -119,9 +119,9 @@ async def get_inventory_products(
     conditions = [{"active": True}]
 
     # Filter by catalog type
-    if product_type == "sysbook":
+    if inventory_source == "sysbook":
         conditions.append({"is_sysbook": True})
-    elif product_type == "public":
+    elif inventory_source == "public":
         conditions.append({"$or": [
             {"is_sysbook": {"$exists": False}},
             {"is_sysbook": False},

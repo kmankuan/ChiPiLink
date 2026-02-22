@@ -7,7 +7,7 @@ Testing:
 - Stock check triggered alerts
 - Stock adjustment triggered alerts
 - Alert auto-resolve when stock > threshold
-- product_type=sysbook in stock_orders
+- inventory_source=sysbook in stock_orders
 """
 import pytest
 import requests
@@ -324,10 +324,10 @@ class TestStockAdjustmentAlerts:
 
 
 class TestStockOrdersCatalogType:
-    """Test stock orders use product_type=sysbook (not pca)"""
+    """Test stock orders use inventory_source=sysbook (not pca)"""
 
-    def test_stock_orders_use_sysbook_product_type(self, headers):
-        """GET /api/sysbook/stock-orders returns orders with product_type=sysbook"""
+    def test_stock_orders_use_sysbook_inventory_source(self, headers):
+        """GET /api/sysbook/stock-orders returns orders with inventory_source=sysbook"""
         r = requests.get(f"{SYSBOOK_API}/stock-orders", headers=headers)
         assert r.status_code == 200, f"Expected 200, got {r.status_code}: {r.text}"
         data = r.json()
@@ -336,14 +336,14 @@ class TestStockOrdersCatalogType:
         assert "total" in data
         print(f"✓ Stock orders: {data['total']} total")
         
-        # If orders exist, verify product_type
+        # If orders exist, verify inventory_source
         if data["orders"]:
             for order in data["orders"][:3]:  # Check first 3
-                assert order.get("product_type") == "sysbook", f"Expected product_type=sysbook, got {order.get('product_type')}"
-            print(f"✓ All checked orders have product_type=sysbook")
+                assert order.get("inventory_source") == "sysbook", f"Expected inventory_source=sysbook, got {order.get('inventory_source')}"
+            print(f"✓ All checked orders have inventory_source=sysbook")
 
     def test_create_shipment_uses_sysbook(self, headers):
-        """POST /api/sysbook/stock-orders/shipment creates with product_type=sysbook"""
+        """POST /api/sysbook/stock-orders/shipment creates with inventory_source=sysbook"""
         # Get a product first
         r = requests.get(f"{SYSBOOK_API}/inventory/products", headers=headers, params={"limit": 1})
         product = r.json()["products"][0]
@@ -362,9 +362,9 @@ class TestStockOrdersCatalogType:
         assert r.status_code == 200, f"Expected 200, got {r.status_code}: {r.text}"
         order = r.json()
         
-        assert order["product_type"] == "sysbook", f"Expected product_type=sysbook, got {order.get('product_type')}"
+        assert order["inventory_source"] == "sysbook", f"Expected inventory_source=sysbook, got {order.get('inventory_source')}"
         assert order["type"] == "shipment"
-        print(f"✓ Created shipment {order['order_id']} with product_type=sysbook")
+        print(f"✓ Created shipment {order['order_id']} with inventory_source=sysbook")
         
         # Return order_id for cleanup if needed
         return order["order_id"]

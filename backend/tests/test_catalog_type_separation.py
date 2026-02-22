@@ -2,10 +2,10 @@
 Catalog Type Separation Tests
 Tests the separation between 'Public Store' and 'PCA Textbooks' inventory.
 Features tested:
-1. GET /api/store/stock-orders?product_type=pca|public filtering
-2. GET /api/store/inventory/products?product_type=pca|public filtering
-3. POST /api/store/stock-orders/shipment with product_type
-4. POST /api/store/stock-orders/adjustment with product_type
+1. GET /api/store/stock-orders?inventory_source=pca|public filtering
+2. GET /api/store/inventory/products?inventory_source=pca|public filtering
+3. POST /api/store/stock-orders/shipment with inventory_source
+4. POST /api/store/stock-orders/adjustment with inventory_source
 5. Catalog counts in list response
 """
 import pytest
@@ -54,7 +54,7 @@ def pca_product(auth_token):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {auth_token}"
     })
-    response = session.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "pca", "limit": 1})
+    response = session.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "pca", "limit": 1})
     if response.status_code == 200:
         data = response.json()
         products = data.get("products", [])
@@ -71,7 +71,7 @@ def public_product(auth_token):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {auth_token}"
     })
-    response = session.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "public", "limit": 1})
+    response = session.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "public", "limit": 1})
     if response.status_code == 200:
         data = response.json()
         products = data.get("products", [])
@@ -83,11 +83,11 @@ def public_product(auth_token):
 # ================ PRODUCT FILTERING BY CATALOG TYPE ================
 
 class TestProductCatalogTypeFiltering:
-    """Test /api/store/inventory/products product_type filtering."""
+    """Test /api/store/inventory/products inventory_source filtering."""
     
     def test_products_pca_filter_returns_only_private_catalog(self, api_client):
-        """GET /api/store/inventory/products?product_type=pca returns only PCA products."""
-        response = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "pca", "limit": 50})
+        """GET /api/store/inventory/products?inventory_source=pca returns only PCA products."""
+        response = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "pca", "limit": 50})
         assert response.status_code == 200, f"Failed: {response.text}"
         
         data = response.json()
@@ -101,8 +101,8 @@ class TestProductCatalogTypeFiltering:
         print(f"PCA products returned: {data['total']}")
     
     def test_products_public_filter_returns_only_public_catalog(self, api_client):
-        """GET /api/store/inventory/products?product_type=public returns only public products."""
-        response = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "public", "limit": 50})
+        """GET /api/store/inventory/products?inventory_source=public returns only public products."""
+        response = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "public", "limit": 50})
         assert response.status_code == 200, f"Failed: {response.text}"
         
         data = response.json()
@@ -116,7 +116,7 @@ class TestProductCatalogTypeFiltering:
         print(f"Public products returned: {data['total']}")
     
     def test_products_no_filter_returns_all(self, api_client):
-        """GET /api/store/inventory/products (no product_type) returns all products."""
+        """GET /api/store/inventory/products (no inventory_source) returns all products."""
         response = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"limit": 100})
         assert response.status_code == 200, f"Failed: {response.text}"
         
@@ -124,8 +124,8 @@ class TestProductCatalogTypeFiltering:
         total_all = data.get("total", 0)
         
         # Get PCA and Public counts
-        r_pca = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "pca", "limit": 1})
-        r_pub = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "public", "limit": 1})
+        r_pca = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "pca", "limit": 1})
+        r_pub = api_client.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "public", "limit": 1})
         
         pca_count = r_pca.json().get("total", 0) if r_pca.status_code == 200 else 0
         pub_count = r_pub.json().get("total", 0) if r_pub.status_code == 200 else 0
@@ -138,7 +138,7 @@ class TestProductCatalogTypeFiltering:
 # ================ STOCK ORDERS FILTERING BY CATALOG TYPE ================
 
 class TestStockOrdersCatalogTypeFiltering:
-    """Test /api/store/stock-orders product_type filtering."""
+    """Test /api/store/stock-orders inventory_source filtering."""
     
     def test_stock_orders_list_returns_catalog_counts(self, api_client):
         """GET /api/store/stock-orders returns catalog_counts in response."""
@@ -156,24 +156,24 @@ class TestStockOrdersCatalogTypeFiltering:
             assert isinstance(value, int), f"catalog_counts[{key}] should be int"
     
     def test_stock_orders_pca_filter(self, api_client):
-        """GET /api/store/stock-orders?product_type=pca returns only PCA orders."""
-        response = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "pca"})
+        """GET /api/store/stock-orders?inventory_source=pca returns only PCA orders."""
+        response = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "pca"})
         assert response.status_code == 200, f"Failed: {response.text}"
         
         data = response.json()
         for order in data.get("orders", []):
-            assert order.get("product_type") == "pca", f"Order {order['order_id']} is not PCA"
+            assert order.get("inventory_source") == "pca", f"Order {order['order_id']} is not PCA"
         
         print(f"PCA orders: {len(data.get('orders', []))}")
     
     def test_stock_orders_public_filter(self, api_client):
-        """GET /api/store/stock-orders?product_type=public returns only public orders."""
-        response = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "public"})
+        """GET /api/store/stock-orders?inventory_source=public returns only public orders."""
+        response = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "public"})
         assert response.status_code == 200, f"Failed: {response.text}"
         
         data = response.json()
         for order in data.get("orders", []):
-            assert order.get("product_type") == "public", f"Order {order['order_id']} is not public"
+            assert order.get("inventory_source") == "public", f"Order {order['order_id']} is not public"
         
         print(f"Public orders: {len(data.get('orders', []))}")
 
@@ -181,10 +181,10 @@ class TestStockOrdersCatalogTypeFiltering:
 # ================ CREATE SHIPMENTS WITH CATALOG TYPE ================
 
 class TestCreateShipmentWithCatalogType:
-    """Test creating shipments with specific product_type."""
+    """Test creating shipments with specific inventory_source."""
     
-    def test_create_shipment_with_public_product_type(self, api_client, public_product):
-        """POST /api/store/stock-orders/shipment with product_type=public creates a public shipment."""
+    def test_create_shipment_with_public_inventory_source(self, api_client, public_product):
+        """POST /api/store/stock-orders/shipment with inventory_source=public creates a public shipment."""
         unique_id = uuid.uuid4().hex[:6]
         payload = {
             "supplier": f"TEST_PublicSupplier_{unique_id}",
@@ -195,28 +195,28 @@ class TestCreateShipmentWithCatalogType:
                 "expected_qty": 5
             }],
             "notes": "E2E test - public catalog shipment",
-            "product_type": "public"
+            "inventory_source": "public"
         }
         response = api_client.post(f"{BASE_URL}/api/store/stock-orders/shipment", json=payload)
         assert response.status_code == 200, f"Create failed: {response.text}"
         
         data = response.json()
-        assert data["product_type"] == "public", f"Expected public product_type, got {data.get('product_type')}"
+        assert data["inventory_source"] == "public", f"Expected public inventory_source, got {data.get('inventory_source')}"
         assert data["type"] == "shipment"
         assert data["status"] == "draft"
         
         print(f"Created PUBLIC shipment: {data['order_id']}")
         
         # Verify it shows up in public filter
-        r = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "public"})
+        r = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "public"})
         assert r.status_code == 200
         order_ids = [o["order_id"] for o in r.json().get("orders", [])]
         assert data["order_id"] in order_ids, "Public shipment should appear in public filter"
         
         self.__class__.test_public_shipment_id = data["order_id"]
     
-    def test_create_shipment_with_pca_product_type(self, api_client, pca_product):
-        """POST /api/store/stock-orders/shipment with product_type=pca creates a PCA shipment."""
+    def test_create_shipment_with_pca_inventory_source(self, api_client, pca_product):
+        """POST /api/store/stock-orders/shipment with inventory_source=pca creates a PCA shipment."""
         unique_id = uuid.uuid4().hex[:6]
         payload = {
             "supplier": f"TEST_PCASupplier_{unique_id}",
@@ -227,18 +227,18 @@ class TestCreateShipmentWithCatalogType:
                 "expected_qty": 3
             }],
             "notes": "E2E test - pca catalog shipment",
-            "product_type": "pca"
+            "inventory_source": "pca"
         }
         response = api_client.post(f"{BASE_URL}/api/store/stock-orders/shipment", json=payload)
         assert response.status_code == 200, f"Create failed: {response.text}"
         
         data = response.json()
-        assert data["product_type"] == "pca", f"Expected pca product_type, got {data.get('product_type')}"
+        assert data["inventory_source"] == "pca", f"Expected pca inventory_source, got {data.get('inventory_source')}"
         
         print(f"Created PCA shipment: {data['order_id']}")
         
         # Verify it shows up in pca filter
-        r = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "pca"})
+        r = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "pca"})
         assert r.status_code == 200
         order_ids = [o["order_id"] for o in r.json().get("orders", [])]
         assert data["order_id"] in order_ids, "PCA shipment should appear in pca filter"
@@ -249,10 +249,10 @@ class TestCreateShipmentWithCatalogType:
 # ================ CREATE ADJUSTMENTS WITH CATALOG TYPE ================
 
 class TestCreateAdjustmentWithCatalogType:
-    """Test creating adjustments with specific product_type."""
+    """Test creating adjustments with specific inventory_source."""
     
-    def test_create_adjustment_with_public_product_type(self, api_client, public_product):
-        """POST /api/store/stock-orders/adjustment with product_type=public creates a public adjustment."""
+    def test_create_adjustment_with_public_inventory_source(self, api_client, public_product):
+        """POST /api/store/stock-orders/adjustment with inventory_source=public creates a public adjustment."""
         unique_id = uuid.uuid4().hex[:6]
         payload = {
             "adjustment_reason": "Inventory correction",
@@ -262,13 +262,13 @@ class TestCreateAdjustmentWithCatalogType:
                 "expected_qty": 2
             }],
             "notes": f"E2E test - public adjustment {unique_id}",
-            "product_type": "public"
+            "inventory_source": "public"
         }
         response = api_client.post(f"{BASE_URL}/api/store/stock-orders/adjustment", json=payload)
         assert response.status_code == 200, f"Create failed: {response.text}"
         
         data = response.json()
-        assert data["product_type"] == "public", f"Expected public product_type, got {data.get('product_type')}"
+        assert data["inventory_source"] == "public", f"Expected public inventory_source, got {data.get('inventory_source')}"
         assert data["type"] == "adjustment"
         assert data["status"] == "requested"
         
@@ -276,8 +276,8 @@ class TestCreateAdjustmentWithCatalogType:
         
         self.__class__.test_public_adjustment_id = data["order_id"]
     
-    def test_create_adjustment_with_pca_product_type(self, api_client, pca_product):
-        """POST /api/store/stock-orders/adjustment with product_type=pca creates a PCA adjustment."""
+    def test_create_adjustment_with_pca_inventory_source(self, api_client, pca_product):
+        """POST /api/store/stock-orders/adjustment with inventory_source=pca creates a PCA adjustment."""
         unique_id = uuid.uuid4().hex[:6]
         payload = {
             "adjustment_reason": "Damaged / Write-off",
@@ -287,13 +287,13 @@ class TestCreateAdjustmentWithCatalogType:
                 "expected_qty": -1
             }],
             "notes": f"E2E test - pca adjustment {unique_id}",
-            "product_type": "pca"
+            "inventory_source": "pca"
         }
         response = api_client.post(f"{BASE_URL}/api/store/stock-orders/adjustment", json=payload)
         assert response.status_code == 200, f"Create failed: {response.text}"
         
         data = response.json()
-        assert data["product_type"] == "pca", f"Expected pca product_type, got {data.get('product_type')}"
+        assert data["inventory_source"] == "pca", f"Expected pca inventory_source, got {data.get('inventory_source')}"
         
         print(f"Created PCA adjustment: {data['order_id']}")
 
@@ -301,10 +301,10 @@ class TestCreateAdjustmentWithCatalogType:
 # ================ VERIFY ORDER DETAIL HAS CATALOG TYPE ================
 
 class TestOrderDetailCatalogType:
-    """Test that order details include product_type."""
+    """Test that order details include inventory_source."""
     
-    def test_order_detail_shows_product_type(self, api_client):
-        """GET /api/store/stock-orders/{order_id} returns product_type."""
+    def test_order_detail_shows_inventory_source(self, api_client):
+        """GET /api/store/stock-orders/{order_id} returns inventory_source."""
         # Get any order first
         r = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"limit": 1})
         assert r.status_code == 200
@@ -319,10 +319,10 @@ class TestOrderDetailCatalogType:
         assert response.status_code == 200, f"Failed: {response.text}"
         
         data = response.json()
-        assert "product_type" in data, "Order detail should include product_type"
-        assert data["product_type"] in ["pca", "public", None], f"Invalid product_type: {data['product_type']}"
+        assert "inventory_source" in data, "Order detail should include inventory_source"
+        assert data["inventory_source"] in ["pca", "public", None], f"Invalid inventory_source: {data['inventory_source']}"
         
-        print(f"Order {order_id} product_type: {data['product_type']}")
+        print(f"Order {order_id} inventory_source: {data['inventory_source']}")
 
 
 # ================ CATALOG TYPE COUNTS VERIFICATION ================
@@ -339,8 +339,8 @@ class TestCatalogTypeCounts:
         reported_counts = main_data.get("catalog_counts", {})
         
         # Get actual counts via filters
-        r_pca = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "pca"})
-        r_public = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "public"})
+        r_pca = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "pca"})
+        r_public = api_client.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "public"})
         
         actual_pca = len(r_pca.json().get("orders", [])) if r_pca.status_code == 200 else 0
         actual_public = len(r_public.json().get("orders", [])) if r_public.status_code == 200 else 0

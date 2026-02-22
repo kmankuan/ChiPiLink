@@ -47,7 +47,7 @@ class CreateShipment(BaseModel):
     expected_date: Optional[str] = None
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    product_type: str = "public"  # "public" or "sysbook"
+    inventory_source: str = "public"  # "public" or "sysbook"
 
 
 class CreateReturn(BaseModel):
@@ -56,14 +56,14 @@ class CreateReturn(BaseModel):
     return_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    product_type: str = "sysbook"  # Returns from linked orders default to sysbook
+    inventory_source: str = "sysbook"  # Returns from linked orders default to sysbook
 
 
 class CreateAdjustment(BaseModel):
     adjustment_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    product_type: str = "public"  # "public" or "sysbook"
+    inventory_source: str = "public"  # "public" or "sysbook"
 
 
 class TransitionRequest(BaseModel):
@@ -177,7 +177,7 @@ async def list_stock_orders(
     order_type: Optional[str] = Query(None, description="shipment|return|adjustment"),
     status: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    product_type: Optional[str] = Query(None, description="public|sysbook"),
+    inventory_source: Optional[str] = Query(None, description="public|sysbook"),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     admin: dict = Depends(get_admin_user),
@@ -188,8 +188,8 @@ async def list_stock_orders(
         query["type"] = order_type
     if status:
         query["status"] = status
-    if product_type:
-        query["product_type"] = product_type
+    if inventory_source:
+        query["inventory_source"] = inventory_source
     if search:
         query["$or"] = [
             {"order_id": {"$regex": search, "$options": "i"}},
@@ -205,17 +205,17 @@ async def list_stock_orders(
     counts_pipeline = [
         {"$group": {"_id": {"type": "$type", "status": "$status"}, "count": {"$sum": 1}}}
     ]
-    if product_type:
-        counts_pipeline.insert(0, {"$match": {"product_type": product_type}})
+    if inventory_source:
+        counts_pipeline.insert(0, {"$match": {"inventory_source": inventory_source}})
     counts_raw = await db.stock_orders.aggregate(counts_pipeline).to_list(50)
     counts = {}
     for c in counts_raw:
         key = f"{c['_id']['type']}_{c['_id']['status']}"
         counts[key] = c["count"]
 
-    # Count by product_type for the filter tabs
+    # Count by inventory_source for the filter tabs
     catalog_counts_pipeline = [
-        {"$group": {"_id": "$product_type", "count": {"$sum": 1}}}
+        {"$group": {"_id": "$inventory_source", "count": {"$sum": 1}}}
     ]
     catalog_raw = await db.stock_orders.aggregate(catalog_counts_pipeline).to_list(10)
     catalog_counts = {}
@@ -243,7 +243,7 @@ async def create_shipment(data: CreateShipment, admin: dict = Depends(get_admin_
         "order_id": make_id(),
         "type": "shipment",
         "status": "draft",
-        "product_type": data.product_type,
+        "inventory_source": data.inventory_source,
         "supplier": data.supplier,
         "expected_date": data.expected_date,
         "items": [it.dict() for it in data.items],
@@ -271,7 +271,7 @@ async def create_return(data: CreateReturn, admin: dict = Depends(get_admin_user
         "order_id": make_id(),
         "type": "return",
         "status": "registered",
-        "product_type": data.product_type,
+        "inventory_source": data.inventory_source,
         "linked_order_id": data.linked_order_id,
         "customer_name": data.customer_name or linked.get("student_name", ""),
         "return_reason": data.return_reason,
@@ -295,7 +295,7 @@ async def create_adjustment(data: CreateAdjustment, admin: dict = Depends(get_ad
         "order_id": make_id(),
         "type": "adjustment",
         "status": "requested",
-        "product_type": data.product_type,
+        "inventory_source": data.inventory_source,
         "adjustment_reason": data.adjustment_reason,
         "items": [it.dict() for it in data.items],
         "notes": data.notes,

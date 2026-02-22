@@ -96,10 +96,10 @@ class TestIsSysbookRename:
 
     # ==================== STORE INVENTORY MODULE ====================
     
-    def test_store_inventory_product_type_sysbook_filter(self, auth_headers):
-        """Verify GET /api/store/inventory/products?product_type=sysbook returns sysbook products"""
+    def test_store_inventory_inventory_source_sysbook_filter(self, auth_headers):
+        """Verify GET /api/store/inventory/products?inventory_source=sysbook returns sysbook products"""
         response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?product_type=sysbook",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=sysbook",
             headers=auth_headers
         )
         assert response.status_code == 200, f"Failed: {response.text}"
@@ -113,10 +113,10 @@ class TestIsSysbookRename:
         else:
             print("⚠ No sysbook products found via store inventory endpoint")
     
-    def test_store_inventory_product_type_public_filter(self, auth_headers):
-        """Verify GET /api/store/inventory/products?product_type=public returns non-sysbook products"""
+    def test_store_inventory_inventory_source_public_filter(self, auth_headers):
+        """Verify GET /api/store/inventory/products?inventory_source=public returns non-sysbook products"""
         response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?product_type=public",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=public",
             headers=auth_headers
         )
         assert response.status_code == 200, f"Failed: {response.text}"

@@ -93,24 +93,24 @@ class TestSysbookDashboardAPIs:
 
 
 class TestSysbookStockOrdersCatalogType:
-    """Verify stock-orders use product_type=sysbook (not pca)"""
+    """Verify stock-orders use inventory_source=sysbook (not pca)"""
     
     def test_stock_orders_list_returns_sysbook(self, headers):
-        """GET /api/sysbook/stock-orders should return orders with product_type=sysbook"""
+        """GET /api/sysbook/stock-orders should return orders with inventory_source=sysbook"""
         response = requests.get(f"{BASE_URL}/api/sysbook/stock-orders", headers=headers)
         assert response.status_code == 200, f"Failed: {response.text}"
         data = response.json()
         orders = data.get("orders", [])
         print(f"Stock orders: {len(orders)} found")
-        # All orders should have product_type=sysbook
+        # All orders should have inventory_source=sysbook
         for order in orders[:5]:
-            product_type = order.get("product_type", "")
+            inventory_source = order.get("inventory_source", "")
             # Should be 'sysbook' not 'pca'
-            assert product_type == "sysbook", f"Order {order.get('order_id')} has product_type={product_type}, expected sysbook"
-            print(f"  {order['order_id']}: type={order['type']}, product_type={product_type}")
+            assert inventory_source == "sysbook", f"Order {order.get('order_id')} has inventory_source={inventory_source}, expected sysbook"
+            print(f"  {order['order_id']}: type={order['type']}, inventory_source={inventory_source}")
     
     def test_create_shipment_uses_sysbook(self, headers):
-        """POST /api/sysbook/stock-orders/shipment should use product_type=sysbook"""
+        """POST /api/sysbook/stock-orders/shipment should use inventory_source=sysbook"""
         # First get a product to use
         prod_response = requests.get(f"{BASE_URL}/api/sysbook/inventory/products", params={"limit": 1}, headers=headers)
         if prod_response.status_code != 200 or not prod_response.json().get("products"):
@@ -133,32 +133,32 @@ class TestSysbookStockOrdersCatalogType:
         assert response.status_code == 200, f"Failed: {response.text}"
         data = response.json()
         
-        assert data["product_type"] == "sysbook", f"Expected product_type=sysbook, got {data.get('product_type')}"
+        assert data["inventory_source"] == "sysbook", f"Expected inventory_source=sysbook, got {data.get('inventory_source')}"
         assert data["type"] == "shipment"
-        print(f"Created shipment: {data['order_id']} with product_type={data['product_type']}")
+        print(f"Created shipment: {data['order_id']} with inventory_source={data['inventory_source']}")
 
 
 class TestUnatiendaPublicOnlyCleanup:
     """Test that Unatienda StockOrdersTab now only shows public store"""
     
     def test_store_stock_orders_supports_public_filter(self, headers):
-        """Verify /api/store/stock-orders supports product_type=public filter"""
+        """Verify /api/store/stock-orders supports inventory_source=public filter"""
         # This is the API used by Unatienda StockOrdersTab
-        response = requests.get(f"{BASE_URL}/api/store/stock-orders", params={"product_type": "public"}, headers=headers)
+        response = requests.get(f"{BASE_URL}/api/store/stock-orders", params={"inventory_source": "public"}, headers=headers)
         assert response.status_code == 200, f"Failed: {response.text}"
         data = response.json()
         orders = data.get("orders", [])
         print(f"Public stock orders: {len(orders)} found")
-        # Any returned orders should have product_type=public
+        # Any returned orders should have inventory_source=public
         for order in orders[:5]:
-            product_type = order.get("product_type", "")
-            if product_type:
-                assert product_type == "public", f"Got non-public order: {product_type}"
+            inventory_source = order.get("inventory_source", "")
+            if inventory_source:
+                assert inventory_source == "public", f"Got non-public order: {inventory_source}"
     
     def test_create_public_shipment(self, headers):
-        """Verify /api/store/stock-orders/shipment accepts product_type=public"""
+        """Verify /api/store/stock-orders/shipment accepts inventory_source=public"""
         # Get a public product
-        prod_response = requests.get(f"{BASE_URL}/api/store/inventory/products", params={"product_type": "public", "limit": 1}, headers=headers)
+        prod_response = requests.get(f"{BASE_URL}/api/store/inventory/products", params={"inventory_source": "public", "limit": 1}, headers=headers)
         if prod_response.status_code != 200:
             pytest.skip("No public products endpoint or failed")
         
@@ -177,13 +177,13 @@ class TestUnatiendaPublicOnlyCleanup:
                 "expected_qty": 1
             }],
             "notes": "Test public store shipment",
-            "product_type": "public"
+            "inventory_source": "public"
         }
         response = requests.post(f"{BASE_URL}/api/store/stock-orders/shipment", json=payload, headers=headers)
-        # Should succeed or at least not fail due to product_type
+        # Should succeed or at least not fail due to inventory_source
         if response.status_code == 200:
             data = response.json()
-            print(f"Created public shipment: {data.get('order_id')} with product_type={data.get('product_type')}")
+            print(f"Created public shipment: {data.get('order_id')} with inventory_source={data.get('inventory_source')}")
         else:
             print(f"Public shipment creation: {response.status_code} - {response.text[:200]}")
 

@@ -63,7 +63,7 @@ async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):
 
     recent = await db.inventory_movements.find(
         {"$or": [
-            {"product_type": "sysbook"},
+            {"inventory_source": "sysbook"},
             {"book_id": {"$in": [
                 p["book_id"] async for p in db.store_products.find(SYSBOOK_FILTER, {"book_id": 1, "_id": 0})
             ]}}
@@ -198,7 +198,7 @@ async def sysbook_adjust_stock(book_id: str, adj: StockAdjustment, admin: dict =
         "new_quantity": new_qty,
         "reason": adj.reason,
         "notes": adj.notes,
-        "product_type": "sysbook",
+        "inventory_source": "sysbook",
         "admin_id": admin.get("user_id"),
         "admin_name": admin.get("name", "Admin"),
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -237,7 +237,7 @@ async def sysbook_batch_adjust(batch: BatchStockAdjustment, admin: dict = Depend
             "new_quantity": new_qty,
             "reason": adj.reason,
             "notes": adj.notes,
-            "product_type": "sysbook",
+            "inventory_source": "sysbook",
             "admin_id": admin.get("user_id"),
             "admin_name": admin.get("name", "Admin"),
             "timestamp": datetime.now(timezone.utc).isoformat(),

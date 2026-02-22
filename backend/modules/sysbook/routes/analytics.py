@@ -35,7 +35,7 @@ async def stock_trends(
         {"$match": {
             "timestamp": {"$gte": since},
             "$or": [
-                {"product_type": "sysbook"},
+                {"inventory_source": "sysbook"},
                 {"book_id": {"$in": sysbook_ids}},
             ],
         }},
@@ -144,7 +144,7 @@ async def analytics_overview(admin: dict = Depends(get_admin_user)):
 
     # Pending stock orders
     pending_orders = await db.stock_orders.count_documents({
-        "product_type": "sysbook",
+        "inventory_source": "sysbook",
         "status": {"$nin": ["received", "approved", "rejected", "applied"]}
     })
 

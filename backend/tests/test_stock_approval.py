@@ -116,8 +116,8 @@ class TestStockApprovalFeature:
             assert "order_id" in order
             assert "type" in order
             assert "status" in order
-            # product_type should be present (from iteration_126)
-            assert "product_type" in order, f"Order {order['order_id']} missing product_type"
+            # inventory_source should be present (from iteration_126)
+            assert "inventory_source" in order, f"Order {order['order_id']} missing inventory_source"
 
     def test_stock_orders_endpoint_without_auth_fails(self):
         """Stock orders endpoint should require authentication"""

@@ -170,11 +170,11 @@ class TestNoDuplicatesInMerge:
 class TestInventoryProducts:
     """Test /api/store/inventory/products endpoint"""
     
-    def test_inventory_products_with_product_type_filter(self, admin_headers):
-        """Verify product_type filter works correctly"""
+    def test_inventory_products_with_inventory_source_filter(self, admin_headers):
+        """Verify inventory_source filter works correctly"""
         # PCA filter
         pca_response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?product_type=pca&limit=500",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=pca&limit=500",
             headers=admin_headers
         )
         assert pca_response.status_code == 200
@@ -184,7 +184,7 @@ class TestInventoryProducts:
         
         # Public filter
         public_response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?product_type=public&limit=500",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=public&limit=500",
             headers=admin_headers
         )
         assert public_response.status_code == 200
@@ -221,7 +221,7 @@ class TestStatsConsistency:
         
         # Get inventory products with PCA filter
         inv_pca_response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?product_type=pca&limit=1",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=pca&limit=1",
             headers=admin_headers
         )
         assert inv_pca_response.status_code == 200
