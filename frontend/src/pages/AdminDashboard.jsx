@@ -157,6 +157,7 @@ const navGroups = [
   {
     group: 'Sysbook',
     items: [
+      { id: 'sysbook-dashboard', labelKey: 'nav.sysbookDashboard', fallbackLabel: 'Dashboard', icon: LayoutDashboard, permission: 'unatienda.access' },
       { id: 'sysbook-inventory', labelKey: 'nav.sysbookInventory', fallbackLabel: 'Inventory', icon: BookOpen, permission: 'unatienda.access' },
       { id: 'sysbook-stock-movements', labelKey: 'nav.sysbookStockMovements', fallbackLabel: 'Stock Movements', icon: Truck, permission: 'unatienda.access' },
       { id: 'sysbook-analytics', labelKey: 'nav.sysbookAnalytics', fallbackLabel: 'Analytics', icon: BarChart2, permission: 'unatienda.access' },
