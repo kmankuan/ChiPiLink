@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import {
   Truck, RotateCcw, Wrench, Plus, ChevronRight, Clock,
   CheckCircle, XCircle, Package, Search, Loader2, ArrowRight,
-  AlertTriangle, Store, BookOpen, Layers, Zap
+  AlertTriangle, Store, Zap
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
