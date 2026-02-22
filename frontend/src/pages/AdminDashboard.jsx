@@ -183,6 +183,7 @@ const navGroups = [
       { id: 'customers', labelKey: 'nav.users', icon: Users, permission: 'users.view' },
       { id: 'memberships', labelKey: 'nav.memberships', icon: CreditCard, permission: 'memberships.view' },
       { id: 'roles', labelKey: 'nav.rolesPermissions', icon: Shield, permission: 'roles.view' },
+      { id: 'data-manager', labelKey: 'nav.dataManager', fallbackLabel: 'Data Manager', icon: Database, permission: 'admin.site_config', adminOnly: true },
     ],
   },
   {
