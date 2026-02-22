@@ -530,7 +530,7 @@ class TextbookOrderService(BaseService):
         
         # Auto-link student to CRM board + create order topic for chat
         try:
-            from ..services.crm_chat_service import crm_chat_service
+            from modules.sysbook.services.crm_chat_service import crm_chat_service
             crm_result = await crm_chat_service.link_student_on_order_submit(
                 student_id=order.get("student_id"),
                 student_name=order.get("student_name", ""),
@@ -789,7 +789,7 @@ class TextbookOrderService(BaseService):
 
         # 12. CRM auto-link (with timeout)
         try:
-            from ..services.crm_chat_service import crm_chat_service
+            from modules.sysbook.services.crm_chat_service import crm_chat_service
             await asyncio.wait_for(
                 crm_chat_service.link_student_on_order_submit(
                     student_id=student_id,
