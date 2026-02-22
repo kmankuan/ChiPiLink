@@ -127,7 +127,7 @@ export default function Unatienda() {
       ]);
 
       const allProducts = productsRes.data || [];
-      setProducts(allProducts.filter(p => !p.is_private_catalog));
+      setProducts(allProducts.filter(p => !p.is_sysbook));
       setStoreInfo(storeRes.data);
       setCategories(categoriesRes.data || []);
       setGrades(gradesRes.data.grades || []);
@@ -203,7 +203,7 @@ export default function Unatienda() {
   // ---- Cart Helpers ----
 
   const handleAddToCart = (product) => {
-    if (product.inventory_quantity <= 0 && !product.is_private_catalog) {
+    if (product.inventory_quantity <= 0 && !product.is_sysbook) {
       toast.error('Producto sin stock');
       return;
     }

@@ -104,7 +104,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       }
       
       // Filter out private catalog products
-      const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_private_catalog);
+      const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_sysbook);
       setProductos(publicProducts);
       setCategorias(Array.isArray(categoriesData) ? categoriesData : []);
       setGrados(gradosData.grades || []);
@@ -231,7 +231,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         ...editForm,
         precio: parseFloat(editForm.price),
         inventory_quantity: parseInt(editForm.inventory_quantity) || 0,
-        is_private_catalog: false
+        is_sysbook: false
       };
       
       const url = editingProduct 

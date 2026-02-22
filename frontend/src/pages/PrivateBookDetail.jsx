@@ -91,7 +91,7 @@ export default function PrivateBookDetail() {
     
     const productToAdd = {
       ...book,
-      is_private_catalog: true,
+      is_sysbook: true,
       inventory_quantity: 999
     };
     

@@ -51,7 +51,7 @@ export function CartProvider({ children }) {
         const newQty = updated[existingIndex].quantity + quantity;
         
         // Check stock (skip for private catalog items)
-        const isPrivate = product.is_private_catalog || updated[existingIndex].is_private_catalog;
+        const isPrivate = product.is_sysbook || updated[existingIndex].is_sysbook;
         if (!isPrivate && newQty > product.inventory_quantity) {
           toast.error('No hay suficiente stock disponible');
           return prev;
@@ -76,7 +76,7 @@ export function CartProvider({ children }) {
         grade: product.grade,
         subject: product.subject,
         inventory_quantity: product.inventory_quantity,
-        is_private_catalog: product.is_private_catalog || false,
+        is_sysbook: product.is_sysbook || false,
         publisher: product.publisher,
         code: product.code,
         quantity
@@ -120,8 +120,8 @@ export function CartProvider({ children }) {
   const subtotal = items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0);
   
   // Separate private and public items
-  const privateItems = items.filter(item => item.is_private_catalog);
-  const publicItems = items.filter(item => !item.is_private_catalog);
+  const privateItems = items.filter(item => item.is_sysbook);
+  const publicItems = items.filter(item => !item.is_sysbook);
   const hasPrivateItems = privateItems.length > 0;
   const hasPublicItems = publicItems.length > 0;
   const hasMixedCart = hasPrivateItems && hasPublicItems;

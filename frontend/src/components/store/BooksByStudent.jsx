@@ -113,7 +113,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
       if (!isInCart(producto.book_id)) {
         const productToAdd = {
           ...producto,
-          is_private_catalog: true,
+          is_sysbook: true,
           inventory_quantity: 999
         };
         addItem(productToAdd, 1);
@@ -139,7 +139,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
     
     const productToAdd = {
       ...producto,
-      is_private_catalog: true,
+      is_sysbook: true,
       inventory_quantity: 999
     };
     addItem(productToAdd, 1);

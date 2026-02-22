@@ -105,7 +105,7 @@ export default function CartDrawer() {
                 <div 
                   key={item.book_id} 
                   className={`flex gap-4 p-3 rounded-lg ${
-                    item.is_private_catalog 
+                    item.is_sysbook 
                       ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' 
                       : 'bg-muted/50'
                   }`}
@@ -121,7 +121,7 @@ export default function CartDrawer() {
                     ) : (
                       <Book className="h-6 w-6 text-muted-foreground/50" />
                     )}
-                    {item.is_private_catalog && (
+                    {item.is_sysbook && (
                       <div className="absolute -top-1 -right-1 bg-purple-500 rounded-full p-1">
                         <Lock className="h-2.5 w-2.5 text-white" />
                       </div>
@@ -135,7 +135,7 @@ export default function CartDrawer() {
                       <p className="text-sm text-muted-foreground">
                         ${(item.price || 0).toFixed(2)}
                       </p>
-                      {item.is_private_catalog && item.grade && (
+                      {item.is_sysbook && item.grade && (
                         <Badge variant="secondary" className="text-xs py-0 h-5">
                           <GraduationCap className="h-2.5 w-2.5 mr-1" />
                           {item.grade}
@@ -161,7 +161,7 @@ export default function CartDrawer() {
                         size="icon"
                         className="h-7 w-7"
                         onClick={() => updateQuantity(item.book_id, item.quantity + 1)}
-                        disabled={!item.is_private_catalog && item.quantity >= item.inventory_quantity}
+                        disabled={!item.is_sysbook && item.quantity >= item.inventory_quantity}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
