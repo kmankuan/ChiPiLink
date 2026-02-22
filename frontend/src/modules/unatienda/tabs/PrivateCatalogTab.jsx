@@ -611,7 +611,7 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
   // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
   const effectiveViewType = sysbook && viewType === 'all' ? 'sysbook' : viewType;
 
-  // Column order per catalog type (persisted)
+  // Column order per view type (persisted)
   const [columnOrders, setColumnOrders] = useState(() => {
     const orders = {};
     for (const type of ['sysbook', 'public', 'all', 'archived']) {
@@ -672,7 +672,7 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
     setDragColumn(null);
   }, [dragColumn, effectiveViewType]);
 
-  // Active columns based on catalog type + saved order
+  // Active columns based on view type + saved order
   const activeColumns = useMemo(() => {
     const defs = COLUMN_DEFS[effectiveViewType] || COLUMN_DEFS.all;
     const order = columnOrders[effectiveViewType];
@@ -788,7 +788,7 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
       const isArchived = !!p.archived;
       if (viewType === 'archived') return isArchived;
       if (isArchived) return false; // hide archived from all other views
-      // Catalog type filter
+      // View type filter
       if (viewType === 'sysbook' && p._source !== 'sysbook') return false;
       if (viewType === 'public' && p._source !== 'public') return false;
       // Text search
@@ -1021,7 +1021,7 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
     'Religion', 'Art', 'Music', 'Physical Education', 'Technology', 'Others'
   ];
 
-  // Stats — compute from the view-filtered list (excluding archived, respecting catalog type)
+  // Stats — compute from the view-filtered list (excluding archived, respecting view type)
   const statsProducts = useMemo(() => {
     return products.filter(p => {
       if (p.archived) return false;
