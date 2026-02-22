@@ -53,9 +53,9 @@ class TestSysbookInventoryAPIs:
         assert "total" in data, "Missing total count"
         assert isinstance(data["products"], list), "Products should be array"
         
-        # Verify all products are sysbook (is_private_catalog=True)
+        # Verify all products are sysbook (is_sysbook=True)
         for p in data["products"]:
-            assert p.get("is_private_catalog") == True, f"Product {p.get('book_id')} is not sysbook"
+            assert p.get("is_sysbook") == True, f"Product {p.get('book_id')} is not sysbook"
             assert "book_id" in p, "Missing book_id"
             assert "name" in p, "Missing name"
         
@@ -160,7 +160,7 @@ class TestSysbookInventoryAPIs:
         
         created = data["product"]
         self.created_book_id = created.get("book_id")
-        assert created.get("is_private_catalog") == True, "Created product should be sysbook"
+        assert created.get("is_sysbook") == True, "Created product should be sysbook"
         assert created.get("name") == new_product["name"]
         
         print(f"Created sysbook product: {self.created_book_id}")

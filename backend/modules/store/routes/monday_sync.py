@@ -329,7 +329,7 @@ async def txb_sync_stock(book_id: str, admin: dict = Depends(get_admin_user)):
     """Push a single product's stock to Monday.com"""
     from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
     product = await db.store_products.find_one(
-        {"book_id": book_id, "is_private_catalog": True}, {"_id": 0}
+        {"book_id": book_id, "is_sysbook": True}, {"_id": 0}
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")

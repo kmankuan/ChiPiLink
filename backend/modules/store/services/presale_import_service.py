@@ -456,7 +456,7 @@ class PreSaleImportService:
         # 1. Try exact code match
         if code:
             product = await db.store_products.find_one(
-                {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_private_catalog": True},
+                {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
                 {"_id": 0, "product_id": 1, "code": 1, "name": 1, "price": 1}
             )
             if product:
@@ -465,7 +465,7 @@ class PreSaleImportService:
         # 2. Try name match (case-insensitive contains)
         if name:
             products = await db.store_products.find(
-                {"name": {"$regex": re.escape(name[:30]), "$options": "i"}, "is_private_catalog": True},
+                {"name": {"$regex": re.escape(name[:30]), "$options": "i"}, "is_sysbook": True},
                 {"_id": 0, "product_id": 1, "code": 1, "name": 1, "price": 1}
             ).to_list(5)
             if len(products) == 1:

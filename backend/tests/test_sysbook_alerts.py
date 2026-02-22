@@ -397,8 +397,8 @@ class TestSysbookInventoryWorks:
         
         # All products should be PCA
         for p in data["products"][:5]:
-            assert p.get("is_private_catalog") == True, f"Product {p.get('book_id')} not PCA"
-        print(f"✓ Products: {data['total']} total, all is_private_catalog=True")
+            assert p.get("is_sysbook") == True, f"Product {p.get('book_id')} not PCA"
+        print(f"✓ Products: {data['total']} total, all is_sysbook=True")
 
 
 class TestSysbookAnalyticsWorks:

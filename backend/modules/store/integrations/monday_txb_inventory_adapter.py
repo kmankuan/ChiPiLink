@@ -185,7 +185,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             code_col = col_map.get("code")
 
             textbooks = await db.store_products.find(
-                {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+                {"is_sysbook": True, "active": True, "archived": {"$ne": True}},
                 {"_id": 0}
             ).sort([("grade", 1), ("name", 1)]).to_list(500)
 
@@ -298,7 +298,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
             for book_code, item_id in items_map.items():
                 await db.store_products.update_one(
-                    {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                    {"$or": [{"code": book_code}, {"book_id": book_code}], "is_sysbook": True},
                     {"$set": {"monday_item_id": str(item_id)}}
                 )
 
@@ -410,7 +410,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             code_col = col_map.get("code")
 
             textbooks = await db.store_products.find(
-                {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+                {"is_sysbook": True, "active": True, "archived": {"$ne": True}},
                 {"_id": 0}
             ).to_list(500)
 
@@ -444,7 +444,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                         if found:
                             monday_item_id = found[0]["id"]
                             await db.store_products.update_one(
-                                {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                                {"$or": [{"code": book_code}, {"book_id": book_code}], "is_sysbook": True},
                                 {"$set": {"monday_item_id": str(monday_item_id)}}
                             )
                     except Exception as e:
@@ -632,7 +632,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         # Get product's monday_item_id
         product = await db.store_products.find_one(
-            {"book_id": book_id, "is_private_catalog": True},
+            {"book_id": book_id, "is_sysbook": True},
             {"_id": 0, "monday_item_id": 1, "code": 1, "name": 1}
         )
         if not product:
@@ -767,7 +767,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         # Find the product by monday_item_id
         product = await db.store_products.find_one(
-            {"monday_item_id": pulse_id, "is_private_catalog": True},
+            {"monday_item_id": pulse_id, "is_sysbook": True},
             {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
         )
 
@@ -782,7 +782,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                     code_value = next((c["text"] for c in item_cols if c["id"] == code_col), None)
                     if code_value:
                         product = await db.store_products.find_one(
-                            {"code": code_value, "is_private_catalog": True},
+                            {"code": code_value, "is_sysbook": True},
                             {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
                         )
                         if product:
@@ -995,7 +995,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         # Check if product already exists with this monday_item_id
         existing = await db.store_products.find_one(
-            {"monday_item_id": pulse_id, "is_private_catalog": True},
+            {"monday_item_id": pulse_id, "is_sysbook": True},
             {"_id": 0, "book_id": 1}
         )
         if existing:
@@ -1025,7 +1025,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         product_data = {
             "name": item_name,
             "book_id": f"txb_{uuid.uuid4().hex[:8]}",
-            "is_private_catalog": True,
+            "is_sysbook": True,
             "active": True,
             "archived": False,
             "monday_item_id": pulse_id,
@@ -1063,7 +1063,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         # If code column was found, also check for existing product by code
         if product_data.get("code"):
             existing_by_code = await db.store_products.find_one(
-                {"code": product_data["code"], "is_private_catalog": True},
+                {"code": product_data["code"], "is_sysbook": True},
                 {"_id": 0, "book_id": 1}
             )
             if existing_by_code:

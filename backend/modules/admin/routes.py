@@ -477,7 +477,7 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
             "products": await db.store_products.count_documents({"is_demo": True}),
             "students": await db.synced_students.count_documents({"is_demo": True}),
             "orders": await db.textbook_orders.count_documents({"is_demo": True}),
-            "total_products": await db.store_products.count_documents({"is_private_catalog": True}),
+            "total_products": await db.store_products.count_documents({"is_sysbook": True}),
             "total_students": await db.synced_students.count_documents({}),
             "total_orders": await db.textbook_orders.count_documents({})
         }
@@ -498,10 +498,10 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
         stats = {
             "public_products": await db.store_products.count_documents({
                 "active": True,
-                "$or": [{"is_private_catalog": {"$exists": False}}, {"is_private_catalog": False}]
+                "$or": [{"is_sysbook": {"$exists": False}}, {"is_sysbook": False}]
             }),
             "private_products": await db.store_products.count_documents({
-                "is_private_catalog": True,
+                "is_sysbook": True,
                 "active": True
             }),
             "students": await db.synced_students.count_documents({}),

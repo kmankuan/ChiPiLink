@@ -31,7 +31,7 @@ class TestPrivateCatalogAdminProducts:
     """Test /api/store/private-catalog/admin/products endpoint"""
     
     def test_pca_products_returns_correct_count(self, admin_headers):
-        """Verify PCA endpoint returns only is_private_catalog:True products"""
+        """Verify PCA endpoint returns only is_sysbook:True products"""
         response = requests.get(
             f"{BASE_URL}/api/store/private-catalog/admin/products?limit=500",
             headers=admin_headers
@@ -43,10 +43,10 @@ class TestPrivateCatalogAdminProducts:
         assert "products" in data
         assert "total" in data
         
-        # All products should be PCA (is_private_catalog: True)
+        # All products should be PCA (is_sysbook: True)
         products = data["products"]
         for p in products:
-            # Note: is_private_catalog may not be in response if excluded
+            # Note: is_sysbook may not be in response if excluded
             # We trust the endpoint returns only PCA products
             pass
         

@@ -120,11 +120,11 @@ async def get_inventory_products(
 
     # Filter by catalog type
     if catalog_type == "sysbook":
-        conditions.append({"is_private_catalog": True})
+        conditions.append({"is_sysbook": True})
     elif catalog_type == "public":
         conditions.append({"$or": [
-            {"is_private_catalog": {"$exists": False}},
-            {"is_private_catalog": False},
+            {"is_sysbook": {"$exists": False}},
+            {"is_sysbook": False},
         ]})
 
     if search:
@@ -241,7 +241,7 @@ async def adjust_stock(
         result["remaining_presale"] = new_reserved
 
     # Sync stock to Monday.com (non-blocking, only for private catalog textbooks)
-    if product.get("is_private_catalog"):
+    if product.get("is_sysbook"):
         try:
             from modules.store.integrations.monday_txb_inventory_adapter import txb_inventory_adapter
             sync_result = await txb_inventory_adapter.sync_stock_to_monday(adjustment.book_id, new_qty)

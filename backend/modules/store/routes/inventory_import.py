@@ -172,7 +172,7 @@ async def preview_csv_import(
             
             # Check if product exists in the private catalog
             existing = await db.store_products.find_one(
-                {"code": code, "is_private_catalog": True},
+                {"code": code, "is_sysbook": True},
                 {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
             )
             
@@ -285,7 +285,7 @@ async def execute_csv_import(
                 price = float(row.get('price', '0').strip() or '0')
                 
                 # Check if exists in the private catalog
-                existing = await db.store_products.find_one({"code": code, "is_private_catalog": True})
+                existing = await db.store_products.find_one({"code": code, "is_sysbook": True})
                 
                 if existing:
                     if duplicate_mode == DuplicateMode.SKIP:
@@ -300,7 +300,7 @@ async def execute_csv_import(
                     
                     # Update existing product
                     await db.store_products.update_one(
-                        {"code": code, "is_private_catalog": True},
+                        {"code": code, "is_sysbook": True},
                         {"$set": {
                             "name": name,
                             "grade": grade,
@@ -335,7 +335,7 @@ async def execute_csv_import(
                         "image_url": None,
                         "active": True,
                         "featured": False,
-                        "is_private_catalog": True,
+                        "is_sysbook": True,
                         "created_at": now,
                         "created_by": admin.get("user_id"),
                         "updated_at": now

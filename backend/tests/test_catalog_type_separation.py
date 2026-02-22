@@ -94,9 +94,9 @@ class TestProductCatalogTypeFiltering:
         assert "products" in data
         assert "total" in data
         
-        # All returned products should be private catalog (is_private_catalog=True)
+        # All returned products should be private catalog (is_sysbook=True)
         for product in data.get("products", []):
-            assert product.get("is_private_catalog") == True, f"Product {product.get('book_id')} is not PCA"
+            assert product.get("is_sysbook") == True, f"Product {product.get('book_id')} is not PCA"
         
         print(f"PCA products returned: {data['total']}")
     
@@ -110,7 +110,7 @@ class TestProductCatalogTypeFiltering:
         
         # All returned products should NOT be private catalog
         for product in data.get("products", []):
-            is_private = product.get("is_private_catalog", False)
+            is_private = product.get("is_sysbook", False)
             assert is_private in [False, None], f"Product {product.get('book_id')} is PCA, not public"
         
         print(f"Public products returned: {data['total']}")

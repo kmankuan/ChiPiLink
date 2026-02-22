@@ -11,7 +11,7 @@ from core.database import db
 
 router = APIRouter(prefix="/analytics", tags=["Sysbook - Analytics"])
 
-SYSBOOK_FILTER = {"is_private_catalog": True}
+SYSBOOK_FILTER = {"is_sysbook": True}
 
 
 @router.get("/stock-trends")

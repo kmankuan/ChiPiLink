@@ -1,6 +1,6 @@
 """
 Sysbook — Textbook Inventory Routes
-Dashboard, product list, CRUD, bulk operations — all scoped to is_private_catalog=True (Sysbook products).
+Dashboard, product list, CRUD, bulk operations — all scoped to is_sysbook=True (Sysbook products).
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -14,7 +14,7 @@ from .alerts import create_stock_alert_if_needed
 
 router = APIRouter(prefix="/inventory", tags=["Sysbook - Inventory"])
 
-SYSBOOK_FILTER = {"is_private_catalog": True}
+SYSBOOK_FILTER = {"is_sysbook": True}
 
 
 class StockAdjustment(BaseModel):
@@ -140,7 +140,7 @@ async def sysbook_list_products(
 @router.post("/products")
 async def sysbook_create_product(product: dict, admin: dict = Depends(get_admin_user)):
     """Create a textbook product."""
-    product["is_private_catalog"] = True
+    product["is_sysbook"] = True
     product["book_id"] = product.get("book_id") or f"book_{uuid.uuid4().hex[:12]}"
     product["active"] = product.get("active", True)
     product["created_at"] = datetime.now(timezone.utc).isoformat()
@@ -153,11 +153,11 @@ async def sysbook_create_product(product: dict, admin: dict = Depends(get_admin_
 @router.put("/products/{book_id}")
 async def sysbook_update_product(book_id: str, updates: dict, admin: dict = Depends(get_admin_user)):
     """Update a textbook product."""
-    updates["is_private_catalog"] = True
+    updates["is_sysbook"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     # Separate null fields for $unset (e.g. clearing custom threshold)
-    unset_fields = {k: "" for k, v in updates.items() if v is None and k != "is_private_catalog"}
-    set_fields = {k: v for k, v in updates.items() if v is not None or k == "is_private_catalog"}
+    unset_fields = {k: "" for k, v in updates.items() if v is None and k != "is_sysbook"}
+    set_fields = {k: v for k, v in updates.items() if v is not None or k == "is_sysbook"}
     update_ops = {}
     if set_fields:
         update_ops["$set"] = set_fields

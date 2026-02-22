@@ -49,7 +49,7 @@ def test_product(api_client):
         "grade": "G1",
         "price": 10.00,
         "active": True,
-        "is_private_catalog": True
+        "is_sysbook": True
     }
     
     response = api_client.post(
@@ -217,7 +217,7 @@ class TestArchiveWorkflow:
             "grade": "G2",
             "price": 15.00,
             "active": True,
-            "is_private_catalog": True
+            "is_sysbook": True
         }
         
         create_response = api_client.post(

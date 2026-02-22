@@ -239,7 +239,7 @@ async def get_comprehensive_analytics(
     
     # ============== INVENTORY OVERVIEW ==============
     inventory_pipeline = [
-        {"$match": {"is_private_catalog": True, "active": True}},
+        {"$match": {"is_sysbook": True, "active": True}},
         {"$project": {
             "_id": 0,
             "book_id": 1,
@@ -343,7 +343,7 @@ async def get_inventory_report(
     check_super_admin(admin)
     
     pipeline = [
-        {"$match": {"is_private_catalog": True}},
+        {"$match": {"is_sysbook": True}},
         {"$project": {
             "_id": 0,
             "book_id": 1,

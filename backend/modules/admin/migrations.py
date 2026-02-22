@@ -36,8 +36,8 @@ FIELD_MAPPINGS = {
     "cantidad_reservada": "reserved_quantity",
     "inventario": "inventory_quantity",
     "destacado": "featured",
-    "catalogo_privado": "is_private_catalog",
-    "es_catalogo_privado": "is_private_catalog",
+    "catalogo_privado": "is_sysbook",
+    "es_catalogo_privado": "is_sysbook",
     "codigo": "code",
     "editorial": "publisher",
     "categoria": "category",
@@ -183,7 +183,7 @@ async def run_spanish_to_english_migration(
     **IMPORTANT**: Run with dry_run=true first to preview changes!
     
     This migration converts:
-    - Field names: grado -> grade, activo -> active, catalogo_privado -> is_private_catalog, etc.
+    - Field names: grado -> grade, activo -> active, catalogo_privado -> is_sysbook, etc.
     - Status values: aprobado -> approved, pendiente -> pending, etc.
     - Nested enrollment fields
     
@@ -266,7 +266,7 @@ async def get_migration_status(
     })
     products_english = await db.store_products.count_documents({
         "$or": [
-            {"is_private_catalog": {"$exists": True}},
+            {"is_sysbook": {"$exists": True}},
             {"grade": {"$exists": True}},
             {"active": {"$exists": True}}
         ]

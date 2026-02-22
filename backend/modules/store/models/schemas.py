@@ -55,7 +55,7 @@ class ProductBase(BaseModel):
     featured: bool = False
     on_sale: bool = False
     featured_order: int = 0
-    is_private_catalog: bool = False
+    is_sysbook: bool = False
     code: Optional[str] = None
 
 

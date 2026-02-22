@@ -24,19 +24,19 @@ async def main():
     # ===== 1. ADD MORE PRODUCTS (textbooks) across grades =====
     new_products = [
         # Grade 3
-        {"book_id": gen_id("libro"), "name": "Matemáticas 3er Grado - Santillana", "grade": "G3", "price": 28.50, "code": "MAT-3-SANT", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 50, "reserved_quantity": 3},
-        {"book_id": gen_id("libro"), "name": "Ciencias Naturales 3er Grado", "grade": "G3", "price": 24.99, "code": "SCI-3-NAT", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 30, "reserved_quantity": 0},
-        {"book_id": gen_id("libro"), "name": "Estudios Sociales 3er Grado", "grade": "G3", "price": 22.00, "code": "SOC-3-EST", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 0, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "Matemáticas 3er Grado - Santillana", "grade": "G3", "price": 28.50, "code": "MAT-3-SANT", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 50, "reserved_quantity": 3},
+        {"book_id": gen_id("libro"), "name": "Ciencias Naturales 3er Grado", "grade": "G3", "price": 24.99, "code": "SCI-3-NAT", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 30, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "Estudios Sociales 3er Grado", "grade": "G3", "price": 22.00, "code": "SOC-3-EST", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 0, "reserved_quantity": 0},
         # Grade 4
-        {"book_id": gen_id("libro"), "name": "Matemáticas 4to Grado - Pearson", "grade": "G4", "price": 32.00, "code": "MAT-4-PEAR", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 40, "reserved_quantity": 2},
-        {"book_id": gen_id("libro"), "name": "Español 4to Grado", "grade": "G4", "price": 27.50, "code": "ESP-4", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 25, "reserved_quantity": 0},
-        {"book_id": gen_id("libro"), "name": "English 4th Grade - Cambridge", "grade": "G4", "price": 35.00, "code": "ENG-4-CAM", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 20, "reserved_quantity": 1},
+        {"book_id": gen_id("libro"), "name": "Matemáticas 4to Grado - Pearson", "grade": "G4", "price": 32.00, "code": "MAT-4-PEAR", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 40, "reserved_quantity": 2},
+        {"book_id": gen_id("libro"), "name": "Español 4to Grado", "grade": "G4", "price": 27.50, "code": "ESP-4", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 25, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "English 4th Grade - Cambridge", "grade": "G4", "price": 35.00, "code": "ENG-4-CAM", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 20, "reserved_quantity": 1},
         # Grade 5
-        {"book_id": gen_id("libro"), "name": "Español Lectura 5to Grado", "grade": "G5", "price": 29.99, "code": "ESP-5-LEC", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 35, "reserved_quantity": 0},
-        {"book_id": gen_id("libro"), "name": "Ciencias 5to Grado - Discovery", "grade": "G5", "price": 31.50, "code": "SCI-5-DIS", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 15, "reserved_quantity": 5},
+        {"book_id": gen_id("libro"), "name": "Español Lectura 5to Grado", "grade": "G5", "price": 29.99, "code": "ESP-5-LEC", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 35, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "Ciencias 5to Grado - Discovery", "grade": "G5", "price": 31.50, "code": "SCI-5-DIS", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 15, "reserved_quantity": 5},
         # Grade 6
-        {"book_id": gen_id("libro"), "name": "Matemáticas 6to Grado - Oxford", "grade": "G6", "price": 34.99, "code": "MAT-6-OXF", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 40, "reserved_quantity": 0},
-        {"book_id": gen_id("libro"), "name": "Historia de Panamá 6to Grado", "grade": "G6", "price": 26.00, "code": "HIS-6-PAN", "category": "Textbooks", "active": True, "is_private_catalog": True, "inventory_quantity": 18, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "Matemáticas 6to Grado - Oxford", "grade": "G6", "price": 34.99, "code": "MAT-6-OXF", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 40, "reserved_quantity": 0},
+        {"book_id": gen_id("libro"), "name": "Historia de Panamá 6to Grado", "grade": "G6", "price": 26.00, "code": "HIS-6-PAN", "category": "Textbooks", "active": True, "is_sysbook": True, "inventory_quantity": 18, "reserved_quantity": 0},
     ]
     
     for p in new_products:
@@ -90,7 +90,7 @@ async def main():
     for grade_key in ["G3", "G4", "G5", "G6"]:
         grade_queries = [grade_key, grade_key.replace("G", "")]
         books = await db.store_products.find(
-            {"active": True, "is_private_catalog": True, "$or": [{"grade": {"$in": grade_queries}}, {"grades": {"$in": grade_queries}}]},
+            {"active": True, "is_sysbook": True, "$or": [{"grade": {"$in": grade_queries}}, {"grades": {"$in": grade_queries}}]},
             {"_id": 0}
         ).to_list(50)
         books_by_grade[grade_key] = books
@@ -234,7 +234,7 @@ async def main():
             print(f"  - {o['order_id']}: {o['student_name']} (grade {o['grade']}) → {o['status']} | ${o['total_amount']:.2f} | {len([i for i in o['items'] if i['quantity_ordered']>0])} items")
     
     # ===== 6. SUMMARY =====
-    total_products = await db.store_products.count_documents({"active": True, "is_private_catalog": True})
+    total_products = await db.store_products.count_documents({"active": True, "is_sysbook": True})
     total_orders = await db.store_textbook_orders.count_documents({})
     total_students = await db.store_students.count_documents({})
     

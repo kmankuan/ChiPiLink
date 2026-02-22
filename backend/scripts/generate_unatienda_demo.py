@@ -91,7 +91,7 @@ async def generate_catalog_products() -> List[Dict]:
                 "on_sale": random.random() > 0.85,
                 "is_demo": True,
                 "ano_escolar": "2025-2026",
-                "is_private_catalog": True,
+                "is_sysbook": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             products.append(product)

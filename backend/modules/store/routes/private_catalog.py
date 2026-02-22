@@ -93,7 +93,7 @@ async def get_private_catalog_products(
     
     # Build query - English field names only
     query = {
-        "is_private_catalog": True,
+        "is_sysbook": True,
         "active": True
     }
     
@@ -137,7 +137,7 @@ async def get_private_catalog_products(
     total = await db.store_products.count_documents(query)
     
     # Get available grades and subjects for filters
-    base_filter = {"is_private_catalog": True, "active": True}
+    base_filter = {"is_sysbook": True, "active": True}
     available_grades = await db.store_products.distinct("grade", base_filter)
     available_subjects = await db.store_products.distinct("subject", base_filter)
     
@@ -173,7 +173,7 @@ async def get_product_detail(
         )
     
     product = await db.store_products.find_one(
-        {"book_id": book_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_sysbook": True},
         {"_id": 0}
     )
     
@@ -209,7 +209,7 @@ async def get_products_by_grade(
         grade_variants.append(f"G{grade}")  # "3" -> "G3"
     
     query = {
-        "is_private_catalog": True,
+        "is_sysbook": True,
         "active": True,
         "$or": [
             {"grade": {"$in": grade_variants}},
@@ -263,7 +263,7 @@ async def get_catalog_summary(
         if grade:
             # Count products for this grade
             count = await db.store_products.count_documents({
-                "is_private_catalog": True,
+                "is_sysbook": True,
                 "active": True,
                 "$or": [{"grade": grade}, {"grades": grade}]
             })
@@ -271,7 +271,7 @@ async def get_catalog_summary(
             # Calculate estimated total
             products = await db.store_products.find(
                 {
-                    "is_private_catalog": True,
+                    "is_sysbook": True,
                     "active": True,
                     "$or": [{"grade": grade}, {"grades": grade}]
                 },
@@ -309,7 +309,7 @@ async def admin_get_private_catalog_products(
     """
     Admin: Get all products from the private catalog.
     """
-    query = {"is_private_catalog": True}
+    query = {"is_sysbook": True}
     
     if grade:
         query["$or"] = [{"grade": grade}, {"grades": grade}]
@@ -344,7 +344,7 @@ async def admin_create_private_catalog_product(
     import uuid
     
     # Ensure it's private catalog
-    product["is_private_catalog"] = True
+    product["is_sysbook"] = True
     product["book_id"] = product.get("book_id") or f"book_{uuid.uuid4().hex[:12]}"
     product["active"] = product.get("active", True)
     product["created_at"] = datetime.now(timezone.utc).isoformat()
@@ -364,12 +364,12 @@ async def admin_update_private_catalog_product(
     """
     Admin: Update product in the private catalog.
     """
-    # Ensure is_private_catalog cannot be changed
-    updates["is_private_catalog"] = True
+    # Ensure is_sysbook cannot be changed
+    updates["is_sysbook"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.store_products.update_one(
-        {"book_id": book_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_sysbook": True},
         {"$set": updates}
     )
     
@@ -393,13 +393,13 @@ async def admin_delete_private_catalog_product(
     """
     if hard_delete:
         result = await db.store_products.delete_one(
-            {"book_id": book_id, "is_private_catalog": True}
+            {"book_id": book_id, "is_sysbook": True}
         )
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Product not found")
     else:
         result = await db.store_products.update_one(
-            {"book_id": book_id, "is_private_catalog": True},
+            {"book_id": book_id, "is_sysbook": True},
             {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
@@ -415,7 +415,7 @@ async def admin_archive_product(
 ):
     """Archive a product — moves it to the archive layer."""
     result = await db.store_products.update_one(
-        {"book_id": book_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_sysbook": True},
         {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
     )
     if result.matched_count == 0:
@@ -430,7 +430,7 @@ async def admin_restore_product(
 ):
     """Restore a product from archive."""
     result = await db.store_products.update_one(
-        {"book_id": book_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_sysbook": True},
         {"$set": {"archived": False}, "$unset": {"archived_at": ""}}
     )
     if result.matched_count == 0:
@@ -445,7 +445,7 @@ async def admin_permanent_delete(
 ):
     """Permanently delete a product (only from archive)."""
     result = await db.store_products.delete_one(
-        {"book_id": book_id, "is_private_catalog": True, "archived": True}
+        {"book_id": book_id, "is_sysbook": True, "archived": True}
     )
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found or not archived")

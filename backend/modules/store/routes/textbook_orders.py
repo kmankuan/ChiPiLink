@@ -392,8 +392,8 @@ async def diagnostic_textbooks(
     # Check for English fields
     with_active_true = await db.store_products.count_documents({"active": True})
     with_active_false = await db.store_products.count_documents({"active": False})
-    with_private_true = await db.store_products.count_documents({"is_private_catalog": True})
-    with_private_false = await db.store_products.count_documents({"is_private_catalog": False})
+    with_private_true = await db.store_products.count_documents({"is_sysbook": True})
+    with_private_false = await db.store_products.count_documents({"is_sysbook": False})
     with_grade = await db.store_products.count_documents({"grade": {"$exists": True, "$ne": None}})
     with_grades = await db.store_products.count_documents({"grades": {"$exists": True, "$ne": []}})
     
@@ -414,8 +414,8 @@ async def diagnostic_textbooks(
         "english_fields": {
             "active_true": with_active_true,
             "active_false": with_active_false,
-            "is_private_catalog_true": with_private_true,
-            "is_private_catalog_false": with_private_false,
+            "is_sysbook_true": with_private_true,
+            "is_sysbook_false": with_private_false,
             "has_grade": with_grade,
             "has_grades_array": with_grades
         },
@@ -430,13 +430,13 @@ async def diagnostic_textbooks(
     # 2. Get sample products to inspect
     sample_products = await db.store_products.find(
         {},
-        {"_id": 0, "name": 1, "grade": 1, "grades": 1, "active": 1, "is_private_catalog": 1, "grado": 1, "activo": 1, "catalogo_privado": 1}
+        {"_id": 0, "name": 1, "grade": 1, "grades": 1, "active": 1, "is_sysbook": 1, "grado": 1, "activo": 1, "catalogo_privado": 1}
     ).limit(10).to_list(10)
     result["products"]["samples"] = sample_products
     
     # 3. Get visible products (what textbook service queries)
     visible_product_list = await db.store_products.find(
-        {"active": True, "is_private_catalog": True},
+        {"active": True, "is_sysbook": True},
         {"_id": 0, "name": 1, "grade": 1, "grades": 1, "book_id": 1}
     ).to_list(50)
     result["products"]["visible_product_list"] = visible_product_list
@@ -502,11 +502,11 @@ async def diagnostic_textbooks(
     
     if visible_products == 0:
         if with_private_true == 0:
-            result["recommendations"].append("No products have is_private_catalog=true. Set this field for textbooks.")
+            result["recommendations"].append("No products have is_sysbook=true. Set this field for textbooks.")
         if with_active_true == 0:
             result["recommendations"].append("No products have active=true. Activate some products.")
         if with_private_true > 0 and with_active_true > 0:
-            result["recommendations"].append("Products exist but none match both active=true AND is_private_catalog=true.")
+            result["recommendations"].append("Products exist but none match both active=true AND is_sysbook=true.")
     
     if grades_in_products and grades_in_students:
         if not (grades_in_products & grades_in_students):

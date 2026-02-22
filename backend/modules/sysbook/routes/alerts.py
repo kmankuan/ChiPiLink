@@ -15,7 +15,7 @@ router = APIRouter(prefix="/alerts", tags=["Sysbook - Alerts"])
 
 logger = logging.getLogger(__name__)
 
-SYSBOOK_FILTER = {"is_private_catalog": True}
+SYSBOOK_FILTER = {"is_sysbook": True}
 
 DEFAULT_SETTINGS = {
     "global_low_stock_threshold": 10,
