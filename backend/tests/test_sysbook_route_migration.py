@@ -116,7 +116,11 @@ class TestNewSysbookRoutes:
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        print(f"Bulk import history: {len(data.get('history', []))} records")
+        # Response could be a list or dict with 'history' key
+        if isinstance(data, list):
+            print(f"Bulk import history: {len(data)} records")
+        else:
+            print(f"Bulk import history: {len(data.get('history', []))} records")
     
     def test_browse_products(self, auth_headers):
         """GET /api/sysbook/browse/products - returns sysbook products"""
