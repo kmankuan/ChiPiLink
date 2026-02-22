@@ -307,7 +307,7 @@ function renderCellContent(col, product, { updateProductField, onAdjustStock, gl
 }
 
 /* ── Shared Table Component (Dynamic Columns) ── */
-function CatalogTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop }) {
+function CatalogTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop, globalThreshold }) {
   const totalWidth = columns.reduce((s, c) => s + (columnWidths[c.key] || c.width), 0) + (columnWidths.select || 40) + (columnWidths.actions || 80);
   const allSelected = products.length > 0 && products.every(p => selectedIds.has(p.book_id));
   const someSelected = products.some(p => selectedIds.has(p.book_id)) && !allSelected;
