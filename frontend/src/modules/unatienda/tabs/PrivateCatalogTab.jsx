@@ -609,7 +609,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const [catalogType, setCatalogType] = useState('all');
 
   // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
-  const effectiveCatalogType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
+  const effectiveViewType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
 
   // Column order per catalog type (persisted)
   const [columnOrders, setColumnOrders] = useState(() => {
@@ -659,7 +659,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     e.preventDefault();
     if (!dragColumn || dragColumn === targetKey) { setDragColumn(null); return; }
     setColumnOrders(prev => {
-      const ct = effectiveCatalogType;
+      const ct = effectiveViewType;
       const order = [...(prev[ct] || COLUMN_DEFS[ct].map(c => c.key))];
       const fromIdx = order.indexOf(dragColumn);
       const toIdx = order.indexOf(targetKey);
@@ -670,38 +670,38 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
       return { ...prev, [ct]: order };
     });
     setDragColumn(null);
-  }, [dragColumn, effectiveCatalogType]);
+  }, [dragColumn, effectiveViewType]);
 
   // Active columns based on catalog type + saved order
   const activeColumns = useMemo(() => {
-    const defs = COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all;
-    const order = columnOrders[effectiveCatalogType];
+    const defs = COLUMN_DEFS[effectiveViewType] || COLUMN_DEFS.all;
+    const order = columnOrders[effectiveViewType];
     if (!order) return defs;
     const defMap = {};
     defs.forEach(c => { defMap[c.key] = c; });
     const ordered = order.map(key => defMap[key]).filter(Boolean);
     defs.forEach(c => { if (!order.includes(c.key)) ordered.push(c); });
     return ordered;
-  }, [effectiveCatalogType, columnOrders]);
+  }, [effectiveViewType, columnOrders]);
 
   const isColumnOrderCustom = useMemo(() => {
-    const defaultOrder = (COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all).map(c => c.key);
-    const current = columnOrders[effectiveCatalogType];
+    const defaultOrder = (COLUMN_DEFS[effectiveViewType] || COLUMN_DEFS.all).map(c => c.key);
+    const current = columnOrders[effectiveViewType];
     if (!current) return false;
     return JSON.stringify(current) !== JSON.stringify(defaultOrder);
-  }, [effectiveCatalogType, columnOrders]);
+  }, [effectiveViewType, columnOrders]);
 
   const handleResetColumnOrder = useCallback(() => {
-    const defaultOrder = (COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all).map(c => c.key);
+    const defaultOrder = (COLUMN_DEFS[effectiveViewType] || COLUMN_DEFS.all).map(c => c.key);
     setColumnOrders(prev => {
-      const updated = { ...prev, [effectiveCatalogType]: defaultOrder };
-      saveColumnOrder(effectiveCatalogType, defaultOrder);
+      const updated = { ...prev, [effectiveViewType]: defaultOrder };
+      saveColumnOrder(effectiveViewType, defaultOrder);
       return updated;
     });
     setColumnWidths(DEFAULT_COLUMN_WIDTHS);
     saveColumnWidths(DEFAULT_COLUMN_WIDTHS);
     toast.success('Column layout reset to default');
-  }, [effectiveCatalogType]);
+  }, [effectiveViewType]);
 
   const [formData, setFormData] = useState({
     name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
