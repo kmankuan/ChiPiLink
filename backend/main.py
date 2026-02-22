@@ -166,6 +166,7 @@ api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
 api_router.include_router(cleanup_router)
 api_router.include_router(seed_demo_router)  # Demo data seeding
+api_router.include_router(data_manager_router)  # Unified data manager
 api_router.include_router(migrations_router)  # Database migrations
 api_router.include_router(privacy_router)  # Privacy settings
 api_router.include_router(invision_router)
