@@ -1,7 +1,7 @@
 /**
- * StockOrdersTab — Stock Movements management
- * With catalog type separation: Public Store vs School Textbooks
+ * StockOrdersTab — Stock Movements for Public Store (Unatienda)
  * 3 workflows: Shipment (restock), Return (linked to orders), Adjustment (corrections)
+ * Textbook stock movements are managed separately in Sysbook.
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
