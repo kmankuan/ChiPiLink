@@ -659,17 +659,18 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
     e.preventDefault();
     if (!dragColumn || dragColumn === targetKey) { setDragColumn(null); return; }
     setColumnOrders(prev => {
-      const order = [...(prev[catalogType] || COLUMN_DEFS[catalogType].map(c => c.key))];
+      const ct = effectiveCatalogType;
+      const order = [...(prev[ct] || COLUMN_DEFS[ct].map(c => c.key))];
       const fromIdx = order.indexOf(dragColumn);
       const toIdx = order.indexOf(targetKey);
       if (fromIdx === -1 || toIdx === -1) return prev;
       order.splice(fromIdx, 1);
       order.splice(toIdx, 0, dragColumn);
-      saveColumnOrder(catalogType, order);
-      return { ...prev, [catalogType]: order };
+      saveColumnOrder(ct, order);
+      return { ...prev, [ct]: order };
     });
     setDragColumn(null);
-  }, [dragColumn, catalogType]);
+  }, [dragColumn, effectiveCatalogType]);
 
   // Active columns based on catalog type + saved order
   const activeColumns = useMemo(() => {
