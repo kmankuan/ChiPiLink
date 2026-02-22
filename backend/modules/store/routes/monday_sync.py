@@ -521,6 +521,7 @@ async def get_webhook_config(admin: dict = Depends(get_admin_user)):
 @router.get("/status-mapping")
 async def get_status_mapping(admin: dict = Depends(get_admin_user)):
     """Get Monday.com status label → app status mapping"""
+    from modules.sysbook.models.textbook_order import DEFAULT_STATUS_MAPPING
     config = await monday_config_service.get_config()
     return {
         "mapping": config.get("status_mapping", DEFAULT_STATUS_MAPPING),
