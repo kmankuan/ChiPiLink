@@ -50,7 +50,8 @@ async def seed_admin_user():
 
     try:
         hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        existing = await db[AuthCollections.USERS].find_one({"email": admin_email})
+        coll = AuthCollections.USERS
+        existing = await db[coll].find_one({"email": admin_email})
 
         if not existing:
             admin_doc = {
@@ -65,15 +66,19 @@ async def seed_admin_user():
                 "address": {},
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
-            await db[AuthCollections.USERS].insert_one(admin_doc)
-            logger.info(f"Admin user CREATED: {admin_email}")
+            res = await db[coll].insert_one(admin_doc)
+            logger.info(f"Admin CREATED in '{coll}' db='{db.name}': {admin_email} uid={admin_doc['user_id']} ack={res.acknowledged}")
         else:
-            # Always force-update password_hash and is_admin to guarantee login works
-            await db[AuthCollections.USERS].update_one(
+            res = await db[coll].update_one(
                 {"email": admin_email},
                 {"$set": {"password_hash": hashed_password, "is_admin": True}}
             )
-            logger.info(f"Admin user ENSURED: {admin_email} (password_hash + is_admin forced)")
+            verify = bcrypt.checkpw(admin_password.encode('utf-8'), hashed_password.encode('utf-8'))
+            logger.info(
+                f"Admin ENSURED in '{coll}' db='{db.name}': {admin_email} "
+                f"uid={existing.get('user_id')} matched={res.matched_count} "
+                f"modified={res.modified_count} hash_ok={verify}"
+            )
 
     except Exception as e:
         logger.error(f"SEED ADMIN FAILED: {e}", exc_info=True)
