@@ -1,7 +1,7 @@
 /**
  * UnatiendaModule — Retail Store Management (Public Store)
  * Contains: Inventory, Public Store, Stock Movements, Store Checkout Form, Config, Demo Data
- * School textbook features have been moved to the "School Textbooks" sidebar group.
+ * School textbook management is handled separately in the Sysbook module.
  */
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
