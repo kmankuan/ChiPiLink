@@ -26,7 +26,7 @@ import { useGuardedAction } from '@/hooks/useGuardedAction';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function TextbookOrderView({ privateCatalogAccess, selectedStudentId, onBack, onRefreshAccess }) {
+export default function TextbookOrderView({ sysbookAccess, selectedStudentId, onBack, onRefreshAccess }) {
   const { token } = useAuth();
   const { t, i18n } = useTranslation();
   const [view, setView] = useState(selectedStudentId ? 'textbooks' : 'students'); // 'students', 'textbooks', 'linking'
