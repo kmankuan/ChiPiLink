@@ -7,7 +7,7 @@ from typing import Dict, Optional, List
 from pydantic import BaseModel
 
 from core.auth import get_admin_user
-from modules.store.services.bulk_import_service import bulk_import_service
+from modules.sysbook.services.bulk_import_service import bulk_import_service
 
 router = APIRouter(prefix="/bulk-import", tags=["Sysbook - Bulk Import"])
 

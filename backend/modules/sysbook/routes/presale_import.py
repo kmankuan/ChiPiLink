@@ -5,7 +5,7 @@ Admin endpoints for importing pre-sale orders from Monday.com
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Optional
 from core.auth import get_admin_user
-from modules.store.services.presale_import_service import presale_import_service
+from modules.sysbook.services.presale_import_service import presale_import_service
 from modules.store.services.monday_config_service import monday_config_service
 
 router = APIRouter(prefix="/presale-import", tags=["Sysbook - Pre-Sale Import"])

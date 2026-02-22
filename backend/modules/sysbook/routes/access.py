@@ -6,12 +6,12 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
 
 from core.auth import get_current_user, get_admin_user, require_permission
-from modules.store.models.textbook_access import (
+from modules.sysbook.models.textbook_access import (
     StudentRecordCreate, StudentRecordUpdate,
     EnrollmentCreate, ApprovalAction, RequestStatus,
     SchoolCreate
 )
-from modules.store.services.textbook_access_service import textbook_access_service
+from modules.sysbook.services.textbook_access_service import textbook_access_service
 
 router = APIRouter(prefix="/access", tags=["Sysbook - Access"])
 
@@ -59,7 +59,7 @@ async def create_student(
         )
         # Suggest pre-sale order link (admin must confirm)
         try:
-            from ..services.presale_import_service import presale_import_service
+            from modules.sysbook.services.presale_import_service import presale_import_service
             student_name = f"{data.first_name} {data.last_name}".strip()
             grade = data.grade or ""
             student_id = result.get("student_id", "")

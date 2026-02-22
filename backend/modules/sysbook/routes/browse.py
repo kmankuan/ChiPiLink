@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 from core.auth import get_current_user, get_admin_user, get_optional_user
 from core.database import db
-from modules.store.services.textbook_access_service import textbook_access_service
+from modules.sysbook.services.textbook_access_service import textbook_access_service
 
 router = APIRouter(prefix="/browse", tags=["Sysbook - Browse"])
 

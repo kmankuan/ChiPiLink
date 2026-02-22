@@ -6,8 +6,8 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
 
 from core.auth import get_current_user, get_admin_user
-from modules.store.services.textbook_order_service import textbook_order_service
-from modules.store.models.textbook_order import (
+from modules.sysbook.services.textbook_order_service import textbook_order_service
+from modules.sysbook.models.textbook_order import (
     OrderStatus, SubmitOrderRequest, ReorderRequest, AdminSetMaxQuantity
 )
 

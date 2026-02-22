@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 from core.auth import get_admin_user
 from core.database import db
-from modules.store.services.school_year_service import school_year_service, SchoolYearConfigUpdate
+from modules.sysbook.services.school_year_service import school_year_service, SchoolYearConfigUpdate
 
 router = APIRouter(prefix="/school-year", tags=["Sysbook - School Year Config"])
 
