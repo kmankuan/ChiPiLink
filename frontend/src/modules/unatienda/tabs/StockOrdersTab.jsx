@@ -165,15 +165,12 @@ function ProductPicker({ items, setItems, token, catalogType }) {
 }
 
 /* ============ Create Shipment Dialog ============ */
-function CreateShipmentDialog({ open, onClose, onCreated, token, defaultCatalog }) {
-  const [catalogType, setCatalogType] = useState(defaultCatalog || 'public');
+function CreateShipmentDialog({ open, onClose, onCreated, token }) {
   const [supplier, setSupplier] = useState('');
   const [expectedDate, setExpectedDate] = useState('');
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => { if (open) setCatalogType(defaultCatalog || 'public'); }, [open, defaultCatalog]);
 
   const handleCreate = async () => {
     if (!supplier) { toast.error('Supplier is required'); return; }
@@ -181,7 +178,7 @@ function CreateShipmentDialog({ open, onClose, onCreated, token, defaultCatalog 
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/shipment`, {
-        supplier, expected_date: expectedDate || null, items, notes: notes || null, catalog_type: catalogType,
+        supplier, expected_date: expectedDate || null, items, notes: notes || null, catalog_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Shipment created');
       onCreated();
@@ -195,15 +192,14 @@ function CreateShipmentDialog({ open, onClose, onCreated, token, defaultCatalog 
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-blue-600" /> New Shipment</DialogTitle>
-          <DialogDescription>Register an incoming shipment. Stock updates when you mark it as received.</DialogDescription>
+          <DialogDescription>Register an incoming shipment for the public store. Stock updates when you mark it as received.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <CatalogTypeSelector value={catalogType} onChange={(v) => { setCatalogType(v); setItems([]); }} />
           <div className="grid grid-cols-2 gap-3">
             <div><Label className="text-xs">Supplier *</Label><Input value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="Supplier name" className="h-9 text-xs" data-testid="shipment-supplier" /></div>
             <div><Label className="text-xs">Expected Date</Label><Input type="date" value={expectedDate} onChange={e => setExpectedDate(e.target.value)} className="h-9 text-xs" data-testid="shipment-date" /></div>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} catalogType={catalogType} />
+          <ProductPicker items={items} setItems={setItems} token={token} catalogType="public" />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Additional details..." rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
