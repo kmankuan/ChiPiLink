@@ -101,6 +101,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`
 - **Comments & Strings**: All user-facing "PCA catalog" references updated
 
+### DB Field Rename: is_private_catalog → is_sysbook (Feb 22, 2026)
+- **Scope**: 91 backend + 15 frontend occurrences renamed
+- **DB Migration**: `$rename` operator used to update existing records (25 textbook products)
+- **Files updated**: All sysbook routes, store routes (private_catalog, textbook_orders, textbook_access, presale_import, inventory, stock_orders), Monday adapters, bulk import, frontend components
+- **Note**: User plans to redeploy with fresh DB, so no migration script needed for production — new data will use `is_sysbook` from the start
+- **Testing**: 100% pass rate (iteration_188)
+
 ### Integration Audit — Textbook Ordering Workflow (Feb 22, 2026)
 - **Fixed `pca` → `sysbook`** in 4 files:
   - `store/routes/inventory.py`: `catalog_type == "pca"` → `"sysbook"` filter
