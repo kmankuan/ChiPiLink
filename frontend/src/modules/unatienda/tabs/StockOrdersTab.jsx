@@ -628,7 +628,7 @@ export default function StockOrdersTab({ token }) {
   const returnCount = orders.filter(o => o.type === 'return').length;
   const adjustmentCount = orders.filter(o => o.type === 'adjustment').length;
 
-  const defaultCatalog = catalogFilter !== 'all' ? catalogFilter : 'public';
+  const defaultCatalog = 'public';
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
