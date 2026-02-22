@@ -489,18 +489,18 @@ class TextbookAccessService(BaseService):
     async def check_inventory_access(
         self,
         user_id: str,
-        catalog_id: str,
+        inventory_id: str,
         year: Optional[int] = None
     ) -> Dict:
         """
-        Check if a user has approved access to a catalog.
+        Check if a user has approved access to a sysbook inventory.
         Returns access info including approved students.
         """
         if year is None:
             year = self.get_current_school_year()
         
         approved_students = await self.student_repo.get_approved_for_catalog(
-            user_id, catalog_id, year
+            user_id, inventory_id, year
         )
         
         return {
