@@ -5,7 +5,7 @@ import sys
 import json
 
 class FrontendMigrationTester:
-    def __init__(self, base_url="https://inventory-mgmt-36.preview.emergentagent.com"):
+    def __init__(self, base_url="https://sysbook-debug.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
