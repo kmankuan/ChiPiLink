@@ -812,7 +812,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "order_id": order_id,
             "type": "adjustment",
             "status": "requested",
-            "catalog_type": "sysbook",
+            "product_type": "sysbook",
             "adjustment_reason": "Monday.com stock change",
             "source": "monday_sync",
             "monday_item_id": pulse_id,

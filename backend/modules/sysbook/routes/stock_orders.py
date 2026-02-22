@@ -100,7 +100,7 @@ async def apply_stock_changes(order: dict, admin: dict):
             "new_quantity": new_qty,
             "reason": f"stock_order_{order_type}",
             "notes": f"Stock Order {order['order_id']}",
-            "catalog_type": CATALOG_TYPE,
+            "product_type": CATALOG_TYPE,
             "admin_id": admin.get("user_id"),
             "admin_name": admin.get("name", "Admin"),
             "stock_order_id": order["order_id"],
@@ -115,7 +115,7 @@ async def apply_stock_changes(order: dict, admin: dict):
 @router.get("/summary/pending")
 async def pending_summary(admin: dict = Depends(get_admin_user)):
     pipeline = [
-        {"$match": {"catalog_type": CATALOG_TYPE, "status": {"$nin": ["received", "approved", "rejected", "applied"]}}},
+        {"$match": {"product_type": CATALOG_TYPE, "status": {"$nin": ["received", "approved", "rejected", "applied"]}}},
         {"$group": {"_id": {"type": "$type", "status": "$status"}, "count": {"$sum": 1}}},
     ]
     result = await db.stock_orders.aggregate(pipeline).to_list(20)
@@ -153,7 +153,7 @@ async def list_stock_orders(
     limit: int = Query(50, ge=1, le=200),
     admin: dict = Depends(get_admin_user),
 ):
-    query = {"catalog_type": CATALOG_TYPE}
+    query = {"product_type": CATALOG_TYPE}
     if order_type:
         query["type"] = order_type
     if status:
@@ -171,7 +171,7 @@ async def list_stock_orders(
 
 @router.get("/{order_id}")
 async def get_stock_order(order_id: str, admin: dict = Depends(get_admin_user)):
-    order = await db.stock_orders.find_one({"order_id": order_id, "catalog_type": CATALOG_TYPE}, {"_id": 0})
+    order = await db.stock_orders.find_one({"order_id": order_id, "product_type": CATALOG_TYPE}, {"_id": 0})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
@@ -182,7 +182,7 @@ async def create_shipment(data: CreateShipment, admin: dict = Depends(get_admin_
     order = {
         "order_id": make_id(),
         "type": "shipment",
-        "catalog_type": CATALOG_TYPE,
+        "product_type": CATALOG_TYPE,
         "status": "draft",
         "supplier": data.supplier,
         "expected_date": data.expected_date,
@@ -203,7 +203,7 @@ async def create_return(data: CreateReturn, admin: dict = Depends(get_admin_user
     order = {
         "order_id": make_id(),
         "type": "return",
-        "catalog_type": CATALOG_TYPE,
+        "product_type": CATALOG_TYPE,
         "status": "registered",
         "linked_order_id": data.linked_order_id,
         "customer_name": data.customer_name,
@@ -225,7 +225,7 @@ async def create_adjustment(data: CreateAdjustment, admin: dict = Depends(get_ad
     order = {
         "order_id": make_id(),
         "type": "adjustment",
-        "catalog_type": CATALOG_TYPE,
+        "product_type": CATALOG_TYPE,
         "status": "requested",
         "adjustment_reason": data.adjustment_reason,
         "items": [i.dict() for i in data.items],
@@ -242,7 +242,7 @@ async def create_adjustment(data: CreateAdjustment, admin: dict = Depends(get_ad
 
 @router.post("/{order_id}/transition")
 async def transition_order(order_id: str, body: TransitionRequest, admin: dict = Depends(get_admin_user)):
-    order = await db.stock_orders.find_one({"order_id": order_id, "catalog_type": CATALOG_TYPE}, {"_id": 0})
+    order = await db.stock_orders.find_one({"order_id": order_id, "product_type": CATALOG_TYPE}, {"_id": 0})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
