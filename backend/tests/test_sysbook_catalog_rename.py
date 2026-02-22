@@ -167,7 +167,7 @@ class TestAdminLogin:
             f"{BASE_URL}/api/auth-v2/login",
             json={
                 "email": "teck@koh.one",
-                "contrasena": "Acdb##0897"
+                "password": "Acdb##0897"
             }
         )
         assert response.status_code == 200, f"Login failed: {response.status_code} - {response.text}"
