@@ -70,6 +70,11 @@ Fix incorrect inventory statistics bug, then separate school textbook ("Sysbook"
 - **(P4)** Extend Monday.com sync to general product inventory
 - Remove diagnostic info from `/api/health` (temporary debug tool)
 
+## Recent Changes (Feb 22, 2026 - Session 2)
+- **Sysbook Backend Separation (P0 COMPLETE)**: Full architectural separation done. All services, models, repos moved. Circular imports fixed with lazy loading.
+- **Data Manager (COMPLETE)**: Combined Demo Data + Data Cleanup into unified admin tool at `/api/data-manager/`. Shows all 8 modules with per-collection stats, clear, seed demo. Admin accounts protected. UI under Management sidebar group. Testing: 100% (iteration_192, iteration_193)
+- **Default Layout Fix**: Changed default landing layout from `living_grid` to `mosaic_community`.
+
 ## Credentials
 - Admin: teck@koh.one / Acdb##0897
 - Auth: POST /api/auth-v2/login
