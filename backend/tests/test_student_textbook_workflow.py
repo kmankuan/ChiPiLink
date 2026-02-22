@@ -291,10 +291,10 @@ class TestStoreInventoryWithInventorySource:
         assert isinstance(data, list), "Response should be a list of products"
         print(f"✓ GET /api/store/products - Found {len(data)} products")
     
-    def test_store_inventory_with_catalog_type_sysbook(self):
-        """GET /api/store/inventory/products?catalog_type=sysbook returns sysbook products"""
+    def test_store_inventory_with_inventory_source_sysbook(self):
+        """GET /api/store/inventory/products?inventory_source=sysbook returns sysbook products"""
         response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?catalog_type=sysbook",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=sysbook",
             headers=self.headers
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
@@ -306,12 +306,12 @@ class TestStoreInventoryWithInventorySource:
             assert product.get("is_sysbook") == True, \
                 f"Product {product.get('name')} should have is_sysbook=True"
         
-        print(f"✓ GET /api/store/inventory/products?catalog_type=sysbook - Found {len(data.get('products', []))} products")
+        print(f"✓ GET /api/store/inventory/products?inventory_source=sysbook - Found {len(data.get('products', []))} products")
     
-    def test_store_inventory_with_catalog_type_public(self):
-        """GET /api/store/inventory/products?catalog_type=public returns non-sysbook products"""
+    def test_store_inventory_with_inventory_source_public(self):
+        """GET /api/store/inventory/products?inventory_source=public returns non-sysbook products"""
         response = requests.get(
-            f"{BASE_URL}/api/store/inventory/products?catalog_type=public",
+            f"{BASE_URL}/api/store/inventory/products?inventory_source=public",
             headers=self.headers
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
@@ -323,7 +323,7 @@ class TestStoreInventoryWithInventorySource:
             assert product.get("is_sysbook") != True, \
                 f"Product {product.get('name')} should not have is_sysbook=True for public catalog"
         
-        print(f"✓ GET /api/store/inventory/products?catalog_type=public - Found {len(data.get('products', []))} products")
+        print(f"✓ GET /api/store/inventory/products?inventory_source=public - Found {len(data.get('products', []))} products")
 
 
 class TestSysbookInventoryEndpoints:
