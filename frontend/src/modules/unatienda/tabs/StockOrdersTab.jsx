@@ -98,7 +98,7 @@ function ProductPicker({ items, setItems, token, catalogType }) {
     setSearching(true);
     try {
       const params = { search: q, limit: 10 };
-      if (catalogType) params.catalog_type = catalogType;
+      if (catalogType) params.product_type = catalogType;
       const { data } = await axios.get(`${API_URL}/api/store/inventory/products`, {
         headers: { Authorization: `Bearer ${token}` },
         params,
@@ -178,7 +178,7 @@ function CreateShipmentDialog({ open, onClose, onCreated, token }) {
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/shipment`, {
-        supplier, expected_date: expectedDate || null, items, notes: notes || null, catalog_type: 'public',
+        supplier, expected_date: expectedDate || null, items, notes: notes || null, product_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Shipment created');
       onCreated();
@@ -258,7 +258,7 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/return`, {
         linked_order_id: linkedOrder.order_id, customer_name: linkedOrder.student_name || '',
-        return_reason: reason, items, notes: notes || null, catalog_type: 'public',
+        return_reason: reason, items, notes: notes || null, product_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Return registered');
       onCreated();
@@ -352,7 +352,7 @@ function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/adjustment`, {
-        adjustment_reason: reason, items, notes: notes || null, catalog_type: 'public',
+        adjustment_reason: reason, items, notes: notes || null, product_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Adjustment created');
       onCreated();
@@ -514,7 +514,7 @@ function TransitionDialog({ order, open, onClose, onDone, token }) {
 function OrderDetailDialog({ order, open, onClose }) {
   if (!order) return null;
   const meta = TYPE_META[order.type];
-  const catBadge = CATALOG_BADGE[order.catalog_type];
+  const catBadge = CATALOG_BADGE[order.product_type];
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
@@ -602,7 +602,7 @@ export default function StockOrdersTab({ token }) {
       if (filter !== 'all') params.order_type = filter;
       if (statusFilter) params.status = statusFilter;
       if (search) params.search = search;
-      if (catalogFilter !== 'all') params.catalog_type = catalogFilter;
+      if (catalogFilter !== 'all') params.product_type = catalogFilter;
       const { data } = await axios.get(`${API_URL}/api/store/stock-orders`, {
         headers: { Authorization: `Bearer ${token}` }, params,
       });
@@ -700,7 +700,7 @@ export default function StockOrdersTab({ token }) {
             const Icon = meta.icon;
             const next = NEXT_STATUS[order.type]?.[order.status];
             const isFinal = !next;
-            const catBadge = CATALOG_BADGE[order.catalog_type];
+            const catBadge = CATALOG_BADGE[order.product_type];
 
             return (
               <div key={order.order_id} className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/30 transition cursor-pointer"
