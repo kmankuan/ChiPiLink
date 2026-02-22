@@ -87,6 +87,7 @@ const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
 const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModule'));
 
 // School Textbooks modules → Sysbook
+const SysbookDashboardTab = lazy(() => import('@/modules/sysbook/SysbookDashboardTab'));
 const SysbookInventoryTab = lazy(() => import('@/modules/sysbook/SysbookInventoryTab'));
 const SysbookStockMovementsTab = lazy(() => import('@/modules/sysbook/SysbookStockMovementsTab'));
 const SysbookAnalyticsTab = lazy(() => import('@/modules/sysbook/SysbookAnalyticsTab'));
