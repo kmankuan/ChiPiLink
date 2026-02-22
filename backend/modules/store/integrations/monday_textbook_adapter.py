@@ -10,7 +10,6 @@ import json
 
 from modules.integrations.monday.base_adapter import BaseMondayAdapter
 from modules.integrations.monday.config_manager import monday_config
-from modules.sysbook.models.textbook_order import OrderItemStatus, DEFAULT_STATUS_MAPPING
 from core.database import db
 
 logger = logging.getLogger(__name__)
