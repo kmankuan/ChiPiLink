@@ -329,7 +329,7 @@ function CatalogTable({ products, columns, columnWidths, onResize, sortConfig, o
               className={col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}
               onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}
               isDragging={dragColumn === col.key}>
-              {col.isStock ? <span className="flex items-center justify-center gap-1"><Package className="h-4 w-4" /> {col.label}</span> : col.label}
+              {col.isStock ? <span className="flex items-center justify-center gap-1"><Package className="h-4 w-4" /> {col.label}</span> : col.isThreshold ? <span className="flex items-center justify-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> {col.label}</span> : col.label}
             </ResizableHeader>
           ))}
           <ResizableHeader columnKey="actions" width={columnWidths.actions || 80} onResize={onResize} isSticky={false} className="text-right">
