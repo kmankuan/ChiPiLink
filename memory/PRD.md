@@ -181,6 +181,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 | **Analytics** | — | Stock trends, grade/subject breakdowns |
 | **Students** | — | Students & Schools |
 
+### Bugfix - Admin Login / Seed Function (Feb 22, 2026)
+- **Root Cause**: The `seed_admin_user()` function only set `password_hash` when the field was missing, but didn't verify the hash matched the configured password. A stale hash (from a previous seed with different config) caused `bcrypt.checkpw` to fail.
+- **Fix**: Updated seed to always verify `password_hash` against the configured `ADMIN_PASSWORD` via `bcrypt.checkpw`. If it doesn't match, the hash is regenerated. Also fixed the `users` collection to mark the LaoPan OAuth user as `is_admin: True`.
+- **Also fixed**: The `users` collection had a duplicate entry from LaoPan OAuth with `is_admin: False`. Updated both `auth_users` and `users` collections.
+- **Testing**: Login verified via curl (token returned) and E2E screenshot (redirects to /admin dashboard).
+
 ## Future/Backlog Tasks
 - **(P3)** On-demand landing page redesign tool
 - **(P4)** Extend Monday.com sync to general product inventory
