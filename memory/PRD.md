@@ -101,12 +101,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`
 - **Comments & Strings**: All user-facing "PCA catalog" references updated
 
-### DB Field Rename: catalog_type → product_type (Feb 22, 2026)
-- **Scope**: 122 backend + 7 frontend occurrences renamed
-- **DB Migration**: `$rename` on `store_products` (0 docs, field wasn't set) and `stock_orders` (17 docs)
-- **Frontend**: `CATALOG_BADGE` → `PRODUCT_TYPE_BADGE` in StockOrdersTab
-- **Values unchanged**: `'sysbook'` and `'public'` — these are correct
-- **Testing**: All API endpoints verified working with new field name
+### DB Field Rename: catalog_type → inventory_source (Feb 22, 2026)
+- **Scope**: 122 backend + 7 frontend occurrences (via intermediate `product_type`, then corrected to `inventory_source`)
+- **Rationale**: Field distinguishes which inventory system owns the product/order (`'sysbook'` vs `'public'`), not the product type
+- **DB Migration**: 17 stock_orders renamed. Values: `'sysbook'` and `'public'`
+- **Frontend**: `CATALOG_BADGE` → `SOURCE_BADGE` in StockOrdersTab
+- **Testing**: APIs verified — inventory (25 products), stock orders (13 with inventory_source=sysbook)
 
 ### DB Field Rename: is_private_catalog → is_sysbook (Feb 22, 2026)
 - **Scope**: 91 backend + 15 frontend occurrences renamed
