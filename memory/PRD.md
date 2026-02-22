@@ -95,6 +95,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Unatienda Cleanup**: Removed CatalogTypeSelector from StockOrdersTab (now public-only), removed all textbook/PCA references, simplified catalog filter
 - **Testing**: 100% pass rate (iteration_185)
 
+### Codebase Cleanup — "Catalog" → "Inventory" Rename (Feb 22, 2026)
+- **File Rename**: `PrivateCatalogTab.jsx` → `UnifiedInventoryTab.jsx`, component `PrivateCatalogTab` → `UnifiedInventoryTab`
+- **Internal Variables**: `catalogType`→`viewType`, `CatalogTable`→`InventoryTable`, `catalogPagination`→`pagination`, `_catalog`→`_source`, `effectiveCatalogType`→`effectiveViewType`
+- **Imports Updated**: `SysbookInventoryTab.jsx`, `TextbookCatalogModule.jsx` — both now import `UnifiedInventoryTab`
+- **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`, `checkPrivateCatalogAccess`→`checkTextbookAccess`
+- **Comments**: All "catalog type" references updated to "view type" or "inventory"
+- **User-facing**: "private PCA catalog" → "inventory" in dialog
+- **Not changed (by design)**: DB fields (`is_private_catalog`, `catalog_type`) and API URLs (`/api/store/private-catalog/`) — these are established cross-module identifiers
+- **Testing**: Visual + lint verification, 0 errors
+
 ### Per-Product Custom Alert Thresholds (Feb 22, 2026)
 - **Backend**: PUT `/api/sysbook/inventory/products/{book_id}` accepts `low_stock_threshold` (int or null to clear). Uses `$unset` to properly remove field when null. `check_stock_levels` and `create_stock_alert_if_needed` both check per-product threshold before falling back to global.
 - **Frontend**: New `ThresholdCell` inline editable component in inventory table. Shows global threshold (muted) when no custom set, custom value with asterisk (*) and violet styling when set. Click to edit, Enter to save, empty to clear back to global.
