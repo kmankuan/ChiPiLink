@@ -672,9 +672,6 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   }, [dragColumn, catalogType]);
 
   // Active columns based on catalog type + saved order
-  // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
-  const effectiveCatalogType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
-
   const activeColumns = useMemo(() => {
     const defs = COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all;
     const order = columnOrders[effectiveCatalogType];
