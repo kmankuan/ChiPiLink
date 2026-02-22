@@ -329,8 +329,10 @@ class TestUnatiendaNotAffected:
         )
         assert response.status_code == 200
         data = response.json()
-        assert "products" in data or isinstance(data, list)
-        print(f"Unatienda /api/store/products works: {len(data.get('products', data))} products")
+        # Endpoint may return products array directly or in "products" key
+        products_list = data.get("products", data) if isinstance(data, dict) else data
+        assert isinstance(products_list, list), "Expected products list"
+        print(f"Unatienda /api/store/products works: {len(products_list)} products")
     
     def test_unatienda_inventory_adjust_endpoint(self):
         """Test Unatienda inventory adjust endpoint exists"""
