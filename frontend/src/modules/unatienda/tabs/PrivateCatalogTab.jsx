@@ -606,10 +606,10 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const [globalThreshold, setGlobalThreshold] = useState(10);
 
   // Catalog type filter
-  const [catalogType, setViewType] = useState('all');
+  const [viewType, setViewType] = useState('all');
 
   // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
-  const effectiveViewType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
+  const effectiveViewType = sysbook && viewType === 'all' ? 'sysbook' : viewType;
 
   // Column order per catalog type (persisted)
   const [columnOrders, setColumnOrders] = useState(() => {
@@ -780,17 +780,17 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   }, [sysbook, token]);
 
   // Filter + Sort
-  const isArchiveView = catalogType === 'archived';
+  const isArchiveView = viewType === 'archived';
 
   const sortedProducts = useMemo(() => {
     let result = products.filter(p => {
       // Archive filter
       const isArchived = !!p.archived;
-      if (catalogType === 'archived') return isArchived;
+      if (viewType === 'archived') return isArchived;
       if (isArchived) return false; // hide archived from all other views
       // Catalog type filter
-      if (catalogType === 'sysbook' && p._catalog !== 'sysbook') return false;
-      if (catalogType === 'public' && p._catalog !== 'public') return false;
+      if (viewType === 'sysbook' && p._catalog !== 'sysbook') return false;
+      if (viewType === 'public' && p._catalog !== 'public') return false;
       // Text search
       if (searchTerm) {
         const t = searchTerm.toLowerCase();
@@ -831,7 +831,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
       });
     }
     return result;
-  }, [products, searchTerm, statusFilter, sortConfig, catalogType]);
+  }, [products, searchTerm, statusFilter, sortConfig, viewType]);
 
   const pagination = usePagination(sortedProducts, 50);
   const pageProducts = pagination.paginated;
@@ -1025,11 +1025,11 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const statsProducts = useMemo(() => {
     return products.filter(p => {
       if (p.archived) return false;
-      if (catalogType === 'sysbook' && p._catalog !== 'sysbook') return false;
-      if (catalogType === 'public' && p._catalog !== 'public') return false;
+      if (viewType === 'sysbook' && p._catalog !== 'sysbook') return false;
+      if (viewType === 'public' && p._catalog !== 'public') return false;
       return true;
     });
-  }, [products, catalogType]);
+  }, [products, viewType]);
 
   const totalStock = statsProducts.reduce((s, p) => s + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0);
   const lowStockCount = statsProducts.filter(p => { const s = (p.inventory_quantity || 0) - (p.reserved_quantity || 0); return s > 0 && s < 5; }).length;
@@ -1055,7 +1055,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
           { value: 'public', label: 'Public', icon: Store },
           { value: 'archived', label: 'Archive', icon: Archive, activeColor: 'bg-amber-500 text-white shadow-sm' },
         ]}
-        activeTab={catalogType}
+        activeTab={viewType}
         onTabChange={(v) => { setViewType(v); setSelectedIds(new Set()); }}
         search={searchTerm}
         onSearchChange={setSearchTerm}
