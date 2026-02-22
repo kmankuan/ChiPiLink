@@ -1,0 +1,56 @@
+{
+  "summary": "Per-product custom stock alert threshold feature fully tested. Backend APIs correctly save/clear custom thresholds via PUT endpoint, $unset when null sent. Frontend ThresholdCell shows global threshold (muted) when no custom set, custom with asterisk (*) and violet styling when set. Inline editing works - click opens input, Enter saves, empty clears to global.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: GET /api/sysbook/alerts/settings returns global_low_stock_threshold (default=10)",
+    "Backend: PUT /api/sysbook/inventory/products/{book_id} with low_stock_threshold saves custom threshold",
+    "Backend: PUT with low_stock_threshold=null $unsets (clears) the custom threshold from product",
+    "Backend: GET /api/sysbook/inventory/products includes low_stock_threshold field when set",
+    "Backend: POST /api/sysbook/alerts/check-stock uses per-product threshold when set (verified via is_custom_threshold=True in alert)",
+    "Backend: Products without low_stock_threshold use global threshold for alerts (is_custom_threshold=False)",
+    "Backend: PUT on non-existent product returns 404",
+    "Backend: Threshold value 0 is valid",
+    "Frontend: Alert column header visible with AlertTriangle icon between Stock and Pre-sale columns",
+    "Frontend: Alert column shows global threshold (10) in muted style when no custom threshold set",
+    "Frontend: Clicking threshold cell opens inline number input with data-testid",
+    "Frontend: Saving custom threshold (25) updates cell to show '25*' with asterisk and violet styling",
+    "Frontend: Clearing input (empty) resets to global threshold display ('10' without asterisk)",
+    "Frontend: 'Updated' toast notification shows on successful save"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_sysbook_custom_threshold.py",
+    "/app/test_reports/pytest/pytest_results_sysbook_custom_threshold.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Backend inventory.py uses $unset for null fields - properly clears custom threshold from MongoDB document",
+    "Backend alerts.py check_stock_levels correctly uses per-product threshold with fallback to global",
+    "Backend create_stock_alert_if_needed also respects per-product threshold",
+    "Frontend ThresholdCell component handles all states: editing, saving, custom vs global display",
+    "Frontend uses data-testid pattern 'threshold-cell-{book_id}' and 'threshold-input-{book_id}' for testing",
+    "COLUMN_DEFS in PrivateCatalogTab.jsx includes threshold column with isThreshold:true flag"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_sysbook_custom_threshold.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {"email": "admin@chipi.co", "password": "admin"},
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+  "seed_data_creation": "Created temporary test products (TEST_THRESHOLD_*, TEST_GET_THRESHOLD_*, TEST_CLEAR_*, TEST_CHECK_*, TEST_GLOBAL_*, TEST_ZERO_*) during backend tests - cleaned up after each test",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Per-product custom stock alert threshold feature is complete. Products can have optional low_stock_threshold field. Frontend ThresholdCell in PrivateCatalogTab.jsx handles inline editing. Backend PUT endpoint accepts low_stock_threshold (int or null to clear). Alerts API uses per-product threshold when set, otherwise global (default 10)."
+}
