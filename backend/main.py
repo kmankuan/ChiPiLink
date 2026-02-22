@@ -347,48 +347,16 @@ async def shutdown_event():
 # Kubernetes health check endpoint (without /api prefix)
 @app.get("/health")
 async def kubernetes_health_check():
-    """Health check endpoint for Kubernetes liveness/readiness probes"""
-    import bcrypt as _bcrypt
-    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
-    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
-    try:
-        auth_user = await db["auth_users"].find_one({"email": admin_email}, {"_id": 0})
-        if auth_user:
-            h = auth_user.get("password_hash", "")
-            pw_ok = _bcrypt.checkpw(admin_password.encode(), h.encode()) if h else False
-            admin_diag = {"uid": auth_user.get("user_id"), "is_admin": auth_user.get("is_admin"), "has_hash": bool(h), "pw_ok": pw_ok}
-        else:
-            admin_diag = {"uid": None, "exists": False}
-    except Exception as e:
-        admin_diag = {"error": str(e)}
-    return {"status": "healthy", "db": db.name, "admin": admin_diag}
+    """Health check endpoint for Kubernetes liveness/readiness probes — must be fast."""
+    return {"status": "healthy", "db": db.name}
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint with admin diagnostic info"""
-    import bcrypt as _bcrypt
-    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
-    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
-    try:
-        auth_user = await db["auth_users"].find_one({"email": admin_email}, {"_id": 0})
-        oauth_user = await db["users"].find_one({"email": admin_email}, {"_id": 0})
-        def _diag(u):
-            if not u:
-                return {"exists": False}
-            h = u.get("password_hash", "")
-            try:
-                pw_ok = _bcrypt.checkpw(admin_password.encode(), h.encode()) if h else False
-            except Exception:
-                pw_ok = "hash_error"
-            return {"uid": u.get("user_id"), "is_admin": u.get("is_admin"), "has_hash": bool(h), "pw_ok": pw_ok}
-        admin_diag = {"auth_users": _diag(auth_user), "users": _diag(oauth_user)}
-    except Exception as e:
-        admin_diag = {"error": str(e)}
+    """Health check endpoint with basic info."""
     return {
         "status": "healthy",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "db": db.name,
-        "admin_diag": admin_diag,
     }
 
 @app.get("/")
