@@ -13,7 +13,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://sysbook-debug.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://backend-cleanup-10.preview.emergentagent.com').rstrip('/')
 
 # Test constants - provided by main agent
 ADMIN_EMAIL = "admin@chipi.co"

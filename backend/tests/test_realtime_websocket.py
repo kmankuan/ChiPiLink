@@ -9,7 +9,7 @@ from websockets.sync.client import connect as ws_connect
 import json
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://sysbook-debug.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://backend-cleanup-10.preview.emergentagent.com')
 
 # Admin credentials for testing
 ADMIN_EMAIL = "admin@chipi.co"

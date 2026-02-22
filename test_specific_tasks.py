@@ -5,7 +5,7 @@ import sys
 import json
 
 class SpecificTasksTester:
-    def __init__(self, base_url="https://sysbook-debug.preview.emergentagent.com"):
+    def __init__(self, base_url="https://backend-cleanup-10.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0

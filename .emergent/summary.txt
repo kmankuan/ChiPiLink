@@ -10,56 +10,50 @@ PRODUCT REQUIREMENTS:
 6.  Create a dashboard/landing page for the new Sysbook module.
 7.  Clean up the Unatienda module to remove all logic related to school textbooks.
 8.  Debug and fix a production deployment issue preventing admin login on a fresh database.
+9.  Fully separate the  backend module from the  module by moving all related services, models, and repositories.
 
 **User's preferred language**: English
 
 **what currently exists?**
-- A fully separated Sysbook module for school textbook management with its own backend routes () and dedicated frontend components. It features inventory management, analytics, a dashboard, and a stock alert system with per-product custom thresholds.
-- A cleaned-up Unatienda module for the public-facing store.
-- The codebase and database schema have been standardized. Legacy terms like , , , and  have been refactored to , , , and , respectively.
-- An attempted fix for the admin user seed logic has been implemented but is not yet working.
+- A fully separated Sysbook module for school textbook management, which is in the process of being fully decoupled at the service/model level from the  module.
+- All Sysbook-related backend routes now use the  prefix, and frontend API calls have been updated accordingly.
+- The codebase and database schema have been standardized. Legacy terms like , ,  have been fully refactored.
+- A critical and persistent admin login failure on production has been diagnosed and fully resolved. The fix involved correcting the custom domain link to point to the correct deployment session and making the backend startup process more robust.
+- A feature to delete individual or all stock order movements has been implemented via the UI and API.
+- Production deployment startup timeouts have been fixed by making background tasks non-blocking and resolving a database index conflict.
 
 **Last working item**:
-- **Last item agent was working:** Debugging a critical login issue for the admin user (). The agent discovered the database seed function was flawed: it would not create or update the admin user if a non-admin user with the same email (e.g., one created via OAuth) already existed. A fix was written in , but the agent was unable to get the running server to apply the change, suspecting a caching or hot-reload issue.
+- **Last item agent was working:** Completing the full architectural separation of the Sysbook module. The agent was moving all remaining Sysbook-related backend code (services, models, repositories) from the general-purpose  directory into the dedicated  directory.
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** backend testing agent
+- **Which testing method agent to use?** both
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Admin user is not created/updated correctly on startup (Priority: P0)**
-    - **Description:** The fix implemented in  to handle pre-existing non-admin users is not being applied by the backend service, even after restarts. This blocks admin login on fresh database deployments. The previous agent observed that manually executing the seed function was still hitting the old code branch.
-    - **Attempted fixes:** The agent modified  to find the user by email and forcefully update them to be an admin if they aren't one already. This failed because the running process did not reflect the code changes.
-    - **Next debug checklist:**
-        1.  Verify the contents of  to ensure the fix is present.
-        2.  Investigate the supervisor configuration and Python's module caching mechanism to understand why the updated code is not being loaded.
-        3.  Attempt a more forceful restart of the backend service using backend: stopped
-backend: started.
-        4.  Once the fix is applied, run the manual seed script () and verify the admin user in the database has  and .
-        5.  Test the admin login via a  command.
-    - **Why fix this issue and what will be achieved with the fix?** This is a critical blocker preventing the user from accessing the application on their newly deployed production environment. Fixing it will enable admin login and make the application usable.
-    - **Status:** IN PROGRESS
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Backend
-    - **Blocked on other issue:** No
+There are no pending bug-related issues. All effort is on the in-progress refactoring task.
 
 **In progress Task List**:
-None. All efforts are focused on the P0 issue.
+- **Task 1: Complete the full separation of Sysbook backend logic (Priority: P0)**
+    - **Where to resume:** The agent has already copied the relevant service, model, and repository files from  to . The next step is to update the Python import statements within these newly moved files and in the router files that consume them to point to the new  locations instead of .
+    - **What will be achieved with this?** The backend codebase will be fully modularized, with all Sysbook logic physically and logically contained within its own module, improving maintainability and eliminating confusion with the Unatienda store module.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** both
+    - **Blocked on something:** No
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   **(P3)** Build an on-demand landing page redesign tool.
--   **Future Tasks:**
-    -   **(P4)** Extend Monday.com synchronization to the general product inventory.
-    -   **(P5)** Perform cosmetic refactoring of remaining catalog internal variable names in the Unatienda module.
+- **Upcoming Tasks:**
+    - (P3) Build an on-demand landing page redesign tool.
+- **Future Tasks:**
+    - (P4) Extend Monday.com synchronization to the general product inventory.
 
 **Completed work in this session**
-- **Feature - Per-Product Custom Alert Thresholds (DONE):** Implemented a custom inline-editable Threshold column in the Sysbook inventory UI and updated the backend alert service to use it.
-- **Refactor - Terminology Cleanup (Catalog -> Inventory) (DONE):** Split the shared  into a dedicated , fully decoupling the Sysbook UI. Also performed a codebase-wide rename of catalog to inventory.
-- **Refactor - Final  Cleanup (DONE):** Audited and removed all remaining hardcoded  references from backend integration points (e.g., Monday.com adapter), replacing them with .
-- **Refactor - DB Field Standardization (DONE):** Successfully renamed database fields  to  and  to  across the entire full-stack application.
-- **Bug Fix - Production Deployment Failure (DONE):** Fixed the  file, which was incorrectly blocking  files from being included in deployments, causing the backend to fail on startup.
-- **Verification - CSV Import & Student Ordering Flow (DONE):** Verified that the CSV import and the entire student textbook ordering workflow function correctly after the extensive refactoring.
+- **Bug Fix - Admin Login & Production Deployment Failure (RESOLVED):** Diagnosed and fixed a complex, multi-layered issue preventing admin login on production. The root cause was the user's custom domain () pointing to an old deployment session. This was confirmed by adding versioning to the  endpoint. The fix involved guiding the user to relink the domain to the correct session.
+- **Bug Fix - Production Startup Timeout (RESOLVED):** Fixed backend startup failures during deployment by resolving a MongoDB index conflict () and making long-running initializations (e.g., Telegram polling) non-blocking in  using .
+- **Refactor - Robust Admin Seeding (DONE):** Made the admin user seed function in  bulletproof by force-updating credentials on every startup, ensuring reliability.
+- **Feature - Delete Stock Orders (DONE):** Implemented backend endpoints and frontend UI buttons to allow for the deletion of individual and all stock movement orders.
+- **Refactor - Sysbook Route Separation (DONE):** Moved all Sysbook-related API routes from the  module to the  module and updated all frontend API calls.
+- **Refactor - Cosmetic Cleanup Catalog -> Inventory (DONE):** Completed a comprehensive cosmetic refactor, removing the term catalog from internal variables, file names, and UI labels in favor of inventory and sysbook.
+- **Bug Fix - Frontend UI Crash (DONE):** Fixed a React hook call order bug in  that was causing a UI-blocking overlay.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -71,56 +65,67 @@ None.
 
 
 **Key Technical Concepts**
-- **Code Decoupling:** A large, shared React component was successfully split into a dedicated, single-purpose component () to enforce architectural separation between modules.
-- **DB Field Standardization:** A major full-stack refactor was completed to rename core database fields ( -> ,  -> ) for clarity and to remove legacy terminology.
-- **Deployment Debugging:** Diagnosed and fixed a critical deployment issue where  was preventing essential  configuration files from being deployed.
-- **Seed Function Logic:** Identified a flaw in the database seeding logic that fails to create an admin user if a non-admin user with the same email already exists.
+- **Deployment Debugging:** Diagnosed that a custom domain was linked to an old session by adding versioning to a  endpoint, confirming production was running stale code.
+- **Asynchronous Startup:** Refactored a blocking FastAPI startup by deferring non-critical initializations (e.g., API polling) using  to ensure fast health checks and prevent deployment timeouts.
+- **Robust Seeding:** Made the admin user seed function idempotent by unconditionally updating admin credentials on every startup, bypassing error-prone conditional logic.
+- **Modular Refactoring:** Systematically moving backend code (routes, services, models) from a general  module to a dedicated  module to enforce strict architectural separation.
+- **Index Conflict Resolution:** Fixed a  by ensuring the Pydantic index definition matched the existing Atlas index specification ().
 
 **key DB schema**
 -   ****: {: Boolean, : String, : Number}
 -   ****: {: String, : Boolean, : Boolean}
+-   ****: The collection managed by the new delete feature.
 
 **changes in tech stack**
 None.
 
 **All files of reference**
--   **For the current issue:**
-    -   : Contains the admin seed logic that needs to be fixed and verified.
-    -   : Where the seed function is called on startup.
--   **Recently created/modified:**
+-   **For the current task:**
+    -   : The destination directory for all Sysbook code.
+    -   : The source directory being cleaned up.
+    -   All files within , , and  need their Python import paths corrected.
+-   **Recently modified:**
     -   
-    -    (Created)
-    -   Numerous backend and frontend files were updated for the  and  renames.
+    -   
+    -   
+    -   
+    -   Numerous files across the stack for API URL updates and cosmetic renaming.
 
 **Areas that need refactoring**:
-- The user has approved deferring further cosmetic renames (e.g., internal variables like  in ) to the future backlog.
+The in-progress task is the primary refactoring effort.
 
 **key api endpoints**
--   : The admin login endpoint, which is currently blocked by the seed issue.
--   : An endpoint to manually trigger the seed function, useful for debugging.
+-   : Enhanced with version info for deployment debugging.
+-   : (NEW) Deletes a single stock order.
+-   : (NEW) Deletes all stock orders.
+-   : The standard prefix for all Sysbook-related API endpoints.
 
 **Critical Info for New Agent**
--   The absolute top priority (P0) is to fix the admin user seeding logic in . The user cannot log into their new production deployment until this is resolved.
--   The previous agent already wrote a fix, but it failed to apply. Your first step is to investigate why the running Python process isn't picking up the code changes. Check for Python module caching, supervisor configuration issues, or other environment-related problems.
--   The goal is to ensure the seed function successfully updates an existing non-admin user () to have  and .
--   Do not proceed with any other tasks until the admin login is confirmed to be working.
+-   You are in the middle of a major backend refactoring task: moving all Sysbook services, models, and repositories from the  module into the  module. The files have been copied; your immediate job is to fix all Python import paths.
+-   Start by updating the imports in the newly created files in , then update the imports in the router files that use them.
+-   After the refactor is complete, you must run the testing agent for both backend and frontend to ensure no regressions were introduced by this large-scale change.
+-   The critical admin login and production deployment issues are **fully resolved**. The root cause was a misconfigured custom domain. Do not reinvestigate this problem.
 
 **documents and test reports created in this job**
 -   
--    (and previous iterations)
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User:** Asks to verify the entire student textbook ordering workflow. (COMPLETED)
-- **Agent:** Confirms the workflow is working via E2E tests.
-- **User:** Reports that the login issue persists on their production environment. (IN PROGRESS)
-- **Agent:** Identifies the root cause: the admin seed function is flawed.
-- **Agent:** Implements a fix for the seed function.
-- **Agent:** Tries to verify the fix but realizes the changes are not being applied by the running backend.
-- **Agent:** Is in the middle of debugging why the seed function code isn't updating.
-- **User:** (pending) Awaiting resolution for the login blocker.
+- **User:** Reports that the login issue persists after redeployment.
+- **Agent:** Adds diagnostic endpoints and logging to investigate the production environment remotely.
+- **User:** Reports the diagnostic endpoint returns a 404, but they can access the admin panel via a specific URL.
+- **Agent:** Moves diagnostic information to the existing  endpoint and adds versioning.
+- **User:** Shares the  response, which shows an old version number ().
+- **Agent:** Concludes that production is running stale code and the deployment is not working as expected.
+- **User:** Mentions a past issue with a duplicated app session, which might be the cause. (Image shows the custom domain is not linked in the current session).
+- **Agent:** Identifies the root cause: the custom domain is pointing to the old session's deployment. Guides the user to fix the domain linkage.
+- **User:** Confirms the login is now resolved and asks to proceed with the remaining cosmetic refactoring (P5).
+- **User:** After the P5 refactor, requests a full architectural separation, as Sysbook logic still resides in the general  folder.
+- **User:** Asks the agent to proceed with the full separation of the  and  modules.
 
 **Project Health Check:**
--   **Broken:** Admin login is non-functional due to a faulty database seed function. The user's production deployment is unusable until this is fixed.
+-   **Broken:** None.
 -   **Mocked:** None.
 
 **3rd Party Integrations**
@@ -130,17 +135,17 @@ None.
 -   OpenAI & Anthropic LLMs
 -   OpenAI TTS (via Emergent LLM Key) & ElevenLabs TTS (via User API Key)
 -   WebSockets ( & )
--   LaoPan OAuth (Identified as the source of the user account that conflicts with the admin seed)
+-   LaoPan OAuth
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
+-   **Testing agent used after significant changes:** YES, after the last major refactor, with a 100% pass rate.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** Admin login functionality is broken.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
 -   **Admin Email:** 
 -   **Admin Password:** 
 
 **What agent forgot to execute**
-The previous agent correctly diagnosed the seed logic issue and implemented a fix. However, they did not resolve the underlying environment problem (likely caching or a process issue) that prevented their fix from being executed by the running backend.</analysis>
+The previous agent was performing as expected and was in the middle of a user-requested refactoring task. Nothing was forgotten.</analysis>
