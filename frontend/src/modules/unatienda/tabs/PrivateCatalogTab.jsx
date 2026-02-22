@@ -189,8 +189,71 @@ function EditableCell({ value, onSave, type = 'text', className = '' }) {
   );
 }
 
+/* ── Threshold Cell (Inline Editable) ── */
+function ThresholdCell({ product, globalThreshold, onSave }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const custom = product.low_stock_threshold;
+  const hasCustom = custom != null;
+  const effective = hasCustom ? custom : (globalThreshold || 10);
+
+  const handleOpen = () => {
+    setEditValue(hasCustom ? String(custom) : '');
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    const val = editValue.trim() === '' ? null : parseInt(editValue);
+    if (val !== null && (isNaN(val) || val < 0)) { setIsEditing(false); return; }
+    if (val === custom) { setIsEditing(false); return; }
+    setSaving(true);
+    try {
+      await onSave(product.book_id, 'low_stock_threshold', val);
+      setIsEditing(false);
+    } catch {} finally { setSaving(false); }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSave();
+    else if (e.key === 'Escape') setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1 px-1">
+        <Input type="number" min="0" value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown} onBlur={handleSave}
+          autoFocus placeholder={String(globalThreshold || 10)}
+          className="h-7 w-16 text-xs text-center" disabled={saving}
+          data-testid={`threshold-input-${product.book_id}`} />
+        {saving && <Loader2 className="h-3 w-3 animate-spin" />}
+      </div>
+    );
+  }
+
+  const stock = product.inventory_quantity || 0;
+  const isBelow = stock <= effective;
+
+  return (
+    <div onClick={handleOpen}
+      className={`cursor-pointer rounded px-2 py-1 text-center text-xs font-medium transition-all hover:ring-2 hover:ring-primary/50
+        ${hasCustom
+          ? (isBelow ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300' : 'bg-violet-50 text-violet-600 dark:bg-violet-950/20 dark:text-violet-400')
+          : (isBelow ? 'bg-slate-100 text-slate-600 dark:bg-slate-800/50 dark:text-slate-400' : 'text-muted-foreground')
+        }`}
+      title={`${hasCustom ? 'Custom' : 'Global'} threshold: ${effective} units. Click to edit.`}
+      data-testid={`threshold-cell-${product.book_id}`}>
+      {hasCustom ? effective : <span className="opacity-60">{effective}</span>}
+      {hasCustom && <span className="ml-0.5 text-[9px] opacity-60">*</span>}
+    </div>
+  );
+}
+
 /* ── Cell Renderer ── */
-function renderCellContent(col, product, { updateProductField, onAdjustStock }) {
+function renderCellContent(col, product, { updateProductField, onAdjustStock, globalThreshold }) {
   const bookId = product.book_id;
   switch (col.key) {
     case 'price':
