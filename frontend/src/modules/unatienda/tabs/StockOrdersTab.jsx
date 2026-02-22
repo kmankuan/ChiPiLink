@@ -25,14 +25,12 @@ import { BoardHeader } from '@/components/shared/BoardHeader';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const CATALOG_TABS = [
-  { key: 'all', label: 'All', icon: Layers, color: 'bg-slate-600' },
-  { key: 'pca', label: 'School Textbooks', icon: BookOpen, color: 'bg-purple-600' },
   { key: 'public', label: 'Public Store', icon: Store, color: 'bg-emerald-600' },
 ];
 
 const CATALOG_BADGE = {
-  pca: { label: 'Textbooks', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
   public: { label: 'Public', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200' },
+  sysbook: { label: 'Sysbook', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
 };
 
 const TYPE_META = {
