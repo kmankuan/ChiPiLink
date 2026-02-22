@@ -1,6 +1,6 @@
 """
 Store Module - Inventory Import Routes
-CSV-based inventory management for textbooks (Private PCA Catalog)
+CSV-based inventory management for Sysbook textbooks
 """
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
