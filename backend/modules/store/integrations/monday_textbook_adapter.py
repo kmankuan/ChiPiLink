@@ -166,8 +166,8 @@ class TextbookMondayAdapter(BaseMondayAdapter):
             return {"processed": False, "reason": "Missing subitem ID or status label"}
 
         # Get status mapping
+        from modules.sysbook.models.textbook_order import DEFAULT_STATUS_MAPPING
         status_mapping = await self.get_status_mapping() or DEFAULT_STATUS_MAPPING
-        new_app_status = status_mapping.get(new_label)
         if not new_app_status:
             return {"processed": False, "reason": f"Unknown status label: {new_label}"}
 
