@@ -60,7 +60,7 @@ export default function Unatienda() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [storeConfig, setStoreConfig] = useState(null);
-  const [textbookAccess, setTextbookAccess] = useState(null);
+  const [sysbookAccess, setTextbookAccess] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [pendingStudentId] = useState(getInitialStudentId);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -92,17 +92,17 @@ export default function Unatienda() {
 
   // Restore student selection from URL on initial load (once access data is ready)
   useEffect(() => {
-    if (!pendingStudentId || !textbookAccess) return;
-    const student = textbookAccess.students?.find(
+    if (!pendingStudentId || !sysbookAccess) return;
+    const student = sysbookAccess.students?.find(
       s => s.student_id === pendingStudentId || s.sync_id === pendingStudentId
     );
-    if (student && textbookAccess.has_access) {
+    if (student && sysbookAccess.has_access) {
       setSelectedStudent(student);
       setActiveView('textbook-order');
     } else {
       setActiveView('textbooks');
     }
-  }, [pendingStudentId, textbookAccess]);
+  }, [pendingStudentId, sysbookAccess]);
 
   // ---- Data Loading ----
 
@@ -385,7 +385,7 @@ export default function Unatienda() {
         {activeView === 'textbooks' ? (
           <SchoolTextbooksView
             isAuthenticated={isAuthenticated}
-            textbookAccess={textbookAccess}
+            sysbookAccess={sysbookAccess}
             storeConfig={storeConfig}
             onSelectStudent={(student) => {
               setSelectedStudent(student);
@@ -399,7 +399,7 @@ export default function Unatienda() {
           />
         ) : activeView === 'textbook-order' && selectedStudent ? (
           <TextbookOrderView
-            textbookAccess={textbookAccess}
+            sysbookAccess={sysbookAccess}
             selectedStudentId={selectedStudent.student_id}
             onBack={() => {
               setSelectedStudent(null);
