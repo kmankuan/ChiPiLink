@@ -1219,7 +1219,7 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingProduct ? 'Edit Book' : 'New Book'}</DialogTitle>
-            <DialogDescription>{editingProduct ? 'Modify the book data' : 'Add a new book to the private PCA catalog'}</DialogDescription>
+            <DialogDescription>{editingProduct ? 'Modify the book data' : 'Add a new book to the inventory'}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
