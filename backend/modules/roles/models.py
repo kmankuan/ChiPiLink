@@ -49,7 +49,7 @@ AVAILABLE_PERMISSIONS = {
     "unatienda": {
         "access": "Acceder a Unatienda",
         "view_public_catalog": "Ver catalog public",
-        "view_private_catalog": "Ver catalog privado PCA",
+        "view_sysbook_catalog": "Ver catálogo Sysbook",
         "manage_products": "Gestionar productos",
         "manage_categories": "Gestionar categorys",
         "manage_orders": "Gestionar pedidos",
@@ -146,7 +146,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "users.edit",
         "unatienda.access",
         "unatienda.view_public_catalog",
-        "unatienda.view_private_catalog",
+        "unatienda.view_sysbook_catalog",
         "unatienda.manage_orders",
         "unatienda.manage_students",
         "unatienda.manage_vinculaciones",
