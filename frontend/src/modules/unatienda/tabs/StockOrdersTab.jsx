@@ -637,14 +637,7 @@ export default function StockOrdersTab({ token }) {
       <BoardHeader
         title="Stock Movements"
         icon={Truck}
-        subtitle="Manage shipments, returns, and stock adjustments"
-        tabs={[
-          { value: 'all', label: 'All', icon: Layers },
-          { value: 'public', label: 'Public Store', icon: Store },
-          { value: 'public', label: 'Public', icon: Store },
-        ]}
-        activeTab={catalogFilter}
-        onTabChange={(v) => { setCatalogFilter(v); setFilter('all'); setStatusFilter(''); }}
+        subtitle="Manage shipments, returns, and stock adjustments for public store"
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search orders..."
