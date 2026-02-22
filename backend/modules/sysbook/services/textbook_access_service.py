@@ -8,8 +8,8 @@ import logging
 
 from core.base import BaseService
 from core.database import db
-from ..repositories.textbook_access_repository import school_repository, student_record_repository
-from ..models.textbook_access import (
+from modules.sysbook.repositories.textbook_access_repository import school_repository, student_record_repository
+from modules.sysbook.models.textbook_access import (
     RequestStatus, RelationType, SchoolGrade,
     StudentRecordCreate, StudentRecordUpdate, 
     EnrollmentCreate, ApprovalAction

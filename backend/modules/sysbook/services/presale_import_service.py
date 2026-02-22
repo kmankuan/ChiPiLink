@@ -12,7 +12,7 @@ import re
 from core.database import db
 from core.config import MONDAY_API_KEY
 from modules.integrations.monday.core_client import monday_client
-from ..services.monday_config_service import monday_config_service
+from modules.store.services.monday_config_service import monday_config_service
 
 logger = logging.getLogger(__name__)
 
