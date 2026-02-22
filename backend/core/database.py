@@ -39,20 +39,17 @@ async def close_database():
 
 async def seed_admin_user():
     """
-    Create default admin user if it doesn't exist.
-    This ensures there's always an admin account in production.
+    Ensure an admin user exists with valid credentials.
+    Handles: fresh DB, pre-existing OAuth user, stale password hash.
     """
     try:
-        # Check if admin exists
         admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
         admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
-        
-        existing_admin = await db[AuthCollections.USERS].find_one({"email": admin_email})
-        
-        if not existing_admin:
-            # Create admin user with English field names
-            hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            
+        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        existing = await db[AuthCollections.USERS].find_one({"email": admin_email})
+
+        if not existing:
             admin_doc = {
                 "user_id": f"admin_{uuid.uuid4().hex[:8]}",
                 "name": "Administrador",
@@ -65,24 +62,23 @@ async def seed_admin_user():
                 "address": {},
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
-            
             await db[AuthCollections.USERS].insert_one(admin_doc)
-            print(f"✅ Admin user created: {admin_email}")
+            print(f"Admin user created: {admin_email}")
         else:
-            # Ensure existing user has admin rights and password
             updates = {}
-            if not existing_admin.get("is_admin"):
+            if not existing.get("is_admin"):
                 updates["is_admin"] = True
-            if not existing_admin.get("password_hash"):
-                updates["password_hash"] = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            stored_hash = existing.get("password_hash", "")
+            if not stored_hash or not bcrypt.checkpw(admin_password.encode('utf-8'), stored_hash.encode('utf-8')):
+                updates["password_hash"] = hashed_password
             if updates:
                 await db[AuthCollections.USERS].update_one({"email": admin_email}, {"$set": updates})
-                print(f"✅ Admin user upgraded: {admin_email} (added: {', '.join(updates.keys())})")
+                print(f"Admin user updated: {admin_email} (fields: {', '.join(updates.keys())})")
             else:
-                print(f"✅ Admin user already exists: {admin_email}")
-            
+                print(f"Admin user OK: {admin_email}")
+
     except Exception as e:
-        print(f"⚠️ Error seeding admin user: {e}")
+        print(f"Error seeding admin user: {e}")
 
 
 async def seed_site_config():
