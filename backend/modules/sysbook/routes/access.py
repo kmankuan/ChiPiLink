@@ -15,8 +15,6 @@ from modules.store.services.textbook_access_service import textbook_access_servi
 
 router = APIRouter(prefix="/access", tags=["Sysbook - Access"])
 
-router = APIRouter(prefix="/textbook-access", tags=["Store - Textbook Access"])
-
 
 # ============== PUBLIC/USER ENDPOINTS ==============
 
