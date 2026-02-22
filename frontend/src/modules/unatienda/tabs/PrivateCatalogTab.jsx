@@ -32,6 +32,7 @@ const COLUMN_DEFS = {
     { key: 'publisher', label: 'Publisher', width: 120, sortKey: 'publisher' },
     { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
     { key: 'stock', label: 'Stock', width: 80, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'threshold', label: 'Alert', width: 90, align: 'center', isThreshold: true },
     { key: 'presale', label: 'Pre-sale', width: 80, sortKey: 'presale', align: 'center' },
     { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
   ],
