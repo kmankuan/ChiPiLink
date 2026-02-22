@@ -605,7 +605,8 @@ export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false 
   // Global alert threshold (fetched from sysbook settings)
   const [globalThreshold, setGlobalThreshold] = useState(10);
 
-  // View type filter = useState('all');
+  // View type filter
+  const [viewType, setViewType] = useState('all');
 
   // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
   const effectiveViewType = sysbook && viewType === 'all' ? 'sysbook' : viewType;
