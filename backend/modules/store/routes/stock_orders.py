@@ -47,7 +47,7 @@ class CreateShipment(BaseModel):
     expected_date: Optional[str] = None
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    catalog_type: str = "public"  # "public" or "pca"
+    catalog_type: str = "public"  # "public" or "sysbook"
 
 
 class CreateReturn(BaseModel):
@@ -56,14 +56,14 @@ class CreateReturn(BaseModel):
     return_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    catalog_type: str = "pca"  # Returns from linked orders default to PCA
+    catalog_type: str = "sysbook"  # Returns from linked orders default to sysbook
 
 
 class CreateAdjustment(BaseModel):
     adjustment_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
-    catalog_type: str = "public"  # "public" or "pca"
+    catalog_type: str = "public"  # "public" or "sysbook"
 
 
 class TransitionRequest(BaseModel):
@@ -177,7 +177,7 @@ async def list_stock_orders(
     order_type: Optional[str] = Query(None, description="shipment|return|adjustment"),
     status: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    catalog_type: Optional[str] = Query(None, description="public|pca"),
+    catalog_type: Optional[str] = Query(None, description="public|sysbook"),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     admin: dict = Depends(get_admin_user),
