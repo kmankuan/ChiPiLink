@@ -263,7 +263,7 @@ export default function BulkImportBooksPage() {
         body: JSON.stringify({
           raw_text: rawText,
           column_mapping: columnMapping,
-          catalogo_id: 'pca',
+          catalogo_id: 'sysbook',
           grado_default: gradeDefault || null
         })
       });
@@ -300,7 +300,7 @@ export default function BulkImportBooksPage() {
         body: JSON.stringify({
           raw_text: rawText,
           column_mapping: columnMapping,
-          catalogo_id: 'pca',
+          catalogo_id: 'sysbook',
           grado_default: gradeDefault || null,
           actualizar_existentes: updateExisting
         })
