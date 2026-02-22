@@ -22,7 +22,7 @@ import {
 import InventoryImport from '../components/InventoryImport';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 
-/* ── Column definitions per catalog type ── */
+/* ── Column definitions per view type ── */
 const COLUMN_DEFS = {
   sysbook: [
     { key: 'name', label: 'Book Name', width: 250, sortKey: 'name', sticky: true },
