@@ -261,7 +261,8 @@ async def create_stock_alert_if_needed(book_id: str, product_name: str, new_quan
         "grade": grade,
         "current_quantity": new_quantity,
         "threshold": threshold,
-        "message": f"{'Out of stock' if new_quantity <= 0 else 'Low stock'}: {product_name} — {new_quantity} units",
+        "is_custom_threshold": product_threshold is not None,
+        "message": f"{'Out of stock' if new_quantity <= 0 else 'Low stock'}: {product_name} — {new_quantity} units (threshold: {threshold})",
         "dismissed": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
