@@ -570,7 +570,7 @@ function MovementHistoryPanel({ token }) {
   );
 }
 
-export default function PrivateCatalogTab({ token, onRefresh, sysbook = false }) {
+export default function UnifiedInventoryTab({ token, onRefresh, sysbook = false }) {
   const navigate = useNavigate();
   const { t: translate } = useTranslation();
 
