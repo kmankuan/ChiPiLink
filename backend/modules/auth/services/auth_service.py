@@ -75,10 +75,14 @@ class AuthService(BaseService):
         user = await self.user_repository.get_by_email(data.email, include_password=True)
         
         if not user:
+            logger.warning(f"Login failed: no user found for email={data.email} in auth_users collection")
             raise ValueError("Invalid credentials")
         
         # Verify password
+        has_hash = bool(user.get("password_hash"))
+        hash_preview = user.get("password_hash", "")[:20] + "..." if has_hash else "(empty)"
         if not verify_password(data.password, user.get("password_hash", "")):
+            logger.warning(f"Login failed: password mismatch for {data.email}, user_id={user.get('user_id')}, has_hash={has_hash}, hash_preview={hash_preview}")
             raise ValueError("Invalid credentials")
         
         # Create token
