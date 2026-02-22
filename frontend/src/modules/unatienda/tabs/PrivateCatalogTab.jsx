@@ -693,14 +693,14 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const handleResetColumnOrder = useCallback(() => {
     const defaultOrder = (COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all).map(c => c.key);
     setColumnOrders(prev => {
-      const updated = { ...prev, [catalogType]: defaultOrder };
-      saveColumnOrder(catalogType, defaultOrder);
+      const updated = { ...prev, [effectiveCatalogType]: defaultOrder };
+      saveColumnOrder(effectiveCatalogType, defaultOrder);
       return updated;
     });
     setColumnWidths(DEFAULT_COLUMN_WIDTHS);
     saveColumnWidths(DEFAULT_COLUMN_WIDTHS);
     toast.success('Column layout reset to default');
-  }, [catalogType]);
+  }, [effectiveCatalogType]);
 
   const [formData, setFormData] = useState({
     name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
