@@ -1,6 +1,6 @@
 """
-Store Module - Sysbook Catalog Routes
-Endpoints for Sysbook (school textbook system — only users with linked students)
+Sysbook Module - Browse Routes
+User-facing endpoints for browsing Sysbook products (school textbooks)
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 
 from core.auth import get_current_user, get_admin_user, get_optional_user
 from core.database import db
-from ..services.textbook_access_service import textbook_access_service
+from modules.store.services.textbook_access_service import textbook_access_service
 
-router = APIRouter(prefix="/sysbook-catalog", tags=["Store - Sysbook Catalog"])
+router = APIRouter(prefix="/browse", tags=["Sysbook - Browse"])
 
 
 async def verify_sysbook_access(user_id: str) -> dict:

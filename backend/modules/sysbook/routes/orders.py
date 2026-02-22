@@ -1,17 +1,17 @@
 """
-Textbook Order Routes
-API endpoints for textbook ordering system
+Sysbook Module - Order Routes
+Textbook ordering system for students
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
 
 from core.auth import get_current_user, get_admin_user
-from ..services.textbook_order_service import textbook_order_service
-from ..models.textbook_order import (
+from modules.store.services.textbook_order_service import textbook_order_service
+from modules.store.models.textbook_order import (
     OrderStatus, SubmitOrderRequest, ReorderRequest, AdminSetMaxQuantity
 )
 
-router = APIRouter(prefix="/textbook-orders", tags=["Store - Textbook Orders"])
+router = APIRouter(prefix="/orders", tags=["Sysbook - Orders"])
 
 
 # ============== USER ENDPOINTS ==============

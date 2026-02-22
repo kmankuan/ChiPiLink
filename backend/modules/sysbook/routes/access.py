@@ -1,17 +1,19 @@
 """
-Textbook Access Module - Routes
-API endpoints for textbook access management
+Sysbook Module - Access Routes
+Student-parent linking and textbook access management
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
 
 from core.auth import get_current_user, get_admin_user, require_permission
-from ..models.textbook_access import (
+from modules.store.models.textbook_access import (
     StudentRecordCreate, StudentRecordUpdate,
     EnrollmentCreate, ApprovalAction, RequestStatus,
     SchoolCreate
 )
-from ..services.textbook_access_service import textbook_access_service
+from modules.store.services.textbook_access_service import textbook_access_service
+
+router = APIRouter(prefix="/access", tags=["Sysbook - Access"])
 
 router = APIRouter(prefix="/textbook-access", tags=["Store - Textbook Access"])
 

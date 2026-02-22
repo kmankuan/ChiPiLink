@@ -1,5 +1,5 @@
 """
-Store Module - Bulk Import Routes
+Sysbook Module - Bulk Import Routes
 Endpoints for bulk import from Google Sheets data
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
@@ -7,9 +7,9 @@ from typing import Dict, Optional, List
 from pydantic import BaseModel
 
 from core.auth import get_admin_user
-from ..services.bulk_import_service import bulk_import_service
+from modules.store.services.bulk_import_service import bulk_import_service
 
-router = APIRouter(prefix="/bulk-import", tags=["Store - Bulk Import"])
+router = APIRouter(prefix="/bulk-import", tags=["Sysbook - Bulk Import"])
 
 
 # ============== REQUEST MODELS ==============

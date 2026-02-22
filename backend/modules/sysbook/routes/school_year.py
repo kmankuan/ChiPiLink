@@ -1,5 +1,5 @@
 """
-School Year Configuration Routes
+Sysbook Module - School Year Configuration Routes
 Admin endpoints for managing school year settings and student locks
 """
 from fastapi import APIRouter, HTTPException, Depends
@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 
 from core.auth import get_admin_user
 from core.database import db
-from ..services.school_year_service import school_year_service, SchoolYearConfigUpdate
+from modules.store.services.school_year_service import school_year_service, SchoolYearConfigUpdate
 
-router = APIRouter(prefix="/school-year", tags=["Store - School Year Config"])
+router = APIRouter(prefix="/school-year", tags=["Sysbook - School Year Config"])
 
 
 # ============== SCHOOL YEAR CONFIG ==============

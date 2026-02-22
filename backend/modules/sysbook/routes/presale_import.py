@@ -1,15 +1,14 @@
 """
-Pre-Sale Import Routes
+Sysbook Module - Pre-Sale Import Routes
 Admin endpoints for importing pre-sale orders from Monday.com
-and managing the linking workflow.
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Optional
 from core.auth import get_admin_user
-from ..services.presale_import_service import presale_import_service
-from ..services.monday_config_service import monday_config_service
+from modules.store.services.presale_import_service import presale_import_service
+from modules.store.services.monday_config_service import monday_config_service
 
-router = APIRouter(prefix="/presale-import", tags=["Store - Pre-Sale Import"])
+router = APIRouter(prefix="/presale-import", tags=["Sysbook - Pre-Sale Import"])
 
 
 @router.get("/preview")
