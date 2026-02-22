@@ -41,7 +41,7 @@ const emptyProductRow = {
   image_url: ''
 };
 
-export default function CatalogoPublicoTab({ token, onRefresh }) {
+export default function PublicInventoryTab({ token, onRefresh }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -103,7 +103,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         materiasData = await materiasRes.json();
       }
       
-      // Filter out private catalog products
+      // Filter out sysbook products
       const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_sysbook);
       setProductos(publicProducts);
       setCategorias(Array.isArray(categoriesData) ? categoriesData : []);
@@ -293,7 +293,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
   return (
     <div className="space-y-3">
       <BoardHeader
-        title="Public Catalog"
+        title="Public Inventory"
         icon={Store}
         subtitle="Products visible to all users in Unatienda"
         tabs={[
@@ -338,7 +338,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <Card>
               <CardContent className="py-12 text-center">
                 <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No products in the public catalog</p>
+                <p className="text-muted-foreground">No products in the public inventory</p>
               </CardContent>
             </Card>
           ) : (
