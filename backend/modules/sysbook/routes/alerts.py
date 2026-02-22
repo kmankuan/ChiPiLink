@@ -172,10 +172,10 @@ async def check_stock_levels(admin: dict = Depends(get_admin_user)):
             await _send_low_stock_push(new_alerts)
 
     return {
-        "checked": len(low_products),
+        "checked": len(all_products),
         "new_alerts": len(new_alerts),
         "already_alerted": len(existing),
-        "threshold": threshold,
+        "global_threshold": global_threshold,
     }
 
 
