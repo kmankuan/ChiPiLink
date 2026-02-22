@@ -1,10 +1,9 @@
 /**
- * SysbookInventoryTab — Sysbook (School Textbook) Inventory
- * Wraps UnifiedInventoryTab in sysbook mode: dedicated API, no public products.
+ * SysbookInventoryTab — Entry point for Sysbook Inventory in AdminDashboard.
  */
-import UnifiedInventoryTab from '@/modules/unatienda/tabs/UnifiedInventoryTab';
+import SysbookInventoryTable from './SysbookInventoryTable';
 
 export default function SysbookInventoryTab() {
   const token = localStorage.getItem('auth_token');
-  return <UnifiedInventoryTab token={token} sysbook />;
+  return <SysbookInventoryTable token={token} />;
 }
