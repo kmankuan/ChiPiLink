@@ -109,3 +109,43 @@ async def change_password(
             raise HTTPException(status_code=500, detail="Error updating password")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@router.get("/admin-diagnostic")
+async def admin_diagnostic():
+    """Diagnostic endpoint to check admin user state in auth_users collection.
+    Temporary — remove after debugging login issue.
+    """
+    import os
+    import bcrypt
+    from core.database import db
+    from core.constants import AuthCollections
+
+    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
+
+    user = await db[AuthCollections.USERS].find_one(
+        {"email": admin_email}, {"_id": 0}
+    )
+    if not user:
+        return {"status": "NOT_FOUND", "email": admin_email, "collection": AuthCollections.USERS}
+
+    stored_hash = user.get("password_hash", "")
+    try:
+        pw_match = bcrypt.checkpw(admin_password.encode('utf-8'), stored_hash.encode('utf-8')) if stored_hash else False
+    except Exception as e:
+        pw_match = f"ERROR: {e}"
+
+    return {
+        "status": "FOUND",
+        "collection": AuthCollections.USERS,
+        "user_id": user.get("user_id"),
+        "email": user.get("email"),
+        "is_admin": user.get("is_admin"),
+        "has_password_hash": bool(stored_hash),
+        "hash_prefix": stored_hash[:25] + "..." if stored_hash else "(none)",
+        "password_matches": pw_match,
+        "env_admin_email": admin_email,
+        "db_name": os.environ.get('DB_NAME', 'chipi_link'),
+    }
