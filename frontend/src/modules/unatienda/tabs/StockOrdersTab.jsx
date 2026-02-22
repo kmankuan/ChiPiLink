@@ -341,21 +341,18 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
 }
 
 /* ============ Create Adjustment Dialog ============ */
-function CreateAdjustmentDialog({ open, onClose, onCreated, token, defaultCatalog }) {
-  const [catalogType, setCatalogType] = useState(defaultCatalog || 'public');
+function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
   const [reason, setReason] = useState(ADJUSTMENT_REASONS[0]);
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => { if (open) setCatalogType(defaultCatalog || 'public'); }, [open, defaultCatalog]);
 
   const handleCreate = async () => {
     if (!items.length) { toast.error('Add at least one product'); return; }
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/adjustment`, {
-        adjustment_reason: reason, items, notes: notes || null, catalog_type: catalogType,
+        adjustment_reason: reason, items, notes: notes || null, catalog_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Adjustment created');
       onCreated();
@@ -369,10 +366,9 @@ function CreateAdjustmentDialog({ open, onClose, onCreated, token, defaultCatalo
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><Wrench className="h-5 w-5 text-purple-600" /> Stock Adjustment</DialogTitle>
-          <DialogDescription>Correct stock levels. Use negative quantities to remove stock.</DialogDescription>
+          <DialogDescription>Correct stock levels for public store products. Use negative quantities to remove stock.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <CatalogTypeSelector value={catalogType} onChange={(v) => { setCatalogType(v); setItems([]); }} />
           <div>
             <Label className="text-xs">Reason</Label>
             <select value={reason} onChange={e => setReason(e.target.value)} className="w-full h-9 px-3 text-xs border rounded-md bg-background mt-1" data-testid="adjustment-reason">
