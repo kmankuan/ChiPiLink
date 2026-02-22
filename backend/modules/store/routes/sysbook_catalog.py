@@ -164,7 +164,7 @@ async def get_product_detail(
     Get detail of a product from the Sysbook catalog.
     """
     # Verify access
-    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    access = await verify_sysbook_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not access["has_access"]:
         raise HTTPException(
@@ -193,7 +193,7 @@ async def get_products_by_grade(
     Useful to display a student's book list.
     """
     # Verify access
-    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    access = await verify_sysbook_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not access["has_access"]:
         raise HTTPException(
@@ -247,7 +247,7 @@ async def get_sysbook_summary(
     Shows available products for each linked student.
     """
     # Verify access
-    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    access = await verify_sysbook_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not access["has_access"]:
         raise HTTPException(
