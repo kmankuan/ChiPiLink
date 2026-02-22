@@ -33,7 +33,14 @@ Fix incorrect inventory statistics bug, then separate school textbook ("Sysbook"
   - `/api/store/presale-import/*` → `/api/sysbook/presale-import/*`
   - `/api/store/school-year/*` → `/api/sysbook/school-year/*`
   - `/api/store/bulk-import/*` → `/api/sysbook/bulk-import/*`
-- **Testing**: 100% pass rate (iteration_190 + iteration_191)
+- **Full Backend Separation (P0)**: Completed full architectural separation of sysbook module:
+  - Moved services from `store/services/` to `sysbook/services/`: `crm_chat_service.py`, `monday_sync_service.py`, `textbook_order_service.py`, `textbook_access_service.py`, `bulk_import_service.py`, `presale_import_service.py`, `school_year_service.py`
+  - Moved models from `store/models/` to `sysbook/models/`: `textbook_access.py`, `textbook_order.py`
+  - Moved repositories from `store/repositories/` to `sysbook/repositories/`: `textbook_access_repository.py`, `textbook_order_repository.py`
+  - Deleted duplicate files from `store/` after verifying no dependencies
+  - Fixed circular import issues with lazy imports in `store/integrations/monday_textbook_adapter.py` and `store/services/monday_sync_service.py`
+  - Shared infrastructure stays in `store/`: Monday.com adapters, config services, and shared routes (inventory_import, form_config, order_form_config, monday_sync)
+- **Testing**: 100% pass rate (iteration_192) — all sysbook and store endpoints verified
 
 ## Architecture
 ```
