@@ -602,6 +602,9 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   // View mode: table | history
   const [viewMode, setViewMode] = useState('table');
 
+  // Global alert threshold (fetched from sysbook settings)
+  const [globalThreshold, setGlobalThreshold] = useState(10);
+
   // Catalog type filter
   const [catalogType, setCatalogType] = useState('all');
 
