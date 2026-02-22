@@ -269,44 +269,48 @@ async def seed_translations():
         print(f"⚠️ Error seeding translations: {e}")
 
 
+async def _safe_index(collection, keys, **kwargs):
+    """Create an index, silently ignoring conflicts with existing indexes."""
+    try:
+        await collection.create_index(keys, **kwargs)
+    except Exception:
+        pass
+
+
 async def create_indexes():
     """
     Create database indexes for optimized queries.
-    Call this on application startup.
+    Each index is created independently so one conflict doesn't block the rest.
     """
+    import logging
+    logger = logging.getLogger("indexes")
     try:
-        # Index for store_students
-        await db[StoreCollections.STUDENTS].create_index("estado")
-        await db[StoreCollections.STUDENTS].create_index("sync_id", unique=True)
-        
-        # Index for auth_users (using English field names)
-        await db[AuthCollections.USERS].create_index("user_id", unique=True)
-        await db[AuthCollections.USERS].create_index("email", unique=True, sparse=True)
-        
-        # Index for store_orders
-        await db[StoreCollections.ORDERS].create_index("order_id", unique=True)
-        await db[StoreCollections.ORDERS].create_index("status")
-        await db[StoreCollections.ORDERS].create_index("user_id")
-        await db[StoreCollections.ORDERS].create_index("created_at")
-        
-        # Index for store_products
-        await db[StoreCollections.PRODUCTS].create_index("book_id", unique=True)
-        await db[StoreCollections.PRODUCTS].create_index("category")
-        await db[StoreCollections.PRODUCTS].create_index("grade")
-        await db[StoreCollections.PRODUCTS].create_index("active")
-        
-        # Index for store_categories
-        await db[StoreCollections.CATEGORIES].create_index("category_id", unique=True)
-        
-        # Compound indexes for common queries
-        await db[StoreCollections.PRODUCTS].create_index([("category", 1), ("active", 1)])
-        await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("active", 1)])
-        await db[StoreCollections.ORDERS].create_index([("estado", 1), ("created_at", -1)])
-        
-        # Index for OAuth states (auto-expire after 10 minutes)
-        await db.oauth_states.create_index("state", unique=True)
-        await db.oauth_states.create_index("created_at", expireAfterSeconds=600)  # TTL index - auto-delete after 10 min
-        
-        print("✅ Database indexes created successfully")
+        users = db[AuthCollections.USERS]
+        students = db[StoreCollections.STUDENTS]
+        orders = db[StoreCollections.ORDERS]
+        products = db[StoreCollections.PRODUCTS]
+        categories = db[StoreCollections.CATEGORIES]
+
+        await asyncio.gather(
+            _safe_index(students, "estado"),
+            _safe_index(students, "sync_id", unique=True, sparse=True),
+            _safe_index(users, "user_id", unique=True, sparse=True),
+            _safe_index(users, "email", unique=True, sparse=True),
+            _safe_index(orders, "order_id", unique=True),
+            _safe_index(orders, "status"),
+            _safe_index(orders, "user_id"),
+            _safe_index(orders, "created_at"),
+            _safe_index(products, "book_id", unique=True),
+            _safe_index(products, "category"),
+            _safe_index(products, "grade"),
+            _safe_index(products, "active"),
+            _safe_index(categories, "category_id", unique=True),
+            _safe_index(products, [("category", 1), ("active", 1)]),
+            _safe_index(products, [("grade", 1), ("active", 1)]),
+            _safe_index(orders, [("estado", 1), ("created_at", -1)]),
+            _safe_index(db.oauth_states, "state", unique=True),
+            _safe_index(db.oauth_states, "created_at", expireAfterSeconds=600),
+        )
+        logger.info("Database indexes ensured")
     except Exception as e:
-        print(f"⚠️ Error creating indexes (may already exist): {e}")
+        logger.warning(f"Index creation issue: {e}")
