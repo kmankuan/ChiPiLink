@@ -101,6 +101,22 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Unatienda.jsx**: `privateCatalogAccess`→`textbookAccess`
 - **Comments & Strings**: All user-facing "PCA catalog" references updated
 
+### Integration Audit — Textbook Ordering Workflow (Feb 22, 2026)
+- **Fixed `pca` → `sysbook`** in 4 files:
+  - `store/routes/inventory.py`: `catalog_type == "pca"` → `"sysbook"` filter
+  - `store/routes/stock_orders.py`: Default `catalog_type` values in CreateShipment, CreateReturn, CreateAdjustment
+  - `store/integrations/monday_txb_inventory_adapter.py`: New products from Monday sync now created with `catalog_type: "sysbook"` (was `"pca"` — **critical fix**)
+  - `frontend/src/pages/BulkImportBooksPage.jsx`: `catalogo_id: 'sysbook'` (was `'pca'`)
+- **Verified all integration endpoints respond correctly:**
+  - `/api/sysbook/inventory/*` — 25 products, dashboard stats OK
+  - `/api/store/private-catalog/products` — Student ordering: 25 products visible
+  - `/api/store/textbook-access/*` — Schools, config, enrollment endpoints
+  - `/api/store/monday/*` — Board config (ID: 18397140868)
+  - `/api/store/presale-import/*` — Import endpoints
+  - `/api/store/stock-orders?catalog_type=sysbook` — 13 orders
+  - `/api/store/textbook-orders/admin/diagnostic/textbooks` — Full diagnostics correct
+- **Zero remaining `pca` references** in both backend and frontend
+
 ### Sysbook/Unatienda Component Split (Feb 22, 2026)
 - **Created**: `frontend/src/modules/sysbook/SysbookInventoryTable.jsx` — Standalone ~600-line inventory table component dedicated to Sysbook. Uses only `/api/sysbook/inventory/` endpoints. No `sysbook` prop, no Unatienda fallback, no `_source` tagging.
 - **Updated**: `SysbookInventoryTab.jsx` now imports from `SysbookInventoryTable` (no cross-module dependency)
