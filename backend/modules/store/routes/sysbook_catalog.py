@@ -65,11 +65,11 @@ async def check_access(
     Check if user has access to the private catalog.
     Returns list of linked students and available grades.
     """
-    return await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    return await verify_sysbook_access(current_user.get("user_id") or current_user.get("user_id"))
 
 
 @router.get("/products")
-async def get_private_catalog_products(
+async def get_sysbook_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
     search: Optional[str] = None,
@@ -79,11 +79,11 @@ async def get_private_catalog_products(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Get products from the private catalog.
-    Only accessible to users with linked PCA students.
+    Get products from the Sysbook catalog.
+    Only accessible to users with linked students.
     """
     # Verify access
-    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    access = await verify_sysbook_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not access["has_access"]:
         raise HTTPException(
