@@ -69,7 +69,17 @@ async def seed_admin_user():
             await db[AuthCollections.USERS].insert_one(admin_doc)
             print(f"✅ Admin user created: {admin_email}")
         else:
-            print(f"✅ Admin user already exists: {admin_email}")
+            # Ensure existing user has admin rights and password
+            updates = {}
+            if not existing_admin.get("is_admin"):
+                updates["is_admin"] = True
+            if not existing_admin.get("password_hash"):
+                updates["password_hash"] = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            if updates:
+                await db[AuthCollections.USERS].update_one({"email": admin_email}, {"$set": updates})
+                print(f"✅ Admin user upgraded: {admin_email} (added: {', '.join(updates.keys())})")
+            else:
+                print(f"✅ Admin user already exists: {admin_email}")
             
     except Exception as e:
         print(f"⚠️ Error seeding admin user: {e}")
