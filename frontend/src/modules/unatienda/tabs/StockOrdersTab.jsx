@@ -272,13 +272,9 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><RotateCcw className="h-5 w-5 text-amber-600" /> New Return</DialogTitle>
-          <DialogDescription>Register a customer return linked to an existing textbook order. Returns are automatically categorized as School Textbooks.</DialogDescription>
+          <DialogDescription>Register a customer return linked to an existing order.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800">
-            <BookOpen className="h-4 w-4 text-purple-600" />
-            <span className="text-xs font-medium text-purple-700 dark:text-purple-300">School Textbooks Inventory</span>
-          </div>
           <div>
             <Label className="text-xs">Link to Order *</Label>
             {linkedOrder ? (
