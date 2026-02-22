@@ -275,6 +275,11 @@ function renderCellContent(col, product, { updateProductField, onAdjustStock, gl
         </div>
       );
     }
+    case 'threshold':
+      return (
+        <ThresholdCell product={product} globalThreshold={globalThreshold}
+          onSave={updateProductField} />
+      );
     case 'presale': {
       const reserved = product.reserved_quantity || 0;
       return reserved > 0 ? (
