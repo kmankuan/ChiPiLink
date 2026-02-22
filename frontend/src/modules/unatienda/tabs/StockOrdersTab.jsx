@@ -126,7 +126,7 @@ function ProductPicker({ items, setItems, token, catalogType }) {
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
         <Input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder={catalogType === 'pca' ? 'Search school textbooks...' : catalogType === 'public' ? 'Search public products...' : 'Search products...'}
+          placeholder="Search public products..."
           className="pl-8 h-9 text-xs" data-testid="product-search-input" />
         {searching && <Loader2 className="absolute right-2.5 top-2.5 h-3.5 w-3.5 animate-spin" />}
       </div>
