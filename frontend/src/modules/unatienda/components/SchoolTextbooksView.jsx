@@ -252,7 +252,7 @@ function PendingStudentCard({ student, lang }) {
 
 export default function SchoolTextbooksView({ 
   isAuthenticated, 
-  privateCatalogAccess, 
+  sysbookAccess, 
   storeConfig, 
   onSelectStudent, 
   onLinkStudent,
@@ -337,8 +337,8 @@ export default function SchoolTextbooksView({
   };
   
   const t = texts[lang] || texts.es;
-  const validatedStudents = privateCatalogAccess?.students || [];
-  const hasAccess = privateCatalogAccess?.has_access === true;
+  const validatedStudents = sysbookAccess?.students || [];
+  const hasAccess = sysbookAccess?.has_access === true;
 
   // Fetch all students (including pending) for the card display
   const fetchAllStudents = useCallback(async () => {
