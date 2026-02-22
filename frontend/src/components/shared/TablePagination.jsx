@@ -20,8 +20,8 @@ export function TablePagination({
   canNext,
   pageSizeOptions = [10, 25, 50, 100],
 }) {
-  if (totalItems <= pageSizeOptions[0]) return null;
   const { t } = useTranslation();
+  if (totalItems <= pageSizeOptions[0]) return null;
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 text-xs text-muted-foreground" data-testid="table-pagination">
