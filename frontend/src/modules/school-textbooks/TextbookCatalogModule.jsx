@@ -1,10 +1,10 @@
 /**
- * TextbookCatalogModule — Standalone wrapper for the Textbook Catalog (Private Catalog)
- * Extracted from UnatiendaModule into the School Textbooks sidebar group.
+ * TextbookCatalogModule — Standalone wrapper for the Textbook Inventory
+ * Used by the Unatienda admin view (non-sysbook mode).
  */
-import PrivateCatalogTab from '@/modules/unatienda/tabs/PrivateCatalogTab';
+import UnifiedInventoryTab from '@/modules/unatienda/tabs/UnifiedInventoryTab';
 
 export default function TextbookCatalogModule() {
   const token = localStorage.getItem('auth_token');
-  return <PrivateCatalogTab token={token} />;
+  return <UnifiedInventoryTab token={token} />;
 }
