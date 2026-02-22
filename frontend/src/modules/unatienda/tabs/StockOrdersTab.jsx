@@ -258,7 +258,7 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/return`, {
         linked_order_id: linkedOrder.order_id, customer_name: linkedOrder.student_name || '',
-        return_reason: reason, items, notes: notes || null, catalog_type: 'pca',
+        return_reason: reason, items, notes: notes || null, catalog_type: 'public',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Return registered');
       onCreated();
