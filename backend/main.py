@@ -244,15 +244,15 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize application on startup"""
+    """Initialize application on startup - fast path for health check readiness"""
     import asyncio
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
     
-    # Phase 1: Database indexes (must be first)
+    # Phase 1: Database indexes (non-blocking, parallel)
     await create_indexes()
     
-    # Phase 2: Seed essential data in parallel
+    # Phase 2: Seed essential data in parallel (required for login)
     await asyncio.gather(
         seed_admin_user(),
         seed_site_config(),
@@ -260,35 +260,42 @@ async def startup_event():
         seed_landing_page(),
     )
 
-    # Phase 3: Initialize modules in parallel
-    from modules.showcase import seed_showcase_defaults
-    await asyncio.gather(
-        seed_showcase_defaults(),
-        init_users(),
-        init_notifications(),
-        roles_service.initialize_default_roles(),
-    )
-    
-    # Phase 4: Register webhooks and start pollers in parallel
-    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
-    await wallet_monday_adapter.register_webhooks()
-    wallet_monday_adapter.init_event_handlers()
+    # Phase 3+4: Everything else runs as background tasks to avoid blocking health check
+    async def _deferred_init():
+        try:
+            from modules.showcase import seed_showcase_defaults
+            await asyncio.gather(
+                seed_showcase_defaults(),
+                init_users(),
+                init_notifications(),
+                roles_service.initialize_default_roles(),
+            )
+        except Exception as e:
+            logger.warning(f"Module init issue (non-blocking): {e}")
 
-    # Register Recharge Approval board webhook handler
-    from modules.wallet_topups.monday_sync import recharge_approval_handler
-    from modules.integrations.monday.webhook_router import register_handler as register_wh
-    recharge_board_config = await db['wallet_topup_monday_config'].find_one(
-        {"id": "default"}, {"_id": 0, "board_id": 1, "enabled": 1}
-    )
-    if recharge_board_config and recharge_board_config.get("board_id") and recharge_board_config.get("enabled"):
-        recharge_board_id = str(recharge_board_config["board_id"])
-        register_wh(recharge_board_id, recharge_approval_handler.handle_webhook)
-        logger.info(f"Recharge Approval webhook registered for board: {recharge_board_id}")
-    else:
-        logger.info("Recharge Approval board not configured or disabled, skipping webhook")
+        try:
+            from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+            await asyncio.wait_for(wallet_monday_adapter.register_webhooks(), timeout=10)
+            wallet_monday_adapter.init_event_handlers()
+        except Exception as e:
+            logger.warning(f"Wallet webhook registration skipped: {e}")
 
-    # Start background services as fire-and-forget tasks (don't block startup)
-    async def start_telegram():
+        try:
+            from modules.wallet_topups.monday_sync import recharge_approval_handler
+            from modules.integrations.monday.webhook_router import register_handler as register_wh
+            recharge_board_config = await db['wallet_topup_monday_config'].find_one(
+                {"id": "default"}, {"_id": 0, "board_id": 1, "enabled": 1}
+            )
+            if recharge_board_config and recharge_board_config.get("board_id") and recharge_board_config.get("enabled"):
+                recharge_board_id = str(recharge_board_config["board_id"])
+                register_wh(recharge_board_id, recharge_approval_handler.handle_webhook)
+                logger.info(f"Recharge Approval webhook registered for board: {recharge_board_id}")
+            else:
+                logger.info("Recharge Approval board not configured or disabled, skipping webhook")
+        except Exception as e:
+            logger.warning(f"Recharge webhook registration skipped: {e}")
+
+        # Background pollers
         try:
             from modules.community.services.telegram_service import telegram_service
             if telegram_service.token:
@@ -297,17 +304,15 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Telegram init failed (non-blocking): {e}")
 
-    async def start_gmail():
         try:
             from modules.wallet_topups.gmail_poller import gmail_poller
             await gmail_poller.start()
         except Exception as e:
             logger.warning(f"Gmail poller init failed (non-blocking): {e}")
 
-    async def start_banner_sync():
-        from modules.showcase.scheduler import banner_sync_scheduler
-        from modules.showcase.monday_banner_adapter import monday_banner_adapter
         try:
+            from modules.showcase.scheduler import banner_sync_scheduler
+            from modules.showcase.monday_banner_adapter import monday_banner_adapter
             sync_config = await db['showcase_sync_config'].find_one({"id": "default"}, {"_id": 0})
             if sync_config and sync_config.get("enabled") and sync_config.get("board_id"):
                 monday_banner_adapter.configure(board_id=str(sync_config["board_id"]))
@@ -319,9 +324,10 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Banner auto-sync init failed (non-blocking): {e}")
 
-    asyncio.create_task(start_telegram())
-    asyncio.create_task(start_gmail())
-    asyncio.create_task(start_banner_sync())
+        logger.info("All modules loaded successfully")
+
+    asyncio.create_task(_deferred_init())
+    logger.info("Core startup complete, deferred init running in background")
 
     logger.info("All modules loaded successfully")
 
