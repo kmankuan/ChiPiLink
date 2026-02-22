@@ -1,6 +1,6 @@
 """
-Store Module - Private Catalog Routes
-Endpoints for Unatienda's private catalog (only users with linked PCA students)
+Store Module - Sysbook Catalog Routes
+Endpoints for Sysbook (school textbook system — only users with linked students)
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -10,12 +10,12 @@ from core.auth import get_current_user, get_admin_user, get_optional_user
 from core.database import db
 from ..services.textbook_access_service import textbook_access_service
 
-router = APIRouter(prefix="/private-catalog", tags=["Store - Private Catalog"])
+router = APIRouter(prefix="/sysbook-catalog", tags=["Store - Sysbook Catalog"])
 
 
-async def verify_private_catalog_access(user_id: str) -> dict:
+async def verify_sysbook_access(user_id: str) -> dict:
     """
-    Verify if user has access to the private catalog.
+    Verify if user has access to the Sysbook catalog.
     Uses the textbook_access system (store_textbook_access_students collection).
     """
     students = []
@@ -46,7 +46,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
             "has_access": False,
             "students": [],
             "grades": [],
-            "message": "No linked students. Link a PCA student to access the private catalog."
+            "message": "No linked students. Link a student to access the Sysbook catalog."
         }
     
     return {
