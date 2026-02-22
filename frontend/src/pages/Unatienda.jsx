@@ -60,7 +60,7 @@ export default function Unatienda() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [storeConfig, setStoreConfig] = useState(null);
-  const [privateCatalogAccess, setPrivateCatalogAccess] = useState(null);
+  const [textbookAccess, setTextbookAccess] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [pendingStudentId] = useState(getInitialStudentId);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -92,17 +92,17 @@ export default function Unatienda() {
 
   // Restore student selection from URL on initial load (once access data is ready)
   useEffect(() => {
-    if (!pendingStudentId || !privateCatalogAccess) return;
-    const student = privateCatalogAccess.students?.find(
+    if (!pendingStudentId || !textbookAccess) return;
+    const student = textbookAccess.students?.find(
       s => s.student_id === pendingStudentId || s.sync_id === pendingStudentId
     );
-    if (student && privateCatalogAccess.has_access) {
+    if (student && textbookAccess.has_access) {
       setSelectedStudent(student);
       setActiveView('textbook-order');
     } else {
       setActiveView('textbooks');
     }
-  }, [pendingStudentId, privateCatalogAccess]);
+  }, [pendingStudentId, textbookAccess]);
 
   // ---- Data Loading ----
 
@@ -110,9 +110,9 @@ export default function Unatienda() {
 
   useEffect(() => {
     if (isAuthenticated && token) {
-      checkPrivateCatalogAccess();
+      checkTextbookAccess();
     } else {
-      setPrivateCatalogAccess(null);
+      setTextbookAccess(null);
     }
   }, [isAuthenticated, token]);
 
@@ -139,15 +139,15 @@ export default function Unatienda() {
     }
   };
 
-  const checkPrivateCatalogAccess = async () => {
+  const checkTextbookAccess = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/store/private-catalog/access`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setPrivateCatalogAccess(response.data);
+      setTextbookAccess(response.data);
     } catch (error) {
       console.error('Error checking private catalog access:', error);
-      setPrivateCatalogAccess({ has_access: false, students: [], grades: [] });
+      setTextbookAccess({ has_access: false, students: [], grades: [] });
     }
   };
 
@@ -385,7 +385,7 @@ export default function Unatienda() {
         {activeView === 'textbooks' ? (
           <SchoolTextbooksView
             isAuthenticated={isAuthenticated}
-            privateCatalogAccess={privateCatalogAccess}
+            textbookAccess={textbookAccess}
             storeConfig={storeConfig}
             onSelectStudent={(student) => {
               setSelectedStudent(student);
@@ -399,13 +399,13 @@ export default function Unatienda() {
           />
         ) : activeView === 'textbook-order' && selectedStudent ? (
           <TextbookOrderView
-            privateCatalogAccess={privateCatalogAccess}
+            textbookAccess={textbookAccess}
             selectedStudentId={selectedStudent.student_id}
             onBack={() => {
               setSelectedStudent(null);
               setActiveView('textbooks');
             }}
-            onRefreshAccess={checkPrivateCatalogAccess}
+            onRefreshAccess={checkTextbookAccess}
           />
         ) : (
           <>
