@@ -87,43 +87,6 @@ function StepIndicator({ statuses, current }) {
   );
 }
 
-/* ============ Catalog Type Selector ============ */
-function CatalogTypeSelector({ value, onChange }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium">Inventory Type *</Label>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => onChange('public')}
-          data-testid="catalog-select-public"
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all ${
-            value === 'public'
-              ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
-              : 'border-muted hover:border-muted-foreground/30 text-muted-foreground'
-          }`}
-        >
-          <Store className="h-4 w-4" />
-          Public Store
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange('pca')}
-          data-testid="catalog-select-pca"
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all ${
-            value === 'pca'
-              ? 'border-purple-500 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300'
-              : 'border-muted hover:border-muted-foreground/30 text-muted-foreground'
-          }`}
-        >
-          <BookOpen className="h-4 w-4" />
-          School Textbooks
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ============ Product Picker ============ */
 function ProductPicker({ items, setItems, token, catalogType }) {
   const [search, setSearch] = useState('');
