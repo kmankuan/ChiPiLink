@@ -55,15 +55,15 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
   
   // Auto-select student if selectedStudentId is provided
   useEffect(() => {
-    if (selectedStudentId && privateCatalogAccess?.students) {
-      const student = privateCatalogAccess.students.find(
+    if (selectedStudentId && sysbookAccess?.students) {
+      const student = sysbookAccess.students.find(
         s => s.student_id === selectedStudentId || s.sync_id === selectedStudentId
       );
       if (student) {
         handleViewTextbooks(student);
       }
     }
-  }, [selectedStudentId, privateCatalogAccess]);
+  }, [selectedStudentId, sysbookAccess]);
 
   // Fetch form fields configuration
   useEffect(() => {
@@ -152,10 +152,10 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
 
   // Fetch orders for all students
   useEffect(() => {
-    if (privateCatalogAccess?.students?.length > 0) {
+    if (sysbookAccess?.students?.length > 0) {
       fetchStudentOrders();
     }
-  }, [privateCatalogAccess]);
+  }, [sysbookAccess]);
 
   const fetchStudentOrders = async () => {
     try {
@@ -846,14 +846,14 @@ export default function TextbookOrderView({ sysbookAccess, selectedStudentId, on
       </div>
 
       {/* Students List */}
-      {privateCatalogAccess?.students?.length > 0 ? (
+      {sysbookAccess?.students?.length > 0 ? (
         <div className="space-y-3 sm:space-y-4">
           <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
             <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-            {te.myStudents} ({privateCatalogAccess.students.length})
+            {te.myStudents} ({sysbookAccess.students.length})
           </h3>
           
-          {privateCatalogAccess.students.map((student) => {
+          {sysbookAccess.students.map((student) => {
             const orderStatus = getStudentOrderStatus(student.student_id || student.sync_id);
             
             return (
