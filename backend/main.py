@@ -363,39 +363,30 @@ async def kubernetes_health_check():
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint with detailed info"""
+    """Health check endpoint with admin diagnostic info"""
+    import bcrypt as _bcrypt
+    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
+    try:
+        auth_user = await db["auth_users"].find_one({"email": admin_email}, {"_id": 0})
+        oauth_user = await db["users"].find_one({"email": admin_email}, {"_id": 0})
+        def _diag(u):
+            if not u:
+                return {"exists": False}
+            h = u.get("password_hash", "")
+            try:
+                pw_ok = _bcrypt.checkpw(admin_password.encode(), h.encode()) if h else False
+            except Exception:
+                pw_ok = "hash_error"
+            return {"uid": u.get("user_id"), "is_admin": u.get("is_admin"), "has_hash": bool(h), "pw_ok": pw_ok}
+        admin_diag = {"auth_users": _diag(auth_user), "users": _diag(oauth_user)}
+    except Exception as e:
+        admin_diag = {"error": str(e)}
     return {
         "status": "healthy",
-        "version": "2.1.0",
-        "architecture": "modular_monolith",
-        "modules": [
-            # Core modules
-            "auth",
-            "store",
-            "landing",
-            "community",
-            "admin",
-            # User Management
-            "users",
-            "notifications",
-            # Integrations
-            "integrations/monday",
-            "integrations/sheets",
-            "invision",
-            # Community/Activities
-            "chess",
-            "content_hub",
-            # Support & Education
-            "cxgenie",
-            "ai_tutor",
-            "fusebase",
-            "task_supervisor",
-            # Existing routes
-            "platform_store",
-            "pingpong",
-            "membership",
-            "translations"
-        ]
+        "version": "2.1.1",
+        "db": db.name,
+        "admin_diag": admin_diag,
     }
 
 @app.get("/")
