@@ -126,6 +126,7 @@ const TranslationCoverageCard = lazy(() => import('@/modules/admin/TranslationCo
 const DemoDataModule = lazy(() => import('@/modules/admin/DemoDataModule'));
 const DatabaseMigrationModule = lazy(() => import('@/modules/admin/DatabaseMigrationModule'));
 const DataCleanupModule = lazy(() => import('@/modules/admin/DataCleanupModule'));
+const DataManagerModule = lazy(() => import('@/modules/admin/DataManagerModule'));
 const ModuleStatusModule = lazy(() => import('@/modules/admin/ModuleStatusModule'));
 
 // Loading component for Suspense
