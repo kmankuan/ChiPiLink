@@ -697,7 +697,7 @@ export default function StockOrdersTab({ token }) {
       {orders.length === 0 ? (
         <div className="text-center py-12 text-sm text-muted-foreground" data-testid="empty-orders">
           {catalogFilter !== 'all'
-            ? `No ${catalogFilter === 'pca' ? 'School Textbooks' : 'Public Store'} stock movements yet.`
+            ? 'No public store stock movements yet.'
             : 'No stock movements yet. Create a shipment, return, or adjustment to get started.'}
         </div>
       ) : (
