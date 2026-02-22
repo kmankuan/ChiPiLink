@@ -155,8 +155,18 @@ async def sysbook_update_product(book_id: str, updates: dict, admin: dict = Depe
     """Update a textbook product."""
     updates["is_private_catalog"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    # Separate null fields for $unset (e.g. clearing custom threshold)
+    unset_fields = {k: "" for k, v in updates.items() if v is None and k != "is_private_catalog"}
+    set_fields = {k: v for k, v in updates.items() if v is not None or k == "is_private_catalog"}
+    update_ops = {}
+    if set_fields:
+        update_ops["$set"] = set_fields
+    if unset_fields:
+        update_ops["$unset"] = unset_fields
+    if not update_ops:
+        update_ops["$set"] = set_fields
     result = await db.store_products.update_one(
-        {"book_id": book_id, **SYSBOOK_FILTER}, {"$set": updates}
+        {"book_id": book_id, **SYSBOOK_FILTER}, update_ops
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
