@@ -171,16 +171,16 @@ async def delete_student(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/check-access/{catalog_id}")
-async def check_catalog_access(
-    catalog_id: str,
+@router.get("/check-access/{inventory_id}")
+async def check_inventory_access(
+    inventory_id: str,
     year: Optional[int] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Check if user has approved access to a catalog"""
-    result = await textbook_access_service.check_catalog_access(
+    """Check if user has approved access to a sysbook inventory"""
+    result = await textbook_access_service.check_inventory_access(
         user_id=current_user["user_id"],
-        catalog_id=catalog_id,
+        inventory_id=inventory_id,
         year=year
     )
     return result
@@ -334,7 +334,7 @@ async def create_school(
     result = await textbook_access_service.create_school(
         name=data.name,
         short_name=data.short_name,
-        catalog_id=data.catalog_id
+        inventory_id=data.catalog_id
     )
     return result
 
@@ -359,7 +359,7 @@ async def update_school(
         school_id=school_id,
         name=data.name,
         short_name=data.short_name,
-        catalog_id=data.catalog_id,
+        inventory_id=data.catalog_id,
         is_active=getattr(data, 'is_active', True)
     )
     if not result:
