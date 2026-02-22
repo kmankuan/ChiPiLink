@@ -214,15 +214,15 @@ async def list_stock_orders(
         counts[key] = c["count"]
 
     # Count by inventory_source for the filter tabs
-    catalog_counts_pipeline = [
+    inventory_counts_pipeline = [
         {"$group": {"_id": "$inventory_source", "count": {"$sum": 1}}}
     ]
-    catalog_raw = await db.stock_orders.aggregate(catalog_counts_pipeline).to_list(10)
-    catalog_counts = {}
-    for c in catalog_raw:
-        catalog_counts[c["_id"] or "unknown"] = c["count"]
+    inventory_raw = await db.stock_orders.aggregate(inventory_counts_pipeline).to_list(10)
+    inventory_counts = {}
+    for c in inventory_raw:
+        inventory_counts[c["_id"] or "unknown"] = c["count"]
 
-    return {"orders": orders, "total": total, "skip": skip, "limit": limit, "counts": counts, "catalog_counts": catalog_counts}
+    return {"orders": orders, "total": total, "skip": skip, "limit": limit, "counts": counts, "inventory_counts": inventory_counts}
 
 
 @router.get("/{order_id}")
