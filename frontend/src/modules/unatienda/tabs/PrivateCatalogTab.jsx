@@ -758,6 +758,23 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
 
   useEffect(() => { fetchProducts(); }, [token, selectedGrade, selectedSubject]);
 
+  // Fetch global alert threshold for sysbook mode
+  useEffect(() => {
+    if (!sysbook) return;
+    const fetchThreshold = async () => {
+      try {
+        const res = await fetch(`${API}/api/sysbook/alerts/settings`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.global_low_stock_threshold != null) {
+          setGlobalThreshold(data.global_low_stock_threshold);
+        }
+      } catch { /* use default */ }
+    };
+    fetchThreshold();
+  }, [sysbook, token]);
+
   // Filter + Sort
   const isArchiveView = catalogType === 'archived';
 
