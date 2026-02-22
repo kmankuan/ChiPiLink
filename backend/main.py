@@ -346,7 +346,20 @@ async def shutdown_event():
 @app.get("/health")
 async def kubernetes_health_check():
     """Health check endpoint for Kubernetes liveness/readiness probes"""
-    return {"status": "healthy"}
+    import bcrypt as _bcrypt
+    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
+    try:
+        auth_user = await db["auth_users"].find_one({"email": admin_email}, {"_id": 0})
+        if auth_user:
+            h = auth_user.get("password_hash", "")
+            pw_ok = _bcrypt.checkpw(admin_password.encode(), h.encode()) if h else False
+            admin_diag = {"uid": auth_user.get("user_id"), "is_admin": auth_user.get("is_admin"), "has_hash": bool(h), "pw_ok": pw_ok}
+        else:
+            admin_diag = {"uid": None, "exists": False}
+    except Exception as e:
+        admin_diag = {"error": str(e)}
+    return {"status": "healthy", "db": db.name, "admin": admin_diag}
 
 @app.get("/api/health")
 async def health_check():
