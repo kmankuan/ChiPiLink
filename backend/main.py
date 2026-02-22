@@ -369,39 +369,3 @@ async def root():
     }
 
 
-# ============== ADMIN DIAGNOSTIC (TEMPORARY) ==============
-@app.get("/api/debug/admin-check")
-async def debug_admin_check():
-    """Temporary diagnostic: check admin user state in DB. Remove after fix."""
-    import bcrypt as _bcrypt
-    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
-    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
-
-    # Check auth_users collection (used by login)
-    auth_user = await db["auth_users"].find_one({"email": admin_email}, {"_id": 0})
-    # Check users collection (used by OAuth)
-    oauth_user = await db["users"].find_one({"email": admin_email}, {"_id": 0})
-
-    def check_hash(user_doc):
-        if not user_doc:
-            return {"exists": False}
-        h = user_doc.get("password_hash", "")
-        try:
-            match = _bcrypt.checkpw(admin_password.encode('utf-8'), h.encode('utf-8')) if h else False
-        except Exception as e:
-            match = f"ERROR: {e}"
-        return {
-            "exists": True,
-            "user_id": user_doc.get("user_id"),
-            "is_admin": user_doc.get("is_admin"),
-            "has_hash": bool(h),
-            "hash_prefix": h[:25] + "..." if h else "(none)",
-            "pw_match": match,
-        }
-
-    return {
-        "db_name": db.name,
-        "admin_email": admin_email,
-        "auth_users": check_hash(auth_user),
-        "users": check_hash(oauth_user),
-    }
