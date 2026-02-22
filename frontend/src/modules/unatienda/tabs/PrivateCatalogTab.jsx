@@ -669,26 +669,29 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   }, [dragColumn, catalogType]);
 
   // Active columns based on catalog type + saved order
+  // In sysbook mode, 'all' tab should use sysbook column defs (includes threshold)
+  const effectiveCatalogType = sysbook && catalogType === 'all' ? 'sysbook' : catalogType;
+
   const activeColumns = useMemo(() => {
-    const defs = COLUMN_DEFS[catalogType] || COLUMN_DEFS.all;
-    const order = columnOrders[catalogType];
+    const defs = COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all;
+    const order = columnOrders[effectiveCatalogType];
     if (!order) return defs;
     const defMap = {};
     defs.forEach(c => { defMap[c.key] = c; });
     const ordered = order.map(key => defMap[key]).filter(Boolean);
     defs.forEach(c => { if (!order.includes(c.key)) ordered.push(c); });
     return ordered;
-  }, [catalogType, columnOrders]);
+  }, [effectiveCatalogType, columnOrders]);
 
   const isColumnOrderCustom = useMemo(() => {
-    const defaultOrder = (COLUMN_DEFS[catalogType] || COLUMN_DEFS.all).map(c => c.key);
-    const current = columnOrders[catalogType];
+    const defaultOrder = (COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all).map(c => c.key);
+    const current = columnOrders[effectiveCatalogType];
     if (!current) return false;
     return JSON.stringify(current) !== JSON.stringify(defaultOrder);
-  }, [catalogType, columnOrders]);
+  }, [effectiveCatalogType, columnOrders]);
 
   const handleResetColumnOrder = useCallback(() => {
-    const defaultOrder = (COLUMN_DEFS[catalogType] || COLUMN_DEFS.all).map(c => c.key);
+    const defaultOrder = (COLUMN_DEFS[effectiveCatalogType] || COLUMN_DEFS.all).map(c => c.key);
     setColumnOrders(prev => {
       const updated = { ...prev, [catalogType]: defaultOrder };
       saveColumnOrder(catalogType, defaultOrder);
