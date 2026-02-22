@@ -40,13 +40,15 @@ async def close_database():
 async def seed_admin_user():
     """
     Ensure an admin user exists with valid credentials.
-    Handles: fresh DB, pre-existing OAuth user, stale password hash.
+    Always force-sets password_hash and is_admin to guarantee login works.
     """
-    try:
-        admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
-        admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
-        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    import logging
+    logger = logging.getLogger("seed")
+    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
 
+    try:
+        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         existing = await db[AuthCollections.USERS].find_one({"email": admin_email})
 
         if not existing:
@@ -63,22 +65,17 @@ async def seed_admin_user():
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db[AuthCollections.USERS].insert_one(admin_doc)
-            print(f"Admin user created: {admin_email}")
+            logger.info(f"Admin user CREATED: {admin_email}")
         else:
-            updates = {}
-            if not existing.get("is_admin"):
-                updates["is_admin"] = True
-            stored_hash = existing.get("password_hash", "")
-            if not stored_hash or not bcrypt.checkpw(admin_password.encode('utf-8'), stored_hash.encode('utf-8')):
-                updates["password_hash"] = hashed_password
-            if updates:
-                await db[AuthCollections.USERS].update_one({"email": admin_email}, {"$set": updates})
-                print(f"Admin user updated: {admin_email} (fields: {', '.join(updates.keys())})")
-            else:
-                print(f"Admin user OK: {admin_email}")
+            # Always force-update password_hash and is_admin to guarantee login works
+            await db[AuthCollections.USERS].update_one(
+                {"email": admin_email},
+                {"$set": {"password_hash": hashed_password, "is_admin": True}}
+            )
+            logger.info(f"Admin user ENSURED: {admin_email} (password_hash + is_admin forced)")
 
     except Exception as e:
-        print(f"Error seeding admin user: {e}")
+        logger.error(f"SEED ADMIN FAILED: {e}", exc_info=True)
 
 
 async def seed_site_config():
