@@ -28,7 +28,12 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, hashed: str) -> bool:
     """Verify a password against its hash"""
-    return bcrypt.checkpw(password.encode(), hashed.encode())
+    if not hashed:
+        return False
+    try:
+        return bcrypt.checkpw(password.encode(), hashed.encode())
+    except Exception:
+        return False
 
 
 def create_token(user_id: str, is_admin: bool = False) -> str:
