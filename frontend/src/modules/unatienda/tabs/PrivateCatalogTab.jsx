@@ -721,7 +721,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
-        all = (data.products || []).map(p => ({ ...p, _catalog: 'sysbook' }));
+        all = (data.products || []).map(p => ({ ...p, _source: 'sysbook' }));
       } else {
         // Legacy mode: merge PCA + public products
         let pcaUrl = `${API}/api/store/private-catalog/admin/products?limit=500`;
@@ -729,7 +729,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
         if (selectedSubject) pcaUrl += `&subject=${encodeURIComponent(selectedSubject)}`;
         const pcaRes = await fetch(pcaUrl, { headers: { Authorization: `Bearer ${token}` } });
         const pcaData = await pcaRes.json();
-        const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'sysbook' }));
+        const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _source: 'sysbook' }));
 
         let pubProducts = [];
         try {
@@ -738,7 +738,7 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
           pubProducts = (pubData.products || pubData || []).map((p, idx) => ({
             ...p,
             book_id: p.product_id && p.product_id !== p.name ? p.product_id : (p.book_id || `pub_${idx}`),
-            _catalog: 'public',
+            _source: 'public',
           }));
         } catch { /* public store may not have products */ }
 
@@ -789,8 +789,8 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
       if (viewType === 'archived') return isArchived;
       if (isArchived) return false; // hide archived from all other views
       // Catalog type filter
-      if (viewType === 'sysbook' && p._catalog !== 'sysbook') return false;
-      if (viewType === 'public' && p._catalog !== 'public') return false;
+      if (viewType === 'sysbook' && p._source !== 'sysbook') return false;
+      if (viewType === 'public' && p._source !== 'public') return false;
       // Text search
       if (searchTerm) {
         const t = searchTerm.toLowerCase();
@@ -1025,8 +1025,8 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
   const statsProducts = useMemo(() => {
     return products.filter(p => {
       if (p.archived) return false;
-      if (viewType === 'sysbook' && p._catalog !== 'sysbook') return false;
-      if (viewType === 'public' && p._catalog !== 'public') return false;
+      if (viewType === 'sysbook' && p._source !== 'sysbook') return false;
+      if (viewType === 'public' && p._source !== 'public') return false;
       return true;
     });
   }, [products, viewType]);
