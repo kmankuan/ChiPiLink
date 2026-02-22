@@ -486,7 +486,7 @@ class TextbookAccessService(BaseService):
     
     # ============== CATALOG ACCESS CHECK ==============
     
-    async def check_catalog_access(
+    async def check_inventory_access(
         self,
         user_id: str,
         catalog_id: str,
