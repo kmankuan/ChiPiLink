@@ -18,7 +18,7 @@ class TestSysbookCatalogRename:
         """Get admin token for tests"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "teck@koh.one",
-            "contrasena": "Acdb##0897"
+            "password": "Acdb##0897"
         })
         if login_res.status_code == 200:
             self.token = login_res.json().get("token")
@@ -97,7 +97,7 @@ class TestUnatiendaStatsEndpoint:
         """Get admin token"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "teck@koh.one",
-            "contrasena": "Acdb##0897"
+            "password": "Acdb##0897"
         })
         if login_res.status_code == 200:
             self.token = login_res.json().get("token")
@@ -126,7 +126,7 @@ class TestSysbookInventoryEndpoint:
         """Get admin token"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "teck@koh.one",
-            "contrasena": "Acdb##0897"
+            "password": "Acdb##0897"
         })
         if login_res.status_code == 200:
             self.token = login_res.json().get("token")
