@@ -287,16 +287,22 @@ async def startup_event():
     else:
         logger.info("Recharge Approval board not configured or disabled, skipping webhook")
 
-    # Start background services in parallel
+    # Start background services as fire-and-forget tasks (don't block startup)
     async def start_telegram():
-        from modules.community.services.telegram_service import telegram_service
-        if telegram_service.token:
-            await telegram_service.start_polling()
-            logger.info("Telegram community feed polling started")
+        try:
+            from modules.community.services.telegram_service import telegram_service
+            if telegram_service.token:
+                await telegram_service.start_polling()
+                logger.info("Telegram community feed polling started")
+        except Exception as e:
+            logger.warning(f"Telegram init failed (non-blocking): {e}")
 
     async def start_gmail():
-        from modules.wallet_topups.gmail_poller import gmail_poller
-        await gmail_poller.start()
+        try:
+            from modules.wallet_topups.gmail_poller import gmail_poller
+            await gmail_poller.start()
+        except Exception as e:
+            logger.warning(f"Gmail poller init failed (non-blocking): {e}")
 
     async def start_banner_sync():
         from modules.showcase.scheduler import banner_sync_scheduler
@@ -313,11 +319,9 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Banner auto-sync init failed (non-blocking): {e}")
 
-    await asyncio.gather(
-        start_telegram(),
-        start_gmail(),
-        start_banner_sync(),
-    )
+    asyncio.create_task(start_telegram())
+    asyncio.create_task(start_gmail())
+    asyncio.create_task(start_banner_sync())
 
     logger.info("All modules loaded successfully")
 
