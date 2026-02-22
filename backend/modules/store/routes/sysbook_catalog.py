@@ -88,7 +88,7 @@ async def get_sysbook_products(
     if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail=access["message"] or "No access to private catalog"
+            detail=access["message"] or "No access to Sysbook catalog"
         )
     
     # Build query - English field names only
@@ -161,7 +161,7 @@ async def get_product_detail(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Get detail of a product from the private catalog.
+    Get detail of a product from the Sysbook catalog.
     """
     # Verify access
     access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
@@ -169,7 +169,7 @@ async def get_product_detail(
     if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have access to the private catalog"
+            detail="You do not have access to the Sysbook catalog"
         )
     
     product = await db.store_products.find_one(
@@ -198,7 +198,7 @@ async def get_products_by_grade(
     if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have access to the private catalog"
+            detail="You do not have access to the Sysbook catalog"
         )
     
     # Handle grade format variations (e.g., "3" vs "G3")
@@ -252,7 +252,7 @@ async def get_catalog_summary(
     if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have access to the private catalog"
+            detail="You do not have access to the Sysbook catalog"
         )
     
     summary = []
