@@ -1,119 +1,114 @@
 <analysis>**original_problem_statement:**
-The user's initial request was to build a rich tournament management feature (PinPan Arena). This evolved into a major refactoring and unification effort to create a cohesive PinPanClub experience by integrating existing features.
+The user's initial goal was to fix a bug causing incorrect inventory statistics in the Textbook Catalog. This led to a series of major architectural refactors requested by the user to improve the clarity and separation of two distinct inventory systems: a public-facing store (Unatienda) and a private school textbook inventory.
 
-Recent work has focused on:
-1.  Implementing a unified referee system and a global Hall of Fame leaderboard.
-2.  A massive codebase refactoring to enforce an English-only standard for all database fields, collections, and variable names.
-3.  Enhancing the analytics dashboard with tournament and referee data.
-4.  Fixing bugs related to archive/delete functionality in Wallet Management and the Textbook Catalog.
-5.  The current task is to fix a bug where the Textbook Catalog displays incorrect statistics after a CSV import.
+The user's requests evolved into the following key tasks:
+1.  Fix the incorrect statistics bug.
+2.  Separate the backend and frontend logic for the School Textbook inventory from the general Unatienda store.
+3.  Create a new, dedicated module named Sysbook for all school textbook-related functionality.
+4.  Globally rename Catalog to Inventory and remove old identifiers like  to avoid confusion.
+5.  Build a low-stock alert system for Sysbook with a dedicated UI and configurable thresholds.
+6.  Create a dashboard/landing page for the new Sysbook module.
+7.  Clean up the Unatienda module to remove all logic related to school textbooks.
+8.  Enhance the alert system with per-product custom thresholds.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-featured club management platform (PinPanClub) with modules for tournaments (PinPan Arena), leagues (PinPan League), and quick matches (RapidPin). It includes real-time spectator views (PinPan Live & TV), a global referee system with profiles, and an all-time Hall of Fame leaderboard. The entire codebase has been refactored to use English as the standard language, removing all Spanish identifiers from backend and frontend code, as well as the database. The application also features inventory management (Textbook Catalog) and wallet/transaction tracking.
+The application now has a clear separation between the public store (Unatienda) and the school textbook management system (Sysbook).
+
+-   **Sysbook Module:** A complete, standalone module with its own backend routes () and frontend components. It includes:
+    -   An **Inventory Management** page for school textbooks.
+    -   A **Stock Movements** tracker.
+    -   An **Analytics** page.
+    -   A central **Dashboard** summarizing key metrics, recent activity, and alerts.
+    -   A **Stock Alerts** system with a UI to view and manage alerts for low or out-of-stock products, triggered by a global threshold.
+-   **Unatienda Module:** The public-facing store functionality has been cleaned up to exclusively manage public products, with all school textbook logic removed.
+-   **Codebase Standardization:** All legacy identifiers like  or  have been migrated to , and a DB migration was performed to update existing records.
 
 **Last working item**:
-- **Last item agent was working:** The agent was investigating a bug where the statistics displayed on the Textbook Catalog page were incorrect. The user reported uploading 143 products via CSV, but the UI showed a total of 338 products, while a database check revealed only 33 products exist. The agent had just identified the correct frontend component () and was about to analyze its data fetching and calculation logic.
+- **Last item agent was working:** Implementing per-product custom stock alert thresholds. The agent started updating the backend alert service () to check for a product-specific threshold before falling back to the global setting.
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** backend testing agent
+- **Which testing method agent to use?** both
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Incorrect statistics in Textbook Catalog after CSV import. (Priority: P0)**
-    - **Description:** The key performance indicators (KPIs) like total products, grades, and low stock on the Textbook Catalog page () are displaying wildly inaccurate numbers. This issue appeared after the user used the Import CSV function.
-    - **Attempted fixes:** The agent has confirmed the discrepancy between the UI stats and the actual database count. The agent initially looked at the wrong dashboard file but has now correctly located the relevant frontend component, . No code changes have been made yet.
-    - **Next debug checklist:**
-        1.  Examine  to see how the KPI stats are fetched and calculated.
-        2.  Identify the specific backend API endpoint that serves these stats (likely from  or a similar file).
-        3.  Test the identified backend endpoint directly using  to verify the raw data it returns.
-        4.  If the backend data is incorrect, investigate the  and the CSV import logic to see if it's corrupting a statistics cache or writing to an unexpected location.
-        5.  If the backend data is correct, the bug is in the frontend's data processing or rendering logic within .
-    - **Why fix this issue and what will be achieved with the fix?** To provide the user with accurate and reliable inventory metrics, which are critical for managing their catalog.
-    - **Status:** IN PROGRESS
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Both
+None.
 
 **In progress Task List**:
-None.
+- **Task 1: Implement per-product custom stock alert thresholds. (Priority: P0)**
+    - **Where to resume:** The backend service  has been partially updated.
+    - **What will be achieved with this?** This will allow admins to set more granular stock alerts for specific products, overriding the global default threshold.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** Both
+    - **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks:**
-    *   **(P3)** Build an on-demand landing page redesign tool.
-*   **Future Tasks:**
-    *   **(P4)** Extend Monday.com synchronization to the general product inventory.
+-   **Upcoming Tasks:**
+    -   **(P3)** Build an on-demand landing page redesign tool.
+-   **Future Tasks:**
+    -   **(P4)** Extend Monday.com synchronization to the general product inventory.
 
 **Completed work in this session**
-- **Refactoring - Spanish to English (DONE):** Executed a full-stack refactoring to eliminate Spanish from the codebase. This included migrating database fields (e.g.,  -> ), updating all backend models, services, and routers, and updating all frontend components and API calls.
-- **Feature - Referee System & Hall of Fame (DONE):** Implemented a unified referee system with admin settings and a global Hall of Fame leaderboard, complete with new backend aggregation pipelines and frontend pages.
-- **Enhancement - Analytics Dashboard (DONE):** Rewrote the analytics dashboard to include data from the new Arena and Referee modules, and updated all labels to English.
-- **Bug Fix - Wallet Transactions (DONE):** Fixed a critical bug where archiving transactions wrote to the wrong database collection. Also added missing delete functionality.
-- **Bug Fix - Textbook Catalog (DONE):** Fixed a bug where archive/delete actions failed due to incorrect field identifiers (). Also added a missing Unarchive feature to the UI.
-- All completed items were successfully validated by the testing agent with a 100% pass rate.
-
-**Earlier issues found/mentioned but not fixed**
-None.
-
-**Known issue recurrence from previous fork**
-None.
+- **Bug Fix - Incorrect Inventory Statistics (DONE):** Fixed a critical bug in  that was causing product duplication and incorrect stat calculations by correcting the product merge logic.
+- **Refactor - Sysbook Module Creation (DONE):** Executed a major architectural refactor, creating a dedicated Sysbook module for school textbook management. This involved creating new backend routes (), services, and a full set of frontend components under .
+- **Refactor - Codebase Cleanup (DONE):** Performed a comprehensive cleanup, renaming all internal references and database values from / to .
+- **Refactor - Unatienda Module Cleanup (DONE):** Removed all school textbook-related logic and UI elements from the public-facing Unatienda module, specifically from the .
+- **Feature - Sysbook Dashboard (DONE):** Built and integrated a new dashboard for the Sysbook module, providing an at-a-glance overview of KPIs, stock health, and recent activity.
+- **Feature - Sysbook Stock Alerts (DONE):** Implemented a complete low-stock alert system, including backend logic to trigger alerts and a frontend UI () to view, filter, and dismiss them.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Bulk Code Refactoring:** Used  and custom Python scripts for large-scale, automated renaming of variables and fields across the entire codebase to enforce a coding standard.
-- **Database Migrations:** Created and executed a Python script to perform live schema changes in MongoDB (renaming fields like  to ) across multiple collections.
-- **MongoDB Aggregation:** Heavily used for calculating complex, cross-collection statistics for the Hall of Fame leaderboard and the enhanced analytics dashboard.
+- **Component Refactoring for Reusability:** The  component (1100+ lines) was refactored to be generic, accepting a prop () to conditionally change its API endpoints and UI elements, avoiding massive code duplication.
+- **Modular Architecture:** A new, self-contained Sysbook module was created on both the frontend and backend, enforcing a clean separation of concerns from the existing store module.
+- **Database Migration:** A script was used to update the  field in the  collection from  to .
 
 **key DB schema**
-- ****: (NEW) Stores global configuration for the referee system.
-- ****: (NEW) Tracks statistics for individual referees.
-- ****: (NEW) Caches data for the all-time player leaderboard.
-- ****: (MODIFIED) All fields refactored from Spanish to English (e.g.,  -> ). Archive/delete logic now functions correctly.
-- ****: (MODIFIED) Confirmed as the correct collection for transactions; archive/delete logic fixed.
+-   ****:
+    -   : (MODIFIED) Values migrated from  to .
+    -   : (NEW - In Progress) , optional. Will store the per-product custom alert threshold.
+-   ****: (NEW) Stores active and dismissed stock alerts for Sysbook products.
 
 **changes in tech stack**
 None.
 
 **All files of reference**
-- **For the current issue:**
-    - : The UI component displaying the incorrect inventory stats.
-    - : Contains product management and CSV import logic.
-    - : Likely contains the API endpoint serving the incorrect stats.
+- **For the current task:**
+    -   : The backend service being modified to handle per-product thresholds.
+    -   : The frontend component that will need an inline editing feature for the new threshold.
 - **Recently created/modified:**
-    - All files in .
-    - .
-    - .
-    - .
-    - .
-    - .
+    -   All files within .
+    -   All files within .
+    -    (refactored).
+    -    (cleaned up).
+    -    (updated navigation).
+    -    (registered new router).
 
 **key api endpoints**
-- **Under Investigation:**  - The suspected source of the incorrect statistics for the Textbook Catalog.
-- **Recently Added/Fixed:**
-    - : New endpoints for the referee system and leaderboard.
-    - , : New and fixed endpoints for wallet management.
-    - , : Fixed endpoints for inventory management.
+- **Recently Added:**
+    -   : A full suite of endpoints for Sysbook inventory, analytics, and stock movements.
+    -   : CRUD endpoints for managing stock alerts.
 
 **Critical Info for New Agent**
-- The immediate priority is to fix the incorrect inventory statistics on the Textbook Catalog page. Do not move on to other tasks until this is resolved and verified.
-- The user is attentive to detail. Acknowledge any mistakes (like the previous agent's repeated Import CSV suggestion) and address user feedback directly.
-- The massive Spanish-to-English refactoring is complete and tested, but be aware that edge cases might still exist. The current bug could potentially be an unexpected side effect of this refactoring.
+- The immediate task is to complete the implementation of per-product custom alert thresholds.
+- The backend logic has been started in . The next steps are to finish the backend changes and then implement the corresponding frontend UI in the Sysbook inventory table.
+- The separation between the Unatienda (public) and Sysbook (private textbook) modules is now complete and has been thoroughly tested. This structure should be maintained.
 
 **documents and test reports created in this job**
-- : Multiple reports were generated, confirming fixes for wallet, textbook catalog, referee, and refactoring tasks.
-- : Updated multiple times to reflect completed work.
+- : Updated multiple times to reflect the completed refactoring and new features.
+- Multiple test reports in  confirming the success of the bug fix and each subsequent refactoring task.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Reports that the Textbook Catalog has the same archive/delete problem as the wallet. (Image provided).
-2.  **Agent:** Acknowledges and investigates. (Fixes bug).
-3.  **Agent:** Finishes task.
-4.  **User:** Points out two issues: 1) Agent repeated a suggestion for an Import CSV button that already exists. 2) The stats on the Textbook Catalog page are wrong after a CSV upload. (Image provided).
-5.  **Agent:** Apologizes for the oversight and begins investigating the incorrect stats. The agent's investigation is the current .
+-   **User:** Approved building the Sysbook Dashboard and cleaning up the Unatienda module.
+-   **Agent:** Implemented the Sysbook Dashboard and cleaned up Unatienda. Ran tests successfully.
+-   **Agent:** Finished, suggesting per-product custom alert thresholds as an enhancement.
+-   **User:** Okay with the enhancement - This approved the current in-progress task.
+-   **Agent:** Began implementing the backend changes for per-product thresholds.
 
 **Project Health Check:**
-- **Broken:** The statistics display on the Textbook Catalog page is providing incorrect data.
+- **Broken:** None.
 - **Mocked:** None.
 
 **3rd Party Integrations**
@@ -125,14 +120,14 @@ None.
 -  &  for WebSockets
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. All major refactoring and bug fixes in this session were validated by the testing agent.
+- **Testing agent used after significant changes:** YES. The testing agent was used successfully after every major feature implementation and refactor (Stats Bug Fix, Sysbook Creation, Alerts System, Dashboard & Cleanup).
 - **Troubleshoot agent used after agent stuck in loop:** NO
 - **Test files created:** None.
-- **Known regressions:** None from the completed work. The current stats bug is a new issue.
+- **Known regressions:** None.
 
 **Credentials to test flow:**
 - **Email:** 
 - **Password:** 
 
 **What agent forgot to execute**
-- The agent proposed an Import CSV feature enhancement without realizing it already existed. The user pointed this out, and the agent acknowledged the mistake before moving on to the user's reported bug.</analysis>
+None. The agent has been methodically following user requests. The current task is simply in progress.</analysis>
