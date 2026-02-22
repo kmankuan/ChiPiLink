@@ -56,10 +56,10 @@ export default function PrivateBookDetail() {
   const fetchBook = async () => {
     try {
       const [bookRes, accesoRes] = await Promise.all([
-        axios.get(`${API_URL}/api/store/private-catalog/products/${bookId}`, {
+        axios.get(`${API_URL}/api/store/sysbook-catalog/products/${bookId}`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`${API_URL}/api/store/private-catalog/access`, {
+        axios.get(`${API_URL}/api/store/sysbook-catalog/access`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);

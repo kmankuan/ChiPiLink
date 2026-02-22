@@ -141,12 +141,12 @@ export default function Unatienda() {
 
   const checkTextbookAccess = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/store/private-catalog/access`, {
+      const response = await axios.get(`${API_URL}/api/store/sysbook-catalog/access`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTextbookAccess(response.data);
     } catch (error) {
-      console.error('Error checking private catalog access:', error);
+      console.error('Error checking sysbook catalog access:', error);
       setTextbookAccess({ has_access: false, students: [], grades: [] });
     }
   };
