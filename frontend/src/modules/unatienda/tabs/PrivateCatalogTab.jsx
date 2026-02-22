@@ -1150,7 +1150,8 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
                   onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
-                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop} />
+                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop}
+                  globalThreshold={globalThreshold} />
               </div>
             </DialogContent>
           </Dialog>
@@ -1181,7 +1182,8 @@ export default function PrivateCatalogTab({ token, onRefresh, sysbook = false })
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
                   onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
-                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop} />
+                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop}
+                  globalThreshold={globalThreshold} />
               </div>
             </CardContent>
           </Card>
