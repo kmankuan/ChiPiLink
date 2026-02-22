@@ -671,7 +671,7 @@ export default function TxbInventoryTab() {
             Auto-Import New Items
           </CardTitle>
           <CardDescription className="text-xs">
-            When a new textbook is added directly on Monday.com, it will be automatically imported into the private catalog.
+            When a new textbook is added directly on Monday.com, it will be automatically imported into the Sysbook catalog.
             Column mappings above are used to extract name, code, grade, price, and stock.
           </CardDescription>
         </CardHeader>

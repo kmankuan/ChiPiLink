@@ -50,7 +50,7 @@ export function CartProvider({ children }) {
         const updated = [...prev];
         const newQty = updated[existingIndex].quantity + quantity;
         
-        // Check stock (skip for private catalog items)
+        // Check stock (skip for sysbook items)
         const isPrivate = product.is_sysbook || updated[existingIndex].is_sysbook;
         if (!isPrivate && newQty > product.inventory_quantity) {
           toast.error('No hay suficiente stock disponible');
@@ -138,7 +138,7 @@ export function CartProvider({ children }) {
     openCart,
     closeCart,
     toggleCart,
-    // New helpers for private catalog
+    // New helpers for sysbook catalog
     privateItems,
     publicItems,
     hasPrivateItems,
