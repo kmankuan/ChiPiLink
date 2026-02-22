@@ -409,6 +409,9 @@ export default function AdminDashboard() {
         return <ModuleStatusModule />;
       case 'cleanup':
         return <DataCleanupModule />;
+      // Management
+      case 'data-manager':
+        return <DataManagerModule />;
       default:
         return <DashboardModule />;
     }
