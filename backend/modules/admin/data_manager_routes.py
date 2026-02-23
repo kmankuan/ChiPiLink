@@ -127,21 +127,42 @@ class ClearRequest(BaseModel):
 
 @router.get("/stats")
 async def get_data_stats(admin: dict = Depends(get_admin_user)):
-    """Get record counts for every module and collection."""
-    result = {}
+    """Get record counts for every module and collection (parallel for speed)."""
+    # Flatten all collections for parallel counting
+    all_colls = []
     for mod_key, mod_info in MODULE_COLLECTIONS.items():
-        mod_stats = {"label": mod_info["label"], "collections": {}, "total": 0}
         for coll_name, coll_label in mod_info["collections"].items():
+            all_colls.append((mod_key, coll_name, coll_label))
+
+    # Count all collections in parallel using estimated_document_count (fast on Atlas)
+    async def _count(coll_name):
+        try:
+            return await db[coll_name].estimated_document_count()
+        except Exception:
             try:
-                count = await db[coll_name].count_documents({})
+                return await db[coll_name].count_documents({})
             except Exception:
-                count = 0
-            mod_stats["collections"][coll_name] = {"label": coll_label, "count": count}
-            mod_stats["total"] += count
-        result[mod_key] = mod_stats
+                return 0
+
+    counts = await asyncio.gather(*[_count(c[1]) for c in all_colls])
+
+    # Assemble result
+    result = {}
+    for (mod_key, coll_name, coll_label), count in zip(all_colls, counts):
+        if mod_key not in result:
+            result[mod_key] = {
+                "label": MODULE_COLLECTIONS[mod_key]["label"],
+                "collections": {},
+                "total": 0,
+            }
+        result[mod_key]["collections"][coll_name] = {"label": coll_label, "count": count}
+        result[mod_key]["total"] += count
 
     # Admin user count (for protection info)
-    admin_count = await db.auth_users.count_documents({"is_admin": True})
+    try:
+        admin_count = await db.auth_users.count_documents({"is_admin": True})
+    except Exception:
+        admin_count = 0
     result["_meta"] = {"admin_user_count": admin_count}
     return result
 
