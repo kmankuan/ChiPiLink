@@ -248,6 +248,7 @@ app.add_middleware(
 async def startup_event():
     """Initialize application on startup - fast path for health check readiness"""
     import asyncio
+    import traceback
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
     
@@ -275,18 +276,30 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Seed operations issue: {e}")
 
-    # Phase 3+4: Everything else runs as background tasks to avoid blocking health check
+    logger.info("Core startup complete, scheduling deferred init...")
+
+    # Phase 3+4: Everything else runs as background tasks AFTER server starts accepting connections
     async def _deferred_init():
+        # Wait for the event loop to start processing HTTP requests before running background tasks
+        await asyncio.sleep(2)
+        logger.info("Deferred init starting...")
+        
         try:
             from modules.showcase import seed_showcase_defaults
-            await asyncio.gather(
-                seed_showcase_defaults(),
-                init_users(),
-                init_notifications(),
-                roles_service.initialize_default_roles(),
+            await asyncio.wait_for(
+                asyncio.gather(
+                    seed_showcase_defaults(),
+                    init_users(),
+                    init_notifications(),
+                    roles_service.initialize_default_roles(),
+                ),
+                timeout=30
             )
+        except asyncio.TimeoutError:
+            logger.warning("Module init timed out (30s), continuing...")
         except Exception as e:
             logger.warning(f"Module init issue (non-blocking): {e}")
+            logger.debug(traceback.format_exc())
 
         try:
             from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
@@ -310,7 +323,9 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Recharge webhook registration skipped: {e}")
 
-        # Background pollers
+        # Background pollers — start after another short delay to avoid event loop contention
+        await asyncio.sleep(1)
+
         try:
             from modules.community.services.telegram_service import telegram_service
             if telegram_service.token:
@@ -342,7 +357,6 @@ async def startup_event():
         logger.info("All modules loaded successfully")
 
     asyncio.create_task(_deferred_init())
-    logger.info("Core startup complete, deferred init running in background")
 
 @app.on_event("shutdown")
 async def shutdown_event():
