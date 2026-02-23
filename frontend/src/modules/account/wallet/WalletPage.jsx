@@ -72,8 +72,9 @@ export default function ChipiWallet({ token }) {
   };
 
   const handleDeposit = async () => {
-    if (!depositAmount || parseFloat(depositAmount) <= 0) return;
+    if (!depositAmount || parseFloat(depositAmount) <= 0 || depositSubmitting) return;
 
+    setDepositSubmitting(true);
     try {
       const res = await fetch(`${API_URL}/api/wallet/deposit`, {
         method: 'POST',
@@ -91,10 +92,11 @@ export default function ChipiWallet({ token }) {
       if (res.ok) {
         setIsDepositOpen(false);
         setDepositAmount('');
-        fetchWalletData();
       }
     } catch (error) {
       console.error('Error depositing:', error);
+    } finally {
+      setDepositSubmitting(false);
     }
   };
 
