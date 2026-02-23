@@ -3,6 +3,7 @@ Admin Data Manager Routes
 Unified interface for viewing stats and clearing data across all app modules.
 Combines the old Demo Data + Data Cleanup into one comprehensive tool.
 """
+import asyncio
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
