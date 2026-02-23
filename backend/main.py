@@ -251,16 +251,29 @@ async def startup_event():
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
     
-    # Phase 1: Database indexes (non-blocking, parallel)
-    await create_indexes()
+    # Phase 1: Database indexes (with timeout for Atlas)
+    try:
+        await asyncio.wait_for(create_indexes(), timeout=30)
+    except asyncio.TimeoutError:
+        logger.warning("Index creation timed out (30s), continuing...")
+    except Exception as e:
+        logger.warning(f"Index creation issue: {e}")
     
-    # Phase 2: Seed essential data in parallel (required for login)
-    await asyncio.gather(
-        seed_admin_user(),
-        seed_site_config(),
-        seed_translations(),
-        seed_landing_page(),
-    )
+    # Phase 2: Seed essential data in parallel (with timeout for Atlas)
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(
+                seed_admin_user(),
+                seed_site_config(),
+                seed_translations(),
+                seed_landing_page(),
+            ),
+            timeout=30
+        )
+    except asyncio.TimeoutError:
+        logger.warning("Seed operations timed out (30s), continuing...")
+    except Exception as e:
+        logger.warning(f"Seed operations issue: {e}")
 
     # Phase 3+4: Everything else runs as background tasks to avoid blocking health check
     async def _deferred_init():
