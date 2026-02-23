@@ -211,8 +211,8 @@ export default function ChipiWallet({ token }) {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button onClick={handleDeposit} className="w-full" data-testid="confirm-deposit-btn">
-                    {t('wallet.confirm')}
+                  <Button onClick={handleDeposit} className="w-full" disabled={depositSubmitting} data-testid="confirm-deposit-btn">
+                    {depositSubmitting ? t('wallet.submitting') || 'Submitting...' : t('wallet.confirm')}
                   </Button>
                 </div>
               </DialogContent>
