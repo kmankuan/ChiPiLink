@@ -223,7 +223,7 @@ async def deposit(
     data: DepositRequest,
     user=Depends(get_current_user)
 ):
-    """Realizar un deposit en la billetera"""
+    """Request a wallet deposit (creates a pending top-up for admin approval)."""
     try:
         currency = Currency(data.currency)
         payment_method = PaymentMethod(data.payment_method)
@@ -233,23 +233,30 @@ async def deposit(
     if data.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
     
-    try:
-        transaction = await wallet_service.deposit(
-            user_id=user["user_id"],
-            amount=data.amount,
-            currency=currency,
-            payment_method=payment_method,
-            reference=data.reference,
-            description=data.description
-        )
-        
-        asyncio.create_task(_monday_sync_tx(
-            user["user_id"], data.amount, "topup", data.description or "", data.reference or ""
-        ))
-        
-        return {"success": True, "transaction": transaction}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    import uuid
+    topup_id = f"topup_{uuid.uuid4().hex[:12]}"
+    now = datetime.now(timezone.utc).isoformat()
+    
+    pending_doc = {
+        "id": topup_id,
+        "user_id": user["user_id"],
+        "user_email": user.get("email", ""),
+        "user_name": user.get("name", ""),
+        "amount": data.amount,
+        "currency": currency.value,
+        "payment_method": payment_method.value,
+        "reference": data.reference or "",
+        "description": data.description or "Wallet top-up request",
+        "status": "pending",
+        "source": "user_request",
+        "created_at": now,
+        "updated_at": now,
+    }
+    
+    await db["wallet_pending_topups"].insert_one(pending_doc)
+    del pending_doc["_id"]
+    
+    return {"success": True, "status": "pending", "topup_id": topup_id, "message": "Deposit request submitted for approval"}
 
 
 @router.post("/admin/deposit/{user_id}")
