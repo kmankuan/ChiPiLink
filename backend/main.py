@@ -356,7 +356,19 @@ async def startup_event():
 
         logger.info("All modules loaded successfully")
 
+    # Self-check: verify the server can actually respond to HTTP requests
+    async def _self_check():
+        await asyncio.sleep(5)
+        try:
+            import httpx
+            async with httpx.AsyncClient() as hc:
+                resp = await hc.get("http://127.0.0.1:8001/health", timeout=10)
+                logger.info(f"Self-check OK: HTTP {resp.status_code}")
+        except Exception as e:
+            logger.error(f"Self-check FAILED (server not responding on 127.0.0.1:8001): {e}")
+
     asyncio.create_task(_deferred_init())
+    asyncio.create_task(_self_check())
 
 @app.on_event("shutdown")
 async def shutdown_event():
