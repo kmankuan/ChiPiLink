@@ -358,15 +358,23 @@ async def shutdown_event():
 @app.get("/health")
 async def kubernetes_health_check():
     """Health check endpoint for Kubernetes liveness/readiness probes — must be fast."""
-    return {"status": "healthy", "db": db.name}
+    try:
+        db_name = db.name
+    except Exception:
+        db_name = "connecting"
+    return {"status": "healthy", "db": db_name}
 
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint with basic info."""
+    try:
+        db_name = db.name
+    except Exception:
+        db_name = "connecting"
     return {
         "status": "healthy",
         "version": "2.2.0",
-        "db": db.name,
+        "db": db_name,
     }
 
 @app.get("/")
