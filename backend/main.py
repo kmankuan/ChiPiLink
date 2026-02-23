@@ -335,12 +335,22 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("ChiPi Link API shutting down...")
-    from modules.wallet_topups.gmail_poller import gmail_poller
-    await gmail_poller.stop()
-    from modules.showcase.scheduler import banner_sync_scheduler
-    banner_sync_scheduler.stop()
-    await close_database()
-    logger.info("Database connection closed")
+    try:
+        from modules.wallet_topups.gmail_poller import gmail_poller
+        await gmail_poller.stop()
+    except Exception as e:
+        logger.warning(f"Gmail poller shutdown issue: {e}")
+    try:
+        from modules.showcase.scheduler import banner_sync_scheduler
+        banner_sync_scheduler.stop()
+    except Exception as e:
+        logger.warning(f"Banner scheduler shutdown issue: {e}")
+    try:
+        await close_database()
+        logger.info("Database connection closed")
+    except Exception as e:
+        logger.warning(f"Database close issue: {e}")
+    logger.info("Application shutdown complete.")
 
 # ============== HEALTH CHECK ==============
 
