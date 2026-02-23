@@ -334,7 +334,7 @@ async def create_school(
     result = await textbook_access_service.create_school(
         name=data.name,
         short_name=data.short_name,
-        inventory_id=data.catalog_id
+        catalog_id=data.catalog_id
     )
     return result
 
