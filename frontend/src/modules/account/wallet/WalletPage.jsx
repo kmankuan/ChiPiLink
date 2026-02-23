@@ -28,6 +28,7 @@ export default function ChipiWallet({ token }) {
   const [convertPoints, setConvertPoints] = useState('');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isConvertOpen, setIsConvertOpen] = useState(false);
+  const [depositSubmitting, setDepositSubmitting] = useState(false);
 
   const lang = i18n.language || 'es';
 
