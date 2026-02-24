@@ -145,48 +145,22 @@ export default function ChipiWallet({ token }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Dialog open={isDepositOpen} onOpenChange={setIsDepositOpen}>
-              <DialogTrigger asChild>
-                <Button variant="secondary" size="sm" className="w-full" data-testid="deposit-btn">
-                  <ArrowDownLeft className="h-4 w-4 mr-2" />
-                  {t('wallet.deposit')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{t('wallet.depositTitle')}</DialogTitle>
-                  <DialogDescription>{t('wallet.depositDesc')}</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  <div>
-                    <Label>{t('wallet.amount')}</Label>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                      data-testid="deposit-amount-input"
-                    />
-                  </div>
-                  <div>
-                    <Label>{t('wallet.method')}</Label>
-                    <Select value={depositMethod} onValueChange={setDepositMethod}>
-                      <SelectTrigger data-testid="deposit-method-select">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">{t('wallet.cash')}</SelectItem>
-                        <SelectItem value="card">{t('wallet.card')}</SelectItem>
-                        <SelectItem value="yappy">{t('wallet.yappy')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleDeposit} className="w-full" disabled={depositSubmitting} data-testid="confirm-deposit-btn">
-                    {depositSubmitting ? t('wallet.submitting') || 'Submitting...' : t('wallet.confirm')}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full"
+              onClick={() => setIsDepositOpen(true)}
+              data-testid="deposit-btn"
+            >
+              <ArrowDownLeft className="h-4 w-4 mr-2" />
+              {t('wallet.deposit')}
+            </Button>
+            <DepositFlow
+              open={isDepositOpen}
+              onOpenChange={setIsDepositOpen}
+              token={token}
+              onSuccess={fetchWalletData}
+            />
           </CardContent>
         </Card>
 
