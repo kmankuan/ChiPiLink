@@ -239,11 +239,15 @@ export default function Orders() {
 
   const fetchPedidos = async () => {
     try {
-      const response = await api.get('/pedidos/mis-pedidos');
-      const data = response.data;
-      setPedidos(Array.isArray(data) ? data : (data.pedidos || []));
+      const response = await fetch(`${API_URL}/api/platform-store/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPedidos(data.orders || []);
+      }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching store orders:', error);
     } finally {
       setLoading(false);
     }
