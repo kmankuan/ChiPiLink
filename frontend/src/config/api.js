@@ -11,7 +11,8 @@
  * Set USE_NEW_ENDPOINTS to true to use refactored endpoints
  */
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import RESOLVED_API_URL from './apiUrl';
+const API_URL = RESOLVED_API_URL;
 
 // Feature flag for gradual migration
 // Set to true to use new microservices-ready endpoints

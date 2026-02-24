@@ -4,7 +4,8 @@ import { AUTH_ENDPOINTS } from '@/config/api';
 
 const AuthContext = createContext(null);
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import RESOLVED_API_URL from '@/config/apiUrl';
+const API_URL = RESOLVED_API_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
