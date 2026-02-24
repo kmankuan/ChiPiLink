@@ -42,46 +42,53 @@ async def seed_admin_user():
     """
     Ensure an admin user exists with valid credentials.
     Always force-sets password_hash and is_admin to guarantee login works.
+    Retries up to 3 times on failure.
     """
     import logging
     logger = logging.getLogger("seed")
     admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
     admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
 
-    try:
-        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        coll = AuthCollections.USERS
-        existing = await db[coll].find_one({"email": admin_email})
+    for attempt in range(3):
+        try:
+            hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            coll = AuthCollections.USERS
+            existing = await db[coll].find_one({"email": admin_email})
 
-        if not existing:
-            admin_doc = {
-                "user_id": f"admin_{uuid.uuid4().hex[:8]}",
-                "name": "Administrador",
-                "last_name": "ChiPi Link",
-                "email": admin_email,
-                "phone": "",
-                "password_hash": hashed_password,
-                "is_admin": True,
-                "students": [],
-                "address": {},
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
-            res = await db[coll].insert_one(admin_doc)
-            logger.info(f"Admin CREATED in '{coll}' db='{db.name}': {admin_email} uid={admin_doc['user_id']} ack={res.acknowledged}")
-        else:
-            res = await db[coll].update_one(
-                {"email": admin_email},
-                {"$set": {"password_hash": hashed_password, "is_admin": True}}
-            )
-            verify = bcrypt.checkpw(admin_password.encode('utf-8'), hashed_password.encode('utf-8'))
-            logger.info(
-                f"Admin ENSURED in '{coll}' db='{db.name}': {admin_email} "
-                f"uid={existing.get('user_id')} matched={res.matched_count} "
-                f"modified={res.modified_count} hash_ok={verify}"
-            )
+            if not existing:
+                admin_doc = {
+                    "user_id": f"admin_{uuid.uuid4().hex[:8]}",
+                    "name": "Administrador",
+                    "last_name": "ChiPi Link",
+                    "email": admin_email,
+                    "phone": "",
+                    "password_hash": hashed_password,
+                    "is_admin": True,
+                    "students": [],
+                    "address": {},
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                res = await db[coll].insert_one(admin_doc)
+                logger.info(f"Admin CREATED in '{coll}' db='{db.name}': {admin_email} uid={admin_doc['user_id']} ack={res.acknowledged}")
+            else:
+                res = await db[coll].update_one(
+                    {"email": admin_email},
+                    {"$set": {"password_hash": hashed_password, "is_admin": True}}
+                )
+                verify = bcrypt.checkpw(admin_password.encode('utf-8'), hashed_password.encode('utf-8'))
+                logger.info(
+                    f"Admin ENSURED in '{coll}' db='{db.name}': {admin_email} "
+                    f"uid={existing.get('user_id')} matched={res.matched_count} "
+                    f"modified={res.modified_count} hash_ok={verify}"
+                )
+            return  # Success, exit retry loop
 
-    except Exception as e:
-        logger.error(f"SEED ADMIN FAILED: {e}", exc_info=True)
+        except Exception as e:
+            logger.error(f"SEED ADMIN attempt {attempt+1}/3 FAILED: {e}", exc_info=True)
+            if attempt < 2:
+                await asyncio.sleep(2)
+    
+    logger.error("SEED ADMIN: all 3 attempts failed — admin login may not work!")
 
 
 async def seed_site_config():
