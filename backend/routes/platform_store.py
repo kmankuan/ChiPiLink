@@ -234,7 +234,6 @@ async def get_my_platform_orders(user=Depends(lambda: get_current_user)):
 @router.post("/orders")
 async def create_platform_order(order_data: dict):
     """Create a new order for platform store (public, optionally authenticated)"""
-    from uuid import uuid4
 
     # Validate required fields
     if not order_data.get("items") or len(order_data["items"]) == 0:
