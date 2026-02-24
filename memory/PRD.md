@@ -59,6 +59,9 @@ Multi-module school supply/textbook management platform ("ChiPi Link") with:
 - Add School API parameter fix
 - Malformed .env file fix
 
+### Session: Feb 24, 2026 (Cont.)
+- **REFACTOR: Unified Cart & Orders Page** — Combined "My Cart" and "My Orders" into a single page at `/pedidos` with two top-level tabs. "Mi Carrito" tab provides full cart management (quantity controls, checkout, empty state with navigation). "Mis Pedidos" tab contains nested sub-tabs for textbook orders and store orders. Supports URL deep-linking via `?tab=cart`. CartDrawer slide-out panel preserved for quick access. Fixed ticker bar overlap with proper page spacing. All tests passed (12/12).
+
 ## Pending/Backlog
 - (P3) Build an on-demand landing page redesign tool
 - (P4) Extend Monday.com synchronization to general product inventory
