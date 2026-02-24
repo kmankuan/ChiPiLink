@@ -248,7 +248,7 @@
     "error": "Error",
     "success": "Éxito",
     "confirm": "Confirmar",
-    "back": "Volver",
+    "back": "Atrás",
     "next": "Siguiente",
     "close": "Cerrar",
     "yes": "Sí",
@@ -405,7 +405,8 @@
     "networkError": "Error de red",
     "urlCopied": "URL copiada",
     "processingAuth": "Procesando autenticación...",
-    "waitVerifying": "Por favor espere mientras verificamos su cuenta"
+    "waitVerifying": "Por favor espere mientras verificamos su cuenta",
+    "done": "Listo"
   },
   "status": {
     "pending": "Pendiente",
@@ -961,7 +962,25 @@
     "charges": "Cargos",
     "noUsers": "No se encontraron usuarios",
     "walletManagement": "Gestión de Billeteras",
-    "manageWallets": "Administrar billeteras, transacciones e info bancaria"
+    "manageWallets": "Administrar billeteras, transacciones e info bancaria",
+    "depositStep1": "Ingresa el monto que deseas depositar",
+    "depositStep2": "Elige tu método de pago",
+    "depositStep3": "Sigue las instrucciones para completar tu depósito",
+    "depositSuccess": "Tu solicitud ha sido enviada",
+    "depositSubmitted": "Solicitud Enviada",
+    "depositPendingMsg": "Tu depósito de",
+    "depositPendingVia": "vía",
+    "depositPendingApproval": "está pendiente de aprobación del administrador.",
+    "underConstruction": "Próximamente",
+    "chooseAnother": "Elegir otro método",
+    "payWithYappy": "Pagar con Yappy",
+    "yappyDesc": "Serás redirigido a Yappy para completar el pago",
+    "confirmDeposit": "Confirmar Solicitud de Depósito",
+    "bankName": "Banco",
+    "accountHolder": "Titular de la Cuenta",
+    "accountNumber": "Número de Cuenta",
+    "accountType": "Tipo de Cuenta",
+    "alertEmail": "Email de Alerta"
   },
   "profile": {
     "title": "Mi Perfil",

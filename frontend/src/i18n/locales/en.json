@@ -405,7 +405,8 @@
     "networkError": "Network error",
     "urlCopied": "URL copied",
     "processingAuth": "Processing authentication...",
-    "waitVerifying": "Please wait while we verify your account"
+    "waitVerifying": "Please wait while we verify your account",
+    "done": "Done"
   },
   "status": {
     "pending": "Pending",
@@ -1101,7 +1102,25 @@
     "charges": "Charges",
     "noUsers": "No users found",
     "walletManagement": "Wallet Management",
-    "manageWallets": "Manage user wallets, transactions, and bank info"
+    "manageWallets": "Manage user wallets, transactions, and bank info",
+    "depositStep1": "Enter the amount you want to deposit",
+    "depositStep2": "Choose your payment method",
+    "depositStep3": "Follow the instructions to complete your deposit",
+    "depositSuccess": "Your request has been submitted",
+    "depositSubmitted": "Request Submitted",
+    "depositPendingMsg": "Your deposit of",
+    "depositPendingVia": "via",
+    "depositPendingApproval": "is pending admin approval.",
+    "underConstruction": "Coming Soon",
+    "chooseAnother": "Choose another method",
+    "payWithYappy": "Pay with Yappy",
+    "yappyDesc": "You will be redirected to Yappy to complete payment",
+    "confirmDeposit": "Confirm Deposit Request",
+    "bankName": "Bank",
+    "accountHolder": "Account Holder",
+    "accountNumber": "Account Number",
+    "accountType": "Account Type",
+    "alertEmail": "Alert Email"
   },
   "profile": {
     "title": "My Profile",

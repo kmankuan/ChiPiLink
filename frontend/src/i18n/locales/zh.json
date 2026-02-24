@@ -404,7 +404,8 @@
     "networkError": "网络错误",
     "urlCopied": "链接已复制",
     "processingAuth": "正在处理认证...",
-    "waitVerifying": "请稍候，正在验证您的账户"
+    "waitVerifying": "请稍候，正在验证您的账户",
+    "done": "完成"
   },
   "status": {
     "pending": "待处理",
@@ -830,7 +831,25 @@
     "charges": "扣款",
     "noUsers": "未找到用户",
     "walletManagement": "钱包管理",
-    "manageWallets": "管理用户钱包、交易和银行信息"
+    "manageWallets": "管理用户钱包、交易和银行信息",
+    "depositStep1": "输入您要存入的金额",
+    "depositStep2": "选择您的支付方式",
+    "depositStep3": "按照指示完成您的存款",
+    "depositSuccess": "您的请求已提交",
+    "depositSubmitted": "请求已提交",
+    "depositPendingMsg": "您的存款",
+    "depositPendingVia": "通过",
+    "depositPendingApproval": "正在等待管理员审批。",
+    "underConstruction": "即将推出",
+    "chooseAnother": "选择其他方式",
+    "payWithYappy": "使用Yappy支付",
+    "yappyDesc": "您将被重定向到Yappy完成支付",
+    "confirmDeposit": "确认存款请求",
+    "bankName": "银行",
+    "accountHolder": "账户持有人",
+    "accountNumber": "账号",
+    "accountType": "账户类型",
+    "alertEmail": "提醒邮箱"
   },
   "profile": {
     "title": "我的资料",
