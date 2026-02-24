@@ -54,15 +54,15 @@ export default function CartDrawer() {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Carrito de Compras
+            {t('cart.shoppingCart', 'Shopping Cart')}
             {itemCount > 0 && (
               <Badge variant="secondary">{itemCount}</Badge>
             )}
           </SheetTitle>
           <SheetDescription>
-            {itemCount === 0 
-              ? 'Tu carrito está vacío'
-              : `${itemCount} producto${itemCount > 1 ? 's' : ''} en tu carrito`
+            {itemCount === 0
+              ? t('cart.emptyTitle', 'Your cart is empty')
+              : `${itemCount} ${t('cart.itemsInCart', 'item(s) in your cart')}`
             }
           </SheetDescription>
         </SheetHeader>
@@ -72,9 +72,9 @@ export default function CartDrawer() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
               <ShoppingBag className="h-16 w-16 text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground mb-4">No hay productos en tu carrito</p>
+              <p className="text-muted-foreground mb-4">{t('cart.noProducts', 'No products in your cart')}</p>
               <Button variant="outline" onClick={() => { closeCart(); navigate('/unatienda'); }}>
-                Explorar Unatienda
+                {t('cart.exploreStoreShort', 'Explore Unatienda')}
               </Button>
               <Button
                 variant="ghost"
@@ -83,7 +83,7 @@ export default function CartDrawer() {
                 data-testid="cart-my-orders-btn"
               >
                 <ClipboardList className="h-4 w-4" />
-                Ver mis pedidos y carrito
+                {t('cart.viewOrdersAndCart', 'View my orders & cart')}
               </Button>
             </div>
           ) : (
@@ -94,27 +94,26 @@ export default function CartDrawer() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
                     <p className="text-xs text-amber-700 dark:text-amber-300">
-                      Tu carrito tiene productos públicos y del catálogo privado. 
-                      Se procesarán en pedidos separados.
+                      {t('cart.mixedCartWarning', 'Your cart has public and private catalog products. They will be processed as separate orders.')}
                     </p>
                   </div>
                 </Card>
               )}
-              
+
               {items.map((item) => (
-                <div 
-                  key={item.book_id} 
+                <div
+                  key={item.book_id}
                   className={`flex gap-4 p-3 rounded-lg ${
-                    item.is_sysbook 
-                      ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' 
+                    item.is_sysbook
+                      ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800'
                       : 'bg-muted/50'
                   }`}
                 >
                   {/* Product Image */}
                   <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 relative">
                     {item.image_url ? (
-                      <img 
-                        src={item.image_url} 
+                      <img
+                        src={item.image_url}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -142,7 +141,7 @@ export default function CartDrawer() {
                         </Badge>
                       )}
                     </div>
-                    
+
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-2">
                       <Button
@@ -196,20 +195,20 @@ export default function CartDrawer() {
               <div className="flex items-start gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                 <Lock className="h-4 w-4 text-purple-600 mt-0.5" />
                 <p className="text-xs text-purple-700 dark:text-purple-300">
-                  Los books del catálogo privado se procesan como pre-orden
+                  {t('cart.privatePreOrder', 'Private catalog books are processed as pre-orders')}
                 </p>
               </div>
             )}
-            
+
             {/* Summary */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{t('cart.subtotal', 'Subtotal')}</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold text-lg">
-                <span>Total</span>
+                <span>{t('cart.total', 'Total')}</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
             </div>
@@ -217,16 +216,16 @@ export default function CartDrawer() {
             {/* Actions */}
             <div className="flex flex-col gap-2">
               <Button onClick={handleCheckout} className="w-full gap-2">
-                Proceder al Pago
+                {t('cart.checkout', 'Proceed to Payment')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={clearCart}
                   className="flex-1"
                 >
-                  Vaciar Carrito
+                  {t('cart.clearCart', 'Clear Cart')}
                 </Button>
                 <Button
                   variant="outline"
@@ -235,7 +234,7 @@ export default function CartDrawer() {
                   data-testid="cart-my-orders-footer-btn"
                 >
                   <ClipboardList className="h-3.5 w-3.5" />
-                  Mis Pedidos
+                  {t('cart.myOrders', 'My Orders')}
                 </Button>
               </div>
             </div>
