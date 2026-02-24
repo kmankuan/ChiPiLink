@@ -259,6 +259,118 @@ async def deposit(
     return {"success": True, "status": "pending", "topup_id": topup_id, "message": "Deposit request submitted for approval"}
 
 
+# ============== DEPOSIT METHODS CONFIG ==============
+
+DEFAULT_DEPOSIT_METHODS = {
+    "yappy": {
+        "id": "yappy",
+        "label": "Yappy",
+        "enabled": True,
+        "status": "active",
+        "icon": "smartphone",
+        "description": "Pay instantly with Yappy",
+        "instructions": "",
+        "config": {
+            "use_platform_yappy": True,
+        }
+    },
+    "cash": {
+        "id": "cash",
+        "label": "Cash",
+        "enabled": True,
+        "status": "active",
+        "icon": "banknote",
+        "description": "Pay with cash at our register",
+        "instructions": "<p>Please visit our <strong>cash register</strong> at the school office to complete your deposit.</p><p>Bring your deposit reference number and the exact amount.</p><p>Operating hours: <strong>Mon-Fri 8:00 AM - 3:00 PM</strong></p>",
+        "config": {}
+    },
+    "card": {
+        "id": "card",
+        "label": "Credit / Debit Card",
+        "enabled": True,
+        "status": "under_construction",
+        "icon": "credit-card",
+        "description": "Pay with credit or debit card",
+        "instructions": "",
+        "config": {
+            "under_construction_label": "Coming Soon — Card payments are under development"
+        }
+    },
+    "transfer": {
+        "id": "transfer",
+        "label": "Bank Transfer",
+        "enabled": True,
+        "status": "active",
+        "icon": "building-2",
+        "description": "Transfer via online banking",
+        "instructions": "<p>Use your <strong>online banking</strong> to make a transfer with the details below.</p><p>Once completed, we will receive an alert at <strong>chipiwallet@gmail.com</strong> and process your deposit as soon as possible.</p>",
+        "config": {
+            "bank_name": "",
+            "account_holder": "",
+            "account_number": "",
+            "account_type": "",
+            "alert_email": "chipiwallet@gmail.com",
+            "additional_notes": "Include your full name in the transfer description for faster processing."
+        }
+    }
+}
+
+
+@router.get("/deposit-methods")
+async def get_deposit_methods(user=Depends(get_current_user)):
+    """Get available deposit methods for users"""
+    config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
+    methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
+
+    # Only return enabled methods to users
+    result = []
+    for method_id in ["yappy", "cash", "card", "transfer"]:
+        m = methods.get(method_id)
+        if m and m.get("enabled", False):
+            result.append({
+                "id": m["id"],
+                "label": m.get("label", method_id),
+                "status": m.get("status", "active"),
+                "icon": m.get("icon", ""),
+                "description": m.get("description", ""),
+                "instructions": m.get("instructions", ""),
+                "config": {k: v for k, v in m.get("config", {}).items() if k not in ["secret", "api_key"]}
+            })
+    return {"methods": result}
+
+
+@router.get("/admin/deposit-methods")
+async def admin_get_deposit_methods(admin=Depends(get_admin_user)):
+    """Get all deposit methods config (admin)"""
+    config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
+    methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
+    return {"methods": methods}
+
+
+@router.put("/admin/deposit-methods")
+async def admin_update_deposit_methods(data: dict, admin=Depends(get_admin_user)):
+    """Update deposit methods config (admin)"""
+    methods = data.get("methods", {})
+    if not methods:
+        raise HTTPException(status_code=400, detail="No methods provided")
+
+    # Merge with defaults to ensure all fields exist
+    merged = dict(DEFAULT_DEPOSIT_METHODS)
+    for method_id, method_data in methods.items():
+        if method_id in merged:
+            merged[method_id].update(method_data)
+            merged[method_id]["id"] = method_id
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.app_config.update_one(
+        {"config_key": "wallet_deposit_methods"},
+        {"$set": {"config_key": "wallet_deposit_methods", "value": merged, "updated_at": now, "updated_by": admin.get("email", "")}},
+        upsert=True
+    )
+    return {"success": True, "methods": merged}
+
+
+
 @router.post("/admin/deposit/{user_id}")
 async def admin_deposit(
     user_id: str,
