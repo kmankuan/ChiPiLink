@@ -217,7 +217,7 @@ export default function UnatiendaCheckout() {
         orderData
       );
       
-      setOrderId(response.data.pedido_id);
+      setOrderId(response.data.order_id);
       toast.success('Orden creada. Procede con el pago.');
     } catch (error) {
       console.error('Error creating order:', error);
