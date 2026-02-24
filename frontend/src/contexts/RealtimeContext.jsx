@@ -2,10 +2,11 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import { useAuth } from './AuthContext';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const RealtimeContext = createContext(null);
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 const WS_URL = API?.replace('https://', 'wss://').replace('http://', 'ws://');
 
 const RECONNECT_DELAY = 3000;

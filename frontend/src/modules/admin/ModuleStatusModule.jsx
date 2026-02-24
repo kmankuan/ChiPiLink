@@ -12,8 +12,9 @@ import { Loader2, Save, RotateCcw, Construction, Clock, Wrench, Rocket, Info } f
 import axios from 'axios';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const STATUS_OPTIONS = [
   { value: 'production', label: 'Production', icon: Rocket, color: 'bg-green-100 text-green-800' },

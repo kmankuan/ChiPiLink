@@ -8,6 +8,7 @@ import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Sen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 // Account components - new structure
 import ChipiWallet from '../wallet/WalletPage';
@@ -26,7 +27,7 @@ import NotificationPreferences from '@/modules/notifications/components/Notifica
 import NotificationHistory from '@/modules/notifications/components/NotificationHistory';
 import PushNotificationSubscribe from '@/components/notifications/PushNotificationSubscribe';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function AccountDashboard() {
   const { t, i18n } = useTranslation();

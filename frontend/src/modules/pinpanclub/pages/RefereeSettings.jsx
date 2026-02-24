@@ -13,11 +13,12 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Shield, ArrowLeft, Save, Star, Award, Trophy, Users, Swords, Zap, Crown
 } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const GAME_TYPE_META = {
   league: { label: 'PinPan League', icon: Crown, color: 'text-yellow-500', desc: 'Round-robin league matches' },

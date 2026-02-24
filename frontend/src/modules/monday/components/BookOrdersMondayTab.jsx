@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card, CardContent,
 } from '@/components/ui/card';
 import {
@@ -24,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 /* ─── Suggested fields (quick-add helpers, NOT a hard limit) ─── */
 const SUGGESTED = {

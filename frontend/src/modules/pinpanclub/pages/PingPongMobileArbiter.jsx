@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Wifi, WifiOff, Play, Pause, RotateCcw, 
   Volume2, VolumeX, Clock, AlertTriangle, Check, X,
   ChevronUp, ChevronDown
@@ -14,7 +15,7 @@ import {
 import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = RESOLVED_API_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
 
 export default function PingPongMobileArbiter() {

@@ -11,8 +11,9 @@ import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import ScoreBoard from '../components/ScoreBoard';
 import ArbiterPanel from '../components/ArbiterPanel';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function PingPongArbiter() {
   const { t } = useTranslation();

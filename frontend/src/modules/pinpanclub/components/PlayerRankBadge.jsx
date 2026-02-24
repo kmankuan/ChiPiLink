@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, Sparkles, Crown, Shield, Star, Gem, Award, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Rank definitions with thresholds and styling
 const RANKS = [

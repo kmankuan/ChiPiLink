@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   Zap, Trophy, Users, Clock, ChevronRight, Play, 
   RefreshCw, AlertCircle, CheckCircle2, Scale,
   ArrowRight, Loader2, Hand, Swords, Search, X,
@@ -28,7 +29,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE = RESOLVED_API_URL || '';
 
 export default function RapidPinPublicPage() {
   const { t } = useTranslation();

@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   BarChart3, Users, Trophy, TrendingUp, ArrowLeft, Zap, Shield,
   Activity, Crown, Swords, ChevronUp, ChevronDown, Award, Star
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Color map for game modes
 const MODE_COLORS = {

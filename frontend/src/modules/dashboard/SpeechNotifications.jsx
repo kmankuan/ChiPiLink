@@ -4,6 +4,7 @@ import { useRealtimeEvent } from '@/contexts/RealtimeContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -21,7 +22,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Volume2, VolumeX, Settings2, Loader2 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const OPENAI_VOICES = [
   { value: 'nova', label: 'Nova (Energetic)' },

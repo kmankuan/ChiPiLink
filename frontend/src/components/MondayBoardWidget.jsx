@@ -4,8 +4,9 @@
  */
 import { useState, useEffect } from 'react';
 import { LayoutGrid } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function MondayBoardWidget() {
   const [data, setData] = useState(null);

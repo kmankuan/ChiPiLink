@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   CreditCard, Users, MapPin, Settings, Plus, Edit2, Trash2, 
   RefreshCw, ArrowLeft, Search, Gift, Clock, Check, X,
   DollarSign, Award, Calendar, Ticket
@@ -23,7 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function AdminMemberships() {
   const { t, i18n } = useTranslation();

@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const EMPTY_FORM = {
   context: '', label: '', bank_name: '', account_holder: '',

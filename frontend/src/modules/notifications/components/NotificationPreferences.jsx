@@ -10,8 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function NotificationPreferences({ token }) {
   const { t, i18n } = useTranslation();

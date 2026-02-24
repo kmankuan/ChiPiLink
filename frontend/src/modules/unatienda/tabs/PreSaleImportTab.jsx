@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -23,7 +24,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const LINK_STATUS_COLORS = {
   unlinked: 'bg-orange-100 text-orange-700 border-orange-200',

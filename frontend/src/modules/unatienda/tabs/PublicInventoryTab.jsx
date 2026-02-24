@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Package, Plus, Edit2, Trash2, Search, Save, Upload, Loader2, 
   AlertTriangle, Box, Tags, Clock, Store, RefreshCw, ShoppingBag, Archive
 } from 'lucide-react';
@@ -25,7 +26,7 @@ import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const emptyProductRow = {
   nombre: '',

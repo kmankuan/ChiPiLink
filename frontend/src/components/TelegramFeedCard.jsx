@@ -7,11 +7,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
   Film, FileText, Image as ImageIcon, ChevronDown, Loader2, Pause, ExternalLink, Link2
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 function formatTimeAgo(dateStr) {
   if (!dateStr) return '';

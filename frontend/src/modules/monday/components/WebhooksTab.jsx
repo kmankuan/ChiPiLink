@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Webhook, Trash2, Copy, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function WebhooksTab() {
   const { t } = useTranslation();

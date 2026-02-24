@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogDescription,
@@ -33,7 +34,7 @@ import {
   Mail
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function TransfersDialog({ 
   open, 

@@ -13,10 +13,11 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { invalidateDictCache } from '@/utils/autoTranslate';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Edit2, Loader2, Plus, Save, Search, Trash2, X, Languages,
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const CATEGORY_COLORS = {
   people: 'bg-blue-100 text-blue-700',

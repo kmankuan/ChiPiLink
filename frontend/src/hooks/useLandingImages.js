@@ -3,8 +3,9 @@
  * Falls back to defaults if API unavailable.
  */
 import { useState, useEffect } from 'react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const DEFAULTS = {
   hero: 'https://images.unsplash.com/photo-1656259541897-a13b22104214?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80',

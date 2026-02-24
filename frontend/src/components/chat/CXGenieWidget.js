@@ -3,8 +3,9 @@
  * Loads the CXGenie ticket widget dynamically based on backend configuration
  */
 import { useEffect, useState } from 'react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = RESOLVED_API_URL || '';
 
 export function CXGenieWidget() {
   const [loaded, setLoaded] = useState(false);

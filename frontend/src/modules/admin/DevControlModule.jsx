@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Loader2, FolderTree, Blocks, BookOpen, Globe, Map,
   StickyNote, Plus, Trash2, Pin, PinOff, Pencil, X, Check,
   ChevronRight, ChevronDown, FileCode, Folder, Search,
@@ -18,7 +19,7 @@ import {
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 const hdrs = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}` });
 
 // ─── File Tree ──────────────────────────────────────────────

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
@@ -23,7 +24,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function WalletTransactionsTab() {
   const token = localStorage.getItem('auth_token');

@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   RefreshCw, CheckCircle, AlertTriangle, XCircle,
   Clock, Loader2, ArrowRight, Webhook, Package,
   ShoppingCart, Wallet, Activity, ExternalLink
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 const getToken = () => localStorage.getItem('auth_token');
 
 const BOARD_ICONS = {

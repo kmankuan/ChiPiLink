@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
@@ -31,7 +32,7 @@ import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function WalletOverviewTab() {
   const { t } = useTranslation();

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Table,
   TableBody,
   TableCell,
@@ -46,7 +47,7 @@ import {
   Eye,
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 function formatDate(isoStr) {
   if (!isoStr) return '—';

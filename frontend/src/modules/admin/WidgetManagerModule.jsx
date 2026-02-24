@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Loader2, Save, Copy, Check, Settings, Palette, Layout,
   Shield, Code, BookOpen, Users, Package, Bell, ExternalLink, Eye, RotateCcw,
   Wallet, Monitor, Link2
@@ -21,7 +22,7 @@ import {
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 const DEFAULT_SITE_URL = 'https://chipilink.me';
 
 const FEATURE_ICONS = {

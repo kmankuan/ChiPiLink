@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Crown, Medal, Star, ArrowLeft, RefreshCw,
   Swords, Zap, Shield, Users, Award, TrendingUp, ChevronRight
 } from 'lucide-react';
@@ -18,7 +19,7 @@ import {
 } from '@/components/ui/tabs';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const RANK_STYLES = [
   { bg: 'bg-gradient-to-r from-yellow-400 to-amber-500', text: 'text-white', icon: Crown, size: 'text-2xl' },

@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Save, RefreshCw, Plus, Trash2, ArrowRight } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const STATUS_COLORS = {
   ordered: 'bg-blue-100 text-blue-700',

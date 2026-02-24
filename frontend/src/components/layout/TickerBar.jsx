@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, UserPlus, ShoppingBag, MessageCircle, Wallet,
   Megaphone, Zap, Star, ChevronRight, X
 } from 'lucide-react';
@@ -17,7 +18,7 @@ const ICON_MAP = {
   'zap': Zap, 'star': Star
 };
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function TickerBar() {
   const location = useLocation();

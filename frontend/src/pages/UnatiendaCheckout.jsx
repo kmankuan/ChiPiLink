@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardHeader,
@@ -42,7 +43,7 @@ import {
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const FIELD_ICONS = {
   text: Type,

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Trophy, Users, Swords, Zap, Grid3X3, Crown,
   Play, CheckCircle, Clock, UserPlus, UserMinus, Shuffle,
   ChevronRight, Medal, Award, Loader2, Share2, Copy
@@ -19,7 +20,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const FORMAT_ICONS = { single_elimination: Swords, round_robin: Grid3X3, group_knockout: Crown, rapidpin: Zap };
 const STATUS_COLORS = {

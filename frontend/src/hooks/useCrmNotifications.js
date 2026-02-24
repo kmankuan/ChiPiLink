@@ -4,8 +4,9 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 const POLL_INTERVAL = 30000; // 30 seconds
 
 export function useCrmNotifications() {

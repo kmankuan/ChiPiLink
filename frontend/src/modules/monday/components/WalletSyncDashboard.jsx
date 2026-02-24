@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   RefreshCw, Loader2, Users, ArrowUpDown, CheckCircle2,
   XCircle, AlertTriangle, RotateCcw, Upload, Clock
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function WalletSyncDashboard() {
   const { t } = useTranslation();

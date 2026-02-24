@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   Monitor, Grid3X3, LayoutDashboard, Maximize2, Minimize2, 
   Volume2, VolumeX, Settings, Wifi, WifiOff, RefreshCw,
   Trophy, Users, Clock, Zap
@@ -19,7 +20,7 @@ import {
 import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = RESOLVED_API_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
 
 // Sound effects URLs (can be customized)

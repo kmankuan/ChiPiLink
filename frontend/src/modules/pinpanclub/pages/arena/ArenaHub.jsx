@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Plus, Users, Calendar, Search, ArrowLeft,
   Swords, Zap, Grid3X3, Crown, Clock, CheckCircle, XCircle, Filter
 } from 'lucide-react';
@@ -18,7 +19,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const FORMAT_LABELS = {
   single_elimination: { label: 'Single Elimination', icon: Swords, color: 'bg-red-500/10 text-red-600 border-red-200' },

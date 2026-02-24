@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Book, Mail, Lock, User, Phone, MapPin, Loader2, Eye, EyeOff } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function Register() {
   const { t } = useTranslation();

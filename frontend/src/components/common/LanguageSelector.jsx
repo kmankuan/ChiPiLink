@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { languages } from '@/i18n';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Globe, Check } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function LanguageSelector({ variant = 'ghost', showLabel = false }) {
   const { i18n } = useTranslation();

@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -32,7 +33,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function AdminWalletTab({ token }) {
   const { t } = useTranslation();

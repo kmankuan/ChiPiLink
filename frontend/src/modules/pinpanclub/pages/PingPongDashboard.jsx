@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy,
   Users,
   Calendar,
@@ -48,7 +49,7 @@ import ScoreBoard from '../components/ScoreBoard';
 import { PINPANCLUB_API, API_BASE } from '../config/api';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function PingPongDashboard() {
   const { t } = useTranslation();

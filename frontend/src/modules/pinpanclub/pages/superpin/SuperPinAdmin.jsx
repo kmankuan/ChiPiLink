@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Users, Calendar, Settings, Plus, Play, Pause,
   ChevronRight, Medal, Target, Award, TrendingUp, ArrowLeft
 } from 'lucide-react';
@@ -14,7 +15,7 @@ import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import PINPANCLUB_API from '../../config/api';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function SuperPinAdmin() {
   const { t } = useTranslation();

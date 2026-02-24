@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = RESOLVED_API_URL;
 
 const SiteConfigContext = createContext({
   siteConfig: {

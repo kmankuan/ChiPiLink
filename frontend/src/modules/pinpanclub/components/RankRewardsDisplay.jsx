@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Gift, Star, Crown, Sparkles, Trophy, ChevronRight,
   Check, Lock, Zap, Shield, Award, PartyPopper
 } from 'lucide-react';
@@ -19,7 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Confetti animation component
 function Confetti() {

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardDescription,
@@ -50,7 +51,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = RESOLVED_API_URL;
 
 export default function PlatformStoreModule() {
   const { t } = useTranslation();

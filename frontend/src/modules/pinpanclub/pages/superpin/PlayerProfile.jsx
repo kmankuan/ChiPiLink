@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   User, Trophy, Target, TrendingUp, TrendingDown, Calendar,
   ArrowLeft, Medal, Award, Flame, BarChart3, History,
   ChevronRight, Loader2, Percent, Zap, UserPlus, UserMinus,
@@ -22,7 +23,7 @@ import PlayerRankBadge, { RankProgressCard } from '../../components/PlayerRankBa
 import RankRewardsDisplay, { RankPromotionModal } from '../../components/RankRewardsDisplay';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function PlayerProfile() {
   const { t } = useTranslation();

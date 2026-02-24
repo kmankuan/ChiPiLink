@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   Target, Trophy, Flame, Users, Calendar, Clock,
   ChevronRight, Play, Check, Star, Loader2, Award
 } from 'lucide-react';
@@ -15,7 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const difficultyConfig = {
   easy: { color: 'bg-green-500', label: 'Easy', icon: '🟢' },

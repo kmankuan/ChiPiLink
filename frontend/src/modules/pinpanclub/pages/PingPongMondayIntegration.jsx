@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardDescription,
@@ -52,7 +53,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = RESOLVED_API_URL;
 
 export default function PingPongMondayIntegration() {
   const { t } = useTranslation();

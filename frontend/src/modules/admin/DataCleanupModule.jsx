@@ -10,11 +10,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trash2, Eye, Loader2, AlertTriangle, CheckCircle2,
   ShoppingCart, MessageSquare, Users, Link2, Package, Wallet, CreditCard
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 function StudentRow({ student, selected, onToggle }) {
   return (

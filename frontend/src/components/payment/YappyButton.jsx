@@ -4,8 +4,9 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 /**
  * YappyButton Component

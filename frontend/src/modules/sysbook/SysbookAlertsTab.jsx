@@ -11,13 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   AlertTriangle, Bell, BellOff, CheckCircle, Settings, Search,
   Loader2, RefreshCw, XCircle, Package, Zap, Eye, EyeOff
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 const SYSBOOK_API = `${API_URL}/api/sysbook`;
 
 const SEVERITY_COLORS = {

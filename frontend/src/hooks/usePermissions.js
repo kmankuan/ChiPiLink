@@ -4,8 +4,9 @@
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Cache de permisos para evitar llamadas innecesarias
 let permissionsCache = null;

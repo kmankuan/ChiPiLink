@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardHeader,
@@ -36,7 +37,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 // Icon mapping for auth methods
 const METHOD_ICONS = {

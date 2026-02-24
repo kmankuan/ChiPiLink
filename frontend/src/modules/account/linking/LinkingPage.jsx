@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -42,7 +43,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL;
+const API_BASE = RESOLVED_API_URL;
 
 // Static grade options
 const GRADE_OPTIONS = [

@@ -12,13 +12,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Shield, ShieldCheck, Crown, User, Plus, Edit2, Trash2, Search,
   Loader2, Save, Users, Key, ChevronRight, AlertTriangle, RefreshCw,
   History, UserPlus, UserMinus, FileEdit, Clock
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const ROLE_ICONS = {
   'Crown': Crown,

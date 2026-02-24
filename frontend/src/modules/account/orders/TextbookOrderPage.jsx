@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -45,7 +46,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const STATUS_CONFIG = {
   available: { label: 'Available', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },

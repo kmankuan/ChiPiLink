@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   BarChart3, Users, Trophy, Target, TrendingUp, 
   ChevronRight, Flame
 } from 'lucide-react';
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function AnalyticsSummary() {
   const { t } = useTranslation();

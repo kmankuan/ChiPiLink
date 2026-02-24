@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -45,7 +46,7 @@ import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function AllStudentsTab({ token }) {
   const { i18n } = useTranslation();

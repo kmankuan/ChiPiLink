@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -61,7 +62,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 // Translations
 const translations = {

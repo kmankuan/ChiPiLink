@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Trophy, Calendar, Users, Target,
   Crown, Medal, Award, Gift, Flame, History,
   ChevronRight, Timer, Star
@@ -22,7 +23,7 @@ import {
   PastSeasons
 } from '../components/RankingSeasons';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function SeasonsPage() {
   const { t, i18n } = useTranslation();

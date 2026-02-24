@@ -17,6 +17,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Users, Search, Loader2, RefreshCw, Lock, Unlock, GraduationCap, Eye, ShoppingCart,
   ArrowUpDown, ArrowUp, ArrowDown, MessageCircle, LayoutGrid, List, X, Check, Clock,
   Info, AlertCircle, CheckCircle2, XCircle, ChevronDown, Clipboard
@@ -26,7 +27,7 @@ import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import CrmChat from '@/components/chat/CrmChat';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 /* ─── i18n constants ─── */
 const REJECT_REASONS = {

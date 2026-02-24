@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -20,7 +21,7 @@ import axios from 'axios';
 import { ArrowLeft, Loader2, Play, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function PingPongMatch() {
   const { t } = useTranslation();

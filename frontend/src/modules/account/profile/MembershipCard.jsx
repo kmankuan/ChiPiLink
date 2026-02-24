@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   CreditCard, Calendar, Clock, MapPin, QrCode, 
   LogIn, LogOut, RefreshCw, Award, ChevronRight, History,
   Wallet, Sparkles, AlertCircle, CheckCircle, Timer
@@ -18,7 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function MembershipCard({ token, walletBalance }) {
   const { t, i18n } = useTranslation();

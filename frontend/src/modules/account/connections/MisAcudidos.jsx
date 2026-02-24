@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ import {
   History
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function MyDependents({ token, onTransfer }) {
   const { t } = useTranslation();

@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   FileText, Plus, Edit2, Trash2, Send, Clock, Eye, 
   RefreshCw, ArrowLeft, Search, MoreVertical
 } from 'lucide-react';
@@ -28,7 +29,7 @@ import { Header } from '@/components/layout/Header';
 import PostEditor from '../components/PostEditor';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function AdminPosts() {
   const { t, i18n } = useTranslation();

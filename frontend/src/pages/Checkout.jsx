@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardHeader,
@@ -29,7 +30,7 @@ import {
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function Checkout() {
   const { t } = useTranslation();

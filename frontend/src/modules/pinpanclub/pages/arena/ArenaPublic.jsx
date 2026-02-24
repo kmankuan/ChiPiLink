@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Users, Swords, Zap, Grid3X3, Crown, Share2,
   CheckCircle, Clock, Medal, Award, Loader2, Copy, ExternalLink,
   Wifi, WifiOff
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 const WS_URL = API_URL?.replace('https://', 'wss://').replace('http://', 'ws://');
 
 const FORMAT_ICONS = { single_elimination: Swords, round_robin: Grid3X3, group_knockout: Crown, rapidpin: Zap };

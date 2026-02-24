@@ -9,6 +9,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import GridLayout from 'react-grid-layout';
 import { QRCodeSVG } from 'qrcode.react';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Settings, Save, Lock, Unlock, Maximize2, Minimize2,
   Plus, Trash2, RefreshCw, Wifi, WifiOff, Layout,
   Move, Grid, Eye, EyeOff
@@ -17,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import 'react-grid-layout/css/styles.css';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = RESOLVED_API_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
 
 // Default layout for new widgets

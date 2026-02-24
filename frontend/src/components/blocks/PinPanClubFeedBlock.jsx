@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Swords, Target, Medal, Users, Calendar, 
   ArrowRight, ChevronRight, Flame, Star, Crown,
   Settings, Eye, EyeOff, RefreshCw, Zap
@@ -28,7 +29,7 @@ import {
 } from '@/components/ui/sheet';
 import { getLocalizedText } from '@/components/admin/MultilingualInput';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Helper to check visibility based on user role
 const checkVisibility = (visibilityConfig, user) => {

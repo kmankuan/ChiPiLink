@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -20,7 +21,7 @@ import CrmChat from '@/components/chat/CrmChat';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useCrmNotifications } from '@/hooks/useCrmNotifications';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function Orders() {
   const { t, i18n } = useTranslation();

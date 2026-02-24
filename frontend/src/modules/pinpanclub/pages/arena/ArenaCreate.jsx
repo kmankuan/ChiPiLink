@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Swords, Grid3X3, Crown, Zap, Trophy, Save
 } from 'lucide-react';
 import {
@@ -19,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const FORMATS = [
   { value: 'single_elimination', label: 'Single Elimination', icon: Swords, desc: 'Classic bracket — lose once, you\'re out' },

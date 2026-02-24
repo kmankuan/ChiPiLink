@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -62,7 +63,7 @@ import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 import CrmChat from '@/components/chat/CrmChat';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const ORDER_STATUSES = [
   { value: 'draft', label: 'Draft' },

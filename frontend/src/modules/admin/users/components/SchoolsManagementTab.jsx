@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Table,
   TableBody,
   TableCell,
@@ -31,7 +32,7 @@ import {
   Search
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 // Translations
 const translations = {

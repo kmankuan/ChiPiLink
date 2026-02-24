@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Table,
   TableBody,
   TableCell,
@@ -42,7 +43,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 // Translation keys
 const translations = {

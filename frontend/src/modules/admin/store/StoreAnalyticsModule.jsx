@@ -13,13 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   DollarSign, TrendingUp, Package, Users, GraduationCap, BookOpen,
   AlertTriangle, RefreshCw, Loader2, Download, BarChart3, PieChart,
   ShoppingCart, Calendar, Search, ArrowUp, ArrowDown, AlertCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function StoreAnalyticsModule() {
   const { t } = useTranslation();

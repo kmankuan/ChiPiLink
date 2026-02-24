@@ -8,8 +8,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const FONT_SIZES = { sm: 'text-sm', md: 'text-base', lg: 'text-lg', xl: 'text-xl' };
 

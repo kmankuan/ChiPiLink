@@ -6,6 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Plus, Trash2, Edit2, Eye, Upload, Save, 
   GripVertical, Monitor, Layout, Palette, Settings2,
   Image, Link, Type, Clock, ToggleLeft, ToggleRight,
@@ -14,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+const API_URL = RESOLVED_API_URL || '';
 
 const POSITION_OPTIONS = [
   { value: 'header_left', label: '📍 Header Izquierdo', desc: 'Espacio cuadrado izquierdo' },

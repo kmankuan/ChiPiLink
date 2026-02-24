@@ -14,8 +14,9 @@ import { Loader2, Save, Check, Palette, Type, RectangleHorizontal, SquareStack, 
 import axios from 'axios';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const RADIUS_OPTIONS = [
   { value: '0', label: 'Sharp' },

@@ -5,8 +5,9 @@
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Image } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const DEFAULT_CONFIG = {
   autoplay: true,

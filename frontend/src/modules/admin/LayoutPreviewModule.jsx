@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ProgressIcon, ProgressIconPreview, LottieProgressIcon,
   PROGRESS_THEMES, PROGRESS_LEVELS,
   isProgressAnimation, parseProgressAnimation, getProgressAnimationType,
@@ -30,7 +31,7 @@ import {
   Monitor, Smartphone, Tv, Headphones, Mic
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 const getToken = () => localStorage.getItem('auth_token');
 
 // Curated set of Lucide icons for the picker

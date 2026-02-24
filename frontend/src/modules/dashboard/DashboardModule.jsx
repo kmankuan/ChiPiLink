@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Package,
   ShoppingCart,
   AlertTriangle,
@@ -31,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import MondaySyncWidget from './MondaySyncWidget';
 import ActivityFeed from './ActivityFeed';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function DashboardModule() {
   const { token } = useAuth();

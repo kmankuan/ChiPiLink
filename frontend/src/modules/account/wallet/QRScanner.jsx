@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   QrCode, Camera, X, Check, AlertCircle, User, Wallet, 
   CreditCard, LogIn, DollarSign, RefreshCw
 } from 'lucide-react';
@@ -15,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function QRScanner({ token }) {
   const { t } = useTranslation();

@@ -4,7 +4,8 @@
  * Fetches dictionary from backend API, falls back to built-in defaults.
  */
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import RESOLVED_API_URL from '@/config/apiUrl';
+const API = RESOLVED_API_URL;
 
 // In-memory cache
 let _dictCache = null;

@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   BookOpen,
   ShoppingCart,
   Plus,
@@ -29,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function PrivateBookDetail() {
   const { t } = useTranslation();

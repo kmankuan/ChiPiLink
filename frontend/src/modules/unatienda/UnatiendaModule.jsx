@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Store, ShoppingCart, Warehouse, Truck, Settings, Database, CreditCard } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 import InventoryTab from './tabs/InventoryTab';
 import PublicInventoryTab from './tabs/PublicInventoryTab';
@@ -15,7 +16,7 @@ import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 import ConfigurationTab from './tabs/ConfigurationTab';
 import DemoDataTab from './tabs/DemoDataTab';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const TAB_GROUPS = [
   {

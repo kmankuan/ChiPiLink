@@ -11,6 +11,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -40,7 +41,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 // Predefined rejection reasons for quick actions
 const QUICK_REJECT_REASONS = {

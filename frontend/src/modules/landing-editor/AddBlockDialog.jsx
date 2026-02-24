@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -23,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = RESOLVED_API_URL;
 
 // Icon mapping for block types
 const BLOCK_ICONS = {

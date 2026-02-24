@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { Bell, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function NotificationCategories({ token }) {
   const { t, i18n } = useTranslation();

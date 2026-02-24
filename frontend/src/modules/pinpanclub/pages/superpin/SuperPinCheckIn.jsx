@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   QrCode, MapPin, Hand, CheckCircle, XCircle, 
   Loader2, Users, Clock, ScanLine
 } from 'lucide-react';
@@ -13,7 +14,7 @@ import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import { QRCodeSVG } from 'qrcode.react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function SuperPinCheckIn({ leagueId, leagueConfig, onCheckInComplete }) {
   const { t } = useTranslation();

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   ChevronLeft,
   ShoppingCart,
   Plus,
@@ -21,7 +22,7 @@ import {
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const categoryIcons = {
   'books': '📚',

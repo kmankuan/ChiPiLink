@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
   Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
   Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw,
@@ -26,7 +27,7 @@ import {
 import InventoryImport from '@/modules/unatienda/components/InventoryImport';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 const API_PREFIX = `${API}/api/sysbook/inventory`;
 
 /* ── Column definitions ── */

@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { applyUIStyle, clearUIStyle } from '@/config/uiStylePresets';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const ThemeContext = createContext(null);
 

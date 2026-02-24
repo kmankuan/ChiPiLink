@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardDescription,
@@ -56,7 +57,7 @@ import WebhooksTab from './components/WebhooksTab';
 import PublicBoardWidgetTab from './components/PublicBoardWidgetTab';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function MondayModule() {
   const { t } = useTranslation();

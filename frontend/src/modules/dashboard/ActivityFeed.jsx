@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
@@ -21,7 +22,7 @@ import {
   Pause, Play,
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 const EVENT_ICONS = {
   order_submitted: ShoppingCart,

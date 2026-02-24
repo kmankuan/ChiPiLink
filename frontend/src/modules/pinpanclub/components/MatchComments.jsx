@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   MessageSquare, Send, AlertTriangle, Shield, ThumbsUp,
   Flag, Loader2, User, Clock, CheckCircle, XCircle
 } from 'lucide-react';
@@ -22,7 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Community rules
 const COMMUNITY_RULES = [

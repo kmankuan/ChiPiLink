@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Award, Sparkles, Crown, Star, Trophy, Flame } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // Rarity configurations
 const rarityConfig = {

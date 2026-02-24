@@ -4,8 +4,9 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE = RESOLVED_API_URL || '';
 
 // Convert HTTP URL to WebSocket URL
 const getWsUrl = () => {

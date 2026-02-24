@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   BookOpen, Check, ChevronRight, Clock, GraduationCap,
   Loader2, Lock, Package, Plus, Send, User, UserPlus, X,
   Wallet, AlertTriangle
@@ -24,7 +25,7 @@ import { OrderSummaryModal } from './OrderSummaryModal';
 import { ExpandableText } from '../../../components/ui/expandable-text';
 import { useGuardedAction } from '@/hooks/useGuardedAction';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 const GRADE_OPTIONS = [
   { value: 'K3', en: 'K3', es: 'K3', zh: 'K3' },

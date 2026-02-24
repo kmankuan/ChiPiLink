@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardDescription,
@@ -28,7 +29,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function DatabaseMigrationModule() {
   const { t } = useTranslation();

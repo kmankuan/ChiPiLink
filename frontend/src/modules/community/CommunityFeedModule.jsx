@@ -11,13 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Heart, MessageCircle, Send, Loader2, ChevronDown,
   Image as ImageIcon, Play, FileText, RefreshCw,
   Eye, EyeOff, Shield, Settings, Users, Check
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // ─── Visibility Admin Panel ─────────────────────────────────
 function VisibilityPanel({ token }) {

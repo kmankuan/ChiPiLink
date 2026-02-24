@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogDescription,
@@ -35,7 +36,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE = RESOLVED_API_URL || '';
 
 export default function ChallengeModal({ 
   seasonId, 

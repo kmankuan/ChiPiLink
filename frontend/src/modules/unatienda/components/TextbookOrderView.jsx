@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Book, BookOpen, Check, CheckCircle, ChevronLeft, ClipboardList,
   Clock, FileText, GraduationCap, Info, Loader2, Lock, Upload,
   User, UserPlus, Users, Wallet, AlertTriangle, CreditCard
@@ -24,7 +25,7 @@ import { OrderSummaryModal } from './OrderSummaryModal';
 import { ExpandableText } from '../../../components/ui/expandable-text';
 import { useGuardedAction } from '@/hooks/useGuardedAction';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function TextbookOrderView({ sysbookAccess, selectedStudentId, onBack, onRefreshAccess }) {
   const { token } = useAuth();

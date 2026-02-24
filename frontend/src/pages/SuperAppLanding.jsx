@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { COMMUNITY_ENDPOINTS, buildUrl } from '@/config/api';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Newspaper, Calendar, Image, Users, ChevronRight,
   Clock, MapPin, Bell, Store, Trophy, Zap,
   Loader2, Edit, Save, Plus, GripVertical,
@@ -39,7 +40,7 @@ import CinematicLanding from './landing-layouts/CinematicLanding';
 import HorizonLanding from './landing-layouts/HorizonLanding';
 import MosaicCommunityLanding from './landing-layouts/MosaicCommunityLanding';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 // ============== CONTEXT FOR EDIT MODE ==============
 const EditModeContext = createContext({

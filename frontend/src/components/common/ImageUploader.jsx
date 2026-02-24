@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Upload,
   X,
   Image as ImageIcon,
@@ -20,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function ImageUploader({
   value,

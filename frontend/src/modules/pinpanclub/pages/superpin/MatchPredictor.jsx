@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
+import RESOLVED_API_URL from '@/config/apiUrl';
   TrendingUp, Zap, Target, Trophy, ChevronRight,
   Award, BarChart3, Loader2
 } from 'lucide-react';
@@ -13,7 +14,7 @@ import { Badge } from '../../../../components/ui/badge';
 import { Button } from '../../../../components/ui/button';
 import { Progress } from '../../../../components/ui/progress';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = RESOLVED_API_URL;
 
 export default function MatchPredictor({ playerA, playerB, onClose }) {
   const { t } = useTranslation();

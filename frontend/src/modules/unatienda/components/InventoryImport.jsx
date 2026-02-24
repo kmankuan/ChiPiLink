@@ -14,12 +14,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   Download, Upload, FileSpreadsheet, Loader2, CheckCircle2, AlertCircle, 
   Plus, RefreshCw, ArrowRight, Package
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 export default function InventoryImport({ token, onImportComplete, apiBase }) {
   const { t } = useTranslation();

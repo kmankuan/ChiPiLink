@@ -10,11 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
+import RESOLVED_API_URL from '@/config/apiUrl';
   MessageCircle, Send, Loader2, X, ArrowLeft, Plus,
   Headphones, ChevronRight, Clock, User
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = RESOLVED_API_URL;
 
 function TopicList({ topics, onSelect, onNewTopic, studentName, loading, highlightOrderId }) {
   if (loading) {
