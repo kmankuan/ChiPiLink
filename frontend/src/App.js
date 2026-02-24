@@ -331,6 +331,8 @@ function AppRouter() {
           </ProtectedRoute>
         } 
       />
+      {/* Redirect old Spanish route to English */}
+      <Route path="/pedidos" element={<Navigate to="/orders" replace />} />
       <Route 
         path="/recibo/:pedidoId" 
         element={
