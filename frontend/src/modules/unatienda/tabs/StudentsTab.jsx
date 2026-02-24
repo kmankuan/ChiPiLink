@@ -248,7 +248,7 @@ export default function StudentsTab({ token }) {
     }
     setReqProcessing(true);
     try {
-      await api(`/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`, {
+      await api(`/admin/requests/${request.student_id}/${request.year}/approve`, {
         method: 'POST',
         body: JSON.stringify({
           status: action,
@@ -271,7 +271,7 @@ export default function StudentsTab({ token }) {
     if (!r || reasonId === 'other') { openReqDialog(request, 'rejected'); return; }
     setReqProcessing(true);
     try {
-      await api(`/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`, {
+      await api(`/admin/requests/${request.student_id}/${request.year}/approve`, {
         method: 'POST',
         body: JSON.stringify({ status: 'rejected', admin_notes: null, rejection_reason: r.reason }),
       });
