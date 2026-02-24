@@ -129,6 +129,7 @@ export default function UnatiendaCheckout() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { items, subtotal, updateQuantity, removeItem, clearCart } = useCart();
+  const { user } = useAuth();
   
   const [loading, setLoading] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
