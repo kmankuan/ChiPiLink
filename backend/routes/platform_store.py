@@ -239,9 +239,9 @@ async def create_platform_order(order_data: dict):
     if not order_data.get("items") or len(order_data["items"]) == 0:
         raise HTTPException(status_code=400, detail="Cart is empty")
 
-    customer_email = order_data.get("customer_email") or order_data.get("form_data", {}).get("email", "")
-    customer_name = order_data.get("customer_name") or order_data.get("form_data", {}).get("name", "")
-    customer_phone = order_data.get("customer_phone") or order_data.get("form_data", {}).get("phone", "")
+    customer_email = order_data.get("customer_email", "")
+    customer_name = order_data.get("customer_name", "")
+    customer_phone = order_data.get("customer_phone", "")
 
     # Build normalized items
     normalized_items = []
