@@ -210,33 +210,80 @@ async def yappy_ipn_callback(
 
 # ============== ORDER ENDPOINTS ==============
 
+@router.get("/my-orders")
+async def get_my_platform_orders(user=Depends(lambda: get_current_user)):
+    """Get current user's Unatienda orders"""
+    user_id = user.get("user_id") or user.get("sub")
+    email = user.get("email", "")
+
+    query = {"$or": []}
+    if user_id:
+        query["$or"].append({"user_id": user_id})
+    if email:
+        query["$or"].append({"customer_email": email})
+        # Also check form_data.email for legacy orders
+        query["$or"].append({"form_data.email": email})
+
+    if not query["$or"]:
+        return {"orders": []}
+
+    orders = await db.store_orders.find(query, {"_id": 0}).sort("created_at", -1).to_list(200)
+    return {"orders": orders}
+
+
 @router.post("/orders")
 async def create_platform_order(order_data: dict):
-    """Create a new order for platform store (public)"""
+    """Create a new order for platform store (public, optionally authenticated)"""
     from uuid import uuid4
-    
+
     # Validate required fields
     if not order_data.get("items") or len(order_data["items"]) == 0:
         raise HTTPException(status_code=400, detail="Cart is empty")
-    
-    if not order_data.get("customer_email"):
-        raise HTTPException(status_code=400, detail="Email is required")
-    
+
+    # Accept both Spanish and English field names
+    customer_email = (
+        order_data.get("customer_email")
+        or order_data.get("cliente_email")
+        or order_data.get("form_data", {}).get("email", "")
+    )
+    customer_name = (
+        order_data.get("customer_name")
+        or order_data.get("cliente_nombre")
+        or order_data.get("form_data", {}).get("nombre", "")
+    )
+    customer_phone = (
+        order_data.get("customer_phone")
+        or order_data.get("cliente_telefono")
+        or order_data.get("form_data", {}).get("telefono", "")
+    )
+
+    # Normalize item fields (accept Spanish or English)
+    normalized_items = []
+    for item in order_data["items"]:
+        normalized_items.append({
+            "book_id": item.get("book_id", ""),
+            "name": item.get("name") or item.get("nombre", ""),
+            "quantity": item.get("quantity") or item.get("cantidad", 1),
+            "unit_price": item.get("unit_price") or item.get("precio_unitario", 0),
+        })
+
     # Generate order ID
     order_id = f"UNA-{uuid4().hex[:8].upper()}"
-    
-    # Calculate totals
-    subtotal = sum(item.get("unit_price", 0) * item.get("quantity", 1) for item in order_data["items"])
+
+    # Calculate totals from normalized items
+    subtotal = sum(i["unit_price"] * i["quantity"] for i in normalized_items)
     total = order_data.get("total", subtotal)
-    
+
     # Create order document
     order_doc = {
         "order_id": order_id,
         "type": "unatienda",
-        "items": order_data["items"],
-        "customer_name": order_data.get("customer_name", ""),
-        "customer_email": order_data["customer_email"],
-        "customer_phone": order_data.get("customer_phone", ""),
+        "items": normalized_items,
+        "customer_name": customer_name,
+        "customer_email": customer_email,
+        "customer_phone": customer_phone,
+        "form_data": order_data.get("form_data", {}),
+        "user_id": order_data.get("user_id", ""),
         "subtotal": subtotal,
         "tax": order_data.get("tax", 0),
         "discount": order_data.get("discount", 0),
@@ -246,16 +293,17 @@ async def create_platform_order(order_data: dict):
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
-    
+
     await db.store_orders.insert_one(order_doc)
-    
+
     # Update inventory (reserve stock)
-    for item in order_data["items"]:
-        await db.store_products.update_one(
-            {"book_id": item.get("book_id") or item.get("book_id")},
-            {"$inc": {"inventory_quantity": -item.get("quantity", 1)}}
-        )
-    
+    for item in normalized_items:
+        if item["book_id"]:
+            await db.store_products.update_one(
+                {"book_id": item["book_id"]},
+                {"$inc": {"inventory_quantity": -item["quantity"]}}
+            )
+
     return {"order_id": order_id, "total": total, "status": "created"}
 
 
