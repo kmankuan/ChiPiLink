@@ -323,7 +323,7 @@ function AppRouter() {
         } 
       />
       <Route 
-        path="/pedidos" 
+        path="/orders" 
         element={
           <ProtectedRoute>
             <Header />

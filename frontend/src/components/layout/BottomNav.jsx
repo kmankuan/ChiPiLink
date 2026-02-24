@@ -66,7 +66,7 @@ export default function BottomNav() {
 
   const isHome = path === '/' || path === '';
   const isExplore = path.startsWith('/comunidad') || path.startsWith('/eventos') || path.startsWith('/galeria');
-  const isStore = path.startsWith('/unatienda') || path.startsWith('/pedidos');
+  const isStore = path.startsWith('/unatienda') || path.startsWith('/orders');
   const isClub = path.startsWith('/pinpanclub') || path.startsWith('/rapidpin');
   const isProfile = path === '/mi-cuenta' || path === '/my-account' || path === '/login';
   const isAdminPage = path.startsWith('/admin');
@@ -90,7 +90,7 @@ export default function BottomNav() {
         )}
 
         {/* Orders & Cart — unified page */}
-        <NavItem icon={ClipboardList} label={t('cart.myOrders', 'My Orders')} to="/pedidos" active={isStore && path.startsWith('/pedidos')} badge={itemCount} />
+        <NavItem icon={ClipboardList} label={t('cart.myOrders', 'My Orders')} to="/orders" active={isStore && path.startsWith('/orders')} badge={itemCount} />
 
         {/* Profile / User menu */}
         {isAuthenticated ? (
@@ -123,7 +123,7 @@ export default function BottomNav() {
                 <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
               </div>
               <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2"><User className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/pedidos" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" />{t('nav.orders', 'Orders')}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/orders" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" />{t('nav.orders', 'Orders')}</Link></DropdownMenuItem>
               {user?.tiene_membresia_activa && (
                 <DropdownMenuItem asChild><Link to="/pinpanclub" className="flex items-center gap-2"><Trophy className="h-4 w-4" />PinPanClub</Link></DropdownMenuItem>
               )}

@@ -79,7 +79,7 @@ export default function CartDrawer() {
               <Button
                 variant="ghost"
                 className="mt-2 gap-2 text-muted-foreground"
-                onClick={() => { closeCart(); navigate('/pedidos'); }}
+                onClick={() => { closeCart(); navigate('/orders'); }}
                 data-testid="cart-my-orders-btn"
               >
                 <ClipboardList className="h-4 w-4" />
