@@ -199,8 +199,9 @@ export default function StudentsTab({ token }) {
     const { student, type } = lockDialog;
     const id = student.student_id || student.sync_id;
     try {
-      await api(`/school-year/students/${id}/${type}`, {
+      await fetch(`${API}/api/sysbook/school-year/students/${id}/${type}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         ...(type === 'unlock' && unlockReason ? { body: JSON.stringify({ reason: unlockReason }) } : {}),
       });
       toast.success(type === 'lock' ? 'Profile locked' : 'Profile unlocked');
