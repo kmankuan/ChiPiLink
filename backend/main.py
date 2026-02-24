@@ -412,9 +412,36 @@ async def health_check():
         db_name = "connecting"
     return {
         "status": "healthy",
-        "version": "2.2.0",
+        "version": "2.3.0",
         "db": db_name,
     }
+
+@app.get("/api/health/admin-check")
+async def admin_check():
+    """Diagnostic: check if the admin user was seeded correctly (no auth required)."""
+    from core.constants import AuthCollections
+    admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+    try:
+        user = await db[AuthCollections.USERS].find_one(
+            {"email": admin_email},
+            {"_id": 0, "user_id": 1, "email": 1, "is_admin": 1, "password_hash": 1}
+        )
+        if user:
+            has_hash = bool(user.get("password_hash"))
+            hash_len = len(user.get("password_hash", "")) if has_hash else 0
+            return {
+                "admin_exists": True,
+                "user_id": user.get("user_id"),
+                "email": user.get("email"),
+                "is_admin": user.get("is_admin"),
+                "has_password_hash": has_hash,
+                "hash_length": hash_len,
+                "db_name": db.name,
+                "collection": AuthCollections.USERS,
+            }
+        return {"admin_exists": False, "db_name": db.name, "collection": AuthCollections.USERS}
+    except Exception as e:
+        return {"error": str(e), "db_name": db.name}
 
 @app.get("/")
 async def root():
