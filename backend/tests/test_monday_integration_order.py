@@ -10,7 +10,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://inventory-split.preview.emergentagent.com"
+    BASE_URL = "https://cart-orders-refactor.preview.emergentagent.com"
 
 # Test constants
 TEST_STUDENT_ID = "std_test_admin_001"
