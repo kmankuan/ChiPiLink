@@ -110,7 +110,7 @@ export default function StudentsTab({ token }) {
 
   // Shared API helper — eliminates fetch boilerplate
   const api = useCallback(async (path, opts = {}) => {
-    const res = await fetch(`${API}/api/store${path}`, {
+    const res = await fetch(`${API}/api/sysbook/access${path}`, {
       ...opts,
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...opts.headers },
     });
