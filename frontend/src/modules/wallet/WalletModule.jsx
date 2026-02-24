@@ -57,6 +57,10 @@ export default function WalletModule() {
           <WalletOverviewTab token={token} />
         </TabsContent>
 
+        <TabsContent value="pending" className="mt-4">
+          <WalletPendingTab />
+        </TabsContent>
+
         <TabsContent value="transactions" className="mt-4">
           <WalletTransactionsTab token={token} />
         </TabsContent>
