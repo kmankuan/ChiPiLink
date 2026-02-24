@@ -270,31 +270,35 @@ export default function Orders() {
   };
 
   const filteredPedidos = pedidos.filter(pedido =>
-    filterStatus === 'all' || pedido.estado === filterStatus
+    filterStatus === 'all' || pedido.status === filterStatus
   );
 
-  const getStatusBadge = (estado) => {
+  const getStatusBadge = (status) => {
     const styles = {
-      pendiente: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      confirmado: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      preparando: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-      enviado: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-      entregado: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      cancelado: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      borrador: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
-      pre_orden: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      preparing: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      shipped: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+      delivered: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      paid: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      payment_rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      payment_cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+      payment_expired: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
     };
     const labelMap = {
-      pendiente: t('orders.statusPending', 'Pending'),
-      confirmado: t('orders.statusConfirmed', 'Confirmed'),
-      preparando: t('orders.statusPreparing', 'Preparing'),
-      enviado: t('orders.statusShipped', 'Shipped'),
-      entregado: t('orders.statusDelivered', 'Delivered'),
-      cancelado: t('orders.statusCancelled', 'Cancelled'),
-      borrador: t('orders.statusDraft', 'Draft'),
-      pre_orden: t('orders.statusPreOrder', 'Pre-order')
+      pending: t('orders.statusPending', 'Pending'),
+      confirmed: t('orders.statusConfirmed', 'Confirmed'),
+      preparing: t('orders.statusPreparing', 'Preparing'),
+      shipped: t('orders.statusShipped', 'Shipped'),
+      delivered: t('orders.statusDelivered', 'Delivered'),
+      cancelled: t('orders.statusCancelled', 'Cancelled'),
+      paid: t('orders.statusPaid', 'Paid'),
+      payment_rejected: t('orders.statusPaymentRejected', 'Payment Rejected'),
+      payment_cancelled: t('orders.statusPaymentCancelled', 'Payment Cancelled'),
+      payment_expired: t('orders.statusPaymentExpired', 'Payment Expired'),
     };
-    return <Badge className={styles[estado] || styles.pendiente}>{labelMap[estado] || estado}</Badge>;
+    return <Badge className={styles[status] || styles.pending}>{labelMap[status] || status}</Badge>;
   };
 
   const getTextbookStatusBadge = (status) => {
