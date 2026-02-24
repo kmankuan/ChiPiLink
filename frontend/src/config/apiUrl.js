@@ -15,6 +15,10 @@ function resolveApiUrl() {
     if (hostname.endsWith('.preview.emergentagent.com')) {
       return window.location.origin;
     }
+    // Custom domain: chipilink.me (with or without www)
+    if (hostname === 'chipilink.me' || hostname === 'www.chipilink.me') {
+      return window.location.origin;
+    }
   }
   // Fallback to build-time env var (local dev)
   return process.env.REACT_APP_BACKEND_URL || '';
