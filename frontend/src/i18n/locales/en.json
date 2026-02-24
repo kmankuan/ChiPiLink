@@ -1710,7 +1710,11 @@
     "itemReady": "Ready",
     "itemDelivered": "Delivered",
     "itemIssue": "Issue",
-    "itemOutOfStock": "Out of Stock"
+    "itemOutOfStock": "Out of Stock",
+    "statusPaid": "Paid",
+    "statusPaymentRejected": "Payment Rejected",
+    "statusPaymentCancelled": "Payment Cancelled",
+    "statusPaymentExpired": "Payment Expired"
   },
   "users": {
     "title": "Users",

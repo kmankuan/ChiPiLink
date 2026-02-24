@@ -1439,7 +1439,11 @@
     "itemReady": "就绪",
     "itemDelivered": "已送达",
     "itemIssue": "问题",
-    "itemOutOfStock": "缺货"
+    "itemOutOfStock": "缺货",
+    "statusPaid": "已支付",
+    "statusPaymentRejected": "支付被拒",
+    "statusPaymentCancelled": "支付已取消",
+    "statusPaymentExpired": "支付已过期"
   },
   "users": {
     "title": "用户",

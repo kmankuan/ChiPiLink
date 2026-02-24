@@ -1714,7 +1714,11 @@
     "itemReady": "Listo",
     "itemDelivered": "Entregado",
     "itemIssue": "Problema",
-    "itemOutOfStock": "Agotado"
+    "itemOutOfStock": "Agotado",
+    "statusPaid": "Pagado",
+    "statusPaymentRejected": "Pago Rechazado",
+    "statusPaymentCancelled": "Pago Cancelado",
+    "statusPaymentExpired": "Pago Expirado"
   },
   "users": {
     "title": "Usuarios",
