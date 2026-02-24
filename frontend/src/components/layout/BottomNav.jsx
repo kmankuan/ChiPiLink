@@ -57,7 +57,7 @@ export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
-  const { itemCount, openCart } = useCart();
+  const { itemCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { totalUnread } = useNotifications();
   const path = location.pathname;
