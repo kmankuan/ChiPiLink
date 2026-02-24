@@ -93,6 +93,13 @@ export default function ChipiWallet({ token }) {
       if (res.ok) {
         setIsDepositOpen(false);
         setDepositAmount('');
+        // Show clear feedback that the request is pending admin approval
+        const { toast } = await import('sonner');
+        toast.success(t('wallet.depositPending', 'Your deposit request has been submitted and is pending admin approval.'));
+      } else {
+        const err = await res.json().catch(() => ({}));
+        const { toast } = await import('sonner');
+        toast.error(err.detail || t('wallet.depositError', 'Error submitting deposit request'));
       }
     } catch (error) {
       console.error('Error depositing:', error);
