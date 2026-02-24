@@ -5,8 +5,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wallet, ArrowLeftRight, Building2, Settings, RefreshCw } from 'lucide-react';
+import { Wallet, ArrowLeftRight, Building2, Settings, RefreshCw, Clock } from 'lucide-react';
 import WalletOverviewTab from './tabs/WalletOverviewTab';
+import WalletPendingTab from './tabs/WalletPendingTab';
 import WalletTransactionsTab from './tabs/WalletTransactionsTab';
 import BankInfoTab from './tabs/BankInfoTab';
 import WalletSettingsTab from './tabs/WalletSettingsTab';
