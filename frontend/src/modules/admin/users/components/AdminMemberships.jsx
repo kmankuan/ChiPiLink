@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   CreditCard, Users, MapPin, Settings, Plus, Edit2, Trash2, 
   RefreshCw, ArrowLeft, Search, Gift, Clock, Check, X,
   DollarSign, Award, Calendar, Ticket
@@ -23,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

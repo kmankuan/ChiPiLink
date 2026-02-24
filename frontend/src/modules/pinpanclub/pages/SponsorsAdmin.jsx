@@ -6,7 +6,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Plus, Trash2, Edit2, Eye, Upload, Save, 
   GripVertical, Monitor, Layout, Palette, Settings2,
   Image, Link, Type, Clock, ToggleLeft, ToggleRight,
@@ -14,6 +13,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL || '';
 

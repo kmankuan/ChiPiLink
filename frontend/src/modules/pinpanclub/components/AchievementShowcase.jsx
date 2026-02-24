@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { Award, Sparkles, Crown, Star, Trophy, Flame } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -287,6 +286,7 @@ export default function AchievementShowcase({ playerId, maxDisplay = 5, showTitl
         @keyframes spin-slow {
           from {
             transform: rotate(0deg);
+import RESOLVED_API_URL from '@/config/apiUrl';
           }
           to {
             transform: rotate(360deg);

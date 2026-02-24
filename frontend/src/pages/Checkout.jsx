@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardHeader,
@@ -29,6 +28,7 @@ import {
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

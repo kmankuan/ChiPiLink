@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardDescription,
@@ -34,6 +33,7 @@ import {
   User,
   Clock
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

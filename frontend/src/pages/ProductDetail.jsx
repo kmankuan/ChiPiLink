@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ChevronLeft,
   ShoppingCart,
   Plus,
@@ -21,6 +20,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

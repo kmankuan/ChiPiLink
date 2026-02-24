@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   MessageSquare, Send, AlertTriangle, Shield, ThumbsUp,
   Flag, Loader2, User, Clock, CheckCircle, XCircle
 } from 'lucide-react';
@@ -443,6 +442,7 @@ export default function MatchComments({ matchId, currentUserId }) {
         @keyframes fade-in {
           from {
             opacity: 0;
+import RESOLVED_API_URL from '@/config/apiUrl';
             transform: translateY(10px);
           }
           to {

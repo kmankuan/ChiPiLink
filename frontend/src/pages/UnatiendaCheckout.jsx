@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Card,
   CardContent,
   CardHeader,
@@ -42,6 +41,7 @@ import {
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

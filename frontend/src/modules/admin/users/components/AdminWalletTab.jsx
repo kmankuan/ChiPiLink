@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -32,6 +31,7 @@ import {
   RefreshCw, DollarSign, Users, TrendingUp
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

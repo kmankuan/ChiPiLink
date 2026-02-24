@@ -7,10 +7,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, UserPlus, ShoppingBag, MessageCircle, Wallet,
   Megaphone, Zap, Star, ChevronRight, X
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const ICON_MAP = {
   'trophy': Trophy, 'user-plus': UserPlus, 'shopping-bag': ShoppingBag,

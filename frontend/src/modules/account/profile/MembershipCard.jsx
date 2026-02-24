@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   CreditCard, Calendar, Clock, MapPin, QrCode, 
   LogIn, LogOut, RefreshCw, Award, ChevronRight, History,
   Wallet, Sparkles, AlertCircle, CheckCircle, Timer
@@ -18,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

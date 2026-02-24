@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -20,6 +19,7 @@ import OrderChat from '@/components/chat/OrderChat';
 import CrmChat from '@/components/chat/CrmChat';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useCrmNotifications } from '@/hooks/useCrmNotifications';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

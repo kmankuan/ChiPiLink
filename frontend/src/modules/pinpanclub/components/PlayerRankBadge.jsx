@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, Sparkles, Crown, Shield, Star, Gem, Award, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -546,6 +545,7 @@ export function RankProgressCard({ playerId }) {
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
+import RESOLVED_API_URL from '@/config/apiUrl';
           to { transform: rotate(360deg); }
         }
         .animate-spin-slow {

@@ -10,7 +10,6 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Upload,
   X,
   Image as ImageIcon,
@@ -20,6 +19,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
   AlertCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

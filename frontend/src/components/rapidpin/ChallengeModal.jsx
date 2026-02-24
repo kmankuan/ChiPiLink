@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogDescription,
@@ -35,6 +34,7 @@ import {
   Target, X, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_BASE = RESOLVED_API_URL || '';
 

@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Table,
   TableBody,
   TableCell,
@@ -46,6 +45,7 @@ import {
   Trash2,
   Eye,
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

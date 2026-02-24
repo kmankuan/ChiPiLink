@@ -10,10 +10,10 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   MessageCircle, Send, Loader2, X, ArrowLeft, Plus,
   Headphones, ChevronRight, Clock, User
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

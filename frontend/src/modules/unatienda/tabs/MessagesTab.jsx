@@ -10,12 +10,12 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   MessageCircle, Search, Loader2, Inbox, User, Clock,
   ChevronRight, RefreshCw, Settings, Bell
 } from 'lucide-react';
 import CrmChat from '@/components/chat/CrmChat';
 import { BoardHeader } from '@/components/shared/BoardHeader';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

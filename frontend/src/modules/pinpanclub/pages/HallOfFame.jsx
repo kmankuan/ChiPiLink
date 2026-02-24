@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Crown, Medal, Star, ArrowLeft, RefreshCw,
   Swords, Zap, Shield, Users, Award, TrendingUp, ChevronRight
 } from 'lucide-react';
@@ -18,6 +17,7 @@ import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
 import axios from 'axios';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

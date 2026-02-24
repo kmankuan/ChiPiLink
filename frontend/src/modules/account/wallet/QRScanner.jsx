@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   QrCode, Camera, X, Check, AlertCircle, User, Wallet, 
   CreditCard, LogIn, DollarSign, RefreshCw
 } from 'lucide-react';
@@ -15,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

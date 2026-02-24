@@ -6,7 +6,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Trophy, Calendar, Users, Target,
   Crown, Medal, Award, Gift, Flame, History,
   ChevronRight, Timer, Star
@@ -22,6 +21,7 @@ import {
   PlayerSeasonCard,
   PastSeasons
 } from '../components/RankingSeasons';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

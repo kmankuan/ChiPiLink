@@ -1,10 +1,10 @@
 /**
+import RESOLVED_API_URL from '@/config/apiUrl';
  * Core Auto-Translate Utility
  * Shared across all modules for bidirectional multilingual auto-translation.
  * Fetches dictionary from backend API, falls back to built-in defaults.
  */
 
-import RESOLVED_API_URL from '@/config/apiUrl';
 const API = RESOLVED_API_URL;
 
 // In-memory cache

@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
@@ -31,6 +30,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

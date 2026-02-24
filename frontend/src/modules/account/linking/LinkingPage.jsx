@@ -6,7 +6,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import RESOLVED_API_URL from '@/config/apiUrl';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_BASE = RESOLVED_API_URL;
 

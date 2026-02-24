@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy,
   Users,
   Calendar,
@@ -48,6 +47,7 @@ import {
 import ScoreBoard from '../components/ScoreBoard';
 import { PINPANCLUB_API, API_BASE } from '../config/api';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

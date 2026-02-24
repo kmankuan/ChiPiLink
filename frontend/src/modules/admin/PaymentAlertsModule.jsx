@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Loader2, CheckCircle, XCircle, Clock, AlertTriangle,
   Plus, Search, Mail, DollarSign, Filter, Settings,
   ListChecks, Eye, ChevronDown, ChevronRight, Trash2,
@@ -15,6 +14,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 } from 'lucide-react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 const hdrs = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}` });

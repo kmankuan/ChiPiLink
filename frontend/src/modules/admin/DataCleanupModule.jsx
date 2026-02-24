@@ -10,10 +10,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trash2, Eye, Loader2, AlertTriangle, CheckCircle2,
   ShoppingCart, MessageSquare, Users, Link2, Package, Wallet, CreditCard
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

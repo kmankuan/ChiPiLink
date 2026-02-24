@@ -13,9 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { invalidateDictCache } from '@/utils/autoTranslate';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Edit2, Loader2, Plus, Save, Search, Trash2, X, Languages,
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

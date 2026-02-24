@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   QrCode, MapPin, Hand, CheckCircle, XCircle, 
   Loader2, Users, Clock, ScanLine
 } from 'lucide-react';
@@ -13,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../../components
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import { QRCodeSVG } from 'qrcode.react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -6,13 +6,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Play, CheckCircle, Trophy, Plus, Minus,
   Zap, Target, RotateCcw
 } from 'lucide-react';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

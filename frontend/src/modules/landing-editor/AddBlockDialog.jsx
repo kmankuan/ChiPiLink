@@ -3,7 +3,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -23,6 +22,7 @@ import {
   Trophy
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const BACKEND_URL = RESOLVED_API_URL;
 

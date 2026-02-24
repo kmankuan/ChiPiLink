@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Card, CardContent,
 } from '@/components/ui/card';
 import {
@@ -24,6 +23,7 @@ import {
   ExternalLink, ArrowRight, User, Plus, X, Columns3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

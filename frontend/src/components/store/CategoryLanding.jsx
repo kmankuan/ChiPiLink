@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ChevronRight,
   ShoppingCart,
   Plus,
@@ -21,6 +20,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
   Percent
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   TrendingUp, Zap, Target, Trophy, ChevronRight,
   Award, BarChart3, Loader2
 } from 'lucide-react';
@@ -13,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../../components
 import { Badge } from '../../../../components/ui/badge';
 import { Button } from '../../../../components/ui/button';
 import { Progress } from '../../../../components/ui/progress';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

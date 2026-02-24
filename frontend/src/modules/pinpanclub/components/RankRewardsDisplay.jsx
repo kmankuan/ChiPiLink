@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Gift, Star, Crown, Sparkles, Trophy, ChevronRight,
   Check, Lock, Zap, Shield, Award, PartyPopper
 } from 'lucide-react';
@@ -199,6 +198,7 @@ export function RankPromotionModal({ isOpen, onClose, promotion, lang = 'es' }) 
             }
             @keyframes spin-slow {
               from { transform: rotate(0deg); }
+import RESOLVED_API_URL from '@/config/apiUrl';
               to { transform: rotate(360deg); }
             }
             .animate-bounce-slow {

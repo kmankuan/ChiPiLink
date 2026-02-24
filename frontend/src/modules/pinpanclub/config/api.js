@@ -1,4 +1,5 @@
 /**
+import RESOLVED_API_URL from '@/config/apiUrl';
  * PinpanClub API Configuration
  * Centralizes all PinpanClub endpoint definitions
  * 
@@ -10,7 +11,6 @@
  * Set USE_NEW_ENDPOINTS to true to use the new microservices-ready endpoints.
  */
 
-import RESOLVED_API_URL from '@/config/apiUrl';
 const API_URL = RESOLVED_API_URL;
 const WS_URL = API_URL?.replace('https://', 'wss://').replace('http://', 'ws://');
 

@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Swords, Target, Medal, Users, Calendar, 
   ArrowRight, ChevronRight, Flame, Star, Crown,
   Settings, Eye, EyeOff, RefreshCw, Zap
@@ -28,6 +27,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { getLocalizedText } from '@/components/admin/MultilingualInput';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

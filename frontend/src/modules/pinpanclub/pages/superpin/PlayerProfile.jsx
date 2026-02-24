@@ -7,7 +7,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   User, Trophy, Target, TrendingUp, TrendingDown, Calendar,
   ArrowLeft, Medal, Award, Flame, BarChart3, History,
   ChevronRight, Loader2, Percent, Zap, UserPlus, UserMinus,
@@ -22,6 +21,7 @@ import AchievementShowcase from '../../components/AchievementShowcase';
 import PlayerRankBadge, { RankProgressCard } from '../../components/PlayerRankBadge';
 import RankRewardsDisplay, { RankPromotionModal } from '../../components/RankRewardsDisplay';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

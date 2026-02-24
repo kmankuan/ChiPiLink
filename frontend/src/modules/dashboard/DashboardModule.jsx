@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Package,
   ShoppingCart,
   AlertTriangle,
@@ -31,6 +30,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 import { useTranslation } from 'react-i18next';
 import MondaySyncWidget from './MondaySyncWidget';
 import ActivityFeed from './ActivityFeed';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogDescription,
@@ -33,6 +32,7 @@ import {
   AlertCircle,
   Mail
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

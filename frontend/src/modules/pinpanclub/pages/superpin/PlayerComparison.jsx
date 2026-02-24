@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Users, Plus, X, BarChart3, Trophy, Target, Flame,
   TrendingUp, Medal, ArrowLeft, RefreshCw, Download,
   ChevronDown, Check, Loader2, Zap
@@ -15,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../../components
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import MatchPredictor from './MatchPredictor';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

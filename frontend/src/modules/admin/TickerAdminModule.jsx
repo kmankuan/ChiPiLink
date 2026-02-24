@@ -10,12 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, UserPlus, ShoppingBag, MessageCircle, Wallet,
   Megaphone, Plus, Trash2, Save, RefreshCw, Eye, EyeOff,
   Settings, Palette, Clock, Layout, Sparkles, Image, Link,
   ChevronDown, ChevronUp, GripVertical
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 const getToken = () => localStorage.getItem('auth_token');

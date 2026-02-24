@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   FileText, Plus, Edit2, Trash2, Send, Clock, Eye, 
   RefreshCw, ArrowLeft, Search, MoreVertical
 } from 'lucide-react';
@@ -28,6 +27,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
 import PostEditor from '../components/PostEditor';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

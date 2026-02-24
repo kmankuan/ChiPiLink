@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { languages } from '@/i18n';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,6 +14,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 import { Button } from '@/components/ui/button';
 import { Globe, Check } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Save, Package, RefreshCw, Users, Upload, Webhook, ArrowLeftRight,
   CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine, Search,
   Square, History
@@ -29,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

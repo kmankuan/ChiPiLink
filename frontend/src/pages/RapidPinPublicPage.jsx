@@ -20,7 +20,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   Zap, Trophy, Users, Clock, ChevronRight, Play, 
   RefreshCw, AlertCircle, CheckCircle2, Scale,
   ArrowRight, Loader2, Hand, Swords, Search, X,
@@ -28,6 +27,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
   Calendar, CalendarCheck, Pause, RotateCcw, Wifi, WifiOff
 } from 'lucide-react';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_BASE = RESOLVED_API_URL || '';
 

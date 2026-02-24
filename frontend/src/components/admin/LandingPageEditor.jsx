@@ -14,7 +14,6 @@ import { MultilingualInput, MultilingualItemEditor } from './MultilingualInput';
 import RichTextEditor from '@/components/common/RichTextEditor';
 import ImageUploader, { useImageUpload } from '@/components/common/ImageUploader';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -73,6 +72,7 @@ import {
   Upload
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const BACKEND_URL = RESOLVED_API_URL;
 

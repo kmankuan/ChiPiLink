@@ -15,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   BookOpen, Check, ChevronRight, Clock, GraduationCap,
   Loader2, Lock, Package, Plus, Send, User, UserPlus, X,
   Wallet, AlertTriangle
@@ -24,6 +23,7 @@ import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { ExpandableText } from '../../../components/ui/expandable-text';
 import { useGuardedAction } from '@/hooks/useGuardedAction';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

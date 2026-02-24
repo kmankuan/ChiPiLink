@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Trophy, Users, Target, ArrowLeft, Settings, Play,
   Plus, Medal, TrendingUp, TrendingDown, Minus, Clock, UserPlus, RefreshCw, CheckCircle
 } from 'lucide-react';
@@ -14,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../../components
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import SuperPinCheckIn from './SuperPinCheckIn';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

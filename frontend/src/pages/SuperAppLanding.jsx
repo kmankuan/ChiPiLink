@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { COMMUNITY_ENDPOINTS, buildUrl } from '@/config/api';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Newspaper, Calendar, Image, Users, ChevronRight,
   Clock, MapPin, Bell, Store, Trophy, Zap,
   Loader2, Edit, Save, Plus, GripVertical,
@@ -39,6 +38,7 @@ import LivingGridLanding from './landing-layouts/LivingGridLanding';
 import CinematicLanding from './landing-layouts/CinematicLanding';
 import HorizonLanding from './landing-layouts/HorizonLanding';
 import MosaicCommunityLanding from './landing-layouts/MosaicCommunityLanding';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -7,7 +7,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
   Film, FileText, Image as ImageIcon, ChevronDown, Loader2, Pause, ExternalLink, Link2
 } from 'lucide-react';
@@ -566,6 +565,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       <style>{`
         @keyframes feedAutoplayProgress {
           from { width: 0%; }
+import RESOLVED_API_URL from '@/config/apiUrl';
           to { width: 100%; }
         }
       `}</style>

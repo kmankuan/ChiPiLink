@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   BookOpen,
   ShoppingCart,
   Plus,
@@ -29,6 +28,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
   Users
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

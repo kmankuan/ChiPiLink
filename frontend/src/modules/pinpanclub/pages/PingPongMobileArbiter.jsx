@@ -7,13 +7,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Wifi, WifiOff, Play, Pause, RotateCcw, 
   Volume2, VolumeX, Clock, AlertTriangle, Check, X,
   ChevronUp, ChevronDown
 } from 'lucide-react';
 import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');

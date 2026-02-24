@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
-import RESOLVED_API_URL from '@/config/apiUrl';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -34,6 +33,7 @@ import {
   BookOpen,
   Users
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -7,7 +7,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
-import RESOLVED_API_URL from '@/config/apiUrl';
   Bell, Check, CheckCheck, Trash2, X, 
   Trophy, Users, MessageSquare, Heart, Target, Award,
   Clock, ChevronRight, Loader2, Wifi, WifiOff
@@ -28,6 +27,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 const WS_URL = API_URL?.replace('https://', 'wss://').replace('http://', 'ws://');

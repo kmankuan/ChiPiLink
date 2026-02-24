@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, Trophy, Users, Swords, Zap, Grid3X3, Crown,
   Play, CheckCircle, Clock, UserPlus, UserMinus, Shuffle,
   ChevronRight, Medal, Award, Loader2, Share2, Copy
@@ -19,6 +18,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

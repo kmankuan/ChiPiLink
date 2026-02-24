@@ -13,12 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   DollarSign, TrendingUp, Package, Users, GraduationCap, BookOpen,
   AlertTriangle, RefreshCw, Loader2, Download, BarChart3, PieChart,
   ShoppingCart, Calendar, Search, ArrowUp, ArrowDown, AlertCircle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

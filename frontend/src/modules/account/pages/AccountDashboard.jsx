@@ -8,7 +8,6 @@ import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Sen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import RESOLVED_API_URL from '@/config/apiUrl';
 
 // Account components - new structure
 import ChipiWallet from '../wallet/WalletPage';
@@ -26,6 +25,7 @@ import MyStudentsSection from '../students/MyStudentsSection';
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
 import NotificationHistory from '@/modules/notifications/components/NotificationHistory';
 import PushNotificationSubscribe from '@/components/notifications/PushNotificationSubscribe';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

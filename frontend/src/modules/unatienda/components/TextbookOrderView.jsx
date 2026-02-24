@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Book, BookOpen, Check, CheckCircle, ChevronLeft, ClipboardList,
   Clock, FileText, GraduationCap, Info, Loader2, Lock, Upload,
   User, UserPlus, Users, Wallet, AlertTriangle, CreditCard
@@ -24,6 +23,7 @@ import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { ExpandableText } from '../../../components/ui/expandable-text';
 import { useGuardedAction } from '@/hooks/useGuardedAction';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

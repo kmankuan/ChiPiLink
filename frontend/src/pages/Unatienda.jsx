@@ -19,7 +19,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ChevronLeft, GraduationCap, Home, Loader2, Lock, Search, Store
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
@@ -27,6 +26,7 @@ import SchoolTextbooksView from '@/modules/unatienda/components/SchoolTextbooksV
 import TextbookOrderView from '@/modules/unatienda/components/TextbookOrderView';
 import ProductCard from '@/modules/unatienda/components/ProductCard';
 import { categoryIcons } from '@/modules/unatienda/constants/translations';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Store, ShoppingCart, Warehouse, Truck, Settings, Database, CreditCard } from 'lucide-react';
-import RESOLVED_API_URL from '@/config/apiUrl';
 
 import InventoryTab from './tabs/InventoryTab';
 import PublicInventoryTab from './tabs/PublicInventoryTab';
@@ -15,6 +14,7 @@ import StockOrdersTab from './tabs/StockOrdersTab';
 import StoreCheckoutFormConfigTab from './tabs/StoreCheckoutFormConfigTab';
 import ConfigurationTab from './tabs/ConfigurationTab';
 import DemoDataTab from './tabs/DemoDataTab';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 

@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   BarChart3, TrendingUp, TrendingDown, Package, BookOpen, Loader2,
   RefreshCw, Archive, Truck, ArrowUpDown
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 const SYSBOOK_API = `${API_URL}/api/sysbook`;

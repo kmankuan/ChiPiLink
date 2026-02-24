@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -22,6 +21,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

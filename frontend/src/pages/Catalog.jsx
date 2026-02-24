@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   Select,
   SelectContent,
   SelectItem,
@@ -16,6 +15,7 @@ import { toast } from 'sonner';
 import { Book, Search, Filter, ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 

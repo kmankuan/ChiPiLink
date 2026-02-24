@@ -14,11 +14,11 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import {
-import RESOLVED_API_URL from '@/config/apiUrl';
   ArrowLeft, BookOpen, ChevronRight, Edit2, GripVertical, Loader2, Plus,
   Save, ShoppingCart, Trash2, UserPlus, X, Eye, EyeOff, AlertTriangle, Languages,
 } from 'lucide-react';
 import useAutoTranslate from '@/hooks/useAutoTranslate';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
