@@ -83,7 +83,7 @@ export default function CartDrawer() {
                 data-testid="cart-my-orders-btn"
               >
                 <ClipboardList className="h-4 w-4" />
-                Ver mis pedidos
+                Ver mis pedidos y carrito
               </Button>
             </div>
           ) : (
@@ -235,7 +235,7 @@ export default function CartDrawer() {
                   data-testid="cart-my-orders-footer-btn"
                 >
                   <ClipboardList className="h-3.5 w-3.5" />
-                  Pedidos
+                  Mis Pedidos
                 </Button>
               </div>
             </div>
