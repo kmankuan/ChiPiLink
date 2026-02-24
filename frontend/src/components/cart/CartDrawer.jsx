@@ -229,7 +229,7 @@ export default function CartDrawer() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => { closeCart(); navigate('/pedidos'); }}
+                  onClick={() => { closeCart(); navigate('/orders'); }}
                   className="flex-1 gap-1.5"
                   data-testid="cart-my-orders-footer-btn"
                 >
