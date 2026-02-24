@@ -10,6 +10,7 @@ import {
   MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
   Film, FileText, Image as ImageIcon, ChevronDown, Loader2, Pause, ExternalLink, Link2
 } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -565,7 +566,6 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       <style>{`
         @keyframes feedAutoplayProgress {
           from { width: 0%; }
-import RESOLVED_API_URL from '@/config/apiUrl';
           to { width: 100%; }
         }
       `}</style>

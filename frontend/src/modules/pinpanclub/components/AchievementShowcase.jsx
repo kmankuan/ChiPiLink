@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -286,7 +287,6 @@ export default function AchievementShowcase({ playerId, maxDisplay = 5, showTitl
         @keyframes spin-slow {
           from {
             transform: rotate(0deg);
-import RESOLVED_API_URL from '@/config/apiUrl';
           }
           to {
             transform: rotate(360deg);

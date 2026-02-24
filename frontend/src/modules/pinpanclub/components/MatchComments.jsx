@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -442,7 +443,6 @@ export default function MatchComments({ matchId, currentUserId }) {
         @keyframes fade-in {
           from {
             opacity: 0;
-import RESOLVED_API_URL from '@/config/apiUrl';
             transform: translateY(10px);
           }
           to {

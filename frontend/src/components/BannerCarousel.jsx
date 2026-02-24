@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -157,7 +158,6 @@ export default function BannerCarousel() {
         }
         @keyframes banner-slide-right {
           from { opacity: 0; transform: translateX(-30px); }
-import RESOLVED_API_URL from '@/config/apiUrl';
           to { opacity: 1; transform: translateX(0); }
         }
       `}</style>

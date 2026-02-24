@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -198,7 +199,6 @@ export function RankPromotionModal({ isOpen, onClose, promotion, lang = 'es' }) 
             }
             @keyframes spin-slow {
               from { transform: rotate(0deg); }
-import RESOLVED_API_URL from '@/config/apiUrl';
               to { transform: rotate(360deg); }
             }
             .animate-bounce-slow {
