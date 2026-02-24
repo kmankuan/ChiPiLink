@@ -239,31 +239,18 @@ async def create_platform_order(order_data: dict):
     if not order_data.get("items") or len(order_data["items"]) == 0:
         raise HTTPException(status_code=400, detail="Cart is empty")
 
-    # Accept both Spanish and English field names
-    customer_email = (
-        order_data.get("customer_email")
-        or order_data.get("cliente_email")
-        or order_data.get("form_data", {}).get("email", "")
-    )
-    customer_name = (
-        order_data.get("customer_name")
-        or order_data.get("cliente_nombre")
-        or order_data.get("form_data", {}).get("nombre", "")
-    )
-    customer_phone = (
-        order_data.get("customer_phone")
-        or order_data.get("cliente_telefono")
-        or order_data.get("form_data", {}).get("telefono", "")
-    )
+    customer_email = order_data.get("customer_email") or order_data.get("form_data", {}).get("email", "")
+    customer_name = order_data.get("customer_name") or order_data.get("form_data", {}).get("name", "")
+    customer_phone = order_data.get("customer_phone") or order_data.get("form_data", {}).get("phone", "")
 
-    # Normalize item fields (accept Spanish or English)
+    # Build normalized items
     normalized_items = []
     for item in order_data["items"]:
         normalized_items.append({
             "book_id": item.get("book_id", ""),
-            "name": item.get("name") or item.get("nombre", ""),
-            "quantity": item.get("quantity") or item.get("cantidad", 1),
-            "unit_price": item.get("unit_price") or item.get("precio_unitario", 0),
+            "name": item.get("name", ""),
+            "quantity": item.get("quantity", 1),
+            "unit_price": item.get("unit_price", 0),
         })
 
     # Generate order ID
