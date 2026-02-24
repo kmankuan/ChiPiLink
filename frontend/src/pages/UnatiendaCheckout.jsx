@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
