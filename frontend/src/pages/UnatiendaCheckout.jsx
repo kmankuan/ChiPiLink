@@ -198,17 +198,18 @@ export default function UnatiendaCheckout() {
       const orderData = {
         items: items.map(item => ({
           book_id: item.book_id,
-          nombre: item.name,
-          cantidad: item.quantity,
-          precio_unitario: item.price
+          name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price
         })),
-        cliente_nombre: formData.nombre || formData[formFields.find(f => f.field_type === 'text')?.field_id] || '',
-        cliente_email: formData.email || formData[formFields.find(f => f.field_type === 'email')?.field_id] || '',
-        cliente_telefono: formData.telefono || formData[formFields.find(f => f.field_type === 'phone')?.field_id] || '',
+        customer_name: formData.nombre || formData[formFields.find(f => f.field_type === 'text')?.field_id] || '',
+        customer_email: formData.email || formData[formFields.find(f => f.field_type === 'email')?.field_id] || '',
+        customer_phone: formData.telefono || formData[formFields.find(f => f.field_type === 'phone')?.field_id] || '',
+        user_id: user?.user_id || '',
         form_data: formData,
         subtotal: subtotal,
         total: subtotal,
-        tipo: 'unatienda'
+        type: 'unatienda'
       };
 
       const response = await axios.post(
