@@ -61,6 +61,7 @@ Multi-module school supply/textbook management platform ("ChiPi Link") with:
 
 ### Session: Feb 24, 2026 (Cont.)
 - **REFACTOR: Unified Cart & Orders Page** — Combined "My Cart" and "My Orders" into a single page at `/pedidos` with two top-level tabs. "Mi Carrito" tab provides full cart management (quantity controls, checkout, empty state with navigation). "Mis Pedidos" tab contains nested sub-tabs for textbook orders and store orders. Supports URL deep-linking via `?tab=cart`. CartDrawer slide-out panel preserved for quick access. Fixed ticker bar overlap with proper page spacing. All tests passed (12/12).
+- **i18n: Cart & Orders Full Internationalization** — Added 22 `cart` keys and 53 `orders` keys to en.json, es.json, zh.json. Replaced all hardcoded Spanish strings in Orders.jsx and CartDrawer.jsx with `t()` calls using English-first defaults. Changed i18n fallback language from 'es' to 'en'. Fixed OrderChat.jsx default lang and fallback labels to English. All i18n tests passed (100%).
 
 ## Pending/Backlog
 - (P3) Build an on-demand landing page redesign tool
