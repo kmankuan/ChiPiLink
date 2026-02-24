@@ -2,7 +2,7 @@
 Platform Store (Unatienda) Routes
 Exclusive store owned by the platform with basic Yappy integration
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import Optional
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from services.yappy_service import YappyService, YappyServiceFactory
 from models.vendor_models import PlatformStoreConfig, YappyAmbiente
+from core.auth import get_current_user as auth_get_current_user
 
 router = APIRouter(prefix="/platform-store", tags=["Platform Store"])
 
