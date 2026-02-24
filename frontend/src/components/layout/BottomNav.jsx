@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useNotifications } from '@/hooks/useNotifications';
 import {
   Home, Compass, ShoppingBag, Trophy, User, LogIn,
-  Sun, Moon, ShoppingCart, Settings, LogOut, Bell,
+  Sun, Moon, ClipboardList, Settings, LogOut, Bell,
   MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
