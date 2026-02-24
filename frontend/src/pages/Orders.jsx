@@ -31,6 +31,7 @@ const API_URL = RESOLVED_API_URL;
 
 /* ───── Cart Tab Content ───── */
 function CartTabContent() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const {
     items, itemCount, subtotal,
@@ -43,16 +44,16 @@ function CartTabContent() {
       <Card>
         <CardContent className="py-16 text-center">
           <ShoppingCart className="h-14 w-14 text-muted-foreground/20 mx-auto mb-4" />
-          <p className="text-lg font-medium mb-1">Tu carrito está vacío</p>
-          <p className="text-sm text-muted-foreground mb-6">Agrega productos desde Unatienda o el catálogo de textos</p>
+          <p className="text-lg font-medium mb-1">{t('cart.emptyTitle', 'Your cart is empty')}</p>
+          <p className="text-sm text-muted-foreground mb-6">{t('cart.emptyDesc', 'Add products from Unatienda or the textbook catalog')}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={() => navigate('/unatienda')} data-testid="cart-go-store-btn">
               <ShoppingBag className="h-4 w-4 mr-2" />
-              Explorar Unatienda
+              {t('cart.exploreStore', 'Explore Unatienda')}
             </Button>
             <Button variant="outline" onClick={() => navigate('/mi-cuenta?tab=textbooks')} data-testid="cart-go-textbooks-btn">
               <BookOpen className="h-4 w-4 mr-2" />
-              Ordenar Textos
+              {t('cart.orderTextbooks', 'Order Textbooks')}
             </Button>
           </div>
         </CardContent>
@@ -68,7 +69,7 @@ function CartTabContent() {
           <CardContent className="p-3 flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
             <p className="text-xs text-amber-700 dark:text-amber-300">
-              Tu carrito tiene productos públicos y del catálogo privado. Se procesarán en pedidos separados.
+              {t('cart.mixedCartWarning', 'Your cart has public and private catalog products. They will be processed as separate orders.')}
             </p>
           </CardContent>
         </Card>
@@ -103,7 +104,7 @@ function CartTabContent() {
                   <div className="min-w-0">
                     <h4 className="font-medium text-sm sm:text-base truncate">{item.name}</h4>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-sm text-muted-foreground">${(item.price || 0).toFixed(2)} c/u</p>
+                      <p className="text-sm text-muted-foreground">${(item.price || 0).toFixed(2)} {t('cart.unitPrice', 'ea')}</p>
                       {item.is_sysbook && item.grade && (
                         <Badge variant="secondary" className="text-xs py-0 h-5">
                           <GraduationCap className="h-2.5 w-2.5 mr-1" />
@@ -127,9 +128,7 @@ function CartTabContent() {
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
+                      variant="outline" size="icon" className="h-8 w-8"
                       onClick={() => updateQuantity(item.book_id, item.quantity - 1)}
                       data-testid={`cart-minus-${item.book_id}`}
                     >
@@ -137,9 +136,7 @@ function CartTabContent() {
                     </Button>
                     <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
                     <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
+                      variant="outline" size="icon" className="h-8 w-8"
                       onClick={() => updateQuantity(item.book_id, item.quantity + 1)}
                       disabled={!item.is_sysbook && item.quantity >= item.inventory_quantity}
                       data-testid={`cart-plus-${item.book_id}`}
@@ -164,19 +161,21 @@ function CartTabContent() {
             <div className="flex items-start gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
               <Lock className="h-4 w-4 text-purple-600 mt-0.5" />
               <p className="text-xs text-purple-700 dark:text-purple-300">
-                Los libros del catálogo privado se procesan como pre-orden
+                {t('cart.privatePreOrder', 'Private catalog books are processed as pre-orders')}
               </p>
             </div>
           )}
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal ({itemCount} producto{itemCount !== 1 ? 's' : ''})</span>
+              <span className="text-muted-foreground">
+                {t('cart.subtotal', 'Subtotal')} ({itemCount} {itemCount === 1 ? t('cart.product', 'product') : t('cart.products', 'products')})
+              </span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold text-lg">
-              <span>Total</span>
+              <span>{t('cart.total', 'Total')}</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
           </div>
@@ -187,7 +186,7 @@ function CartTabContent() {
               className="w-full gap-2"
               data-testid="cart-checkout-btn"
             >
-              Proceder al Pago
+              {t('cart.checkout', 'Proceed to Payment')}
               <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
@@ -195,7 +194,7 @@ function CartTabContent() {
               onClick={clearCart}
               data-testid="cart-clear-btn"
             >
-              Vaciar Carrito
+              {t('cart.clearCart', 'Clear Cart')}
             </Button>
           </div>
         </CardContent>
@@ -281,12 +280,17 @@ export default function Orders() {
       borrador: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
       pre_orden: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
     };
-    const labels = {
-      pendiente: 'Pendiente', confirmado: 'Confirmado', preparando: 'Preparando',
-      enviado: 'Enviado', entregado: 'Entregado', cancelado: 'Cancelado',
-      borrador: 'Borrador', pre_orden: 'Pre-orden'
+    const labelMap = {
+      pendiente: t('orders.statusPending', 'Pending'),
+      confirmado: t('orders.statusConfirmed', 'Confirmed'),
+      preparando: t('orders.statusPreparing', 'Preparing'),
+      enviado: t('orders.statusShipped', 'Shipped'),
+      entregado: t('orders.statusDelivered', 'Delivered'),
+      cancelado: t('orders.statusCancelled', 'Cancelled'),
+      borrador: t('orders.statusDraft', 'Draft'),
+      pre_orden: t('orders.statusPreOrder', 'Pre-order')
     };
-    return <Badge className={styles[estado] || styles.pendiente}>{labels[estado] || estado}</Badge>;
+    return <Badge className={styles[estado] || styles.pendiente}>{labelMap[estado] || estado}</Badge>;
   };
 
   const getTextbookStatusBadge = (status) => {
@@ -295,12 +299,12 @@ export default function Orders() {
       processing: 'bg-amber-100 text-amber-700', ready: 'bg-green-100 text-green-700',
       delivered: 'bg-emerald-100 text-emerald-700', cancelled: 'bg-red-100 text-red-700',
     };
-    const labels = {
+    const labelMap = {
       draft: t('orders.statusDraft', 'Draft'), submitted: t('orders.statusSubmitted', 'Submitted'),
       processing: t('orders.statusProcessing', 'Processing'), ready: t('orders.statusReady', 'Ready'),
       delivered: t('orders.statusDelivered', 'Delivered'), cancelled: t('orders.statusCancelled', 'Cancelled'),
     };
-    return <Badge className={styles[status] || styles.draft}>{labels[status] || status}</Badge>;
+    return <Badge className={styles[status] || styles.draft}>{labelMap[status] || status}</Badge>;
   };
 
   const getItemStatusBadge = (status) => {
@@ -310,13 +314,13 @@ export default function Orders() {
       delivered: 'bg-emerald-100 text-emerald-700 text-[10px]', issue: 'bg-red-100 text-red-700 text-[10px]',
       out_of_stock: 'bg-gray-200 text-gray-500 text-[10px]',
     };
-    const labels = {
+    const labelMap = {
       available: t('orders.itemAvailable', 'Available'), ordered: t('orders.itemOrdered', 'Ordered'),
       processing: t('orders.itemProcessing', 'Processing'), ready_for_pickup: t('orders.itemReady', 'Ready'),
       delivered: t('orders.itemDelivered', 'Delivered'), issue: t('orders.itemIssue', 'Issue'),
       out_of_stock: t('orders.itemOutOfStock', 'Out of Stock'),
     };
-    return <Badge className={styles[status] || styles.ordered}>{labels[status] || status}</Badge>;
+    return <Badge className={styles[status] || styles.ordered}>{labelMap[status] || status}</Badge>;
   };
 
   const getDeliveryProgress = (items) => {
@@ -349,10 +353,10 @@ export default function Orders() {
         </Link>
         <div>
           <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold">
-            Compras y Pedidos
+            {t('orders.pageTitle', 'Shopping & Orders')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Carrito de compras e historial de pedidos
+            {t('orders.pageSubtitle', 'Shopping cart and order history')}
           </p>
         </div>
       </div>
@@ -362,14 +366,14 @@ export default function Orders() {
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="cart" className="gap-2" data-testid="tab-cart">
             <ShoppingCart className="h-4 w-4" />
-            Mi Carrito
+            {t('cart.title', 'My Cart')}
             {itemCount > 0 && (
               <Badge variant="secondary" className="ml-1">{itemCount}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="orders" className="gap-2" data-testid="tab-orders">
             <ClipboardList className="h-4 w-4" />
-            Mis Pedidos
+            {t('cart.myOrders', 'My Orders')}
             {totalOrders > 0 && (
               <Badge variant="secondary" className="ml-1">{totalOrders}</Badge>
             )}
@@ -387,14 +391,14 @@ export default function Orders() {
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="textbooks" className="gap-2" data-testid="subtab-textbooks">
                 <BookOpen className="h-4 w-4" />
-                Pedidos de Textos
+                {t('orders.textbookOrders', 'Textbook Orders')}
                 {textbookOrders.length > 0 && (
                   <Badge variant="secondary" className="ml-1">{textbookOrders.length}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="store" className="gap-2" data-testid="subtab-store">
                 <ShoppingBag className="h-4 w-4" />
-                Otros Pedidos
+                {t('orders.storeOrders', 'Other Orders')}
                 {pedidos.length > 0 && (
                   <Badge variant="secondary" className="ml-1">{pedidos.length}</Badge>
                 )}
@@ -411,9 +415,9 @@ export default function Orders() {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">No tienes pedidos de textos aún</p>
+                    <p className="text-muted-foreground mb-4">{t('orders.noTextbookOrders', "You don't have textbook orders yet")}</p>
                     <Link to="/mi-cuenta?tab=textbooks">
-                      <Button data-testid="order-textbooks-btn">Ordenar Textos</Button>
+                      <Button data-testid="order-textbooks-btn">{t('cart.orderTextbooks', 'Order Textbooks')}</Button>
                     </Link>
                   </CardContent>
                 </Card>
@@ -557,18 +561,18 @@ export default function Orders() {
                     <div className="flex justify-end mb-4">
                       <Select value={filterStatus} onValueChange={setFilterStatus}>
                         <SelectTrigger className="w-48" data-testid="filter-status">
-                          <SelectValue placeholder="Filtrar por estado" />
+                          <SelectValue placeholder={t('orders.filterByStatus', 'Filter by status')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos los estados</SelectItem>
-                          <SelectItem value="borrador">Borrador</SelectItem>
-                          <SelectItem value="pre_orden">Pre-orden</SelectItem>
-                          <SelectItem value="pendiente">Pendiente</SelectItem>
-                          <SelectItem value="confirmado">Confirmado</SelectItem>
-                          <SelectItem value="preparando">Preparando</SelectItem>
-                          <SelectItem value="enviado">Enviado</SelectItem>
-                          <SelectItem value="entregado">Entregado</SelectItem>
-                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                          <SelectItem value="all">{t('orders.allStates', 'All statuses')}</SelectItem>
+                          <SelectItem value="borrador">{t('orders.statusDraft', 'Draft')}</SelectItem>
+                          <SelectItem value="pre_orden">{t('orders.statusPreOrder', 'Pre-order')}</SelectItem>
+                          <SelectItem value="pendiente">{t('orders.statusPending', 'Pending')}</SelectItem>
+                          <SelectItem value="confirmado">{t('orders.statusConfirmed', 'Confirmed')}</SelectItem>
+                          <SelectItem value="preparando">{t('orders.statusPreparing', 'Preparing')}</SelectItem>
+                          <SelectItem value="enviado">{t('orders.statusShipped', 'Shipped')}</SelectItem>
+                          <SelectItem value="entregado">{t('orders.statusDelivered', 'Delivered')}</SelectItem>
+                          <SelectItem value="cancelado">{t('orders.statusCancelled', 'Cancelled')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -579,10 +583,12 @@ export default function Orders() {
                       <CardContent className="py-12 text-center">
                         <ShoppingBag className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                         <p className="text-muted-foreground mb-4">
-                          {pedidos.length === 0 ? "No tienes pedidos de tienda aún" : "No hay pedidos con el filtro seleccionado"}
+                          {pedidos.length === 0
+                            ? t('orders.noStoreOrders', "You don't have store orders yet")
+                            : t('orders.noFilterResults', 'No orders match the selected filter')}
                         </p>
                         <Link to="/unatienda">
-                          <Button data-testid="go-to-store-btn">Ir a Unatienda</Button>
+                          <Button data-testid="go-to-store-btn">{t('orders.goToStore', 'Go to Unatienda')}</Button>
                         </Link>
                       </CardContent>
                     </Card>
@@ -597,9 +603,9 @@ export default function Orders() {
                                   {getStatusBadge(pedido.estado)}
                                   <span className="text-xs text-muted-foreground font-mono">#{pedido.pedido_id?.slice(-8)}</span>
                                 </div>
-                                <p className="font-medium">{pedido.estudiante_nombre || 'Pedido General'}</p>
+                                <p className="font-medium">{pedido.estudiante_nombre || t('orders.orderGeneral', 'General Order')}</p>
                                 {pedido.ano_escolar && (
-                                  <p className="text-sm text-muted-foreground">Año escolar: {pedido.ano_escolar}</p>
+                                  <p className="text-sm text-muted-foreground">{t('orders.schoolYear', 'School year')}: {pedido.ano_escolar}</p>
                                 )}
                                 <p className="text-xs text-muted-foreground mt-1">
                                   {pedido.created_at && new Date(pedido.created_at).toLocaleDateString()}
@@ -607,7 +613,7 @@ export default function Orders() {
                               </div>
                               <div className="flex flex-col items-end gap-2">
                                 <p className="text-xl font-bold text-primary">${pedido.total?.toFixed(2) || '0.00'}</p>
-                                <p className="text-sm text-muted-foreground">{pedido.items?.length || 0} artículos</p>
+                                <p className="text-sm text-muted-foreground">{pedido.items?.length || 0} {t('orders.articles', 'items')}</p>
                               </div>
                             </div>
 
@@ -621,7 +627,7 @@ export default function Orders() {
                                     </div>
                                   ))}
                                   {pedido.items.length > 3 && (
-                                    <p className="text-xs text-muted-foreground">+{pedido.items.length - 3} más...</p>
+                                    <p className="text-xs text-muted-foreground">+{pedido.items.length - 3} {t('orders.moreItems', 'more...')}</p>
                                   )}
                                 </div>
                               </div>
@@ -630,12 +636,12 @@ export default function Orders() {
                             <div className="flex gap-2 mt-4 justify-end">
                               <Link to={`/pedido/${pedido.pedido_id}`}>
                                 <Button variant="outline" size="sm" className="rounded-full" data-testid={`view-order-${pedido.pedido_id}`}>
-                                  <Eye className="h-4 w-4 mr-2" />Ver Detalles
+                                  <Eye className="h-4 w-4 mr-2" />{t('orders.viewDetailsBtn', 'View Details')}
                                 </Button>
                               </Link>
                               <Link to={`/recibo/${pedido.pedido_id}?print=true`}>
                                 <Button variant="ghost" size="sm" className="rounded-full">
-                                  <Printer className="h-4 w-4 mr-2" />Imprimir
+                                  <Printer className="h-4 w-4 mr-2" />{t('orders.print', 'Print')}
                                 </Button>
                               </Link>
                             </div>
@@ -657,7 +663,7 @@ export default function Orders() {
         studentName={chatOrder?.student_name}
         isOpen={!!chatOrder}
         onClose={() => { setChatOrder(null); refreshUnread(); }}
-        lang={i18n?.language || 'es'}
+        lang={i18n?.language || 'en'}
       />
 
       {/* CRM Chat */}
