@@ -765,7 +765,7 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
                     : 'This profile is locked by the administrator. Fields cannot be edited.'}
                 </p>
                 <a
-                  href="/pedidos"
+                  href="/orders"
                   className="text-xs text-purple-600 hover:underline font-medium mt-1 inline-block"
                 >
                   {lang === 'es' ? 'Ir a Mensajes para contactar soporte' : 'Go to Messages to contact support'}
