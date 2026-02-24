@@ -31,6 +31,10 @@ export default function WalletModule() {
             <Wallet className="h-3.5 w-3.5" />
             {t('wallet.overview')}
           </TabsTrigger>
+          <TabsTrigger value="pending" className="gap-1.5 text-xs">
+            <Clock className="h-3.5 w-3.5" />
+            Pending Approvals
+          </TabsTrigger>
           <TabsTrigger value="transactions" className="gap-1.5 text-xs">
             <ArrowLeftRight className="h-3.5 w-3.5" />
             {t('wallet.transactions')}
