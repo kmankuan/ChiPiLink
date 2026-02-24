@@ -153,7 +153,7 @@ export default function StudentsTab({ token }) {
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api('/textbook-access/admin/all-students');
+      const data = await api('/admin/all-students');
       setStudents(data.students || data || []);
     } catch {
       try {
@@ -169,21 +169,21 @@ export default function StudentsTab({ token }) {
       const params = new URLSearchParams();
       if (reqFilter !== 'all') params.append('status', reqFilter);
       if (reqSchoolFilter !== 'all') params.append('school_id', reqSchoolFilter);
-      const data = await api(`/textbook-access/admin/requests?${params}`);
+      const data = await api(`/admin/requests?${params}`);
       setRequests(data.requests || []);
     } catch { /* silent */ } finally { setRequestsLoading(false); }
   }, [api, reqFilter, reqSchoolFilter]);
 
   const fetchPendingCount = useCallback(async () => {
     try {
-      const data = await api('/textbook-access/admin/requests?status=pending');
+      const data = await api('/admin/requests?status=pending');
       setPendingCount((data.requests || []).length);
     } catch { /* silent */ }
   }, [api]);
 
   const fetchSchools = useCallback(async () => {
     try {
-      const data = await api('/textbook-access/admin/schools');
+      const data = await api('/admin/schools');
       setReqSchools(data.schools || []);
     } catch { /* silent */ }
   }, [api]);
@@ -211,7 +211,7 @@ export default function StudentsTab({ token }) {
 
   const handleTogglePresale = async (studentId, current) => {
     try {
-      await api('/textbook-access/admin/students/bulk-presale', {
+      await api('/admin/students/bulk-presale', {
         method: 'POST', body: JSON.stringify({ student_ids: [studentId], presale_mode: !current }),
       });
       setStudents(prev => prev.map(s => (s.student_id || s.sync_id) === studentId ? { ...s, presale_mode: !current } : s));
@@ -223,7 +223,7 @@ export default function StudentsTab({ token }) {
     if (!selectedIds.size) return;
     setBulkProcessing(true);
     try {
-      const data = await api('/textbook-access/admin/students/bulk-presale', {
+      const data = await api('/admin/students/bulk-presale', {
         method: 'POST', body: JSON.stringify({ student_ids: [...selectedIds], presale_mode: enable }),
       });
       toast.success(`Pre-sale ${enable ? 'enabled' : 'disabled'} for ${data.modified} students`);
