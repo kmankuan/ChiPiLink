@@ -223,7 +223,7 @@ export default function OrderForm() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => navigate('/pedidos')} className="rounded-full">
+            <Button onClick={() => navigate('/orders')} className="rounded-full">
               Ver Mis Pedidos
             </Button>
             <Button 
