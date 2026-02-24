@@ -573,14 +573,13 @@ export default function Orders() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">{t('orders.allStates', 'All statuses')}</SelectItem>
-                          <SelectItem value="borrador">{t('orders.statusDraft', 'Draft')}</SelectItem>
-                          <SelectItem value="pre_orden">{t('orders.statusPreOrder', 'Pre-order')}</SelectItem>
-                          <SelectItem value="pendiente">{t('orders.statusPending', 'Pending')}</SelectItem>
-                          <SelectItem value="confirmado">{t('orders.statusConfirmed', 'Confirmed')}</SelectItem>
-                          <SelectItem value="preparando">{t('orders.statusPreparing', 'Preparing')}</SelectItem>
-                          <SelectItem value="enviado">{t('orders.statusShipped', 'Shipped')}</SelectItem>
-                          <SelectItem value="entregado">{t('orders.statusDelivered', 'Delivered')}</SelectItem>
-                          <SelectItem value="cancelado">{t('orders.statusCancelled', 'Cancelled')}</SelectItem>
+                          <SelectItem value="pending">{t('orders.statusPending', 'Pending')}</SelectItem>
+                          <SelectItem value="confirmed">{t('orders.statusConfirmed', 'Confirmed')}</SelectItem>
+                          <SelectItem value="preparing">{t('orders.statusPreparing', 'Preparing')}</SelectItem>
+                          <SelectItem value="shipped">{t('orders.statusShipped', 'Shipped')}</SelectItem>
+                          <SelectItem value="delivered">{t('orders.statusDelivered', 'Delivered')}</SelectItem>
+                          <SelectItem value="paid">{t('orders.statusPaid', 'Paid')}</SelectItem>
+                          <SelectItem value="cancelled">{t('orders.statusCancelled', 'Cancelled')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -603,18 +602,15 @@ export default function Orders() {
                   ) : (
                     <div className="space-y-4">
                       {filteredPedidos.map((pedido) => (
-                        <Card key={pedido.pedido_id} data-testid={`store-order-${pedido.pedido_id}`}>
+                        <Card key={pedido.order_id} data-testid={`store-order-${pedido.order_id}`}>
                           <CardContent className="p-4 sm:p-6">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                                  {getStatusBadge(pedido.estado)}
-                                  <span className="text-xs text-muted-foreground font-mono">#{pedido.pedido_id?.slice(-8)}</span>
+                                  {getStatusBadge(pedido.status)}
+                                  <span className="text-xs text-muted-foreground font-mono">#{pedido.order_id}</span>
                                 </div>
-                                <p className="font-medium">{pedido.estudiante_nombre || t('orders.orderGeneral', 'General Order')}</p>
-                                {pedido.ano_escolar && (
-                                  <p className="text-sm text-muted-foreground">{t('orders.schoolYear', 'School year')}: {pedido.ano_escolar}</p>
-                                )}
+                                <p className="font-medium">{pedido.customer_name || t('orders.orderGeneral', 'General Order')}</p>
                                 <p className="text-xs text-muted-foreground mt-1">
                                   {pedido.created_at && new Date(pedido.created_at).toLocaleDateString()}
                                 </p>
@@ -630,8 +626,8 @@ export default function Orders() {
                                 <div className="space-y-2">
                                   {pedido.items.slice(0, 3).map((item, idx) => (
                                     <div key={idx} className="flex justify-between text-sm">
-                                      <span>{item.name || item.book_name}</span>
-                                      <span className="text-muted-foreground">{item.cantidad} x ${item.price?.toFixed(2) || '0.00'}</span>
+                                      <span>{item.name}</span>
+                                      <span className="text-muted-foreground">{item.quantity} x ${item.unit_price?.toFixed(2) || '0.00'}</span>
                                     </div>
                                   ))}
                                   {pedido.items.length > 3 && (
@@ -642,14 +638,9 @@ export default function Orders() {
                             )}
 
                             <div className="flex gap-2 mt-4 justify-end">
-                              <Link to={`/pedido/${pedido.pedido_id}`}>
-                                <Button variant="outline" size="sm" className="rounded-full" data-testid={`view-order-${pedido.pedido_id}`}>
+                              <Link to={`/checkout/${pedido.order_id}`}>
+                                <Button variant="outline" size="sm" className="rounded-full" data-testid={`view-order-${pedido.order_id}`}>
                                   <Eye className="h-4 w-4 mr-2" />{t('orders.viewDetailsBtn', 'View Details')}
-                                </Button>
-                              </Link>
-                              <Link to={`/recibo/${pedido.pedido_id}?print=true`}>
-                                <Button variant="ghost" size="sm" className="rounded-full">
-                                  <Printer className="h-4 w-4 mr-2" />{t('orders.print', 'Print')}
                                 </Button>
                               </Link>
                             </div>
