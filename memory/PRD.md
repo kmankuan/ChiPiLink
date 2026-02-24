@@ -1,80 +1,69 @@
 # ChiPi Link - PRD
 
 ## Original Problem Statement
-Fix incorrect inventory statistics bug, then separate school textbook ("Sysbook") system from public store ("Unatienda"), with full-stack refactoring of legacy terminology.
+Multi-module school supply/textbook management platform ("ChiPi Link") with:
+- **Unatienda**: Public-facing store for school supplies
+- **Sysbook**: Private school textbook inventory management  
+- **PinpanClub**: Ping pong club management
+- **Wallet**: User wallet with Monday.com integration
+- **Community**: Telegram-based community feed
+- **Admin Panel**: Full admin dashboard with modules
 
-## Core Systems
-- **Unatienda**: Public-facing store with product inventory → Backend: `modules/store/`, API: `/api/store/`
-- **Sysbook**: Private school textbook management → Backend: `modules/sysbook/`, API: `/api/sysbook/`
+## Architecture
+- **Frontend**: React (CRA) with Shadcn UI, deployed on Emergent platform
+- **Backend**: FastAPI with MongoDB (Motor), modular architecture
+- **Database**: MongoDB (local in preview, Atlas in production)
+- **Deployment**: Emergent Kubernetes platform
 
-## Naming Convention
-- Files, variables, paths use `sysbook_` or `unatienda_` prefix to distinguish systems
-- No "catalog" concept — use "inventory" instead
-- API routes: `/api/sysbook/*` for textbooks, `/api/store/*` for public store
+## Code Structure
+```
+/app
+├── backend/
+│   ├── core/          # Config, database, auth, base classes
+│   ├── modules/       # Feature modules (auth, store, sysbook, wallet, etc.)
+│   ├── main.py        # App entry point, startup, routing
+│   └── server.py      # Bridge for uvicorn
+└── frontend/
+    └── src/
+        ├── config/
+        │   ├── api.js        # API endpoints config
+        │   └── apiUrl.js     # Runtime API URL resolver (NEW)
+        ├── contexts/         # Auth, Theme, Cart, SiteConfig
+        ├── modules/          # Feature modules
+        ├── pages/            # Route pages
+        └── components/       # Shared UI components
+```
+
+## Key Credentials
+- Admin: teck@koh.one / Acdb##0897
+- Auth endpoint: POST /api/auth-v2/login
+- Health: GET /api/health
+- Admin diagnostic: GET /api/health/admin-check
 
 ## What's Been Implemented
 
-### Previous Sessions
-- Sysbook module separation (backend routes, frontend components)
-- Per-product custom alert thresholds, stock alerts dashboard
-- CSV import & student ordering flow
-- DB field standardization: `is_private_catalog` → `is_sysbook`, `catalog_type` → `inventory_source`
+### Session: Feb 24, 2026
+- **CRITICAL FIX: Production Login** — Root cause: `REACT_APP_BACKEND_URL` was baked at build-time with stale URL (`backend-cleanup-10.emergent.host`). Created `apiUrl.js` runtime resolver that detects the hostname and uses `window.location.origin` for `.emergent.host` and `.preview.emergentagent.com` domains. Updated 165+ files to use the runtime resolver instead of `process.env.REACT_APP_BACKEND_URL`.
+- **FIX: .gitignore blocking .env files** — Removed `*.env` patterns that prevented environment files from being included in Docker builds.
+- **FIX: Backend startup robustness** — Added 2s delay before deferred init, 1s delay before pollers, retry logic (3x) for admin seeding, and self-check diagnostic.
+- **NEW: Admin diagnostic endpoint** — `GET /api/health/admin-check` to verify admin user exists with valid hash in production.
 
-### Current Session (Feb 22, 2026)
-- **Admin Login Fix (P0)**: Force-update `password_hash` + `is_admin` on every startup
-- **Deployment Startup Fix**: Fast path (indexes + seeds ~250ms) + deferred background init
-- **Index Conflict Fix**: Per-index `_safe_index()` with `sparse=True` for Atlas
-- **Stock Order Delete**: DELETE endpoints (individual, bulk, clear-all) + UI buttons
-- **P5 Cosmetic Refactor**: `catalog` → `inventory/sysbook` naming across full-stack
-- **Route Migration (P5+)**: Moved 6 sysbook route files from `store/` to `sysbook/` module:
-  - `/api/store/sysbook-catalog/*` → `/api/sysbook/browse/*`
-  - `/api/store/textbook-access/*` → `/api/sysbook/access/*`
-  - `/api/store/textbook-orders/*` → `/api/sysbook/orders/*`
-  - `/api/store/presale-import/*` → `/api/sysbook/presale-import/*`
-  - `/api/store/school-year/*` → `/api/sysbook/school-year/*`
-  - `/api/store/bulk-import/*` → `/api/sysbook/bulk-import/*`
-- **Full Backend Separation (P0)**: Completed full architectural separation of sysbook module:
-  - Moved services from `store/services/` to `sysbook/services/`: `crm_chat_service.py`, `monday_sync_service.py`, `textbook_order_service.py`, `textbook_access_service.py`, `bulk_import_service.py`, `presale_import_service.py`, `school_year_service.py`
-  - Moved models from `store/models/` to `sysbook/models/`: `textbook_access.py`, `textbook_order.py`
-  - Moved repositories from `store/repositories/` to `sysbook/repositories/`: `textbook_access_repository.py`, `textbook_order_repository.py`
-  - Deleted duplicate files from `store/` after verifying no dependencies
-  - Fixed circular import issues with lazy imports in `store/integrations/monday_textbook_adapter.py` and `store/services/monday_sync_service.py`
-  - Shared infrastructure stays in `store/`: Monday.com adapters, config services, and shared routes (inventory_import, form_config, order_form_config, monday_sync)
-- **Testing**: 100% pass rate (iteration_192) — all sysbook and store endpoints verified
+### Previous Sessions (Completed)
+- Sysbook Module Separation (full backend separation from store)
+- Unified Data Manager feature in admin panel
+- Default layout changed to "Mosaic Community"
+- Wallet self-recharge security fix (requires admin approval)
+- Wallet double-deposit UI fix
+- Health check timeout fix (removed bcrypt from health endpoint)
+- "Clear All" stock orders route fix
+- Add School API parameter fix
+- Malformed .env file fix
 
-## Architecture
-```
-/api/sysbook/              ← All school textbook functionality
-  /inventory/*             ← Admin inventory management
-  /stock-orders/*          ← Stock movements
-  /analytics/*             ← Sysbook analytics
-  /alerts/*                ← Low-stock alerts
-  /browse/*                ← User-facing product browsing
-  /access/*                ← Student-parent linking
-  /orders/*                ← Textbook orders
-  /presale-import/*        ← Pre-sale import from Monday.com
-  /school-year/*           ← School year config
-  /bulk-import/*           ← Bulk import from sheets
+## Pending/Backlog
+- (P3) Build an on-demand landing page redesign tool
+- (P4) Extend Monday.com synchronization to general product inventory
 
-/api/store/                ← Public store (Unatienda)
-  /products/*              ← Product CRUD
-  /categories/*            ← Category management
-  /inventory/*             ← Public inventory
-  /public/*                ← Public endpoints
-  /analytics/*             ← Store analytics
-  /stock-orders/*          ← Unatienda stock orders
-```
-
-## Remaining Tasks
-- **(P3)** On-demand landing page redesign tool
-- **(P4)** Extend Monday.com sync to general product inventory
-- Remove diagnostic info from `/api/health` (temporary debug tool)
-
-## Recent Changes (Feb 22, 2026 - Session 2)
-- **Sysbook Backend Separation (P0 COMPLETE)**: Full architectural separation done. All services, models, repos moved. Circular imports fixed with lazy loading.
-- **Data Manager (COMPLETE)**: Combined Demo Data + Data Cleanup into unified admin tool at `/api/data-manager/`. Shows all 8 modules with per-collection stats, clear, seed demo. Admin accounts protected. UI under Management sidebar group. Testing: 100% (iteration_192, iteration_193)
-- **Default Layout Fix**: Changed default landing layout from `living_grid` to `mosaic_community`.
-
-## Credentials
-- Admin: teck@koh.one / Acdb##0897
-- Auth: POST /api/auth-v2/login
+## 3rd Party Integrations
+- OneSignal (Push), Monday.com API v2, Google Photos, Gmail, Telegram Bot
+- OpenAI & Anthropic LLMs, OpenAI TTS (Emergent Key), ElevenLabs TTS
+- WebSockets (socket.io-client & python-socketio), LaoPan OAuth
