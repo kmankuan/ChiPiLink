@@ -212,16 +212,10 @@ async def yappy_ipn_callback(
 # ============== ORDER ENDPOINTS ==============
 
 @router.get("/my-orders")
-async def get_my_platform_orders(user=Depends(lambda: get_current_user)):
+async def get_my_platform_orders(user: dict = Depends(auth_get_current_user)):
     """Get current user's Unatienda orders"""
-    # Resolve the actual dependency if it's a coroutine function
-    if callable(user):
-        from fastapi import Request
-        # Fall back to extracting user from the module-level variable
-        pass
-
-    user_id = user.get("user_id") if isinstance(user, dict) else None
-    email = user.get("email", "") if isinstance(user, dict) else ""
+    user_id = user.get("user_id", "")
+    email = user.get("email", "")
 
     query = {"$or": []}
     if user_id:
