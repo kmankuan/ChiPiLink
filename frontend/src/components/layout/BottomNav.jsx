@@ -89,8 +89,8 @@ export default function BottomNav() {
           <NavItem icon={Trophy} label={t('common.club', 'Club')} to="/pinpanclub" active={isClub} />
         )}
 
-        {/* Cart button */}
-        <NavItem icon={ShoppingCart} label={t('common.cart', 'Cart')} onClick={openCart} badge={itemCount} />
+        {/* Orders & Cart — unified page */}
+        <NavItem icon={ClipboardList} label={t('cart.myOrders', 'My Orders')} to="/pedidos" active={isStore && path.startsWith('/pedidos')} badge={itemCount} />
 
         {/* Profile / User menu */}
         {isAuthenticated ? (
