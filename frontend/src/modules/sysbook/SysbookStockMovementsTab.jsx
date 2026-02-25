@@ -61,6 +61,8 @@ export default function SysbookStockMovementsTab() {
   const [deleting, setDeleting] = useState(false);
 
   const [products, setProducts] = useState([]);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
 
   const fetchOrders = useCallback(async () => {
     try {
