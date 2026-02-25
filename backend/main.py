@@ -128,6 +128,9 @@ from routes.membership import router as membership_router, init_routes as init_m
 # Translations - Already modularized
 from routes.translations import router as translations_router, init_routes as init_translations_routes
 
+# Print Module
+from modules.print import router as print_router, init_print_routes
+
 # ============== INITIALIZE ROUTES WITH DB ==============
 
 # Initialize routes that need db injection
