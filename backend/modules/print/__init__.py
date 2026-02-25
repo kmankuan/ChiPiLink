@@ -262,6 +262,16 @@ async def complete_print_job(job_id: str, admin=Depends(lambda: get_admin_user))
     return {"success": True, "printed_at": now}
 
 
+
+@router.get("/monday-webhook-status")
+async def get_monday_webhook_status(admin=Depends(lambda: get_admin_user)):
+    """Get the status of the Monday.com print webhook integration"""
+    config = await db.app_config.find_one({"config_key": "print_monday_webhook"}, {"_id": 0})
+    if not config:
+        return {"configured": False}
+    return {"configured": True, **config.get("value", {})}
+
+
 # ============ MONDAY.COM WEBHOOK ============
 
 @router.post("/monday-trigger")
