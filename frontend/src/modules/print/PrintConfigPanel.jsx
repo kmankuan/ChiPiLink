@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/select';
 import {
   Printer, Settings, FileText, Save, Loader2,
-  LayoutTemplate, SlidersHorizontal, Usb, RefreshCw
+  LayoutTemplate, SlidersHorizontal, Usb, RefreshCw, History,
+  Clock, User, Package, CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import RESOLVED_API_URL from '@/config/apiUrl';
