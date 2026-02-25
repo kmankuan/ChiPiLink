@@ -20,7 +20,7 @@ ENTITY_CONFIG = {
     "students": {"collection": "store_students", "id_field": "student_id"},
     "orders": {"collection": "store_textbook_orders", "id_field": "order_id"},
     "store_orders": {"collection": "store_orders", "id_field": "order_id"},
-    "movements": {"collection": "inventory_movements", "id_field": "movement_id"},
+    "movements": {"collection": "stock_orders", "id_field": "order_id"},
     "alerts": {"collection": "sysbook_alerts", "id_field": "alert_id"},
     "print_jobs": {"collection": "print_jobs", "id_field": "job_id"},
     "products": {"collection": "store_products", "id_field": "product_id"},
