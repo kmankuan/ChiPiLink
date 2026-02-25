@@ -1,77 +1,58 @@
-# ChiPi Link - PRD
+# Sysbook / Unatienda — Product Requirements Document
 
 ## Original Problem Statement
-Multi-module school supply/textbook management platform ("ChiPi Link") with:
-- **Unatienda**: Public-facing store for school supplies
-- **Sysbook**: Private school textbook inventory management  
-- **PinpanClub**: Ping pong club management
-- **Wallet**: User wallet with Monday.com integration
-- **Community**: Telegram-based community feed
-- **Admin Panel**: Full admin dashboard with modules
+Build and maintain a private school inventory system ("Sysbook") alongside a public e-commerce store ("Unatienda"). Features include cart/orders management, wallet with deposits, printing package lists, Monday.com integration, and full i18n support.
 
-## Architecture
-- **Frontend**: React (CRA) with Shadcn UI, deployed on Emergent platform
-- **Backend**: FastAPI with MongoDB (Motor), modular architecture
-- **Database**: MongoDB (local in preview, Atlas in production)
-- **Deployment**: Emergent Kubernetes platform
-
-## Code Structure
-```
-/app
-├── backend/
-│   ├── core/          # Config, database, auth, base classes
-│   ├── modules/       # Feature modules (auth, store, sysbook, wallet, etc.)
-│   ├── main.py        # App entry point, startup, routing
-│   └── server.py      # Bridge for uvicorn
-└── frontend/
-    └── src/
-        ├── config/
-        │   ├── api.js        # API endpoints config
-        │   └── apiUrl.js     # Runtime API URL resolver (NEW)
-        ├── contexts/         # Auth, Theme, Cart, SiteConfig
-        ├── modules/          # Feature modules
-        ├── pages/            # Route pages
-        └── components/       # Shared UI components
-```
-
-## Key Credentials
-- Admin: teck@koh.one / Acdb##0897
-- Auth endpoint: POST /api/auth-v2/login
-- Health: GET /api/health
-- Admin diagnostic: GET /api/health/admin-check
+## Core Architecture
+- **Frontend:** React (CRA) with Shadcn/UI, i18n (en/es/zh), React Router
+- **Backend:** FastAPI + MongoDB (chipilink_prod)
+- **Integrations:** Monday.com, OneSignal, Google Photos, Gmail, Telegram Bot, OpenAI, Anthropic, ElevenLabs, LaoPan OAuth, WebSockets (socket.io)
 
 ## What's Been Implemented
 
-### Session: Feb 24, 2026
-- **CRITICAL FIX: Production Login** — Root cause: `REACT_APP_BACKEND_URL` was baked at build-time with stale URL (`backend-cleanup-10.emergent.host`). Created `apiUrl.js` runtime resolver that detects the hostname and uses `window.location.origin` for `.emergent.host` and `.preview.emergentagent.com` domains. Updated 165+ files to use the runtime resolver instead of `process.env.REACT_APP_BACKEND_URL`.
-- **FIX: .gitignore blocking .env files** — Removed `*.env` patterns that prevented environment files from being included in Docker builds.
-- **FIX: Backend startup robustness** — Added 2s delay before deferred init, 1s delay before pollers, retry logic (3x) for admin seeding, and self-check diagnostic.
-- **NEW: Admin diagnostic endpoint** — `GET /api/health/admin-check` to verify admin user exists with valid hash in production.
+### Completed Features
+1. **Refactored Cart & Orders** — Unified two-tab interface (My Cart + My Orders)
+2. **Full i18n** — English-first system across all components (en/es/zh)
+3. **Unified Order History** — Combined Sysbook + Unatienda orders display
+4. **Backend-Driven Deposit Flow** — Dynamic multi-step deposit (Yappy, Cash, Card, Transfer)
+5. **Print Package List** — Multi-select orders, configurable format, Monday.com webhook trigger, WebSocket real-time notifications
+6. **Print History** — Staff can view past print jobs with who/when/status
+7. **Monday.com Print Button Webhook (2026-02-25)** — Connected button column `button_mm0xa5t0` on TB2026-Orders board (ID: 18397140868) to the print system. Webhook ID: 541186620. Clicking the button in Monday.com triggers a print job and broadcasts to admin browsers via WebSocket.
 
-### Previous Sessions (Completed)
-- Sysbook Module Separation (full backend separation from store)
-- Unified Data Manager feature in admin panel
-- Default layout changed to "Mosaic Community"
-- Wallet self-recharge security fix (requires admin approval)
-- Wallet double-deposit UI fix
-- Health check timeout fix (removed bcrypt from health endpoint)
-- "Clear All" stock orders route fix
-- Add School API parameter fix
-- Malformed .env file fix
+### Key Endpoints
+- `GET/POST /api/print/config/format` — Print format configuration
+- `POST /api/print/jobs` — Create print job
+- `GET /api/print/jobs` — List print job history
+- `POST /api/print/jobs/{job_id}/complete` — Mark job as printed
+- `POST /api/print/monday-trigger` — Monday.com webhook endpoint
+- `GET /api/print/monday-webhook-status` — Check webhook configuration
+- `GET/POST/PUT /api/wallet/deposit-methods` — Deposit method config
+- `GET /api/platform-store/my-orders` — User's store orders
 
-### Session: Feb 24, 2026 (Cont.)
-- **REFACTOR: Unified Cart & Orders Page** — Combined "My Cart" and "My Orders" into a single page at `/pedidos` with two top-level tabs. "Mi Carrito" tab provides full cart management (quantity controls, checkout, empty state with navigation). "Mis Pedidos" tab contains nested sub-tabs for textbook orders and store orders. Supports URL deep-linking via `?tab=cart`. CartDrawer slide-out panel preserved for quick access. Fixed ticker bar overlap with proper page spacing. All tests passed (12/12).
-- **i18n: Cart & Orders Full Internationalization** — Added 22 `cart` keys and 53 `orders` keys to en.json, es.json, zh.json. Replaced all hardcoded Spanish strings in Orders.jsx and CartDrawer.jsx with `t()` calls using English-first defaults. Changed i18n fallback language from 'es' to 'en'. Fixed OrderChat.jsx default lang and fallback labels to English. All i18n tests passed (100%).
-- **Unatienda Orders Integration Fix** — Created `GET /api/platform-store/my-orders` endpoint to fetch user's store orders (was missing, caused 404). Fixed field name mismatch in checkout (frontend sent Spanish field names, backend expected English). Updated `Orders.jsx` to call correct API. Updated store order display to use English field names. Fixed `UnatiendaCheckout.jsx` to read `order_id` from response. Added `user_id` to order creation for logged-in users. All tests passed (13/13 backend, 100% frontend).
-- **Route Rename: /pedidos → /orders** — Changed all frontend route references from `/pedidos` to `/orders` across 6 files. Added redirect for backward compatibility.
-- **Deposit Funds Refactor** — New step-based deposit flow with 4 admin-configurable payment methods: Yappy (redirect to platform Yappy integration with toggle), Cash (rich text instructions), Card (under construction with Lottie), Transfer (rich text with bank details and chipiwallet@gmail.com). Backend: `GET/PUT /api/wallet/deposit-methods` for config, `GET /api/wallet/admin/deposit-methods` for admin. Frontend: `DepositFlow.jsx` component with 3 steps (amount → method → instructions/confirmation). All tests passed (16/16 backend, 100% frontend).
-- **Package List Print System** — Multi-select orders → preview package lists → print. Backend: `POST /api/print/jobs` creates print jobs, `GET/PUT /api/print/config/format` and `/config/printer` for admin config. Monday.com webhook at `POST /api/print/monday-trigger` sends real-time print events via WebSocket. Frontend: `PackageListPreview` renders printable thermal receipt format, `PrintDialog` for multi-order preview with pagination, `PrintConfigPanel` admin page with Field Toggles (simple) and Template Editor (advanced) for format, plus USB thermal printer registration (Logic Controls). All tests passed (14/14 backend, 100% frontend).
+## Prioritized Backlog
 
-## Pending/Backlog
-- (P3) Build an on-demand landing page redesign tool
-- (P4) Extend Monday.com synchronization to general product inventory
+### P0 (Critical)
+- None
 
-## 3rd Party Integrations
-- OneSignal (Push), Monday.com API v2, Google Photos, Gmail, Telegram Bot
-- OpenAI & Anthropic LLMs, OpenAI TTS (Emergent Key), ElevenLabs TTS
-- WebSockets (socket.io-client & python-socketio), LaoPan OAuth
+### P1 (High)
+- None
+
+### P2 (Medium)
+- **Direct-to-Printer Integration** — Browser USB printing to Logic Controls thermal printer via WebUSB API
+- **On-Demand Landing Page Redesign Tool** — Admin customization tool for landing page
+
+### P3 (Low)
+- **Extend Monday.com Sync** — Expand sync to general product inventory beyond Sysbook orders
+
+## Key Database Collections
+- `print_jobs` — Print job records with status tracking
+- `app_config` — Print format config, printer config, webhook config
+- `store_textbook_orders` — Sysbook textbook orders (linked to Monday.com items)
+- `deposit_methods` — Wallet deposit method configuration
+- `store_orders` — Unatienda public store orders
+
+## Credentials
+- Admin: teck@koh.one / Acdb##0897
+- Monday.com Board: TB2026-Orders (18397140868)
+- Print Button Column: button_mm0xa5t0
+- Webhook ID: 541186620
