@@ -238,7 +238,7 @@ async def monday_print_trigger(data: dict):
         raise HTTPException(status_code=400, detail="No item ID in webhook payload")
 
     # Find the order linked to this Monday.com item
-    order = await db.sysbook_orders.find_one(
+    order = await db.store_textbook_orders.find_one(
         {"$or": [
             {"monday_item_id": item_id},
             {"monday_item_ids": item_id},
