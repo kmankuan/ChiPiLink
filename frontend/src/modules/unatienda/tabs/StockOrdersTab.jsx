@@ -597,6 +597,18 @@ export default function StockOrdersTab({ token }) {
   const [showAdjustment, setShowAdjustment] = useState(false);
   const [transitionOrder, setTransitionOrder] = useState(null);
   const [detailOrder, setDetailOrder] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
+
+  const handleArchiveOrder = async (orderId) => {
+    try {
+      await axios.post(`${API_URL}/api/archive/movements/archive`, { ids: [orderId] }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Movement archived');
+      fetchOrders();
+    } catch { toast.error('Archive failed'); }
+  };
 
   const fetchOrders = useCallback(async () => {
     try {
