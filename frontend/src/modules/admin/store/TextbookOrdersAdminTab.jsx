@@ -63,6 +63,7 @@ import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 import CrmChat from '@/components/chat/CrmChat';
 import PrintDialog from '@/modules/print/PrintDialog';
+import ArchiveTab from '@/components/shared/ArchiveTab';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -109,6 +110,7 @@ export default function TextbookOrdersAdminTab() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [chatStudent, setChatStudent] = useState(null);
   const [singlePrintOpen, setSinglePrintOpen] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
 
   useEffect(() => {
     fetchData();
