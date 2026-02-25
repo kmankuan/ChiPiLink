@@ -23,9 +23,10 @@ import {
 import {
   Printer, Settings, FileText, Save, Loader2,
   LayoutTemplate, SlidersHorizontal, Usb, RefreshCw, History,
-  Clock, User, Package, CheckCircle2
+  Clock, User, Package, CheckCircle2, Unplug, Plug, Zap, AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import useThermalPrinter from '@/hooks/useThermalPrinter';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
