@@ -261,8 +261,8 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
                   onClick={async () => {
                     try {
                       if (!printer.connected) {
-                        await printer.connect();
-                        toast.success('Printer connected');
+                        await printer.connectUSB();
+                        toast.success('Printer connected via USB');
                       }
                       const fmtCfg = {
                         title: formatConfig?.header?.title || 'PACKAGE LIST',
