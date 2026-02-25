@@ -165,8 +165,8 @@ async def create_print_job(data: dict, admin=Depends(lambda: get_admin_user)):
     if not order_ids:
         raise HTTPException(status_code=400, detail="No orders specified")
 
-    # Fetch orders
-    orders = await db.sysbook_orders.find(
+    # Fetch orders from store_textbook_orders collection
+    orders = await db.store_textbook_orders.find(
         {"order_id": {"$in": order_ids}},
         {"_id": 0}
     ).to_list(100)
