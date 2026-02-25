@@ -34,6 +34,11 @@ def init_archive_routes(_db, _get_admin_user):
     get_admin_user = _get_admin_user
 
 
+def get_admin_dependency():
+    """Wrapper to get admin user dependency at runtime"""
+    return Depends(get_admin_user)
+
+
 class ArchiveRequest(BaseModel):
     ids: List[str]
 
