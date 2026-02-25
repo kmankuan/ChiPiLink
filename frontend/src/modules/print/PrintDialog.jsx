@@ -15,6 +15,8 @@ import {
   Printer, ChevronLeft, ChevronRight, Loader2, Eye, Usb
 } from 'lucide-react';
 import PackageListPreview from './PackageListPreview';
+import useThermalPrinter from '@/hooks/useThermalPrinter';
+import { toast } from 'sonner';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
