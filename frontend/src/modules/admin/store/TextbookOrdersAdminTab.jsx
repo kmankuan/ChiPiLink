@@ -312,8 +312,8 @@ export default function TextbookOrdersAdminTab() {
             options: grades.map(g => ({ value: g, label: `Grade ${g}` })),
           },
         ] : []}
-        hasActiveFilters={!!(searchTerm || filterStatus !== 'all' || filterGrade !== 'all' || showArchived)}
-        onClearFilters={() => { setSearchTerm(''); setFilterStatus('all'); setFilterGrade('all'); setShowArchived(false); }}
+        hasActiveFilters={!!(searchTerm || filterStatus !== 'all' || filterGrade !== 'all')}
+        onClearFilters={() => { setSearchTerm(''); setFilterStatus('all'); setFilterGrade('all'); }}
         stats={stats ? [
           { label: 'total', value: stats.total || orders.length, color: 'blue' },
           ...(stats.by_status?.submitted > 0 ? [{ label: 'submitted', value: stats.by_status.submitted, color: 'amber', highlight: true }] : []),
