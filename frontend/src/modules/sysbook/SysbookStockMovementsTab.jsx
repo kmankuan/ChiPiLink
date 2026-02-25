@@ -235,6 +235,23 @@ export default function SysbookStockMovementsTab() {
         }
       />
 
+      {/* Archived View */}
+      {showArchived ? (
+        <ArchiveTab
+          entityType="movements"
+          token={token}
+          idField="order_id"
+          onCountChange={setArchiveCount}
+          searchFields={['order_id', 'supplier', 'customer_name']}
+          columns={[
+            { key: 'order_id', label: 'ID', render: o => <span className="font-mono text-[10px]">{o.order_id}</span> },
+            { key: 'type', label: 'Type', render: o => <Badge variant="outline" className="text-[10px]">{o.type}</Badge> },
+            { key: 'status', label: 'Status' },
+            { key: 'items', label: 'Items', render: o => `${(o.items || []).length} items` },
+          ]}
+        />
+      ) : (
+      <>
       {/* Orders List */}
       {orders.length === 0 ? (
         <Card><CardContent className="py-12 text-center">
