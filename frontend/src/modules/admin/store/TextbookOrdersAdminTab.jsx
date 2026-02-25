@@ -51,7 +51,8 @@ import {
   Users,
   BarChart3,
   Archive,
-  MessageCircle
+  MessageCircle,
+  Printer
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
