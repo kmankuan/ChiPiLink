@@ -285,14 +285,89 @@ async def get_monday_webhook_status(admin=Depends(lambda: get_admin_user)):
     return {"configured": True, **config.get("value", {})}
 
 
-# ============ MONDAY.COM WEBHOOK ============
+# ============ MONDAY.COM WEBHOOK (with batch support) ============
+
+async def _finalize_batch(batch_id: str, order_ids: list, monday_item_ids: list):
+    """Background task: waits for the batch window, then creates one combined print job."""
+    global _active_batch
+
+    logger.info(f"[print/batch] Batch {batch_id}: waiting {MONDAY_BATCH_WINDOW_SECONDS}s for more clicks...")
+    await asyncio.sleep(MONDAY_BATCH_WINDOW_SECONDS)
+
+    # Grab and clear the active batch under lock
+    async with _batch_lock:
+        if _active_batch and _active_batch["batch_id"] == batch_id:
+            final_order_ids = list(_active_batch["order_ids"])
+            final_monday_ids = list(_active_batch["monday_item_ids"])
+            _active_batch = None
+        else:
+            # Batch was already finalized or replaced — nothing to do
+            return
+
+    if not final_order_ids:
+        return
+
+    logger.info(f"[print/batch] Batch {batch_id}: finalizing with {len(final_order_ids)} orders: {final_order_ids}")
+
+    # Fetch all orders
+    orders = await db.store_textbook_orders.find(
+        {"order_id": {"$in": final_order_ids}},
+        {"_id": 0}
+    ).to_list(100)
+
+    if not orders:
+        logger.warning(f"[print/batch] Batch {batch_id}: no orders found in DB")
+        return
+
+    # Get format config
+    config = await db.app_config.find_one({"config_key": "print_format"}, {"_id": 0})
+    fmt = config["value"] if config else DEFAULT_FORMAT_CONFIG
+    template = config.get("template", DEFAULT_TEMPLATE) if config else DEFAULT_TEMPLATE
+
+    now = datetime.now(timezone.utc).isoformat()
+    job_id = f"PJ-MON-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+
+    job = {
+        "job_id": job_id,
+        "order_ids": final_order_ids,
+        "orders": orders,
+        "student_names": list({o.get("student_name", "") for o in orders if o.get("student_name")}),
+        "order_count": len(orders),
+        "format_config": fmt,
+        "template": template,
+        "status": "pending",
+        "source": "monday",
+        "monday_item_ids": final_monday_ids,
+        "batch_id": batch_id,
+        "created_at": now,
+    }
+
+    await db.print_jobs.insert_one(job)
+
+    logger.info(f"[print/batch] Print job {job_id} created with {len(orders)} orders from Monday.com batch")
+
+    # Broadcast to admin browsers for immediate printing
+    if ws_manager:
+        await ws_manager.broadcast_to_room("admin", {
+            "type": "print_job",
+            "job_id": job_id,
+            "order_ids": final_order_ids,
+            "order_count": len(orders),
+            "source": "monday",
+            "batch": True,
+        })
+
 
 @router.post("/monday-trigger")
 async def monday_print_trigger(data: dict):
     """Webhook endpoint for Monday.com button column to trigger printing.
-    Monday.com sends: { "event": { "boardId", "pulseId", "columnId", "value" } }
-    Webhook fires on ALL column changes — we filter for the print button column only.
+
+    Monday.com sends one webhook per row. When multiple rows are clicked in quick
+    succession, the backend automatically batches them into a single print job.
+    The batch window is MONDAY_BATCH_WINDOW_SECONDS (default 15s).
     """
+    global _active_batch
+
     # Monday.com challenge verification (sent once when webhook is created)
     if "challenge" in data:
         logger.info(f"[print/monday-trigger] Challenge: {data['challenge']}")
@@ -317,47 +392,50 @@ async def monday_print_trigger(data: dict):
             {"monday_item_id": item_id},
             {"monday_item_ids": item_id},
         ]},
-        {"_id": 0}
+        {"_id": 0, "order_id": 1, "student_name": 1}
     )
 
     if not order:
         logger.warning(f"[print/monday-trigger] No order found for monday item {item_id}")
         return {"status": "no_order_found", "monday_item_id": item_id}
 
-    # Get format config
-    config = await db.app_config.find_one({"config_key": "print_format"}, {"_id": 0})
-    fmt = config["value"] if config else DEFAULT_FORMAT_CONFIG
-    template = config.get("template", DEFAULT_TEMPLATE) if config else DEFAULT_TEMPLATE
+    order_id = order["order_id"]
 
-    now = datetime.now(timezone.utc).isoformat()
-    job_id = f"PJ-MON-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    # ---- Batch accumulation ----
+    async with _batch_lock:
+        if _active_batch is not None:
+            # Add to existing batch (if order not already in it)
+            if order_id not in _active_batch["order_ids"]:
+                _active_batch["order_ids"].append(order_id)
+                _active_batch["monday_item_ids"].append(item_id)
+                count = len(_active_batch["order_ids"])
+                batch_id = _active_batch["batch_id"]
+                logger.info(f"[print/batch] Added order {order_id} to batch {batch_id} (now {count} orders)")
+            return {
+                "status": "batched",
+                "batch_id": _active_batch["batch_id"],
+                "orders_in_batch": len(_active_batch["order_ids"]),
+                "order_id": order_id,
+            }
+        else:
+            # Start a new batch
+            batch_id = f"BATCH-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+            _active_batch = {
+                "batch_id": batch_id,
+                "order_ids": [order_id],
+                "monday_item_ids": [item_id],
+            }
+            logger.info(f"[print/batch] New batch {batch_id} started with order {order_id}")
 
-    job = {
-        "job_id": job_id,
-        "order_ids": [order["order_id"]],
-        "orders": [order],
-        "student_names": [order.get("student_name", "")],
-        "order_count": 1,
-        "format_config": fmt,
-        "template": template,
-        "status": "pending",
-        "source": "monday",
-        "monday_item_id": item_id,
-        "created_at": now,
-    }
+            # Schedule finalization after the batch window
+            task = asyncio.create_task(
+                _finalize_batch(batch_id, _active_batch["order_ids"], _active_batch["monday_item_ids"])
+            )
+            _active_batch["task"] = task
 
-    await db.print_jobs.insert_one(job)
-
-    logger.info(f"[print/monday-trigger] Print job created: {job_id} for order {order['order_id']}")
-
-    # Broadcast to admin browsers for immediate printing
-    if ws_manager:
-        await ws_manager.broadcast_to_room("admin", {
-            "type": "print_job",
-            "job_id": job_id,
-            "order_ids": [order["order_id"]],
-            "order_count": 1,
-            "source": "monday",
-        })
-
-    return {"status": "print_triggered", "job_id": job_id, "order_id": order["order_id"]}
+            return {
+                "status": "batch_started",
+                "batch_id": batch_id,
+                "order_id": order_id,
+                "window_seconds": MONDAY_BATCH_WINDOW_SECONDS,
+            }
