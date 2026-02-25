@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import {
   Users, Search, Loader2, RefreshCw, Lock, Unlock, GraduationCap, Eye, ShoppingCart,
   ArrowUpDown, ArrowUp, ArrowDown, MessageCircle, LayoutGrid, List, X, Check, Clock,
-  Info, AlertCircle, CheckCircle2, XCircle, ChevronDown, Clipboard
+  Info, AlertCircle, CheckCircle2, XCircle, ChevronDown, Clipboard, Archive, Trash2
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
