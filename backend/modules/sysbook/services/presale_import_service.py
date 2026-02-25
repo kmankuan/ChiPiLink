@@ -28,6 +28,20 @@ SYNC_TRIGGER_LABELS = ["Ready", "ready"]
 class PreSaleImportService:
     """Import pre-sale orders from Monday.com and auto-link on registration"""
 
+    def __init__(self):
+        # Default subitem price column — will be loaded from config
+        self._subitem_price_col = "numeric_mm02v6ym"
+
+    async def _load_subitem_config(self):
+        """Load subitem column mapping from monday_configs"""
+        config = await db.monday_configs.find_one(
+            {"key": "store.textbook_orders.board"}, {"_id": 0}
+        )
+        if config:
+            sub_map = config.get("data", {}).get("subitem_column_mapping", {})
+            if sub_map.get("price"):
+                self._subitem_price_col = sub_map["price"]
+
     async def fetch_importable_items(self, board_id: str) -> List[Dict]:
         """Fetch items from Monday.com board that are marked for import via the trigger column"""
         items = await monday_client.get_board_items(board_id, limit=200)
