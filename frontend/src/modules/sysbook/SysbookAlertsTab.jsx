@@ -39,6 +39,33 @@ export default function SysbookAlertsTab() {
   const [showSettings, setShowSettings] = useState(false);
   const [checking, setChecking] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
+
+  const handleArchiveAlert = async (alertId) => {
+    try {
+      await fetch(`${API_URL}/api/archive/alerts/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids: [alertId] }),
+      });
+      toast.success('Alert archived');
+      fetchAlerts();
+    } catch { toast.error('Error archiving alert'); }
+  };
+
+  const handleArchiveAll = async () => {
+    const ids = alerts.map(a => a.alert_id);
+    if (!ids.length) return;
+    try {
+      await fetch(`${API_URL}/api/archive/alerts/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids }),
+      });
+      toast.success(`${ids.length} alerts archived`);
+      fetchAlerts();
+    } catch { toast.error('Error archiving alerts'); }
+  };
 
   const fetchAlerts = useCallback(async () => {
     try {
