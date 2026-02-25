@@ -141,13 +141,23 @@ class PreSaleImportService:
                 text = col.get("text", "").strip()
                 if not text:
                     continue
-                # Try to detect quantity columns
-                if col.get("id", "").startswith("numbers") or "cantidad" in col.get("id", "").lower() or "quantity" in col.get("id", "").lower():
+                col_id = col.get("id", "").lower()
+                col_type = col.get("type", "").lower()
+                # Detect numeric columns (price or quantity)
+                is_numeric = col_type in ("numbers", "numeric") or col_id.startswith("numbers") or col_id.startswith("numeric")
+                is_qty = "cantidad" in col_id or "quantity" in col_id or "qty" in col_id
+                if is_numeric or is_qty:
                     try:
-                        val = float(text.replace(",", ""))
-                        if val < 100:  # Likely quantity
-                            quantity = max(1, int(val))
-                        else:  # Likely price
+                        val = float(text.replace(",", "").replace("$", ""))
+                        if is_qty or val < 100 and "price" not in col_id and "precio" not in col_id:
+                            # Small values in qty-named columns are quantities
+                            if is_qty:
+                                quantity = max(1, int(val))
+                            elif val < 20:
+                                quantity = max(1, int(val))
+                            else:
+                                price = val
+                        else:
                             price = val
                     except ValueError:
                         pass
