@@ -38,6 +38,9 @@ export default function PrintConfigPanel() {
   const [printerConfig, setPrinterConfig] = useState(null);
   const [configTab, setConfigTab] = useState('simple');
   const [mainTab, setMainTab] = useState('format');
+  const [history, setHistory] = useState([]);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [historyPage, setHistoryPage] = useState(0);
 
   const token = localStorage.getItem('auth_token');
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
