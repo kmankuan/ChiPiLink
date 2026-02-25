@@ -16,10 +16,11 @@ import { toast } from 'sonner';
 import {
   Truck, RotateCcw, Wrench, Plus, ChevronRight, Clock,
   CheckCircle, XCircle, Package, Search, Loader2, ArrowRight,
-  AlertTriangle, BookOpen, Zap
+  AlertTriangle, BookOpen, Zap, Archive, Trash2
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
+import ArchiveTab from '@/components/shared/ArchiveTab';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
