@@ -673,7 +673,46 @@ export default function StudentsTab({ token }) {
         </div>
       )}
 
+      {/* ═══ ARCHIVED SECTION ═══ */}
+      {section === 'archived' && (
+        <ArchiveTab
+          entityType="students"
+          token={token}
+          idField="student_id"
+          onCountChange={setArchiveCount}
+          searchFields={['full_name', 'student_number', 'student_id']}
+          columns={[
+            { key: 'full_name', label: 'Student' },
+            { key: 'student_number', label: 'Student #' },
+            { key: 'school_name', label: 'School' },
+            { key: 'grade', label: 'Grade', render: (item) => {
+              const enr = (item.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
+              return enr?.grade || '-';
+            }},
+          ]}
+        />
+      )}
+
       {/* ═══ DIALOGS ═══ */}
+
+      {/* Archive Confirm */}
+      <Dialog open={!!archiveDialog} onOpenChange={() => setArchiveDialog(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Archive className="h-5 w-5 text-amber-500" /> Archive Student{archiveDialog?.ids?.length > 1 ? 's' : ''}</DialogTitle>
+            <DialogDescription>
+              Move {archiveDialog?.ids?.length} student{archiveDialog?.ids?.length !== 1 ? 's' : ''} to archive? You can restore them later.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setArchiveDialog(null)} disabled={processing}>Cancel</Button>
+            <Button onClick={() => handleArchive(archiveDialog.ids)} disabled={processing} variant="destructive" className="gap-1">
+              {processing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Archive
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Lock/Unlock */}
       <Dialog open={!!lockDialog} onOpenChange={() => setLockDialog(null)}>
