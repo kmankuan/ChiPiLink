@@ -49,6 +49,10 @@ export default function PrintConfigPanel() {
     fetchConfig();
   }, []);
 
+  useEffect(() => {
+    if (mainTab === 'history') fetchHistory();
+  }, [mainTab, historyPage]);
+
   const fetchConfig = async () => {
     setLoading(true);
     try {
