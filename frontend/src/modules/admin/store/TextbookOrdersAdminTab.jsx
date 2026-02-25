@@ -223,7 +223,7 @@ export default function TextbookOrdersAdminTab() {
   };
 
   const filteredOrders = orders.filter(order => {
-    if (!showArchived && order.archived) return false;
+    if (order.archived) return false;
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       return (
