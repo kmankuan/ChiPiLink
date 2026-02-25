@@ -372,6 +372,7 @@ export default function StudentsTab({ token }) {
           tabs={[
             { value: 'students', label: t.students, icon: Users },
             { value: 'requests', label: t.requests, icon: Clipboard },
+            { value: 'archived', label: 'Archived', icon: Archive, count: archiveCount || undefined },
           ]}
           activeTab={section}
           onTabChange={setSection}
@@ -410,6 +411,7 @@ export default function StudentsTab({ token }) {
           tabs={[
             { value: 'students', label: t.students, icon: Users },
             { value: 'requests', label: t.requests, icon: Clipboard },
+            { value: 'archived', label: 'Archived', icon: Archive, count: archiveCount || undefined },
           ]}
           activeTab={section}
           onTabChange={setSection}
