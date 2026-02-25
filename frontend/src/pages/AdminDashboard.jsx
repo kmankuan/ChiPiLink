@@ -65,7 +65,8 @@ import {
   RefreshCw,
   ClipboardList,
   Truck,
-  AlertTriangle
+  AlertTriangle,
+  Printer
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
