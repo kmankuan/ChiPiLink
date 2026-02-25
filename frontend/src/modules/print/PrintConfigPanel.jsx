@@ -171,7 +171,7 @@ export default function PrintConfigPanel() {
   return (
     <div className="space-y-6" data-testid="print-config-panel">
       <Tabs value={mainTab} onValueChange={setMainTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="format" className="gap-2">
             <FileText className="h-4 w-4" />
             {t('print.formatConfig', 'Package List Format')}
@@ -179,6 +179,10 @@ export default function PrintConfigPanel() {
           <TabsTrigger value="printer" className="gap-2">
             <Printer className="h-4 w-4" />
             {t('print.printerConfig', 'Printer Settings')}
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            {t('print.history', 'Print History')}
           </TabsTrigger>
         </TabsList>
 
