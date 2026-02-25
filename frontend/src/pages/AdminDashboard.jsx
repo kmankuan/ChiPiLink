@@ -95,6 +95,7 @@ const SysbookAlertsTab = lazy(() => import('@/modules/sysbook/SysbookAlertsTab')
 const StudentsSchoolsModule = lazy(() => import('@/modules/school-textbooks/StudentsSchoolsModule'));
 const PreSaleImportTab = lazy(() => import('@/modules/unatienda/tabs/PreSaleImportTab'));
 const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/MondayTextbookSyncModule'));
+const PrintConfigPanel = lazy(() => import('@/modules/print/PrintConfigPanel'));
 const TextbookFormSettingsModule = lazy(() => import('@/modules/school-textbooks/TextbookFormSettingsModule'));
 const MessagesTab = lazy(() => import('@/modules/unatienda/tabs/MessagesTab'));
 
