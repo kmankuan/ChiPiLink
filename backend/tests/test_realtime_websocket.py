@@ -9,7 +9,7 @@ from websockets.sync.client import connect as ws_connect
 import json
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://print-history-hub.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://presale-import-fix.preview.emergentagent.com')
 
 # Admin credentials for testing
 ADMIN_EMAIL = "admin@chipi.co"

@@ -1,146 +1,149 @@
 <analysis>**original_problem_statement:**
-The user's initial goal was to fix an inventory statistics bug. This quickly expanded into a major architectural refactor to separate a private school inventory system (Sysbook) from a public e-commerce store (Unatienda). Throughout the session, the user requested numerous features and bug fixes, including:
-1.  **Refactor Cart & Orders:** Combine the My Cart and My Orders pages into a single, two-tab interface.
-2.  **Full Internationalization (i18n):** Implement and enforce an English-first i18n system (for English, Spanish, Chinese) across the new Cart & Orders components, removing all hardcoded Spanish text and routes.
-3.  **Unify Order History:** Fix a critical bug where public store orders were not being displayed and ensure the My Orders tab shows a combined history of both Sysbook and Unatienda purchases.
-4.  **Refactor Deposit Flow:** Overhaul the wallet deposit feature, making it a dynamic, multi-step process driven by a backend configuration. This included custom workflows for different payment methods (Yappy, Cash, Card, Bank Transfer).
-5.  **Implement Order Printing:** Build a comprehensive Package List printing system for staff. This involved:
-    *   Allowing multi-selection of orders for bulk printing.
-    *   Creating a configurable print format template for receipts.
-    -   Integrating with Monday.com via a webhook to trigger print jobs remotely.
-    -   Implementing a real-time print notification in the browser using WebSockets.
-6.  **Enhance Printing with History:** Add a Print History feature for staff to track past print jobs, including who printed them and when.
+The user initially requested to configure a Monday.com button to trigger a print job in the application. This evolved into a series of feature requests and bug reports. The primary goals are:
+1.  **Data Reset:** Clean all transactional data (orders, students, stock movements, etc.) to start fresh for a pre-sale import.
+2.  **Archive Workflow:** Implement a universal soft delete system. Items should first be moved to an Archived state, from which they can be either restored or permanently deleted. This needs to be applied to Students, Orders, Stock Alerts, and Stock Movements.
+3.  **Direct-to-Printer Integration:** Implement direct printing to a Logic Controls LR2000E thermal printer from the browser.
+4.  **Fix Pre-Sale Import:** Address four critical bugs the user found after testing the import feature:
+    *   Imported orders from Monday.com are missing item prices and the total is not calculated.
+    *   The Print button is missing from the individual order detail dialog.
+    *   The book code column is missing from the order view.
+    *   The bulk print option is not visible on the main Orders table, preventing printing of multiple selected orders.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack React (frontend) and FastAPI (backend) solution. Key functionalities include:
-- A clear architectural separation between the Sysbook (school inventory) and Unatienda (public store) modules.
-- A stable production environment, thanks to a robust runtime-dynamic API URL resolver that prevents build-time configuration issues.
-- A secure wallet deposit system with a mandatory admin approval workflow.
-- A highly flexible, backend-driven wallet deposit flow that allows administrators to configure payment methods (Yappy, Cash, Card, Transfer) without code changes.
-- A complete, end-to-end order printing system for Sysbook orders. Staff can select, preview, and print Package Lists from the admin dashboard. This feature is also connected to Monday.com via a webhook and uses WebSockets to push print jobs to connected browser clients in real-time. The system also includes a Print History log.
+- A full-stack React/FastAPI application for school inventory (Sysbook) and public e-commerce (Unatienda).
+- A Monday.com integration that syncs pre-sale orders and triggers print jobs.
+- The Monday.com print trigger webhook now supports time-window batching, which groups multiple rapid clicks (like from a bulk selection) into a single combined print job.
+- The backend for a generic archive/soft-delete system has been implemented () and passed testing. The frontend integration is partially complete.
+- A direct-to-printer solution using the browser's native  function, targeting the user's default Windows printer. This includes CSS optimized for 72mm thermal paper receipts. This approach was chosen after attempts with WebUSB and Web Serial APIs failed due to OS-level driver conflicts.
+- All transactional data has been wiped from the database, as requested by the user.
 
 **Last working item**:
-- **Last item agent was working:** The agent implemented an enhancement for the new printing feature: a Print History tab. This allows staff to see a log of all past print jobs, including the user who initiated the print, the timestamp, and the status of the job.
-- **Status:** USER VERIFICATION PENDING
-- **Agent Testing Done:** Y
-- **Which testing method agent to use?** NA (The feature is complete and was successfully verified by the testing agent).
+- **Last item agent was working:** The agent was actively working on fixing the four critical bugs reported by the user regarding the pre-sale import process and the order management UI.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** both
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-There are no pending or in-progress issues. All requested features and fixes in this session were completed.
+- **Issue 1 (P0): Fix Pre-sale Import and Order UI bugs**
+    - **Description:** User is blocked by four critical bugs discovered after a test import.
+        1.  **Price & Total Missing:** Imported presale orders from Monday.com lack item prices, and the order total is not being calculated.
+        2.  **No Print Button in Dialog:** The modal for viewing a single order's details is missing a Print button.
+        3.  **Missing Book Code:** The items list within the order view does not display the textbook's code.
+        4.  **No Bulk Print Option:** The main orders admin table does not correctly show the Print button for bulk-selected orders.
+    - **Attempted fixes:** For the missing price issue, the agent correctly identified that the import logic in  was not using the pre-configured column mapping for prices and began implementing a fix.
+    - **Next debug checklist:**
+        1.  **Backend ():** Complete the fix to ensure the presale import service correctly loads and uses the  for the price field from the . Verify that the order's  is calculated and saved.
+        2.  **Frontend ():**
+            *   Add a Print button to the  component.
+            *   Add a Code column to the items table within the .
+            *   Investigate the  and the main orders table. Ensure row selection checkboxes are enabled and that selecting items makes the bulk Print action visible and functional.
+    - **Why fix this issue and what will be achieved with the fix?** Resolving these bugs is critical to unblock the user's core workflow of importing and managing pre-sale orders.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Both
 
 **In progress Task List**:
-There are no tasks currently in progress.
+- **Task 1: Complete Archive Workflow Implementation**
+    - **Where to resume:** The backend API () is complete and tested. The frontend work is partially done. The agent was in the process of adding the archive UI/UX (archive tab, action buttons) to , , , and . This work needs to be completed and verified for consistency across all modules.
+    - **What will be achieved with this?** A safe, non-destructive soft delete feature across the entire admin panel, allowing users to review and restore accidentally deleted items.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** Both
+    - **Blocked on something:** Blocked by the higher-priority P0 bug fixes.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **(P2) Direct-to-Printer Integration:** Implement direct printing to the thermal printer (Logic Controls brand) from the browser, likely using the WebUSB API. This is the next phase of the printing feature.
     - **(P3) On-Demand Landing Page Redesign Tool:** Build a tool for administrators to customize the application's landing page.
 - **Future Tasks:**
     - **(P4) Extend Monday.com Sync:** Expand the existing Monday.com synchronization to cover the general product inventory, not just Sysbook orders.
 
 **Completed work in this session**
-- **Refactored Cart & Orders Pages (DONE):** Merged the cart and orders pages into a unified component () with two tabs (My Cart and My Orders).
-- **Full Internationalization (i18n) for Cart/Orders (DONE):** Refactored the entire Cart/Orders flow to be English-first, adding comprehensive translation keys to , , and  and removing all hardcoded Spanish strings and URL paths.
-- **Unified Order History (DONE):** Fixed a critical bug by creating a new API endpoint () to correctly fetch and display Unatienda store orders alongside Sysbook orders.
-- **Enforced English-First Principle (DONE):** Systematically replaced Spanish-named API fields and URL routes ( -> ) with English equivalents, enforcing a strict codebase standard. Updated the main bottom navigation to link to the new unified page.
-- **Refactored Deposit Funds Flow (DONE):** Built a new, backend-configurable deposit system with a dynamic, multi-step frontend UI ().
-- **Implemented Print Package List Feature (DONE):** Delivered a full-stack printing solution including a configurable print template, multi-order selection, a Monday.com webhook (), and a real-time WebSocket listener ().
-- **Enhanced Print Feature with History (DONE):** Added a print history log with its own API endpoints () and a new UI tab in the admin print configuration panel.
+- **Data Cleanup (DONE):** Successfully wiped all transactional data (orders, students, stock, etc.) from the database while preserving essential configurations.
+- **Monday.com Print Trigger Enhancement (DONE):** Implemented time-window batching for the  webhook. This groups rapid-fire button clicks from Monday.com's bulk-select feature into a single, consolidated print job.
+- **Direct-to-Printer Integration (DONE):** Delivered a robust printing solution that uses the system's default printer via . This includes creating optimized CSS for 72mm thermal receipts (). This approach replaced failed attempts using the WebUSB/Web Serial APIs.
+- **Simplified Pre-sale Import Trigger (DONE):** Modified the backend to recognize only the Ready status on Monday.com for triggering a pre-sale import, simplifying the user's workflow.
 
 **Earlier issues found/mentioned but not fixed**
 None.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** Production deployment failures.
-- **Recurrence count:** 2+
-- **Status:** RESOLVED. The root cause was fixed in a prior session, and no related issues occurred in this one.
+None.
 
 **Code Architecture**
-
+is_archivedis_archived
 
 **Key Technical Concepts**
-- **Backend-Driven UI:** The deposit flow is dynamically rendered based on a configuration fetched from the backend, allowing for easy updates without frontend changes.
-- **WebSocket for Real-time Events:** WebSockets are used to push print job notifications from the server (triggered by a Monday.com webhook) directly to the admin's browser for immediate action.
-- **Systematic i18n & URL Migration:** Followed a strict process to eliminate hardcoded text and non-English URL paths, including setting up redirects for backward compatibility.
-- **Browser Print API:** Utilized  combined with  CSS rules to generate clean, printable Package List documents from HTML.
-- **API-First Development & Debugging:** Consistently verified and fixed backend endpoints using  before implementing frontend changes, leading to more robust features.
+- **Soft Deletes (Archiving):** Using an  flag to hide documents from default views instead of permanently deleting them. This requires filtering all  queries with  or a similar condition.
+- **Time-Window Batching:** A backend technique to group multiple independent, asynchronous API calls (like webhooks) that arrive in a short time frame into a single, logical transaction. This prevents overwhelming the system and provides a better user experience.
+- **System Print for Hardware Integration:** When direct hardware APIs like WebUSB are blocked by OS drivers (a common issue on Windows), a reliable fallback is to use the standard  browser function and leverage  CSS to format the output for the specific device (e.g., a thermal receipt printer).
 
 **key DB schema**
--   ****: { , ,  ('redirect', 'info', 'disabled'), ,  }
--   ****: { , , , , ,  }
--   ****: { , ,  }
--   ****: (Modified) Now includes a  field.
+- All major transactional collections (, , , ) are being modified to include  and  fields to support the new archive workflow.
+- : Stores configuration for registered Monday.com webhooks.
 
 **changes in tech stack**
 None.
 
 **All files of reference**
--   **Print Feature:** , , , .
--   **Deposit Flow:** , , .
--   **Unified Orders/Cart:** , , .
--   **i18n:**  (all files), .
+- **P0 Bug Fixes:**
+    -  (For price import logic)
+    -  (For all four UI/data bugs)
+- **Archive Task:**
+    - 
+    -  (and other admin tabs)
+- **Monday.com Logic:**
+    -  (Print batching)
 
 **Areas that need refactoring**:
-None. The agent performed significant refactoring as part of the implemented tasks.
+- The files  and  contain now-obsolete code from the abandoned WebUSB/Web Serial implementation. They should be cleaned up or removed to prevent future confusion.
 
 **key api endpoints**
--   **Deposit Methods:** 
--   **Platform Orders:** , 
--   **Printing:**
-    -   
-    -   
-    -   
-    -   
--   **Monday Webhook:** 
+- : Marks a document as archived.
+- : Restores an archived document.
+- : Permanently deletes an archived document.
+- : Retrieves a list of archived documents for a specific collection.
+- : The webhook that receives print triggers from Monday.com, now with batching logic.
 
 **Critical Info for New Agent**
--   The application now follows a strict English-first principle for all new code, UI text, and API routes.
--   The wallet deposit system is highly dynamic and managed via backend configuration. Any changes should be made there first.
--   The printing system is complex, involving the frontend UI, backend APIs, WebSockets, and a Monday.com webhook. The immediate next step is to integrate it with a physical thermal printer.
--   Continue the established practice of using the  after every significant feature implementation. It has been highly effective at catching bugs.
+- **Immediate Priority:** The user is completely blocked by the four bugs in the pre-sale import workflow. These are P0 and must be fixed before any other task.
+- **Printer Strategy:** The direct-to-printer feature now relies on the OS default printer and . Do not attempt to revert to WebUSB or Web Serial, as it has been proven not to work in the user's environment.
+- **Archive Implementation:** The archive feature is half-finished. The backend is ready, but the frontend needs to be completed across all specified admin modules. Use the work started in  as a reference pattern.
 
 **documents and test reports created in this job**
--    (Updated).
--   Multiple test reports in , with the latest being iteration_5.json, iteration_6.json, iteration_7.json.
+-  (Contains successful test results for the backend archive endpoints).
+-  (Updated with recent progress).
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requested the entire Print Package List feature, including multi-select, Monday.com trigger, format config, and thermal printer support. (Completed, except direct printer integration).
-2.  **User:** Clarified printing needs: browser-based USB printing and immediate implementation. (Led to current implementation).
-3.  **User:** Approved the agent's suggestion to add a Print History enhancement. (Completed).
-4.  **User:** Asked to confirm that the unified Orders page works for both Sysbook and Unatienda orders. (Led to a major bug fix).
-5.  **User:** Questioned the agent's language about using Spanish field names and reinforced the English-only rule. (Led to a cleanup task).
-6.  **User:** Reported the new Cart/Orders page was not linked in the bottom navigation bar. (Fixed).
-7.  **User:** Pointed out the URL path  was still in Spanish. (Fixed to ).
-8.  **User:** Requested a complete overhaul of the Deposit Funds feature with specific requirements for 4 payment methods. (Completed).
-9.  **User:** Added more requirements for the deposit flow (toggling methods, editing bank details). (Completed).
-10. **User:** Asked for a final check of the Cart/Orders components against i18n principles. (Led to the i18n refactor).
+1.  **User:** Reported 4 critical bugs with the pre-sale import: missing prices, missing print button in dialog, missing book code column, and no bulk print option.
+2.  **User:** Confirmed their Windows 11 setup has the printer installed as default, explaining why the previous WebUSB attempt failed.
+3.  **User:** Reported an error message (No printer selected) and asked how to explicitly use the USB port.
+4.  **User:** Confirmed the printer model (LR2000E) and agreed to simplify the Monday.com import trigger status to just Ready.
+5.  **User:** Reported that the WebUSB connection failed within their WaveBox (Chromium-based) browser.
+6.  **User:** Requested to start the import process, asking to first clean all test data and then implement an app-wide archive-to-delete workflow.
+7.  **User:** Asked if importing pre-sale orders would create an infinite sync loop with the existing automation. (Agent confirmed it would not).
+8.  **User:** Asked for details on the pre-sale sync workflow and why the preview was empty.
+9.  **User:** Asked if Monday.com's bulk selection feature would work with the print button. (This led to the agent implementing time-window batching).
+10. **User:** Provided the column ID for the print button on their Monday.com board.
 
 **Project Health Check:**
--   **Fixed:** All user-reported issues and requested features during this session have been implemented and tested.
--   **Broken:** None.
--   **Mocked:** None.
+- **Broken:** The core pre-sale import workflow is broken due to data integrity (missing prices) and UI usability issues.
+- **Mocked:** None.
+- **In Progress:** A comprehensive, app-wide archive/soft-delete feature.
 
 **3rd Party Integrations**
--   OneSignal (Push Notifications)
--   Monday.com API v2 (Expanded to trigger print jobs via webhook)
--   Google Photos, Gmail, Telegram Bot API
--   OpenAI & Anthropic LLMs
--   OpenAI TTS & ElevenLabs TTS
--   WebSockets ( & )
--   LaoPan OAuth
+- **Monday.com:** Heavily integrated for bi-directional data sync, including pre-sale order import and triggering print jobs via webhooks.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** None
+- **Testing agent used after significant changes:** YES (For the backend archive endpoints).
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None.
+- **Known regressions:** The pre-sale import functionality has regressed, as it no longer correctly parses item prices from Monday.com.
 
 **Credentials to test flow:**
--   **Admin Email:** 
--   **Admin Password:** 
+- **Admin Email:** 
+- **Admin Password:** 
 
 **What agent forgot to execute**
-Nothing. The agent successfully executed all user requests in this session.</analysis>
+The agent was in the middle of executing the fixes for the four user-reported bugs. The work is incomplete but not forgotten. The full frontend implementation of the archive feature is also pending completion.</analysis>
