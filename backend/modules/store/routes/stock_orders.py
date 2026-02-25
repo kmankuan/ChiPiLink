@@ -183,7 +183,7 @@ async def list_stock_orders(
     admin: dict = Depends(get_admin_user),
 ):
     """List stock orders with filters."""
-    query = {}
+    query = {"$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
     if order_type:
         query["type"] = order_type
     if status:
