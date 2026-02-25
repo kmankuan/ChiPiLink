@@ -169,6 +169,7 @@ const navGroups = [
       { id: 'presale-import', labelKey: 'nav.presaleImport', fallbackLabel: 'Pre-Sale Import', icon: Upload, permission: 'unatienda.access' },
       { id: 'monday-textbook-sync', labelKey: 'nav.mondayTextbookSync', fallbackLabel: 'Monday.com Sync', icon: RefreshCw, permission: 'unatienda.access' },
       { id: 'textbook-form-settings', labelKey: 'nav.textbookFormSettings', fallbackLabel: 'Form Settings', icon: ClipboardList, permission: 'unatienda.access' },
+      { id: 'print-config', labelKey: 'nav.printConfig', fallbackLabel: 'Print & Package', icon: Printer, permission: 'unatienda.access' },
     ],
   },
   {
