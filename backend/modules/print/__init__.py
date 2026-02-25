@@ -186,9 +186,12 @@ async def create_print_job(data: dict, admin=Depends(lambda: get_admin_user)):
         "job_id": job_id,
         "order_ids": order_ids,
         "orders": orders,
+        "student_names": list({o.get("student_name", "") for o in orders if o.get("student_name")}),
+        "order_count": len(orders),
         "format_config": fmt,
         "template": template,
         "status": "pending",
+        "source": "app",
         "created_at": now,
         "created_by": admin.get("email", "") if isinstance(admin, dict) else "",
     }
