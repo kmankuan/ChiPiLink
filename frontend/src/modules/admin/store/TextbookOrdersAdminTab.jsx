@@ -729,11 +729,22 @@ export default function TextbookOrdersAdminTab() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Action Bar — Archive + Delete */}
+      {/* Bulk Action Bar — Archive + Delete + Print */}
       <BulkActionBar count={orderSelection.count} onClear={orderSelection.clear}
         onArchive={() => setConfirmArchive(true)}
         onDelete={() => setConfirmDelete(true)}
-        loading={bulkLoading} />
+        loading={bulkLoading}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setPrintDialogOpen(true)}
+          className="gap-1.5 bg-background"
+          data-testid="bulk-print-btn"
+        >
+          <Printer className="h-3.5 w-3.5" />
+          {t('print.packageList', 'Package List')}
+        </Button>
+      </BulkActionBar>
 
       <ConfirmDialog
         open={confirmArchive}
