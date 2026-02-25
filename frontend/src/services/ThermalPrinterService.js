@@ -1,10 +1,14 @@
 /**
- * ThermalPrinterService — WebUSB direct printing for Logic Controls LR2000E
+ * ThermalPrinterService — Direct printing for Logic Controls LR2000E
  *
- * Uses the WebUSB API to communicate with the LR2000E thermal receipt printer
- * via ESC/POS commands. No native drivers needed — works directly in Chrome/Edge.
+ * Supports TWO connection methods:
+ *   1. Web Serial API (preferred on Windows/ChromeOS — works with virtual COM ports)
+ *   2. WebUSB API (fallback for macOS/Linux)
  *
- * Specs: 72mm print width (512 dots/line), 180 dpi, ESC/POS, USB Type B
+ * Both send ESC/POS commands to the printer. The service auto-detects
+ * which API is available and prefers Web Serial.
+ *
+ * Specs: LR2000E — 72mm print width, 512 dots/line, 180 dpi, ESC/POS
  */
 
 // ESC/POS command constants
@@ -22,7 +26,6 @@ const CMD = {
   DOUBLE_ON:    [GS,  0x21, 0x11],                // GS ! 0x11 — double width+height
   DOUBLE_OFF:   [GS,  0x21, 0x00],                // GS ! 0x00 — normal
   WIDE_ON:      [GS,  0x21, 0x10],                // GS ! 0x10 — double width only
-  WIDE_OFF:     [GS,  0x21, 0x00],
   TALL_ON:      [GS,  0x21, 0x01],                // GS ! 0x01 — double height only
   UNDERLINE_ON: [ESC, 0x2d, 0x01],                // ESC - 1
   UNDERLINE_OFF:[ESC, 0x2d, 0x00],                // ESC - 0
@@ -33,25 +36,33 @@ const CMD = {
   LINE:         [LF],
 };
 
-// Known USB vendor/product IDs for POS printers (including Logic Controls)
-const KNOWN_FILTERS = [
-  { vendorId: 0x0dd4 },     // Logic Controls / Bematech
-  { vendorId: 0x04b8 },     // Epson (ESC/POS compatible)
-  { vendorId: 0x0483 },     // STMicroelectronics (common POS chipset)
-  { vendorId: 0x1fc9 },     // NXP (common POS chipset)
-];
-
 class ThermalPrinterService {
   constructor() {
-    this.device = null;
-    this.interfaceNumber = null;
-    this.endpointOut = null;
+    // Connection state
     this.connected = false;
+    this.connectionType = null; // 'serial' | 'usb'
+
+    // Web Serial state
+    this.serialPort = null;
+    this.serialWriter = null;
+
+    // WebUSB state
+    this.usbDevice = null;
+    this.usbEndpointOut = null;
+    this.usbInterfaceNumber = null;
+
+    // Listeners
     this._listeners = new Set();
   }
 
-  /** Check if WebUSB is supported */
+  /** Check which APIs are supported */
   get isSupported() {
+    return this.hasSerial || this.hasUSB;
+  }
+  get hasSerial() {
+    return !!navigator.serial;
+  }
+  get hasUSB() {
     return !!navigator.usb;
   }
 
@@ -60,95 +71,183 @@ class ThermalPrinterService {
     this._listeners.add(fn);
     return () => this._listeners.delete(fn);
   }
-
   _notify() {
-    const state = { connected: this.connected, device: this.device };
+    const state = {
+      connected: this.connected,
+      connectionType: this.connectionType,
+      deviceInfo: this.getDeviceInfo(),
+    };
     this._listeners.forEach(fn => fn(state));
   }
 
-  /** Request and connect to the thermal printer */
+  // ═══════════════════════════════════════════════════════
+  // CONNECTION — tries Serial first, then USB
+  // ═══════════════════════════════════════════════════════
+
   async connect() {
-    if (!this.isSupported) throw new Error('WebUSB is not supported in this browser. Use Chrome or Edge.');
     if (this.connected) return;
 
-    try {
-      // Let user pick from known POS printers, or any USB device
-      this.device = await navigator.usb.requestDevice({
-        filters: KNOWN_FILTERS.length ? KNOWN_FILTERS : [{}],
-      }).catch(() => null);
-
-      // If no known device matched, try with no filter (shows all USB devices)
-      if (!this.device) {
-        this.device = await navigator.usb.requestDevice({ filters: [] });
-      }
-
-      await this.device.open();
-
-      // Find the bulk OUT endpoint for data transfer
-      const cfg = this.device.configuration;
-      if (!cfg) await this.device.selectConfiguration(1);
-
-      for (const iface of this.device.configuration.interfaces) {
-        for (const alt of iface.alternates) {
-          for (const ep of alt.endpoints) {
-            if (ep.direction === 'out' && ep.type === 'bulk') {
-              this.interfaceNumber = iface.interfaceNumber;
-              this.endpointOut = ep.endpointNumber;
-              break;
-            }
-          }
-          if (this.endpointOut !== null) break;
+    // Try Web Serial first (better on Windows with WaveBox/Chrome)
+    if (this.hasSerial) {
+      try {
+        await this._connectSerial();
+        return;
+      } catch (serialErr) {
+        console.warn('[ThermalPrinter] Serial failed, trying USB:', serialErr.message);
+        // If user cancelled the picker, don't fall through
+        if (serialErr.message?.includes('No port selected') || serialErr.name === 'NotFoundError') {
+          throw new Error('No printer selected. Please select your LR2000E from the list.');
         }
-        if (this.endpointOut !== null) break;
       }
-
-      if (this.endpointOut === null) {
-        throw new Error('No bulk OUT endpoint found. The device may not be a supported printer.');
-      }
-
-      await this.device.claimInterface(this.interfaceNumber);
-      this.connected = true;
-      this._notify();
-    } catch (err) {
-      this.device = null;
-      this.connected = false;
-      this._notify();
-      throw err;
     }
+
+    // Fallback to WebUSB
+    if (this.hasUSB) {
+      try {
+        await this._connectUSB();
+        return;
+      } catch (usbErr) {
+        console.warn('[ThermalPrinter] USB also failed:', usbErr.message);
+        throw new Error(`Could not connect to printer. Serial: ${this.hasSerial ? 'available' : 'not available'}, USB: ${this.hasUSB ? 'available' : 'not available'}. Error: ${usbErr.message}`);
+      }
+    }
+
+    throw new Error('Neither Web Serial nor WebUSB is available in this browser. Please use Chrome or Edge.');
   }
 
-  /** Disconnect from the printer */
-  async disconnect() {
-    if (this.device) {
-      try {
-        await this.device.releaseInterface(this.interfaceNumber);
-        await this.device.close();
-      } catch { /* ignore close errors */ }
+  /** Connect via Web Serial API */
+  async _connectSerial() {
+    // Request port — shows browser picker dialog
+    this.serialPort = await navigator.serial.requestPort();
+
+    // Open at 115200 baud (common for POS printers, also try 9600 if needed)
+    try {
+      await this.serialPort.open({ baudRate: 115200 });
+    } catch (e) {
+      // Some printers use 9600 baud
+      if (e.message?.includes('already open')) {
+        // Port is already open, just use it
+      } else {
+        try {
+          await this.serialPort.open({ baudRate: 9600 });
+        } catch {
+          throw e; // Re-throw original error
+        }
+      }
     }
-    this.device = null;
-    this.connected = false;
-    this.interfaceNumber = null;
-    this.endpointOut = null;
+
+    this.serialWriter = this.serialPort.writable.getWriter();
+    this.connected = true;
+    this.connectionType = 'serial';
     this._notify();
   }
 
-  /** Send raw bytes to the printer */
+  /** Connect via WebUSB API */
+  async _connectUSB() {
+    // Known POS printer USB vendor IDs
+    const filters = [
+      { vendorId: 0x0dd4 },     // Logic Controls / Bematech
+      { vendorId: 0x04b8 },     // Epson
+      { vendorId: 0x0483 },     // STMicroelectronics
+      { vendorId: 0x1fc9 },     // NXP
+    ];
+
+    // Try with known filters first, then without
+    try {
+      this.usbDevice = await navigator.usb.requestDevice({ filters });
+    } catch {
+      this.usbDevice = await navigator.usb.requestDevice({ filters: [] });
+    }
+
+    await this.usbDevice.open();
+
+    // Select configuration if needed
+    if (!this.usbDevice.configuration) {
+      await this.usbDevice.selectConfiguration(1);
+    }
+
+    // Find bulk OUT endpoint
+    this.usbEndpointOut = null;
+    this.usbInterfaceNumber = null;
+
+    for (const iface of this.usbDevice.configuration.interfaces) {
+      for (const alt of iface.alternates) {
+        for (const ep of alt.endpoints) {
+          if (ep.direction === 'out' && ep.type === 'bulk') {
+            this.usbInterfaceNumber = iface.interfaceNumber;
+            this.usbEndpointOut = ep.endpointNumber;
+            break;
+          }
+        }
+        if (this.usbEndpointOut !== null) break;
+      }
+      if (this.usbEndpointOut !== null) break;
+    }
+
+    if (this.usbEndpointOut === null) {
+      await this.usbDevice.close();
+      throw new Error('No compatible print endpoint found on this USB device.');
+    }
+
+    await this.usbDevice.claimInterface(this.usbInterfaceNumber);
+    this.connected = true;
+    this.connectionType = 'usb';
+    this._notify();
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // DISCONNECT
+  // ═══════════════════════════════════════════════════════
+
+  async disconnect() {
+    try {
+      if (this.connectionType === 'serial' && this.serialPort) {
+        if (this.serialWriter) {
+          await this.serialWriter.releaseLock();
+          this.serialWriter = null;
+        }
+        await this.serialPort.close();
+        this.serialPort = null;
+      }
+      if (this.connectionType === 'usb' && this.usbDevice) {
+        await this.usbDevice.releaseInterface(this.usbInterfaceNumber);
+        await this.usbDevice.close();
+        this.usbDevice = null;
+        this.usbEndpointOut = null;
+        this.usbInterfaceNumber = null;
+      }
+    } catch { /* ignore close errors */ }
+
+    this.connected = false;
+    this.connectionType = null;
+    this._notify();
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // SEND DATA
+  // ═══════════════════════════════════════════════════════
+
   async _send(data) {
-    if (!this.connected || !this.device) throw new Error('Printer not connected');
+    if (!this.connected) throw new Error('Printer not connected');
     const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-    // Send in chunks of 64 bytes (USB packet size)
-    const CHUNK = 64;
-    for (let i = 0; i < bytes.length; i += CHUNK) {
-      const chunk = bytes.slice(i, i + CHUNK);
-      await this.device.transferOut(this.endpointOut, chunk);
+
+    if (this.connectionType === 'serial') {
+      await this.serialWriter.write(bytes);
+    } else if (this.connectionType === 'usb') {
+      // Send in 64-byte USB chunks
+      const CHUNK = 64;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        await this.usbDevice.transferOut(this.usbEndpointOut, bytes.slice(i, i + CHUNK));
+      }
     }
   }
 
-  /** Encode text to bytes (Latin-1 for ESC/POS) */
+  // ═══════════════════════════════════════════════════════
+  // ESC/POS ENCODING
+  // ═══════════════════════════════════════════════════════
+
+  /** Encode text to bytes (Code Page 437 / Latin-1 for ESC/POS) */
   _encode(text) {
-    const encoder = new TextEncoder();
-    // ESC/POS uses Code Page 437 / Latin-1. TextEncoder gives UTF-8.
-    // For basic ASCII this is fine. For accented chars, map manually.
     const bytes = [];
     for (let i = 0; i < text.length; i++) {
       const code = text.charCodeAt(i);
@@ -157,7 +256,7 @@ class ThermalPrinterService {
     return bytes;
   }
 
-  /** Build the full byte array for a receipt from structured data */
+  /** Build a formatted receipt from structured data */
   buildReceipt({ title, subtitle, separator, sections, footer }) {
     const data = [];
     const push = (...args) => args.forEach(a => Array.isArray(a) ? data.push(...a) : data.push(a));
@@ -182,14 +281,13 @@ class ThermalPrinterService {
     const sep = separator || '-'.repeat(32);
     push(...CMD.ALIGN_LEFT, ...this._encode(sep), ...CMD.LINE);
 
-    // Sections (each is { heading?, rows: [{ left, right? }] })
+    // Sections
     for (const section of (sections || [])) {
       if (section.heading) {
         push(...CMD.BOLD_ON, ...this._encode(section.heading), ...CMD.LINE, ...CMD.BOLD_OFF);
       }
       for (const row of (section.rows || [])) {
         if (row.right !== undefined) {
-          // Two-column row: left-justify name, right-justify value
           const left = String(row.left || '');
           const right = String(row.right || '');
           const pad = Math.max(1, 32 - left.length - right.length);
@@ -213,7 +311,7 @@ class ThermalPrinterService {
     return new Uint8Array(data);
   }
 
-  /** Convert a package list order to a thermal receipt format */
+  /** Convert a package list order to a thermal receipt */
   buildPackageListReceipt(order, formatConfig = {}) {
     const studentName = order.student_name || order.studentName || 'Unknown';
     const grade = order.grade || '';
@@ -223,7 +321,7 @@ class ThermalPrinterService {
 
     const sections = [];
 
-    // Student info section
+    // Student info
     sections.push({
       heading: 'STUDENT INFO',
       rows: [
@@ -233,7 +331,7 @@ class ThermalPrinterService {
       ]
     });
 
-    // Items section
+    // Items
     if (items.length > 0) {
       sections.push({
         heading: `ITEMS (${items.length})`,
@@ -245,12 +343,9 @@ class ThermalPrinterService {
         })
       });
 
-      // Total if available
       const total = items.reduce((sum, it) => sum + (Number(it.price || 0) * (it.quantity || it.qty || 1)), 0);
       if (total > 0) {
-        sections.push({
-          rows: [{ left: 'TOTAL:', right: `$${total.toFixed(2)}` }]
-        });
+        sections.push({ rows: [{ left: 'TOTAL:', right: `$${total.toFixed(2)}` }] });
       }
     }
 
@@ -262,38 +357,56 @@ class ThermalPrinterService {
     });
   }
 
-  /** Print a single order */
+  // ═══════════════════════════════════════════════════════
+  // PRINT METHODS
+  // ═══════════════════════════════════════════════════════
+
   async printOrder(order, formatConfig = {}) {
     const receipt = this.buildPackageListReceipt(order, formatConfig);
     await this._send(receipt);
   }
 
-  /** Print multiple orders (one receipt per order with separator) */
   async printOrders(orders, formatConfig = {}) {
     for (const order of orders) {
-      const receipt = this.buildPackageListReceipt(order, formatConfig);
-      await this._send(receipt);
-      // Small delay between prints
+      await this.printOrder(order, formatConfig);
       await new Promise(r => setTimeout(r, 300));
     }
   }
 
-  /** Print raw text (for testing) */
   async printText(text) {
     const data = [...CMD.INIT, ...this._encode(text), ...CMD.LINE, ...CMD.FEED_3, ...CMD.CUT_PARTIAL];
     await this._send(new Uint8Array(data));
   }
 
-  /** Get device info */
+  // ═══════════════════════════════════════════════════════
+  // DEVICE INFO
+  // ═══════════════════════════════════════════════════════
+
   getDeviceInfo() {
-    if (!this.device) return null;
-    return {
-      productName: this.device.productName || 'Unknown',
-      manufacturerName: this.device.manufacturerName || 'Unknown',
-      serialNumber: this.device.serialNumber || '',
-      vendorId: this.device.vendorId,
-      productId: this.device.productId,
-    };
+    if (!this.connected) return null;
+
+    if (this.connectionType === 'serial' && this.serialPort?.getInfo) {
+      const info = this.serialPort.getInfo();
+      return {
+        connectionType: 'Serial (COM)',
+        productName: 'LR2000E',
+        vendorId: info.usbVendorId,
+        productId: info.usbProductId,
+      };
+    }
+
+    if (this.connectionType === 'usb' && this.usbDevice) {
+      return {
+        connectionType: 'USB',
+        productName: this.usbDevice.productName || 'LR2000E',
+        manufacturerName: this.usbDevice.manufacturerName || 'Logic Controls',
+        vendorId: this.usbDevice.vendorId,
+        productId: this.usbDevice.productId,
+        serialNumber: this.usbDevice.serialNumber || '',
+      };
+    }
+
+    return { connectionType: this.connectionType, productName: 'LR2000E' };
   }
 }
 
