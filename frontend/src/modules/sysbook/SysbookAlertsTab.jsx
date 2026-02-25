@@ -293,8 +293,18 @@ export default function SysbookAlertsTab() {
                     </div>
                   </div>
                   {!alert.dismissed && (
-                    <Button variant="ghost" size="sm" className="shrink-0 h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); handleDismiss(alert.alert_id); }} data-testid={`dismiss-${alert.alert_id}`}>
-                      <BellOff className="h-3 w-3" /> Dismiss
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); handleDismiss(alert.alert_id); }} data-testid={`dismiss-${alert.alert_id}`}>
+                        <BellOff className="h-3 w-3" /> Dismiss
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600" onClick={(e) => { e.stopPropagation(); handleArchiveAlert(alert.alert_id); }} data-testid={`archive-${alert.alert_id}`}>
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                  {alert.dismissed && (
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600 shrink-0" onClick={(e) => { e.stopPropagation(); handleArchiveAlert(alert.alert_id); }} data-testid={`archive-${alert.alert_id}`}>
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   )}
                 </div>
