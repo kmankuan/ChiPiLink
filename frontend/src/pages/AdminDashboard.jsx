@@ -356,6 +356,8 @@ export default function AdminDashboard() {
         return <MondayTextbookSyncModule />;
       case 'textbook-form-settings':
         return <TextbookFormSettingsModule />;
+      case 'print-config':
+        return <PrintConfigPanel />;
       case 'customers':
         return <UsersManagementModule />;
       case 'memberships':
