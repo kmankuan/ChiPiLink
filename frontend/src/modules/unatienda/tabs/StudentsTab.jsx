@@ -138,6 +138,8 @@ export default function StudentsTab({ token }) {
   const [detailStudent, setDetailStudent] = useState(null);
   const [chatStudent, setChatStudent] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
+  const [archiveDialog, setArchiveDialog] = useState(null); // { ids: [], action: 'archive' }
 
   /* ── Requests state ── */
   const [requests, setRequests] = useState([]);
