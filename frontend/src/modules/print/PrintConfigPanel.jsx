@@ -419,6 +419,95 @@ export default function PrintConfigPanel() {
             {t('print.savePrinter', 'Save Printer Settings')}
           </Button>
         </TabsContent>
+
+        {/* ─── Print History ─── */}
+        <TabsContent value="history" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm">{t('print.printHistory', 'Print History')}</CardTitle>
+                  <CardDescription>{t('print.printHistoryDesc', 'Track which orders were printed, when, and by whom')}</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchHistory} data-testid="refresh-history-btn">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {history.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground py-6">
+                  {t('print.noHistory', 'No print jobs recorded yet')}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {history.map((job) => (
+                    <div key={job.job_id} className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg" data-testid={`history-${job.job_id}`}>
+                      <div className={`mt-0.5 p-1.5 rounded-full ${job.status === 'printed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
+                        {job.status === 'printed' ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs text-muted-foreground">{job.job_id}</span>
+                          <Badge variant={job.status === 'printed' ? 'default' : 'secondary'} className="text-[10px]">
+                            {job.status === 'printed' ? t('print.statusPrinted', 'Printed') : t('print.statusPending', 'Pending')}
+                          </Badge>
+                          {job.source === 'monday' && (
+                            <Badge variant="outline" className="text-[10px]">Monday.com</Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Package className="h-3 w-3" />
+                            {job.order_count || job.order_ids?.length || 0} {t('print.orders', 'orders')}
+                          </span>
+                          {job.student_names?.length > 0 && (
+                            <span className="truncate max-w-[200px]">{job.student_names.join(', ')}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(job.created_at).toLocaleString()}
+                          </span>
+                          {job.created_by && (
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              {job.created_by}
+                            </span>
+                          )}
+                        </div>
+                        {job.printed_at && (
+                          <p className="text-xs text-green-600 mt-1">
+                            {t('print.printedAt', 'Printed')}: {new Date(job.printed_at).toLocaleString()}
+                            {job.printed_by && ` ${t('print.by', 'by')} ${job.printed_by}`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {historyTotal > 20 && (
+                <div className="flex items-center justify-between mt-4 pt-3 border-t">
+                  <span className="text-xs text-muted-foreground">
+                    {t('print.showing', 'Showing')} {historyPage * 20 + 1}-{Math.min((historyPage + 1) * 20, historyTotal)} {t('print.of', 'of')} {historyTotal}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setHistoryPage(p => Math.max(0, p - 1))} disabled={historyPage === 0}>
+                      {t('common.back', 'Back')}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setHistoryPage(p => p + 1)} disabled={(historyPage + 1) * 20 >= historyTotal}>
+                      {t('common.next', 'Next')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
