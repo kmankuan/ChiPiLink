@@ -220,9 +220,12 @@ export default function SysbookStockMovementsTab() {
           <div className="flex gap-1">
             {orders.length > 0 && (
               <Button variant="destructive" size="sm" className="gap-1 h-7 text-xs" onClick={handleClearAll} data-testid="clear-all-orders-btn">
-                <XCircle className="h-3 w-3" /> Clear All
+                <Archive className="h-3 w-3" /> Archive All
               </Button>
             )}
+            <Button variant={showArchived ? 'default' : 'ghost'} size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowArchived(!showArchived)} data-testid="toggle-archived-movements">
+              <Archive className="h-3 w-3" /> Archived {archiveCount > 0 && `(${archiveCount})`}
+            </Button>
             {Object.entries(TYPE_META).map(([key, meta]) => (
               <Button key={key} variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowCreate(key)} data-testid={`create-${key}-btn`}>
                 <meta.icon className="h-3 w-3" /> {meta.label}
