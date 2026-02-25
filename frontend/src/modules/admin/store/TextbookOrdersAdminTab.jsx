@@ -61,6 +61,7 @@ import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 import CrmChat from '@/components/chat/CrmChat';
+import PrintDialog from '@/modules/print/PrintDialog';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
