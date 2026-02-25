@@ -336,52 +336,136 @@ export default function PrintConfigPanel() {
           </Tabs>
         </TabsContent>
 
-        {/* ─── Printer Settings ─── */}
+        {/* ─── Printer Settings (USB Direct Connection) ─── */}
         <TabsContent value="printer" className="space-y-4">
+          {/* USB Connection Card */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-sm">{t('print.registeredPrinters', 'Registered Printers')}</CardTitle>
-                  <CardDescription>{t('print.printerDesc', 'Configure USB thermal printers')}</CardDescription>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Usb className="h-4 w-4" />
+                    {t('print.usbConnection', 'USB Printer Connection')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('print.usbDesc', 'Connect directly to your LR2000E thermal printer via USB')}
+                  </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={addPrinter} data-testid="add-printer-btn">
-                  <Usb className="h-4 w-4 mr-2" />
-                  {t('print.addPrinter', 'Add Printer')}
-                </Button>
+                <Badge variant={printer.connected ? 'default' : 'secondary'} className="gap-1">
+                  {printer.connected ? <Plug className="h-3 w-3" /> : <Unplug className="h-3 w-3" />}
+                  {printer.connected ? t('print.connected', 'Connected') : t('print.disconnected', 'Disconnected')}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              {!printer.isSupported ? (
+                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">WebUSB Not Available</p>
+                    <p className="text-xs text-yellow-600 mt-0.5">
+                      WebUSB requires Chrome or Edge browser with HTTPS. Please switch to a supported browser.
+                    </p>
+                  </div>
+                </div>
+              ) : printer.connected ? (
+                <>
+                  {/* Device Info */}
+                  {printer.deviceInfo && (
+                    <div className="p-3 bg-green-50/70 rounded-lg border border-green-200 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-800">{printer.deviceInfo.productName}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1 text-xs text-green-700">
+                        <span>Manufacturer: {printer.deviceInfo.manufacturerName}</span>
+                        <span>Vendor ID: 0x{printer.deviceInfo.vendorId?.toString(16).padStart(4, '0')}</span>
+                        {printer.deviceInfo.serialNumber && <span>Serial: {printer.deviceInfo.serialNumber}</span>}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={async () => {
+                      try { await printer.printTest(); toast.success('Test page sent to printer'); }
+                      catch (e) { toast.error(e.message); }
+                    }} disabled={printer.printing} className="gap-1" data-testid="test-print-btn">
+                      {printer.printing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
+                      {t('print.testPrint', 'Test Print')}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={printer.disconnect} className="gap-1 text-red-600 border-red-200 hover:bg-red-50" data-testid="disconnect-printer-btn">
+                      <Unplug className="h-3 w-3" /> {t('print.disconnect', 'Disconnect')}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-4 space-y-3">
+                  <div className="p-4 bg-muted/30 rounded-lg space-y-2">
+                    <Printer className="h-10 w-10 mx-auto text-muted-foreground/40" />
+                    <p className="text-sm text-muted-foreground">
+                      {t('print.noConnection', 'No printer connected. Connect your LR2000E via USB and click the button below.')}
+                    </p>
+                    <ol className="text-xs text-muted-foreground text-left max-w-xs mx-auto space-y-1">
+                      <li>1. Plug in the LR2000E USB cable</li>
+                      <li>2. Turn the printer on</li>
+                      <li>3. Click "Connect Printer" below</li>
+                      <li>4. Select "LR2000" from the USB device list</li>
+                    </ol>
+                  </div>
+                  <Button onClick={async () => {
+                    try { await printer.connect(); toast.success('Printer connected!'); }
+                    catch (e) { toast.error(e.message || 'Failed to connect'); }
+                  }} className="gap-2" data-testid="connect-printer-btn">
+                    <Usb className="h-4 w-4" /> {t('print.connectPrinter', 'Connect Printer')}
+                  </Button>
+                </div>
+              )}
+
+              {printer.error && (
+                <div className="p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                  {printer.error}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Printer Configuration */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">{t('print.printerRegistry', 'Printer Registry')}</CardTitle>
+              <CardDescription>{t('print.registryDesc', 'Save printer configurations for your team')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {(printerConfig?.printers || []).length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-6">
-                  {t('print.noPrinters', 'No printers configured. Click "Add Printer" to register your USB thermal printer.')}
+                <p className="text-center text-sm text-muted-foreground py-4">
+                  {t('print.noPrinters', 'No printers registered. Add your first printer below.')}
                 </p>
               ) : (
-                printerConfig.printers.map((printer, idx) => (
-                  <Card key={printer.id} className="p-4 space-y-3" data-testid={`printer-${idx}`}>
+                printerConfig.printers.map((p, idx) => (
+                  <Card key={p.id} className="p-3 space-y-2" data-testid={`printer-${idx}`}>
                     <div className="flex items-center justify-between">
-                      <Badge variant={printer.enabled ? 'default' : 'secondary'}>
-                        {printer.enabled ? t('print.active', 'Active') : t('print.inactive', 'Inactive')}
-                      </Badge>
-                      <Switch checked={printer.enabled} onCheckedChange={(v) => updatePrinter(idx, 'enabled', v)} />
+                      <div className="flex items-center gap-2">
+                        <Badge variant={p.enabled ? 'default' : 'secondary'} className="text-[10px]">
+                          {p.enabled ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <span className="text-sm font-medium">{p.name || 'Unnamed Printer'}</span>
+                      </div>
+                      <Switch checked={p.enabled} onCheckedChange={(v) => updatePrinter(idx, 'enabled', v)} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <Label className="text-xs">{t('print.printerName', 'Name')}</Label>
-                        <Input value={printer.name} onChange={(e) => updatePrinter(idx, 'name', e.target.value)} placeholder="Front Desk Printer" className="mt-1" />
+                        <Label className="text-[10px]">Name</Label>
+                        <Input value={p.name} onChange={(e) => updatePrinter(idx, 'name', e.target.value)} className="h-7 text-xs mt-0.5" />
                       </div>
                       <div>
-                        <Label className="text-xs">{t('print.brand', 'Brand')}</Label>
-                        <Input value={printer.brand} onChange={(e) => updatePrinter(idx, 'brand', e.target.value)} placeholder="Logic Controls" className="mt-1" />
+                        <Label className="text-[10px]">Model</Label>
+                        <Input value={p.model} onChange={(e) => updatePrinter(idx, 'model', e.target.value)} placeholder="LR2000E" className="h-7 text-xs mt-0.5" />
                       </div>
                       <div>
-                        <Label className="text-xs">{t('print.model', 'Model')}</Label>
-                        <Input value={printer.model} onChange={(e) => updatePrinter(idx, 'model', e.target.value)} placeholder="LR2000" className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-xs">{t('print.paperSizePrinter', 'Paper Size')}</Label>
-                        <Select value={printer.paper_size} onValueChange={(v) => updatePrinter(idx, 'paper_size', v)}>
-                          <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <Label className="text-[10px]">Paper</Label>
+                        <Select value={p.paper_size} onValueChange={(v) => updatePrinter(idx, 'paper_size', v)}>
+                          <SelectTrigger className="h-7 text-xs mt-0.5"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="58mm">58mm</SelectItem>
                             <SelectItem value="80mm">80mm</SelectItem>
@@ -389,24 +473,21 @@ export default function PrintConfigPanel() {
                         </Select>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="gap-1">
-                        <Usb className="h-3 w-3" />
-                        USB
-                      </Badge>
-                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => removePrinter(idx)}>
-                        {t('print.remove', 'Remove')}
-                      </Button>
-                    </div>
+                    <Button variant="ghost" size="sm" className="text-destructive text-xs h-6" onClick={() => removePrinter(idx)}>
+                      Remove
+                    </Button>
                   </Card>
                 ))
               )}
+              <Button variant="outline" size="sm" onClick={addPrinter} className="gap-1" data-testid="add-printer-btn">
+                <Usb className="h-3 w-3" /> Add Printer Entry
+              </Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">{t('print.generalSettings', 'General Settings')}</CardTitle>
+              <CardTitle className="text-sm">{t('print.autoSettings', 'Auto-Print Settings')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <ToggleRow
@@ -414,6 +495,9 @@ export default function PrintConfigPanel() {
                 checked={printerConfig?.auto_print}
                 onChange={(v) => setPrinterConfig(p => ({ ...p, auto_print: v }))}
               />
+              <p className="text-[10px] text-muted-foreground">
+                When enabled, incoming Monday.com print triggers will automatically print to the connected USB printer.
+              </p>
             </CardContent>
           </Card>
 
