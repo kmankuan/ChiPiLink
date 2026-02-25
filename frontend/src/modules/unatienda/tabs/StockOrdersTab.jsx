@@ -777,6 +777,8 @@ export default function StockOrdersTab({ token }) {
           })}
         </div>
       )}
+      </>
+      )}
 
       {/* Dialogs */}
       <CreateShipmentDialog open={showShipment} onClose={() => setShowShipment(false)} onCreated={fetchOrders} token={token} />
