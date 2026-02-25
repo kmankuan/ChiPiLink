@@ -143,6 +143,9 @@ init_translations_routes(db, get_admin_user, get_current_user)
 from modules.realtime.services import ws_manager
 init_print_routes(db, get_admin_user, get_current_user, ws_manager)
 
+# Initialize Archive module
+init_archive_routes(db, get_admin_user)
+
 # Initialize PinpanClub module (event handlers)
 init_pinpanclub()
 
