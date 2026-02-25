@@ -151,6 +151,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
     printWindow.onafterprint = () => {
       printWindow.close();
       setPrinting(false);
+      markJobComplete();
     };
 
     setTimeout(() => {
