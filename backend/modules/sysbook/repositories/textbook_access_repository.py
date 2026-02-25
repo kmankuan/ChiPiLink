@@ -83,7 +83,7 @@ class StudentRecordRepository(BaseRepository):
     
     async def get_all(self, status: str = None, school_id: str = None, include_inactive: bool = False) -> List[Dict]:
         """Get all student records with optional filters"""
-        query = {}
+        query = {"$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
         if not include_inactive:
             query["is_active"] = True
         if school_id:
