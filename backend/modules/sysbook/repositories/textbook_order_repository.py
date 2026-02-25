@@ -52,8 +52,8 @@ class TextbookOrderRepository(BaseRepository):
         year: Optional[int] = None,
         limit: int = 500
     ) -> List[Dict]:
-        """Get all orders with optional filters (excludes drafts from admin view)"""
-        query = {"status": {"$ne": "draft"}}
+        """Get all orders with optional filters (excludes drafts and archived from admin view)"""
+        query = {"status": {"$ne": "draft"}, "$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
         if status:
             query["status"] = status
         if grade:
