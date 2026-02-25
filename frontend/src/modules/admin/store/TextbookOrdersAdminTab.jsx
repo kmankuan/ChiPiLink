@@ -615,6 +615,23 @@ export default function TextbookOrdersAdminTab() {
         </div>
       )}
 
+      {/* Archived Orders Tab */}
+      {subTab === 'archived' && (
+        <ArchiveTab
+          entityType="orders"
+          token={localStorage.getItem('auth_token')}
+          columns={[
+            { key: 'student_name', label: 'Student' },
+            { key: 'grade', label: 'Grade' },
+            { key: 'total_amount', label: 'Total', render: (item) => `$${(item.total_amount || 0).toFixed(2)}` },
+            { key: 'status', label: 'Status' },
+          ]}
+          idField="order_id"
+          onCountChange={setArchiveCount}
+          searchFields={['student_name', 'order_id']}
+        />
+      )}
+
       {/* Order Details Dialog */}
       <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
         <DialogContent className="max-w-2xl">
