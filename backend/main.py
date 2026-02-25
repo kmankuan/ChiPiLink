@@ -138,6 +138,10 @@ init_platform_store_routes(db, get_admin_user, get_current_user)
 init_membership_routes(db, get_admin_user, get_current_user)
 init_translations_routes(db, get_admin_user, get_current_user)
 
+# Initialize Print module with WebSocket manager
+from modules.realtime.services import ws_manager
+init_print_routes(db, get_admin_user, get_current_user, ws_manager)
+
 # Initialize PinpanClub module (event handlers)
 init_pinpanclub()
 
