@@ -12,10 +12,11 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
   AlertTriangle, Bell, BellOff, CheckCircle, Settings, Search,
-  Loader2, RefreshCw, XCircle, Package, Zap, Eye, EyeOff
+  Loader2, RefreshCw, XCircle, Package, Zap, Eye, EyeOff, Archive, Trash2, Undo2
 } from 'lucide-react';
 import axios from 'axios';
 import { BoardHeader } from '@/components/shared/BoardHeader';
+import ArchiveTab from '@/components/shared/ArchiveTab';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
