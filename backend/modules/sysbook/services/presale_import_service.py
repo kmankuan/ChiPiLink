@@ -155,18 +155,26 @@ class PreSaleImportService:
             price = 0.0
             # Parse price from the configured subitem price column
             for col in si.get("column_values", []):
-                text = col.get("text", "").strip()
-                if not text:
-                    continue
+                text = (col.get("text") or "").strip()
+                raw_value = (col.get("value") or "").strip().strip('"')
                 col_id = col.get("id", "")
                 col_type = col.get("type", "").lower()
 
                 # Check against configured price column first
                 if col_id == self._subitem_price_col:
-                    try:
-                        price = float(text.replace(",", "").replace("$", ""))
-                    except ValueError:
-                        pass
+                    # Try text first, then raw value as fallback
+                    for candidate in [text, raw_value]:
+                        if not candidate:
+                            continue
+                        try:
+                            price = float(candidate.replace(",", "").replace("$", ""))
+                            break
+                        except ValueError:
+                            continue
+                    continue
+
+                # Skip empty columns
+                if not text and not raw_value:
                     continue
 
                 # Fallback: detect numeric columns for quantity
@@ -174,7 +182,7 @@ class PreSaleImportService:
                 is_qty = "cantidad" in col_id.lower() or "quantity" in col_id.lower() or "qty" in col_id.lower()
                 if is_qty or (is_numeric and col_id != self._subitem_price_col):
                     try:
-                        val = float(text.replace(",", ""))
+                        val = float((text or raw_value).replace(",", ""))
                         if val < 100:
                             quantity = max(1, int(val))
                     except ValueError:

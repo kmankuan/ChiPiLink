@@ -175,7 +175,7 @@ class MondayCoreClient:
         """Fetch subitems for an item with their column values"""
         data = await self.execute(
             f'''query {{ items(ids: [{item_id}]) {{
-                subitems {{ id name column_values {{ id text value }} }}
+                subitems {{ id name column_values {{ id type text value }} }}
             }} }}'''
         )
         items = data.get("items", [])
