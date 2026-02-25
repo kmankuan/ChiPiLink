@@ -70,6 +70,7 @@ from modules.admin.seed_demo import router as seed_demo_router
 from modules.admin.privacy_routes import router as privacy_router, public_router as privacy_public_router
 from modules.admin.cleanup_routes import router as cleanup_router
 from modules.admin.data_manager_routes import router as data_manager_router
+from modules.admin.archive_routes import router as archive_router, init_archive_routes
 
 # Translation Dictionary Module (core feature)
 from modules.translations.routes import router as translation_dict_router
