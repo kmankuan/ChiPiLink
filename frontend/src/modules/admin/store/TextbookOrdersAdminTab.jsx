@@ -103,7 +103,6 @@ export default function TextbookOrdersAdminTab() {
   const [selectedReorder, setSelectedReorder] = useState(null);
   const [maxQuantity, setMaxQuantity] = useState(2);
   const [adminNotes, setAdminNotes] = useState('');
-  const [showArchived, setShowArchived] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
