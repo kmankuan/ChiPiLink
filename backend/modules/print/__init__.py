@@ -267,16 +267,26 @@ async def complete_print_job(job_id: str, admin=Depends(lambda: get_admin_user))
 @router.post("/monday-trigger")
 async def monday_print_trigger(data: dict):
     """Webhook endpoint for Monday.com button column to trigger printing.
-    Monday.com sends: { "event": { "boardId", "itemId", "columnId", "value" } }
+    Monday.com sends: { "event": { "boardId", "pulseId", "columnId", "value" } }
+    Webhook fires on ALL column changes — we filter for the print button column only.
     """
-    event = data.get("event", data)
+    # Monday.com challenge verification (sent once when webhook is created)
+    if "challenge" in data:
+        logger.info(f"[print/monday-trigger] Challenge: {data['challenge']}")
+        return {"challenge": data["challenge"]}
+
+    event = data.get("event", {})
+    column_id = event.get("columnId", "")
     item_id = str(event.get("pulseId") or event.get("itemId") or "")
 
+    logger.info(f"[print/monday-trigger] Event: column={column_id}, item={item_id}, board={event.get('boardId')}")
+
+    # Ignore non-button column changes
+    if column_id and column_id != PRINT_BUTTON_COLUMN_ID:
+        return {"status": "ignored", "reason": f"column {column_id} is not the print button"}
+
     if not item_id:
-        # Monday.com challenge verification
-        if "challenge" in data:
-            return {"challenge": data["challenge"]}
-        raise HTTPException(status_code=400, detail="No item ID in webhook payload")
+        return {"status": "ignored", "reason": "no item ID"}
 
     # Find the order linked to this Monday.com item
     order = await db.store_textbook_orders.find_one(
@@ -288,6 +298,7 @@ async def monday_print_trigger(data: dict):
     )
 
     if not order:
+        logger.warning(f"[print/monday-trigger] No order found for monday item {item_id}")
         return {"status": "no_order_found", "monday_item_id": item_id}
 
     # Get format config
@@ -302,6 +313,8 @@ async def monday_print_trigger(data: dict):
         "job_id": job_id,
         "order_ids": [order["order_id"]],
         "orders": [order],
+        "student_names": [order.get("student_name", "")],
+        "order_count": 1,
         "format_config": fmt,
         "template": template,
         "status": "pending",
@@ -311,6 +324,8 @@ async def monday_print_trigger(data: dict):
     }
 
     await db.print_jobs.insert_one(job)
+
+    logger.info(f"[print/monday-trigger] Print job created: {job_id} for order {order['order_id']}")
 
     # Broadcast to admin browsers for immediate printing
     if ws_manager:
