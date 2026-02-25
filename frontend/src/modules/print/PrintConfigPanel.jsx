@@ -408,17 +408,25 @@ export default function PrintConfigPanel() {
                   <div className="p-4 bg-muted/30 rounded-lg space-y-2">
                     <Printer className="h-10 w-10 mx-auto text-muted-foreground/40" />
                     <p className="text-sm text-muted-foreground">
-                      {t('print.noConnection', 'No printer connected. Connect your LR2000E via USB and click the button below.')}
+                      {t('print.noConnection', 'No printer connected. Connect your LR2000E and click the button below.')}
                     </p>
                     <ol className="text-xs text-muted-foreground text-left max-w-xs mx-auto space-y-1">
                       <li>1. Plug in the LR2000E USB cable</li>
                       <li>2. Turn the printer on</li>
                       <li>3. Click "Connect Printer" below</li>
-                      <li>4. Select "LR2000" from the USB device list</li>
+                      <li>4. Select your printer from the browser dialog</li>
                     </ol>
+                    <div className="flex items-center justify-center gap-2 pt-1">
+                      <Badge variant={printer.hasSerial ? 'default' : 'secondary'} className="text-[9px]">
+                        Serial API {printer.hasSerial ? 'Available' : 'N/A'}
+                      </Badge>
+                      <Badge variant={printer.hasUSB ? 'default' : 'secondary'} className="text-[9px]">
+                        USB API {printer.hasUSB ? 'Available' : 'N/A'}
+                      </Badge>
+                    </div>
                   </div>
                   <Button onClick={async () => {
-                    try { await printer.connect(); toast.success('Printer connected!'); }
+                    try { await printer.connect(); toast.success(`Printer connected via ${printer.connectionType === 'serial' ? 'Serial' : 'USB'}!`); }
                     catch (e) { toast.error(e.message || 'Failed to connect'); }
                   }} className="gap-2" data-testid="connect-printer-btn">
                     <Usb className="h-4 w-4" /> {t('print.connectPrinter', 'Connect Printer')}
