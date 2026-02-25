@@ -25,6 +25,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import CrmChat from '@/components/chat/CrmChat';
+import ArchiveTab from '@/components/shared/ArchiveTab';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
