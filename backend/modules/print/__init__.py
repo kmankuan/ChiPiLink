@@ -221,6 +221,38 @@ async def get_print_job(job_id: str, admin=Depends(lambda: get_admin_user)):
     return job
 
 
+@router.get("/jobs")
+async def list_print_jobs(
+    limit: int = 50,
+    skip: int = 0,
+    admin=Depends(lambda: get_admin_user)
+):
+    """List print job history with pagination"""
+    total = await db.print_jobs.count_documents({})
+    jobs = await db.print_jobs.find(
+        {},
+        {"_id": 0, "orders": 0, "format_config": 0, "template": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return {"jobs": jobs, "total": total}
+
+
+@router.post("/jobs/{job_id}/complete")
+async def complete_print_job(job_id: str, admin=Depends(lambda: get_admin_user)):
+    """Mark a print job as printed"""
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.print_jobs.update_one(
+        {"job_id": job_id},
+        {"$set": {
+            "status": "printed",
+            "printed_at": now,
+            "printed_by": admin.get("email", "") if isinstance(admin, dict) else "",
+        }}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Print job not found")
+    return {"success": True, "printed_at": now}
+
+
 # ============ MONDAY.COM WEBHOOK ============
 
 @router.post("/monday-trigger")
