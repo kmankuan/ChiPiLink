@@ -17,47 +17,39 @@ Build and maintain a private school inventory system ("Sysbook") alongside a pub
 4. **Backend-Driven Deposit Flow** — Dynamic multi-step deposit (Yappy, Cash, Card, Transfer)
 5. **Print Package List** — Multi-select orders, configurable format, Monday.com webhook trigger, WebSocket real-time notifications
 6. **Print History** — Staff can view past print jobs with who/when/status
-7. **Monday.com Print Button Webhook** — Connected button column `button_mm0xa5t0` on TB2026-Orders board (ID: 18397140868) to the print system. Webhook ID: 541186620. Includes time-window batching (15s) for bulk button clicks.
-8. **Data Cleanup** — All demo/test data wiped across all collections, keeping configs, translations, roles, and admin users.
-9. **Delete → Archive → Permanent Delete Workflow** — Generic archive system across all modules:
-   - Backend: `POST /api/archive/{entity}/archive`, `POST /api/archive/{entity}/restore`, `POST /api/archive/{entity}/permanent-delete`, `GET /api/archive/{entity}`, `GET /api/archive/{entity}/counts`
-   - Entity types: students, orders, store_orders, movements, alerts, print_jobs, products, schools
-   - All listing endpoints filter out archived items automatically
-   - Frontend: ArchiveTab reusable component integrated in Students, Alerts, Stock Movements tabs
-   - Safety guard: permanent delete only works on archived items
-   - 25/25 backend tests passing
+7. **Monday.com Print Button Webhook** — Connected button column `button_mm0xa5t0` on TB2026-Orders board. Includes 15s batch window for bulk button clicks.
+8. **Data Cleanup** — All demo/test data wiped, configs preserved
+9. **Delete → Archive → Permanent Delete Workflow** — Generic archive system across all modules (25/25 tests passing)
+10. **Direct-to-Printer Integration (LR2000E)** — WebUSB-based direct thermal printer connection:
+    - `ThermalPrinterService` — ESC/POS encoder for LR2000E (72mm, 512 dots/line)
+    - `useThermalPrinter` hook — React hook for connect/disconnect/print
+    - PrintConfigPanel — Live USB connection panel with test print
+    - PrintDialog — "USB Print" button alongside browser print
+    - usePrintListener — Auto-print via WebSocket when thermal printer is connected
+11. **Presale Import Trigger** — Simplified to "Ready" label only
 
 ### Key Endpoints
 - **Archive System:** `POST/GET /api/archive/{entity_type}/archive|restore|permanent-delete|counts`
+- **Print System:** `GET/POST /api/print/config/format|printer`, `POST /api/print/jobs`, `GET /api/print/jobs/{job_id}`, `POST /api/print/monday-trigger`
+- **Monday Webhook:** `POST /api/print/monday-trigger` (webhook ID: 541186620)
 - **Deposit Methods:** `GET/POST/PUT /api/wallet/deposit-methods`
-- **Platform Orders:** `GET /api/platform-store/my-orders`, `POST /api/platform-store/create-order`
-- **Printing:** `GET/POST /api/print/config`, `POST /api/print/jobs`, `GET /api/print/jobs`, `POST /api/print/monday-trigger`, `GET /api/print/monday-webhook-status`
-- **Monday Webhook:** `POST /api/monday/print-order`
+- **Platform Orders:** `GET /api/platform-store/my-orders`
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
 - None
 
-### P2 (Medium)
-- **Direct-to-Printer Integration** — Browser USB printing to Logic Controls thermal printer via WebUSB API
-- **On-Demand Landing Page Redesign Tool** — Admin customization tool for landing page
-
 ### P3 (Low)
+- **On-Demand Landing Page Redesign Tool** — Admin customization tool for landing page
 - **Extend Monday.com Sync** — Expand sync to general product inventory beyond Sysbook orders
 
-## Key Database Collections
-- `print_jobs` — Print job records with status tracking
-- `app_config` — Print format config, printer config, webhook config
-- `store_textbook_orders` — Sysbook textbook orders (linked to Monday.com items)
-- `store_students` — Student records with enrollments
-- `sysbook_alerts` — Stock alert records
-- `stock_orders` — Stock movements (shipments, returns, adjustments)
-- `deposit_methods` — Wallet deposit method configuration
-- `store_orders` — Unatienda public store orders
+## Key Technical Details
+- **Thermal Printer:** Logic Controls LR2000E, ESC/POS protocol, WebUSB API, USB Type B
+- **Monday.com Board:** TB2026-Orders (18397140868), button column: button_mm0xa5t0
+- **Presale Sync Trigger Column:** color_mm0mnmrs, accepted label: "Ready"
+- **Archive Entity Types:** students, orders, store_orders, movements, alerts, print_jobs, products, schools
 
 ## Credentials
 - Admin: teck@koh.one / Acdb##0897
-- Monday.com Board: TB2026-Orders (18397140868)
-- Print Button Column: button_mm0xa5t0
-- Webhook ID: 541186620
+- Monday.com Webhook ID: 541186620
