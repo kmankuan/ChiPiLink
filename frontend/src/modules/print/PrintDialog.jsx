@@ -30,6 +30,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const [printing, setPrinting] = useState(false);
   const [jobId, setJobId] = useState(null);
   const printRef = useRef(null);
+  const printer = useThermalPrinter();
 
   useEffect(() => {
     if (open && orderIds?.length > 0) {
