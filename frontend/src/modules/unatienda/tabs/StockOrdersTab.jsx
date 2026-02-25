@@ -694,6 +694,23 @@ export default function StockOrdersTab({ token }) {
         </>}
       />
 
+      {/* Archived View */}
+      {showArchived ? (
+        <ArchiveTab
+          entityType="movements"
+          token={token}
+          columns={[
+            { key: 'order_id', label: 'ID', render: (item) => <span className="font-mono text-[10px]">{item.order_id}</span> },
+            { key: 'type', label: 'Type', render: (item) => <Badge className={`text-[9px] ${TYPE_META[item.type]?.color || ''}`}>{item.type}</Badge> },
+            { key: 'status', label: 'Status', render: (item) => <Badge className={`text-[9px] ${STATUS_COLORS[item.status] || ''}`}>{item.status}</Badge> },
+            { key: 'items', label: 'Items', render: (item) => `${(item.items || []).length} items` },
+          ]}
+          idField="order_id"
+          onCountChange={setArchiveCount}
+          searchFields={['order_id', 'supplier', 'customer_name']}
+        />
+      ) : (
+      <>
       {/* Pending Actions Banner */}
       {pendingCount > 0 && (
         <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800">
