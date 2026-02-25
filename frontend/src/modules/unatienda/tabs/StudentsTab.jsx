@@ -514,6 +514,10 @@ export default function StudentsTab({ token }) {
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
                 className="gap-1 h-7 text-[11px] shrink-0" data-testid="bulk-presale-off">Pre-sale Off</Button>
+              <Button variant="outline" size="sm" onClick={() => setArchiveDialog({ ids: [...selectedIds] })} disabled={bulkProcessing}
+                className="gap-1 h-7 text-[11px] shrink-0 border-red-200 text-red-700 hover:bg-red-50" data-testid="bulk-archive-students">
+                <Trash2 className="h-3 w-3" /> Archive
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px] shrink-0">Clear</Button>
             </div>
           )}
