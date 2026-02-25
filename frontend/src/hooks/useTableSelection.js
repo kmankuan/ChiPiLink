@@ -31,6 +31,7 @@ export function useTableSelection(items = [], idKey = 'id') {
 
   return {
     selected,
+    ids: Array.from(selected),  // Array version of selected IDs for API calls
     isSelected,
     toggle,
     toggleAll,
