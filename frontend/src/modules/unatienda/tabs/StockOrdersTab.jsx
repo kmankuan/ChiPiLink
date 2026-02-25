@@ -772,6 +772,10 @@ export default function StockOrdersTab({ token }) {
                   </Button>
                 )}
                 {isFinal && <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />}
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-600 shrink-0"
+                  onClick={e => { e.stopPropagation(); handleArchiveOrder(order.order_id); }} data-testid={`archive-movement-${order.order_id}`}>
+                  <Archive className="h-3.5 w-3.5" />
+                </Button>
               </div>
             );
           })}
