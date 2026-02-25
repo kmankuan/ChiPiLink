@@ -46,8 +46,6 @@ export default function PrintConfigPanel() {
   const token = localStorage.getItem('auth_token');
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-  const printer = useThermalPrinter();
-
   useEffect(() => {
     fetchConfig();
   }, []);
