@@ -26,6 +26,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
+  const [jobId, setJobId] = useState(null);
   const printRef = useRef(null);
 
   useEffect(() => {
