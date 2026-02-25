@@ -76,6 +76,19 @@ export default function PrintConfigPanel() {
     }
   };
 
+  const fetchHistory = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/print/jobs?limit=20&skip=${historyPage * 20}`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data.jobs || []);
+        setHistoryTotal(data.total || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching print history:', err);
+    }
+  };
+
   const saveFormat = async () => {
     setSaving(true);
     try {
