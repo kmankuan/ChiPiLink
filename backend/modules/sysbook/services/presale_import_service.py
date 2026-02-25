@@ -22,7 +22,7 @@ GRADO_COL = "color_mm02xhw1"
 SYNC_TRIGGER_COL = "color_mm0mnmrs"
 
 # Status labels on the sync trigger column that mean "ready to import"
-SYNC_TRIGGER_LABELS = ["Ready", "Sync", "Import", "Listo", "ready", "sync", "import", "listo"]
+SYNC_TRIGGER_LABELS = ["Ready", "ready"]
 
 
 class PreSaleImportService:
