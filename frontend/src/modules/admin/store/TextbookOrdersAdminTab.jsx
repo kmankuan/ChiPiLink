@@ -295,6 +295,7 @@ export default function TextbookOrdersAdminTab() {
           { value: 'orders', label: 'Orders', icon: Package },
           { value: 'stats', label: 'Statistics', icon: BarChart3 },
           { value: 'reorders', label: 'Reorders', icon: RefreshCw },
+          { value: 'archived', label: 'Archived', icon: Archive, count: archiveCount || undefined },
         ]}
         activeTab={subTab}
         onTabChange={setSubTab}
