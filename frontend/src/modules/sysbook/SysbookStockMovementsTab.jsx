@@ -292,6 +292,8 @@ export default function SysbookStockMovementsTab() {
           })}
         </div>
       )}
+      </>
+      )}
 
       {/* Order Detail / Transition Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
