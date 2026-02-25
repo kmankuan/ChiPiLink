@@ -17,24 +17,26 @@ Build and maintain a private school inventory system ("Sysbook") alongside a pub
 4. **Backend-Driven Deposit Flow** — Dynamic multi-step deposit (Yappy, Cash, Card, Transfer)
 5. **Print Package List** — Multi-select orders, configurable format, Monday.com webhook trigger, WebSocket real-time notifications
 6. **Print History** — Staff can view past print jobs with who/when/status
-7. **Monday.com Print Button Webhook (2026-02-25)** — Connected button column `button_mm0xa5t0` on TB2026-Orders board (ID: 18397140868) to the print system. Webhook ID: 541186620. Clicking the button in Monday.com triggers a print job and broadcasts to admin browsers via WebSocket.
+7. **Monday.com Print Button Webhook** — Connected button column `button_mm0xa5t0` on TB2026-Orders board (ID: 18397140868) to the print system. Webhook ID: 541186620. Includes time-window batching (15s) for bulk button clicks.
+8. **Data Cleanup** — All demo/test data wiped across all collections, keeping configs, translations, roles, and admin users.
+9. **Delete → Archive → Permanent Delete Workflow** — Generic archive system across all modules:
+   - Backend: `POST /api/archive/{entity}/archive`, `POST /api/archive/{entity}/restore`, `POST /api/archive/{entity}/permanent-delete`, `GET /api/archive/{entity}`, `GET /api/archive/{entity}/counts`
+   - Entity types: students, orders, store_orders, movements, alerts, print_jobs, products, schools
+   - All listing endpoints filter out archived items automatically
+   - Frontend: ArchiveTab reusable component integrated in Students, Alerts, Stock Movements tabs
+   - Safety guard: permanent delete only works on archived items
+   - 25/25 backend tests passing
 
 ### Key Endpoints
-- `GET/POST /api/print/config/format` — Print format configuration
-- `POST /api/print/jobs` — Create print job
-- `GET /api/print/jobs` — List print job history
-- `POST /api/print/jobs/{job_id}/complete` — Mark job as printed
-- `POST /api/print/monday-trigger` — Monday.com webhook endpoint
-- `GET /api/print/monday-webhook-status` — Check webhook configuration
-- `GET/POST/PUT /api/wallet/deposit-methods` — Deposit method config
-- `GET /api/platform-store/my-orders` — User's store orders
+- **Archive System:** `POST/GET /api/archive/{entity_type}/archive|restore|permanent-delete|counts`
+- **Deposit Methods:** `GET/POST/PUT /api/wallet/deposit-methods`
+- **Platform Orders:** `GET /api/platform-store/my-orders`, `POST /api/platform-store/create-order`
+- **Printing:** `GET/POST /api/print/config`, `POST /api/print/jobs`, `GET /api/print/jobs`, `POST /api/print/monday-trigger`, `GET /api/print/monday-webhook-status`
+- **Monday Webhook:** `POST /api/monday/print-order`
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None
-
-### P1 (High)
 - None
 
 ### P2 (Medium)
@@ -48,6 +50,9 @@ Build and maintain a private school inventory system ("Sysbook") alongside a pub
 - `print_jobs` — Print job records with status tracking
 - `app_config` — Print format config, printer config, webhook config
 - `store_textbook_orders` — Sysbook textbook orders (linked to Monday.com items)
+- `store_students` — Student records with enrollments
+- `sysbook_alerts` — Stock alert records
+- `stock_orders` — Stock movements (shipments, returns, adjustments)
 - `deposit_methods` — Wallet deposit method configuration
 - `store_orders` — Unatienda public store orders
 
