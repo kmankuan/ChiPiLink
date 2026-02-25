@@ -3,10 +3,16 @@ Package List Print Module — Backend endpoints for:
 - Package list format configuration (admin)
 - Print job creation and Monday.com webhook trigger
 - Printer configuration
+
+Monday.com Batch Printing:
+  When multiple button clicks arrive from Monday.com within a short time window,
+  they are automatically batched into a single print job. This allows users to
+  click the Print button on 10 rows and get one combined print job.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timezone
 from typing import Optional
+import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,10 +22,17 @@ router = APIRouter(prefix="/print", tags=["Print"])
 # Monday.com button column ID that triggers printing
 PRINT_BUTTON_COLUMN_ID = "button_mm0xa5t0"
 
+# Batch window: seconds to wait for more button clicks before finalizing the print job
+MONDAY_BATCH_WINDOW_SECONDS = 15
+
 db = None
 get_admin_user = None
 get_current_user = None
 ws_manager = None
+
+# In-memory batch accumulator: { batch_id: { "order_ids": [...], "monday_item_ids": [...], "task": asyncio.Task } }
+_active_batch = None
+_batch_lock = asyncio.Lock()
 
 def init_print_routes(_db, _get_admin_user, _get_current_user, _ws_manager=None):
     global db, get_admin_user, get_current_user, ws_manager
