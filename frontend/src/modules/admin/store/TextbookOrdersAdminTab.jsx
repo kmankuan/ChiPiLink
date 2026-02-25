@@ -322,7 +322,6 @@ export default function TextbookOrdersAdminTab() {
         ] : [{ label: 'orders', value: orders.length, color: 'blue' }]}
         loading={loading}
         onRefresh={fetchData}
-        actions={subTab === 'orders' ? null : null}
       />
 
       {/* Orders Tab */}
