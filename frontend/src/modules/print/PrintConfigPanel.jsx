@@ -336,126 +336,72 @@ export default function PrintConfigPanel() {
           </Tabs>
         </TabsContent>
 
-        {/* ─── Printer Settings (USB Direct Connection) ─── */}
+        {/* ─── Printer Settings (System Printer) ─── */}
         <TabsContent value="printer" className="space-y-4">
-          {/* USB Connection Card */}
+          {/* LR2000E Status Card */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Usb className="h-4 w-4" />
-                    {t('print.usbConnection', 'USB Printer Connection')}
+                    <Printer className="h-4 w-4" />
+                    {t('print.printerSetup', 'Thermal Printer Setup')}
                   </CardTitle>
                   <CardDescription>
-                    {t('print.usbDesc', 'Connect directly to your LR2000E thermal printer via USB')}
+                    {t('print.systemPrinterDesc', 'Your LR2000E is configured as a Windows system printer')}
                   </CardDescription>
                 </div>
-                <Badge variant={printer.connected ? 'default' : 'secondary'} className="gap-1">
-                  {printer.connected ? <Plug className="h-3 w-3" /> : <Unplug className="h-3 w-3" />}
-                  {printer.connected ? t('print.connected', 'Connected') : t('print.disconnected', 'Disconnected')}
+                <Badge variant="default" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> Installed
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!printer.isSupported ? (
-                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-yellow-800">Web Serial / WebUSB Not Available</p>
-                    <p className="text-xs text-yellow-600 mt-0.5">
-                      Direct printing requires Chrome, Edge, or WaveBox with HTTPS. Please switch to a supported browser.
-                    </p>
-                  </div>
+              <div className="p-3 bg-green-50/70 rounded-lg border border-green-200 space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Logic Controls LR2000E — Ready</span>
                 </div>
-              ) : printer.connected ? (
-                <>
-                  {/* Device Info */}
-                  {printer.deviceInfo && (
-                    <div className="p-3 bg-green-50/70 rounded-lg border border-green-200 space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-800">{printer.deviceInfo.productName || 'Thermal Printer'}</span>
-                        <Badge variant="outline" className="text-[9px] px-1.5 h-4 gap-1">
-                          {printer.connectionType === 'serial' ? 'Serial' : 'USB'} Connection
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1 text-xs text-green-700">
-                        {printer.deviceInfo.manufacturerName && <span>Manufacturer: {printer.deviceInfo.manufacturerName}</span>}
-                        {printer.deviceInfo.vendorId && <span>Vendor ID: 0x{printer.deviceInfo.vendorId?.toString(16).padStart(4, '0')}</span>}
-                        {printer.deviceInfo.serialNumber && <span>Serial: {printer.deviceInfo.serialNumber}</span>}
-                        <span>Method: {printer.connectionType === 'serial' ? 'Web Serial API' : 'WebUSB API'}</span>
-                      </div>
-                    </div>
-                  )}
+                <p className="text-xs text-green-700">
+                  The printer is installed as your default Windows printer. Print jobs are sent through the Windows print system — no additional browser setup required.
+                </p>
+              </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={async () => {
-                      try { await printer.printTest(); toast.success('Test page sent to printer'); }
-                      catch (e) { toast.error(e.message); }
-                    }} disabled={printer.printing} className="gap-1" data-testid="test-print-btn">
-                      {printer.printing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
-                      {t('print.testPrint', 'Test Print')}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={printer.disconnect} className="gap-1 text-red-600 border-red-200 hover:bg-red-50" data-testid="disconnect-printer-btn">
-                      <Unplug className="h-3 w-3" /> {t('print.disconnect', 'Disconnect')}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-4 space-y-3">
-                  <div className="p-4 bg-muted/30 rounded-lg space-y-2">
-                    <Printer className="h-10 w-10 mx-auto text-muted-foreground/40" />
-                    <p className="text-sm text-muted-foreground">
-                      {t('print.noConnection', 'No printer connected. Connect your LR2000E and click a button below.')}
-                    </p>
-                    <ol className="text-xs text-muted-foreground text-left max-w-xs mx-auto space-y-1">
-                      <li>1. Plug in the LR2000E USB cable and turn it on</li>
-                      <li>2. Click one of the connection buttons below</li>
-                      <li>3. Select your printer from the browser dialog</li>
-                    </ol>
-                  </div>
+              <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-200 space-y-2">
+                <p className="text-xs text-blue-700 font-medium">How it works:</p>
+                <ol className="text-xs text-blue-600 space-y-1 list-decimal pl-4">
+                  <li>Select orders from the Orders tab and click "Print"</li>
+                  <li>Click <strong>"Print to LR2000E"</strong> — this opens a thermal-formatted receipt</li>
+                  <li>The Windows print dialog appears with your LR2000E as default</li>
+                  <li>Click Print — the receipt prints on 72mm thermal paper</li>
+                </ol>
+              </div>
 
-                  <div className="flex flex-col gap-2 max-w-xs mx-auto">
-                    {printer.hasUSB && (
-                      <Button onClick={async () => {
-                        try { await printer.connectUSB(); toast.success('Printer connected via USB!'); }
-                        catch (e) { toast.error(e.message || 'Failed to connect via USB'); }
-                      }} className="gap-2 w-full" data-testid="connect-usb-btn">
-                        <Usb className="h-4 w-4" /> Connect via USB
-                      </Button>
-                    )}
-                    {printer.hasSerial && (
-                      <Button variant="outline" onClick={async () => {
-                        try { await printer.connectSerial(); toast.success('Printer connected via Serial port!'); }
-                        catch (e) { toast.error(e.message || 'Failed to connect via Serial'); }
-                      }} className="gap-2 w-full" data-testid="connect-serial-btn">
-                        <Plug className="h-4 w-4" /> Connect via Serial Port
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-center gap-2 pt-1">
-                    <Badge variant={printer.hasUSB ? 'default' : 'secondary'} className="text-[9px]">
-                      USB {printer.hasUSB ? 'Available' : 'N/A'}
-                    </Badge>
-                    <Badge variant={printer.hasSerial ? 'default' : 'secondary'} className="text-[9px]">
-                      Serial {printer.hasSerial ? 'Available' : 'N/A'}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-
-              {printer.error && (
-                <div className="p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
-                  {printer.error}
-                </div>
-              )}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Quick Test:</p>
+                <Button variant="outline" size="sm" onClick={() => {
+                  const html = `<!DOCTYPE html><html><head><title>Test</title>
+<style>@page{size:72mm auto;margin:2mm 3mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;font-size:11px;width:72mm}
+.t{text-align:center;font-size:16px;font-weight:bold;padding:2mm 0}.s{border-top:1px dashed #000;margin:1.5mm 0}.r{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:10px}.f{text-align:center;font-size:9px;color:#555;margin-top:3mm}
+</style></head><body>
+<div class="t">LR2000E TEST</div>
+<div class="s"></div>
+<div class="r"><span>Status:</span><span>Connected</span></div>
+<div class="r"><span>Time:</span><span>${new Date().toLocaleString()}</span></div>
+<div class="s"></div>
+<div class="f">If you see this on the receipt, the printer is working correctly.</div>
+</body></html>`;
+                  const w = window.open('', '_blank', 'width=320,height=400');
+                  if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 500); }
+                  else toast.error('Pop-up blocked. Please allow pop-ups.');
+                }} className="gap-1" data-testid="test-print-btn">
+                  <Zap className="h-3 w-3" /> Print Test Page
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Printer Configuration */}
+          {/* Printer Registry */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">{t('print.printerRegistry', 'Printer Registry')}</CardTitle>
@@ -505,7 +451,7 @@ export default function PrintConfigPanel() {
                 ))
               )}
               <Button variant="outline" size="sm" onClick={addPrinter} className="gap-1" data-testid="add-printer-btn">
-                <Usb className="h-3 w-3" /> Add Printer Entry
+                <Printer className="h-3 w-3" /> Add Printer Entry
               </Button>
             </CardContent>
           </Card>
@@ -521,7 +467,7 @@ export default function PrintConfigPanel() {
                 onChange={(v) => setPrinterConfig(p => ({ ...p, auto_print: v }))}
               />
               <p className="text-[10px] text-muted-foreground">
-                When enabled, incoming Monday.com print triggers will automatically print to the connected USB printer.
+                When enabled, incoming Monday.com print triggers will automatically open a print window.
               </p>
             </CardContent>
           </Card>
