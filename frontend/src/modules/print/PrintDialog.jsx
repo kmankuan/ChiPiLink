@@ -51,6 +51,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
         const data = await res.json();
         setOrders(data.orders || []);
         setFormatConfig(data.format_config || {});
+        setJobId(data.job_id || null);
       }
     } catch (err) {
       console.error('Error fetching print data:', err);
