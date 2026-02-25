@@ -56,6 +56,7 @@ class PreSaleImportService:
 
     async def preview_import(self, board_id: str) -> Dict:
         """Preview what would be imported — no DB changes"""
+        await self._load_subitem_config()
         items = await self.fetch_importable_items(board_id)
         previews = []
         for item in items:
@@ -66,6 +67,7 @@ class PreSaleImportService:
 
     async def import_presale_orders(self, board_id: str, admin_user_id: str) -> Dict:
         """Import pre-sale orders from Monday.com into the app"""
+        await self._load_subitem_config()
         items = await self.fetch_importable_items(board_id)
         imported = []
         skipped = []
