@@ -237,6 +237,24 @@ export default function StudentsTab({ token }) {
     finally { setBulkProcessing(false); }
   };
 
+  const handleArchive = async (ids) => {
+    setProcessing(true);
+    try {
+      const res = await fetch(`${API}/api/archive/students/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      toast.success(`${data.archived_count} student${data.archived_count !== 1 ? 's' : ''} archived`);
+      setSelectedIds(new Set());
+      setArchiveDialog(null);
+      fetchStudents();
+    } catch { toast.error('Error archiving students'); }
+    finally { setProcessing(false); }
+  };
+
   /* ── Request actions ── */
   const openReqDialog = (request, action) => {
     setReqDialog({ request, action });
