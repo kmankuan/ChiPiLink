@@ -60,6 +60,18 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
     }
   };
 
+  const markJobComplete = async () => {
+    if (!jobId) return;
+    try {
+      await fetch(`${API_URL}/api/print/jobs/${jobId}/complete`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error('Error marking print job complete:', err);
+    }
+  };
+
   const handleBrowserPrint = () => {
     setPrinting(true);
 
