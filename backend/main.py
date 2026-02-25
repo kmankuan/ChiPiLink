@@ -206,6 +206,10 @@ api_router.include_router(realtime_router)
 # Roles & Permissions Module
 api_router.include_router(roles_router)
 
+# Print Module
+api_router.include_router(print_router)
+
+
 # Widget Module
 from modules.widget import widget_router
 api_router.include_router(widget_router)
