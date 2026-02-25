@@ -216,6 +216,7 @@ export default function SysbookAlertsTab() {
           { value: 'active', label: 'Active', icon: Bell },
           { value: 'dismissed', label: 'Dismissed', icon: BellOff },
           { value: 'all', label: 'All', icon: Eye },
+          { value: 'archived', label: 'Archived', icon: Archive, count: archiveCount || undefined },
         ].map(tab => (
           <Button
             key={tab.value}
@@ -226,10 +227,33 @@ export default function SysbookAlertsTab() {
             data-testid={`filter-${tab.value}`}
           >
             <tab.icon className="h-3 w-3" /> {tab.label}
+            {tab.count > 0 && <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-0.5">{tab.count}</Badge>}
           </Button>
         ))}
+        {alerts.length > 0 && statusFilter !== 'archived' && (
+          <Button variant="ghost" size="sm" className="gap-1 h-7 text-xs text-red-600 ml-auto" onClick={handleArchiveAll} data-testid="archive-all-alerts">
+            <Archive className="h-3 w-3" /> Archive All
+          </Button>
+        )}
       </div>
 
+      {/* Archived View */}
+      {statusFilter === 'archived' ? (
+        <ArchiveTab
+          entityType="alerts"
+          token={token}
+          idField="alert_id"
+          onCountChange={setArchiveCount}
+          searchFields={['product_name', 'product_code']}
+          columns={[
+            { key: 'product_name', label: 'Product' },
+            { key: 'alert_type', label: 'Type', render: a => a.alert_type === 'out_of_stock' ? 'Out of Stock' : 'Low Stock' },
+            { key: 'severity', label: 'Severity' },
+            { key: 'current_quantity', label: 'Qty' },
+          ]}
+        />
+      ) : (
+      <>
       {/* Alerts List */}
       {alerts.length === 0 ? (
         <Card><CardContent className="py-12 text-center">
