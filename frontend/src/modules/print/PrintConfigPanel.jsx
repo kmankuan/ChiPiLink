@@ -362,9 +362,9 @@ export default function PrintConfigPanel() {
                 <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                   <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-yellow-800">WebUSB Not Available</p>
+                    <p className="text-sm font-medium text-yellow-800">Web Serial / WebUSB Not Available</p>
                     <p className="text-xs text-yellow-600 mt-0.5">
-                      WebUSB requires Chrome or Edge browser with HTTPS. Please switch to a supported browser.
+                      Direct printing requires Chrome, Edge, or WaveBox with HTTPS. Please switch to a supported browser.
                     </p>
                   </div>
                 </div>
@@ -375,12 +375,16 @@ export default function PrintConfigPanel() {
                     <div className="p-3 bg-green-50/70 rounded-lg border border-green-200 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-800">{printer.deviceInfo.productName}</span>
+                        <span className="text-sm font-medium text-green-800">{printer.deviceInfo.productName || 'Thermal Printer'}</span>
+                        <Badge variant="outline" className="text-[9px] px-1.5 h-4 gap-1">
+                          {printer.connectionType === 'serial' ? 'Serial' : 'USB'} Connection
+                        </Badge>
                       </div>
                       <div className="grid grid-cols-2 gap-1 text-xs text-green-700">
-                        <span>Manufacturer: {printer.deviceInfo.manufacturerName}</span>
-                        <span>Vendor ID: 0x{printer.deviceInfo.vendorId?.toString(16).padStart(4, '0')}</span>
+                        {printer.deviceInfo.manufacturerName && <span>Manufacturer: {printer.deviceInfo.manufacturerName}</span>}
+                        {printer.deviceInfo.vendorId && <span>Vendor ID: 0x{printer.deviceInfo.vendorId?.toString(16).padStart(4, '0')}</span>}
                         {printer.deviceInfo.serialNumber && <span>Serial: {printer.deviceInfo.serialNumber}</span>}
+                        <span>Method: {printer.connectionType === 'serial' ? 'Web Serial API' : 'WebUSB API'}</span>
                       </div>
                     </div>
                   )}
