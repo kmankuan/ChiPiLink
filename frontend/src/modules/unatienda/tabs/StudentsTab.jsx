@@ -551,6 +551,10 @@ export default function StudentsTab({ token }) {
                               className={`h-6 w-6 p-0 ${locked ? 'text-amber-600' : 'text-red-600'}`}>
                               {locked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
                             </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setArchiveDialog({ ids: [id] })}
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-red-600" data-testid={`archive-student-${id}`}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </div>
                         <p className="text-[10px] text-muted-foreground font-mono">{student.student_number || id}</p>
