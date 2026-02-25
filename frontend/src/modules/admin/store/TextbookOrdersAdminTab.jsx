@@ -769,6 +769,15 @@ export default function TextbookOrdersAdminTab() {
         loading={bulkLoading}
       />
 
+
+      {/* Print Dialog */}
+      <PrintDialog
+        open={printDialogOpen}
+        onOpenChange={setPrintDialogOpen}
+        orderIds={orderSelection.ids}
+        token={localStorage.getItem('auth_token')}
+      />
+
       {/* CRM Chat */}
       {chatStudent && (
         <CrmChat
