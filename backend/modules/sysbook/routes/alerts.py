@@ -75,7 +75,7 @@ async def list_alerts(
     admin: dict = Depends(get_admin_user),
 ):
     """List stock alerts."""
-    query = {"source": "sysbook"}
+    query = {"source": "sysbook", "$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
     if status == "active":
         query["dismissed"] = {"$ne": True}
     elif status == "dismissed":
