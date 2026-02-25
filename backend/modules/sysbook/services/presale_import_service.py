@@ -137,28 +137,30 @@ class PreSaleImportService:
             # Parse quantity and price from subitem columns
             quantity = 1
             price = 0.0
+            # Parse price from the configured subitem price column
             for col in si.get("column_values", []):
                 text = col.get("text", "").strip()
                 if not text:
                     continue
-                col_id = col.get("id", "").lower()
+                col_id = col.get("id", "")
                 col_type = col.get("type", "").lower()
-                # Detect numeric columns (price or quantity)
-                is_numeric = col_type in ("numbers", "numeric") or col_id.startswith("numbers") or col_id.startswith("numeric")
-                is_qty = "cantidad" in col_id or "quantity" in col_id or "qty" in col_id
-                if is_numeric or is_qty:
+
+                # Check against configured price column first
+                if col_id == self._subitem_price_col:
                     try:
-                        val = float(text.replace(",", "").replace("$", ""))
-                        if is_qty or val < 100 and "price" not in col_id and "precio" not in col_id:
-                            # Small values in qty-named columns are quantities
-                            if is_qty:
-                                quantity = max(1, int(val))
-                            elif val < 20:
-                                quantity = max(1, int(val))
-                            else:
-                                price = val
-                        else:
-                            price = val
+                        price = float(text.replace(",", "").replace("$", ""))
+                    except ValueError:
+                        pass
+                    continue
+
+                # Fallback: detect numeric columns for quantity
+                is_numeric = col_type in ("numbers", "numeric") or col_id.startswith("numbers") or col_id.startswith("numeric")
+                is_qty = "cantidad" in col_id.lower() or "quantity" in col_id.lower() or "qty" in col_id.lower()
+                if is_qty or (is_numeric and col_id != self._subitem_price_col):
+                    try:
+                        val = float(text.replace(",", ""))
+                        if val < 100:
+                            quantity = max(1, int(val))
                     except ValueError:
                         pass
 
