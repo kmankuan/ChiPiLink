@@ -250,11 +250,40 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
                 onClick={handleBrowserPrint}
                 className="flex-1 gap-2"
                 disabled={printing}
+                variant="outline"
                 data-testid="print-btn"
               >
                 {printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
-                {t('print.printAll', 'Print All')} ({orders.length})
+                {t('print.browserPrint', 'Browser Print')} ({orders.length})
               </Button>
+              {printer.isSupported && (
+                <Button
+                  onClick={async () => {
+                    try {
+                      if (!printer.connected) {
+                        await printer.connect();
+                        toast.success('Printer connected');
+                      }
+                      const fmtCfg = {
+                        title: formatConfig?.header?.title || 'PACKAGE LIST',
+                        subtitle: formatConfig?.header?.subtitle || '',
+                        footer: formatConfig?.footer?.text || 'Thank you!',
+                      };
+                      await printer.printOrders(orders, fmtCfg);
+                      toast.success(`${orders.length} receipt${orders.length > 1 ? 's' : ''} sent to printer`);
+                      markJobComplete();
+                    } catch (e) {
+                      toast.error(e.message || 'Print failed');
+                    }
+                  }}
+                  className="flex-1 gap-2"
+                  disabled={printer.printing}
+                  data-testid="thermal-print-btn"
+                >
+                  {printer.printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Usb className="h-4 w-4" />}
+                  {printer.connected ? `USB Print (${orders.length})` : 'Connect & Print'}
+                </Button>
+              )}
             </div>
           </>
         )}
