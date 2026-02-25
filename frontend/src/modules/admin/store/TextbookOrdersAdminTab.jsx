@@ -108,6 +108,7 @@ export default function TextbookOrdersAdminTab() {
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [chatStudent, setChatStudent] = useState(null);
+  const [singlePrintOpen, setSinglePrintOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
