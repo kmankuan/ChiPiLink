@@ -1,20 +1,22 @@
 /**
  * useThermalPrinter — React hook for the LR2000E thermal printer
- * Provides connection state, connect/disconnect, and print functions.
+ * Supports both Web Serial and WebUSB connections.
  */
 import { useState, useEffect, useCallback } from 'react';
 import thermalPrinter from '@/services/ThermalPrinterService';
 
 export default function useThermalPrinter() {
   const [connected, setConnected] = useState(thermalPrinter.connected);
+  const [connectionType, setConnectionType] = useState(thermalPrinter.connectionType);
   const [deviceInfo, setDeviceInfo] = useState(thermalPrinter.getDeviceInfo());
   const [printing, setPrinting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const unsub = thermalPrinter.onStateChange(({ connected: c, device }) => {
+    const unsub = thermalPrinter.onStateChange(({ connected: c, connectionType: ct, deviceInfo: di }) => {
       setConnected(c);
-      setDeviceInfo(thermalPrinter.getDeviceInfo());
+      setConnectionType(ct);
+      setDeviceInfo(di);
     });
     return unsub;
   }, []);
@@ -42,9 +44,7 @@ export default function useThermalPrinter() {
     } catch (err) {
       setError(err.message);
       throw err;
-    } finally {
-      setPrinting(false);
-    }
+    } finally { setPrinting(false); }
   }, []);
 
   const printOrders = useCallback(async (orders, formatConfig) => {
@@ -55,9 +55,7 @@ export default function useThermalPrinter() {
     } catch (err) {
       setError(err.message);
       throw err;
-    } finally {
-      setPrinting(false);
-    }
+    } finally { setPrinting(false); }
   }, []);
 
   const printTest = useCallback(async () => {
@@ -68,14 +66,15 @@ export default function useThermalPrinter() {
     } catch (err) {
       setError(err.message);
       throw err;
-    } finally {
-      setPrinting(false);
-    }
+    } finally { setPrinting(false); }
   }, []);
 
   return {
     isSupported: thermalPrinter.isSupported,
+    hasSerial: thermalPrinter.hasSerial,
+    hasUSB: thermalPrinter.hasUSB,
     connected,
+    connectionType,
     deviceInfo,
     printing,
     error,
