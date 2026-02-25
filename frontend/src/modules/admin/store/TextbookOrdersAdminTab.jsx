@@ -323,12 +323,7 @@ export default function TextbookOrdersAdminTab() {
         ] : [{ label: 'orders', value: orders.length, color: 'blue' }]}
         loading={loading}
         onRefresh={fetchData}
-        actions={subTab === 'orders' ? (
-          <Button variant={showArchived ? "default" : "ghost"} size="sm" className="gap-1 h-7 text-xs"
-            onClick={() => setShowArchived(!showArchived)} data-testid="toggle-archived-btn">
-            <Archive className="h-3 w-3" /> {showArchived ? 'Hide' : 'Show'} Archived
-          </Button>
-        ) : null}
+        actions={subTab === 'orders' ? null : null}
       />
 
       {/* Orders Tab */}
