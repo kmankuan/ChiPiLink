@@ -7,8 +7,14 @@ Package List Print Module — Backend endpoints for:
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timezone
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/print", tags=["Print"])
+
+# Monday.com button column ID that triggers printing
+PRINT_BUTTON_COLUMN_ID = "button_mm0xa5t0"
 
 db = None
 get_admin_user = None
