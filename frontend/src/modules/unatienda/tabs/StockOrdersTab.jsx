@@ -678,6 +678,10 @@ export default function StockOrdersTab({ token }) {
         loading={loading}
         onRefresh={fetchOrders}
         actions={<>
+          <Button size="sm" variant={showArchived ? "default" : "ghost"} onClick={() => setShowArchived(!showArchived)}
+            className="gap-1 h-7 text-xs" data-testid="toggle-archived-movements">
+            <Archive className="h-3 w-3" /> {showArchived ? 'Active' : 'Archived'}{archiveCount > 0 ? ` (${archiveCount})` : ''}
+          </Button>
           <Button size="sm" onClick={() => setShowShipment(true)} className="gap-1 h-7 text-xs" data-testid="new-shipment-btn">
             <Truck className="h-3 w-3" /> <span className="hidden sm:inline">Shipment</span>
           </Button>
