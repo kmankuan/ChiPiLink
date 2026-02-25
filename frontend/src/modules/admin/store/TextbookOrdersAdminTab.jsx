@@ -647,17 +647,28 @@ export default function TextbookOrdersAdminTab() {
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Selected Items</p>
                 <ScrollArea className="h-[200px]">
-                  <div className="space-y-2">
-                    {selectedOrder.items?.filter(i => i.quantity_ordered > 0).map((item) => (
-                      <div key={item.book_id} className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span>{item.book_name}</span>
-                        <div className="text-right">
-                          <span className="font-medium">${item.price?.toFixed(2)}</span>
-                          <span className="text-muted-foreground ml-2">x{item.quantity_ordered}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Code</TableHead>
+                        <TableHead className="text-xs">Book</TableHead>
+                        <TableHead className="text-xs text-right">Price</TableHead>
+                        <TableHead className="text-xs text-right">Qty</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedOrder.items?.filter(i => i.quantity_ordered > 0).map((item) => (
+                        <TableRow key={item.book_id}>
+                          <TableCell className="text-xs font-mono text-muted-foreground" data-testid={`item-code-${item.book_id}`}>
+                            {item.book_code || '-'}
+                          </TableCell>
+                          <TableCell className="text-sm">{item.book_name}</TableCell>
+                          <TableCell className="text-sm text-right font-medium">${item.price?.toFixed(2)}</TableCell>
+                          <TableCell className="text-sm text-right">x{item.quantity_ordered}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </ScrollArea>
               </div>
 
@@ -668,8 +679,31 @@ export default function TextbookOrdersAdminTab() {
               )}
             </div>
           )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => {
+                setSinglePrintOpen(true);
+              }}
+              data-testid="order-detail-print-btn"
+            >
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Single Order Print Dialog */}
+      <PrintDialog
+        open={singlePrintOpen}
+        onOpenChange={setSinglePrintOpen}
+        orderIds={selectedOrder ? [selectedOrder.order_id] : []}
+        token={localStorage.getItem('auth_token')}
+      />
 
       {/* Approve Reorder Dialog */}
       <Dialog open={showReorderDialog} onOpenChange={setShowReorderDialog}>
