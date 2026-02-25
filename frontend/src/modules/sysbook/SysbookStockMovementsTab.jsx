@@ -139,25 +139,32 @@ export default function SysbookStockMovementsTab() {
   };
 
   const handleDelete = async (orderId) => {
-    if (!window.confirm('Delete this stock order?')) return;
-    setDeleting(true);
     try {
-      await axios.delete(`${SYSBOOK_API}/stock-orders/${orderId}`, { headers });
-      toast.success('Order deleted');
+      await fetch(`${API_URL}/api/archive/movements/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids: [orderId] }),
+      });
+      toast.success('Order archived');
       setSelectedOrder(null);
       fetchOrders();
       fetchPending();
-    } catch (e) { toast.error(e.response?.data?.detail || 'Error deleting'); } finally { setDeleting(false); }
+    } catch { toast.error('Error archiving order'); } finally { setDeleting(false); }
   };
 
   const handleClearAll = async () => {
-    if (!window.confirm('Delete ALL stock orders? This cannot be undone.')) return;
+    if (!window.confirm('Archive ALL stock orders?')) return;
+    const ids = orders.map(o => o.order_id);
     try {
-      const { data } = await axios.delete(`${SYSBOOK_API}/stock-orders/clear/all`, { headers });
-      toast.success(`Deleted ${data.deleted_count} orders`);
+      await fetch(`${API_URL}/api/archive/movements/archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids }),
+      });
+      toast.success(`${ids.length} orders archived`);
       fetchOrders();
       fetchPending();
-    } catch (e) { toast.error(e.response?.data?.detail || 'Error clearing'); }
+    } catch { toast.error('Error archiving'); }
   };
 
   const addItem = () => setCreateItems(prev => [...prev, { book_id: '', product_name: '', expected_qty: 0 }]);
