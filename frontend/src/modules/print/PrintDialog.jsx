@@ -27,67 +27,22 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 const API_URL = RESOLVED_API_URL;
 
 /**
- * Build thermal receipt HTML for the LR2000E (72mm paper)
- * Uses ESC/POS-style layout in HTML: monospace, narrow, compact
+ * Build thermal receipt HTML by extracting each .package-list-page from
+ * the already-rendered PackageListPreview components (printRef).
+ * This guarantees print output matches preview exactly.
  */
-function buildThermalReceiptHTML(orders, formatConfig = {}) {
-  const title = formatConfig?.header?.title || 'PACKAGE LIST';
-  const footer = formatConfig?.footer?.text || 'Thank you!';
-  const now = new Date().toLocaleString();
-
-  const receipts = orders.map((order, idx) => {
-    const student = order.student_name || 'Unknown';
-    const grade = order.grade || '';
-    const orderId = (order.order_id || '').slice(-8);
-    const items = order.items || order.books || [];
-    const total = items.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity_ordered || it.quantity || it.qty || 1)), 0);
-
-    let html = `<div class="receipt${idx < orders.length - 1 ? ' page-break' : ''}">`;
-
-    // Header
-    html += `<div class="title">${title}</div>`;
-    html += `<div class="subtitle">${now}</div>`;
-    html += `<div class="sep"></div>`;
-
-    // Student info
-    html += `<div class="section-head">STUDENT</div>`;
-    html += `<div class="row"><span>${student}</span></div>`;
-    if (grade) html += `<div class="row"><span>Grade: ${grade}</span><span>ID: ${orderId}</span></div>`;
-    html += `<div class="sep"></div>`;
-
-    // Items
-    if (items.length > 0) {
-      html += `<div class="section-head">ITEMS (${items.length})</div>`;
-      items.forEach((item, i) => {
-        const code = item.book_code || '';
-        const name = item.book_name || item.name || item.title || item.book_title || `Item ${i + 1}`;
-        const qty = item.quantity_ordered || item.quantity || item.qty || 1;
-        const price = item.price ? `$${Number(item.price).toFixed(2)}` : '';
-        const label = code ? `${code} - ${name}` : name;
-        html += `<div class="row"><span>${qty}x ${label}</span><span>${price}</span></div>`;
-      });
-      html += `<div class="sep"></div>`;
-      if (total > 0) {
-        html += `<div class="row total"><span>TOTAL</span><span>$${total.toFixed(2)}</span></div>`;
-        html += `<div class="sep"></div>`;
-      }
-    }
-
-    // Footer
-    html += `<div class="footer">${footer}</div>`;
-    html += `</div>`;
-    return html;
-  }).join('');
+function buildThermalHTML(printRefEl) {
+  if (!printRefEl) return null;
+  const content = printRefEl.innerHTML;
+  if (!content) return null;
 
   return `<!DOCTYPE html>
 <html>
 <head>
-<title>Print - ${orders.length} Package List(s)</title>
+<title>Thermal Print</title>
 <style>
-  /* Reset */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* Page setup for 72mm (80mm with margins) thermal paper */
   @page {
     size: 72mm auto;
     margin: 2mm 3mm;
@@ -102,97 +57,80 @@ function buildThermalReceiptHTML(orders, formatConfig = {}) {
     background: #fff;
   }
 
-  .receipt {
-    padding: 2mm 0;
+  /* Override PackageListPreview styles for thermal paper */
+  .package-list-page {
+    padding: 2mm 0 !important;
+    max-width: 72mm !important;
+    margin: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 10px !important;
   }
 
-  .page-break {
+  .package-list-page:not(:last-child) {
     page-break-after: always;
     border-bottom: 1px dashed #999;
-    margin-bottom: 4mm;
-    padding-bottom: 4mm;
+    margin-bottom: 4mm !important;
+    padding-bottom: 4mm !important;
   }
 
-  .title {
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    padding: 2mm 0 1mm;
-  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 1px 2px; text-align: left; font-size: 10px; }
+  th { border-bottom: 1px solid #333; font-weight: bold; }
+  td { border-bottom: 1px dotted #ccc; }
+  p, h2, div { font-size: 10px; }
+  h2 { font-size: 12px !important; }
+  img { display: none !important; }
+  svg { display: none !important; }
 
-  .subtitle {
-    text-align: center;
-    font-size: 9px;
-    color: #555;
-    margin-bottom: 2mm;
-  }
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .font-bold { font-weight: bold; }
+  .font-mono { font-family: 'Courier New', monospace; }
+  .font-medium { font-weight: 600; }
+  .border-b { border-bottom: 1px solid #ddd; }
+  .border-dashed { border-style: dashed; }
+  .text-xs { font-size: 9px; }
+  .text-sm { font-size: 10px; }
+  .text-base { font-size: 11px; }
+  .text-gray-400, .text-gray-500, .text-gray-600 { color: #333; }
+  .mb-2 { margin-bottom: 2px; }
+  .mb-3 { margin-bottom: 4px; }
+  .mb-4 { margin-bottom: 6px; }
+  .mt-2 { margin-top: 2px; }
+  .mt-6 { margin-top: 10px; }
+  .pb-2 { padding-bottom: 2px; }
+  .pb-3 { padding-bottom: 4px; }
+  .pt-3 { padding-top: 4px; }
+  .pt-4 { padding-top: 6px; }
+  .py-1 { padding-top: 1px; padding-bottom: 1px; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+  .flex { display: flex; }
+  .justify-between { justify-content: space-between; }
+  .items-center { align-items: center; }
+  .gap-1 { gap: 2px; }
+  .space-y-2 > * + * { margin-top: 2px; }
+  .border-gray-100 { border-color: #ddd; }
+  .border-gray-200 { border-color: #ccc; }
+  .border-gray-300 { border-color: #999; }
+  .border-gray-400 { border-color: #666; }
+  .rounded-sm { border-radius: 1px; }
+  .inline-block { display: inline-block; }
+  .w-3\\.5, .h-3\\.5 { width: 10px; height: 10px; }
+  .h-8 { height: 16px; }
+  .w-48 { width: 100px; }
+  .hidden { display: none !important; }
 
-  .sep {
-    border-top: 1px dashed #000;
-    margin: 1.5mm 0;
-  }
-
-  .section-head {
-    font-weight: bold;
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    margin: 1mm 0;
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5mm 0;
-    font-size: 10px;
-    gap: 2mm;
-  }
-
-  .row span:first-child {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .row span:last-child {
-    text-align: right;
-    white-space: nowrap;
-  }
-
-  .row.total {
-    font-weight: bold;
-    font-size: 12px;
-    padding: 1mm 0;
-  }
-
-  .footer {
-    text-align: center;
-    font-size: 9px;
-    color: #555;
-    margin-top: 3mm;
-    padding-bottom: 2mm;
-  }
-
-  /* Screen preview */
   @media screen {
-    body {
-      max-width: 72mm;
-      margin: 10mm auto;
-      border: 1px solid #ddd;
-      padding: 3mm;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+    body { max-width: 72mm; margin: 10mm auto; border: 1px solid #ddd; padding: 3mm; }
   }
-
-  /* Print: remove shadows, ensure clean output */
   @media print {
-    body { width: 72mm; margin: 0; box-shadow: none; border: none; padding: 0; }
+    body { width: 72mm; margin: 0; padding: 0; }
   }
 </style>
 </head>
 <body>
-${receipts}
+${content}
 </body>
 </html>`;
 }
