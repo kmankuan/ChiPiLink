@@ -119,6 +119,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         printWindow.close();
         setPrinting(false);
         markJobComplete();
+        markOrdersPrinted();
         toast.success(`${orders.length} receipt(s) sent to printer`);
       };
 
