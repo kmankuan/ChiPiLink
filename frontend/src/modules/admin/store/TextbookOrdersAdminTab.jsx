@@ -52,7 +52,9 @@ import {
   BarChart3,
   Archive,
   MessageCircle,
-  Printer
+  Printer,
+  Link2,
+  PrinterCheck
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
