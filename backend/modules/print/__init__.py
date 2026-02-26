@@ -235,7 +235,7 @@ def _build_thermal_html(orders, fmt):
                 receipt += '<td style="padding:1px;"><span style="display:inline-block;width:8px;height:8px;border:1px solid #666;"></span></td>'
             if b.get("show_item_code", True):
                 receipt += f'<td style="padding:1px 2px; font-weight:bold; color:#333; font-size:8px;">{escape(code)}</td>'
-            receipt += f'<td style="padding:1px 2px; font-weight:500;">{escape(name)}</td>'
+            receipt += f'<td style="padding:1px 2px; font-weight:600;">{escape(name)}</td>'
             if b.get("show_item_quantity", True):
                 receipt += f'<td style="text-align:right; padding:1px 2px;">{qty}</td>'
             if b.get("show_item_price", True):
