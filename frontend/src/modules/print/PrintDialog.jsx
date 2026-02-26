@@ -167,7 +167,6 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
         const data = await res.json();
         setOrders(data.orders || []);
         setFormatConfig(data.format_config || {});
-        setThermalHtml(data.thermal_html || null);
         setJobId(data.job_id || null);
       }
     } catch (err) {
