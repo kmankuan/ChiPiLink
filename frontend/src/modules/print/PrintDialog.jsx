@@ -190,39 +190,49 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   };
 
   /** Print to thermal printer (LR2000E) — uses the Windows default printer */
-  const handleThermalPrint = () => {
+  const handleThermalPrint = async () => {
     setPrinting(true);
 
-    // Open a real server-rendered page (not document.write)
-    // This ensures the browser fully renders the HTML with all styles
-    const ids = orderIds.join(',');
-    const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(ids)}&token=${encodeURIComponent(token)}`;
-    const printWindow = window.open(url, '_blank', 'width=400,height=600');
+    try {
+      // Fetch fresh thermal HTML from backend at print time
+      const ids = orderIds.join(',');
+      const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(ids)}&token=${encodeURIComponent(token)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const html = await res.text();
 
-    if (!printWindow) {
-      toast.error('Pop-up blocked. Please allow pop-ups for this site.');
-      setPrinting(false);
-      return;
-    }
+      // Open popup and write the HTML using document.write (same pattern as Standard Print)
+      const printWindow = window.open('', '_blank', 'width=400,height=600');
+      if (!printWindow) {
+        toast.error('Pop-up blocked. Please allow pop-ups for this site.');
+        setPrinting(false);
+        return;
+      }
 
-    // Monitor the popup — when it closes, mark job complete
-    const checkClosed = setInterval(() => {
-      if (printWindow.closed) {
-        clearInterval(checkClosed);
+      printWindow.document.write(html);
+      printWindow.document.close();
+
+      // Wait for content to render, then print
+      printWindow.onafterprint = () => {
+        printWindow.close();
         setPrinting(false);
         markJobComplete();
         toast.success(`${orders.length} receipt(s) sent to printer`);
-      }
-    }, 1000);
+      };
 
-    // Fallback timeout after 60s
-    setTimeout(() => {
-      clearInterval(checkClosed);
-      if (!printWindow.closed) {
-        setPrinting(false);
-        markJobComplete();
-      }
-    }, 60000);
+      setTimeout(() => {
+        printWindow.print();
+        // Fallback close after 30s if onafterprint doesn't fire
+        setTimeout(() => {
+          if (!printWindow.closed) printWindow.close();
+          setPrinting(false);
+        }, 30000);
+      }, 800);
+    } catch (err) {
+      console.error('Thermal print error:', err);
+      toast.error('Failed to load print data. Please try again.');
+      setPrinting(false);
+    }
   };
 
   /** Standard browser print (for regular paper printers) */
