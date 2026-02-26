@@ -25,7 +25,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
 
-export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
+export default function PrintDialog({ open, onOpenChange, orderIds, token, onPrintComplete }) {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [formatConfig, setFormatConfig] = useState(null);
