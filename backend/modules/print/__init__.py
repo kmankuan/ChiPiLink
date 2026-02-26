@@ -274,6 +274,29 @@ body{{font-family:'Courier New',monospace;font-size:10px;line-height:1.3;width:7
 <body>{receipts_html}</body></html>'''
 
 
+# ============ THERMAL RECEIPT (returns raw HTML) ============
+
+@router.post("/thermal-receipt", response_class=HTMLResponse)
+async def get_thermal_receipt(data: dict, admin=Depends(lambda: get_admin_user)):
+    """Return complete thermal receipt HTML page ready for window.print()"""
+    order_ids = data.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="No orders specified")
+
+    orders = await db.store_textbook_orders.find(
+        {"order_id": {"$in": order_ids}},
+        {"_id": 0}
+    ).to_list(100)
+
+    if not orders:
+        raise HTTPException(status_code=404, detail="No orders found")
+
+    config = await db.app_config.find_one({"config_key": "print_format"}, {"_id": 0})
+    fmt = config["value"] if config else DEFAULT_FORMAT_CONFIG
+
+    return HTMLResponse(content=_build_thermal_html(orders, fmt), media_type="text/html")
+
+
 # ============ PRINT JOBS ============
 
 @router.post("/jobs")
