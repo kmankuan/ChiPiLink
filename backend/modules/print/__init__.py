@@ -329,6 +329,7 @@ async def create_print_job(data: dict, admin=Depends(lambda: get_admin_user)):
         "orders": orders,
         "format_config": fmt,
         "template": template,
+        "thermal_html": _build_thermal_html(orders, fmt),
     }
 
 
