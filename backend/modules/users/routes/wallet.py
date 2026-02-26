@@ -873,10 +873,14 @@ async def bulk_delete_transactions(data: dict, admin=Depends(get_admin_user)):
     if not transaction_ids:
         raise HTTPException(status_code=400, detail="No transactions specified")
 
-    r = await db.chipi_transactions.delete_many(
-        {"transaction_id": {"$in": transaction_ids}}
-    )
-    return {"status": "deleted", "count": r.deleted_count}
+    try:
+        r = await db.chipi_transactions.delete_many(
+            {"transaction_id": {"$in": transaction_ids}}
+        )
+        return {"status": "deleted", "count": r.deleted_count}
+    except Exception as e:
+        logger.error(f"[wallet] bulk-delete error: {e}")
+        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
 
 
 @router.delete("/admin/transactions/{transaction_id}")
