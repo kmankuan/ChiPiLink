@@ -18,8 +18,13 @@ async def preview_import(admin: dict = Depends(get_admin_user)):
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
-    result = await presale_import_service.preview_import(board_id)
-    return result
+    try:
+        result = await presale_import_service.preview_import(board_id)
+        return result
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"[presale] Preview failed: {e}")
+        raise HTTPException(500, f"Error fetching from Monday.com: {str(e)}")
 
 
 @router.post("/execute")
