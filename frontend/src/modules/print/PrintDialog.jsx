@@ -138,6 +138,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [formatConfig, setFormatConfig] = useState(null);
+  const [thermalHtml, setThermalHtml] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
