@@ -193,7 +193,9 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const handleThermalPrint = () => {
     setPrinting(true);
 
-    const html = buildThermalHTML(printRef.current);
+    // Use server-generated thermal HTML (backend builds the receipt)
+    // Falls back to extracting from the rendered preview if server HTML not available
+    const html = thermalHtml || buildThermalHTML(printRef.current);
     if (!html) {
       toast.error('No content to print');
       setPrinting(false);
