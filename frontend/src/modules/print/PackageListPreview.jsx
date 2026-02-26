@@ -19,6 +19,7 @@ export default function PackageListPreview({ order, formatConfig, isLast = false
     <div
       className="package-list-page bg-white text-black p-6"
       style={{
+        fontFamily: 'Verdana, Arial, Helvetica, sans-serif',
         fontSize: s.font_size || '12px',
         pageBreakAfter: isLast ? 'auto' : 'always',
         maxWidth: formatConfig?.paper_size === '58mm' ? '58mm' : '80mm',
