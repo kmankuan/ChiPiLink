@@ -858,6 +858,7 @@ export default function TextbookOrdersAdminTab() {
         onOpenChange={setPrintDialogOpen}
         orderIds={orderSelection.ids}
         token={localStorage.getItem('auth_token')}
+        onPrintComplete={fetchData}
       />
 
       {/* CRM Chat */}
