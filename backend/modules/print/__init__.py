@@ -198,31 +198,31 @@ def _build_thermal_html(orders, fmt):
         receipt += '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:2mm; margin-bottom:2mm;">'
         receipt += f'<div style="font-size:14px; font-weight:bold;">{escape(title)}</div>'
         if h.get("show_date", True):
-            receipt += f'<div style="font-size:9px; color:#555;">{now_str}</div>'
+            receipt += f'<div style="font-size:9px; color:#000; font-weight:500;">{now_str}</div>'
         if h.get("show_order_id", True):
-            receipt += f'<div style="font-size:8px; font-family:Verdana,Arial,sans-serif; color:#555; margin-top:1mm;">{escape(order.get("order_id", ""))}</div>'
+            receipt += f'<div style="font-size:8px; font-family:Verdana,Arial,sans-serif; color:#000; font-weight:500; margin-top:1mm;">{escape(order.get("order_id", ""))}</div>'
         receipt += '</div>'
         # Student
         if b.get("show_student_name", True):
             receipt += f'<div style="font-weight:bold; font-size:11px;">{escape(order.get("student_name", "Unknown"))}</div>'
         if b.get("show_grade", True) and order.get("grade"):
             yr = f' &mdash; {order["year"]}' if order.get("year") else ''
-            receipt += f'<div style="font-size:9px; color:#555;">Grade: {escape(str(order["grade"]))}{yr}</div>'
-        receipt += '<div style="border-top:1px dashed #ccc; margin:1.5mm 0;"></div>'
+            receipt += f'<div style="font-size:9px; color:#000; font-weight:600;">Grade: {escape(str(order["grade"]))}{yr}</div>'
+        receipt += '<div style="border-top:1px dashed #000; margin:1.5mm 0;"></div>'
         # Items table
         receipt += '<table style="width:100%; border-collapse:collapse; font-size:9px;">'
-        receipt += '<tr style="border-bottom:1px solid #333;">'
+        receipt += '<tr style="border-bottom:1px solid #000;">'
         if b.get("show_checkboxes", True):
             receipt += '<th style="width:12px; padding:1px;"></th>'
         if b.get("show_item_code", True):
-            receipt += '<th style="text-align:left; padding:1px 2px;">Code</th>'
-        receipt += '<th style="text-align:left; padding:1px 2px;">Item</th>'
+            receipt += '<th style="text-align:left; padding:1px 2px; font-weight:bold;">Code</th>'
+        receipt += '<th style="text-align:left; padding:1px 2px; font-weight:bold;">Item</th>'
         if b.get("show_item_quantity", True):
-            receipt += '<th style="text-align:right; padding:1px 2px; width:20px;">Qty</th>'
+            receipt += '<th style="text-align:right; padding:1px 2px; width:20px; font-weight:bold;">Qty</th>'
         if b.get("show_item_price", True):
-            receipt += '<th style="text-align:right; padding:1px 2px; width:40px;">Price</th>'
+            receipt += '<th style="text-align:right; padding:1px 2px; width:40px; font-weight:bold;">Price</th>'
         if b.get("show_item_status", True):
-            receipt += '<th style="text-align:right; padding:1px 2px; width:40px;">Status</th>'
+            receipt += '<th style="text-align:right; padding:1px 2px; width:40px; font-weight:bold;">Status</th>'
         receipt += '</tr>'
         for item in items:
             code = item.get("book_code") or ""
@@ -230,35 +230,35 @@ def _build_thermal_html(orders, fmt):
             qty = item.get("quantity_ordered") or item.get("quantity") or 1
             price = item.get("price") or 0
             status = item.get("status") or ""
-            receipt += '<tr style="border-bottom:1px dotted #ccc;">'
+            receipt += '<tr style="border-bottom:1px dotted #000;">'
             if b.get("show_checkboxes", True):
-                receipt += '<td style="padding:1px;"><span style="display:inline-block;width:8px;height:8px;border:1px solid #666;"></span></td>'
+                receipt += '<td style="padding:1px;"><span style="display:inline-block;width:8px;height:8px;border:1.5px solid #000;"></span></td>'
             if b.get("show_item_code", True):
-                receipt += f'<td style="padding:1px 2px; font-weight:bold; color:#333; font-size:8px;">{escape(code)}</td>'
-            receipt += f'<td style="padding:1px 2px; font-weight:600;">{escape(name)}</td>'
+                receipt += f'<td style="padding:1px 2px; font-weight:bold; color:#000; font-size:8px;">{escape(code)}</td>'
+            receipt += f'<td style="padding:1px 2px; font-weight:600; color:#000;">{escape(name)}</td>'
             if b.get("show_item_quantity", True):
-                receipt += f'<td style="text-align:right; padding:1px 2px;">{qty}</td>'
+                receipt += f'<td style="text-align:right; padding:1px 2px; font-weight:600;">{qty}</td>'
             if b.get("show_item_price", True):
-                receipt += f'<td style="text-align:right; padding:1px 2px;">${price:.2f}</td>'
+                receipt += f'<td style="text-align:right; padding:1px 2px; font-weight:600;">${price:.2f}</td>'
             if b.get("show_item_status", True):
-                receipt += f'<td style="text-align:right; padding:1px 2px; color:#555; font-size:8px;">{escape(status)}</td>'
+                receipt += f'<td style="text-align:right; padding:1px 2px; color:#000; font-weight:500; font-size:8px;">{escape(status)}</td>'
             receipt += '</tr>'
         receipt += '</table>'
         # Footer
         receipt += '<div style="border-top:1px dashed #000; margin-top:1.5mm; padding-top:1.5mm;">'
         footer_parts = []
         if f.get("show_item_count", True):
-            footer_parts.append(f'<span>Items: {len(items)}</span>')
+            footer_parts.append(f'<span style="font-weight:600;">Items: {len(items)}</span>')
         if f.get("show_total", True):
             footer_parts.append(f'<span style="font-weight:bold;">Total: ${total:.2f}</span>')
         if footer_parts:
             receipt += f'<div style="display:flex; justify-content:space-between; font-size:9px;">{"".join(footer_parts)}</div>'
         if f.get("show_signature_line", True):
             label = f.get("signature_label", "Received by")
-            receipt += '<div style="margin-top:8mm;"><div style="border-top:1px solid #666; width:60%; margin:0 auto;"></div>'
-            receipt += f'<div style="text-align:center; font-size:8px; color:#555; margin-top:1mm;">{escape(label)}</div></div>'
+            receipt += '<div style="margin-top:8mm;"><div style="border-top:1px solid #000; width:60%; margin:0 auto;"></div>'
+            receipt += f'<div style="text-align:center; font-size:9px; color:#000; font-weight:500; margin-top:1mm;">{escape(label)}</div></div>'
         if f.get("custom_text"):
-            receipt += f'<div style="font-size:8px; color:#555; font-style:italic; margin-top:2mm;">{escape(f["custom_text"])}</div>'
+            receipt += f'<div style="font-size:9px; color:#000; font-weight:500; font-style:italic; margin-top:2mm;">{escape(f["custom_text"])}</div>'
         receipt += '</div></div>'
         receipts_html += receipt
 
