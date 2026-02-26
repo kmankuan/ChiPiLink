@@ -35,28 +35,47 @@ class MondayCoreClient:
         return MONDAY_API_KEY or None
 
     async def execute(self, query: str, timeout: float = 20.0) -> dict:
-        """Execute a GraphQL query/mutation against Monday.com API"""
+        """Execute a GraphQL query/mutation against Monday.com API with retry"""
         api_key = await self.get_api_key()
         if not api_key:
             raise ValueError("Monday.com API key not configured")
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                MONDAY_API_URL,
-                json={"query": query},
-                headers={
-                    "Authorization": api_key,
-                    "Content-Type": "application/json"
-                },
-                timeout=timeout
-            )
-            data = response.json()
+        last_error = None
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        MONDAY_API_URL,
+                        json={"query": query},
+                        headers={
+                            "Authorization": api_key,
+                            "Content-Type": "application/json"
+                        },
+                        timeout=timeout
+                    )
+                    data = response.json()
 
-        if "errors" in data:
-            logger.error(f"Monday.com API error: {data['errors']}")
-            raise ValueError(f"Monday.com error: {data['errors']}")
+                if "errors" in data:
+                    error_msg = str(data['errors'])
+                    # Retry on rate limit or complexity budget errors
+                    if any(kw in error_msg.lower() for kw in ["rate limit", "complexity", "budget"]):
+                        logger.warning(f"Monday.com rate/complexity limit (attempt {attempt+1}): {error_msg}")
+                        if attempt < 2:
+                            import asyncio
+                            await asyncio.sleep(2 ** attempt)  # 1s, 2s backoff
+                            continue
+                    logger.error(f"Monday.com API error: {data['errors']}")
+                    raise ValueError(f"Monday.com error: {data['errors']}")
 
-        return data.get("data", {})
+                return data.get("data", {})
+            except (httpx.TimeoutException, httpx.ConnectError) as e:
+                last_error = e
+                logger.warning(f"Monday.com request failed (attempt {attempt+1}): {e}")
+                if attempt < 2:
+                    import asyncio
+                    await asyncio.sleep(2 ** attempt)
+
+        raise ValueError(f"Monday.com API failed after 3 attempts: {last_error}")
 
     async def test_connection(self) -> dict:
         """Test API connectivity and return account info"""
