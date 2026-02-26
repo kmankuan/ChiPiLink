@@ -175,6 +175,104 @@ async def update_printer_config(data: dict, admin=Depends(lambda: get_admin_user
     return {"success": True}
 
 
+def _build_thermal_html(orders, fmt):
+    """Generate complete thermal receipt HTML for 72mm paper (server-side)"""
+    from html import escape
+    h = fmt.get("header", {})
+    b = fmt.get("body", {})
+    f = fmt.get("footer", {})
+    now_str = datetime.now(timezone.utc).strftime("%m/%d/%Y, %H:%M:%S")
+    title = h.get("title", "Package List")
+
+    receipts_html = ""
+    for idx, order in enumerate(orders):
+        items = [i for i in order.get("items", []) if (i.get("quantity_ordered") or i.get("quantity") or 0) > 0]
+        total = order.get("total_amount") or sum(
+            (i.get("price") or 0) * (i.get("quantity_ordered") or i.get("quantity") or 1) for i in items
+        )
+        page_break = 'page-break-after: always;' if idx < len(orders) - 1 else ''
+
+        receipt = f'<div style="padding: 2mm 0; {page_break}">'
+        # Header
+        receipt += f'<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:2mm; margin-bottom:2mm;">'
+        receipt += f'<div style="font-size:14px; font-weight:bold;">{escape(title)}</div>'
+        if h.get("show_date", True):
+            receipt += f'<div style="font-size:9px; color:#555;">{now_str}</div>'
+        if h.get("show_order_id", True):
+            receipt += f'<div style="font-size:8px; font-family:monospace; color:#555; margin-top:1mm;">{escape(order.get("order_id", ""))}</div>'
+        receipt += '</div>'
+        # Student
+        if b.get("show_student_name", True):
+            receipt += f'<div style="font-weight:bold; font-size:11px;">{escape(order.get("student_name", "Unknown"))}</div>'
+        if b.get("show_grade", True) and order.get("grade"):
+            yr = f' &mdash; {order["year"]}' if order.get("year") else ''
+            receipt += f'<div style="font-size:9px; color:#555;">Grade: {escape(str(order["grade"]))}{yr}</div>'
+        receipt += '<div style="border-top:1px dashed #ccc; margin:1.5mm 0;"></div>'
+        # Items table
+        receipt += '<table style="width:100%; border-collapse:collapse; font-size:9px;">'
+        receipt += '<tr style="border-bottom:1px solid #333;">'
+        if b.get("show_checkboxes", True):
+            receipt += '<th style="width:12px; padding:1px;"></th>'
+        if b.get("show_item_code", True):
+            receipt += '<th style="text-align:left; padding:1px 2px;">Code</th>'
+        receipt += '<th style="text-align:left; padding:1px 2px;">Item</th>'
+        if b.get("show_item_quantity", True):
+            receipt += '<th style="text-align:right; padding:1px 2px; width:20px;">Qty</th>'
+        if b.get("show_item_price", True):
+            receipt += '<th style="text-align:right; padding:1px 2px; width:40px;">Price</th>'
+        if b.get("show_item_status", True):
+            receipt += '<th style="text-align:right; padding:1px 2px; width:40px;">Status</th>'
+        receipt += '</tr>'
+        for item in items:
+            code = item.get("book_code") or ""
+            name = item.get("book_name") or item.get("name") or "—"
+            qty = item.get("quantity_ordered") or item.get("quantity") or 1
+            price = item.get("price") or 0
+            status = item.get("status") or ""
+            receipt += '<tr style="border-bottom:1px dotted #ccc;">'
+            if b.get("show_checkboxes", True):
+                receipt += '<td style="padding:1px;"><span style="display:inline-block;width:8px;height:8px;border:1px solid #666;"></span></td>'
+            if b.get("show_item_code", True):
+                receipt += f'<td style="padding:1px 2px; font-family:monospace; color:#555; font-size:8px;">{escape(code)}</td>'
+            receipt += f'<td style="padding:1px 2px; font-weight:500;">{escape(name)}</td>'
+            if b.get("show_item_quantity", True):
+                receipt += f'<td style="text-align:right; padding:1px 2px;">{qty}</td>'
+            if b.get("show_item_price", True):
+                receipt += f'<td style="text-align:right; padding:1px 2px;">${price:.2f}</td>'
+            if b.get("show_item_status", True):
+                receipt += f'<td style="text-align:right; padding:1px 2px; color:#555; font-size:8px;">{escape(status)}</td>'
+            receipt += '</tr>'
+        receipt += '</table>'
+        # Footer
+        receipt += '<div style="border-top:1px dashed #000; margin-top:1.5mm; padding-top:1.5mm;">'
+        footer_parts = []
+        if f.get("show_item_count", True):
+            footer_parts.append(f'<span>Items: {len(items)}</span>')
+        if f.get("show_total", True):
+            footer_parts.append(f'<span style="font-weight:bold;">Total: ${total:.2f}</span>')
+        if footer_parts:
+            receipt += f'<div style="display:flex; justify-content:space-between; font-size:9px;">{"".join(footer_parts)}</div>'
+        if f.get("show_signature_line", True):
+            label = f.get("signature_label", "Received by")
+            receipt += f'<div style="margin-top:8mm;"><div style="border-top:1px solid #666; width:60%; margin:0 auto;"></div>'
+            receipt += f'<div style="text-align:center; font-size:8px; color:#555; margin-top:1mm;">{escape(label)}</div></div>'
+        if f.get("custom_text"):
+            receipt += f'<div style="font-size:8px; color:#555; font-style:italic; margin-top:2mm;">{escape(f["custom_text"])}</div>'
+        receipt += '</div></div>'
+        receipts_html += receipt
+
+    return f'''<!DOCTYPE html>
+<html><head><title>Print</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box;}}
+@page{{size:72mm auto;margin:2mm 3mm;}}
+body{{font-family:'Courier New',monospace;font-size:10px;line-height:1.3;width:72mm;color:#000;background:#fff;}}
+@media screen{{body{{max-width:72mm;margin:10mm auto;border:1px solid #ddd;padding:3mm;}}}}
+@media print{{body{{width:72mm;margin:0;padding:0;}}}}
+</style></head>
+<body>{receipts_html}</body></html>'''
+
+
 # ============ PRINT JOBS ============
 
 @router.post("/jobs")
