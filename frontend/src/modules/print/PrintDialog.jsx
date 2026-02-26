@@ -190,14 +190,27 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   };
 
   /** Print to thermal printer (LR2000E) — uses the Windows default printer */
-  const handleThermalPrint = () => {
+  const handleThermalPrint = async () => {
     setPrinting(true);
 
-    // Use server-generated thermal HTML (backend builds the receipt)
-    // Falls back to extracting from the rendered preview if server HTML not available
-    const html = thermalHtml || buildThermalHTML(printRef.current);
+    // Always fetch fresh thermal HTML directly from the server
+    // This bypasses any React state/caching issues
+    let html = null;
+    try {
+      const res = await fetch(`${API_URL}/api/print/thermal-receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order_ids: orderIds }),
+      });
+      if (res.ok) {
+        html = await res.text();
+      }
+    } catch (err) {
+      console.error('Failed to fetch thermal HTML:', err);
+    }
+
     if (!html) {
-      toast.error('No content to print');
+      toast.error('Failed to generate receipt');
       setPrinting(false);
       return;
     }
