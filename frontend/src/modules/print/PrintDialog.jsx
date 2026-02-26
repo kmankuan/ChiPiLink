@@ -9,6 +9,7 @@
  * "Browser Print" = opens a standard-formatted window for regular printers
  */
 import { useState, useRef, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
