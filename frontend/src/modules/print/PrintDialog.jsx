@@ -78,6 +78,19 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     }
   };
 
+  const markOrdersPrinted = async () => {
+    try {
+      await fetch(`${API_URL}/api/sysbook/orders/admin/mark-printed`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order_ids: orderIds }),
+      });
+      onPrintComplete?.();
+    } catch (err) {
+      console.error('Error marking orders printed:', err);
+    }
+  };
+
   /** Print to thermal printer (LR2000E) — uses the Windows default printer */
   const handleThermalPrint = async () => {
     setPrinting(true);
