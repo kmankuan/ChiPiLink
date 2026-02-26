@@ -17,16 +17,17 @@ School textbook order management platform with Monday.com integration for order 
 - Universal archive/soft-delete system (backend + frontend)
 - Nginx reverse proxy configuration
 - Deployment health check fixes
-- **Thermal Printer Fix (P0)**: Changed `handleThermalPrint` from `window.open(url)` to `fetch(url)` + `document.write(html)` pattern, matching the working Standard Print approach. Removed dead code (`buildThermalHTML`, `thermalHtml` state).
+- **Thermal Printer Fix (P0)**: Changed `handleThermalPrint` from `window.open(url)` to `fetch(url)` + `document.write(html)` pattern
 - Print Preview shows correct book codes and names
-- Standard Print shows correct book codes and names
-- Backend `GET /api/print/thermal-page` verified to return correct HTML
+- **Wallet Transactions Delete**: Improved error handling with specific error messages, logging, and console diagnostics
 
 ### Key Files
 - `frontend/src/modules/print/PrintDialog.jsx` — Print dialog with LR2000E + Standard Print
 - `frontend/src/modules/print/PackageListPreview.jsx` — Package list renderer
-- `backend/modules/print/__init__.py` — Print endpoints (thermal-page, jobs, config)
+- `backend/modules/print/__init__.py` — Print endpoints
 - `frontend/src/modules/admin/store/TextbookOrdersAdminTab.jsx` — Orders admin
+- `frontend/src/modules/wallet/tabs/WalletTransactionsTab.jsx` — Wallet transactions with archive/delete
+- `backend/modules/users/routes/wallet.py` — Wallet API routes
 
 ## Prioritized Backlog
 
@@ -39,12 +40,15 @@ School textbook order management platform with Monday.com integration for order 
 ## Key API Endpoints
 - `POST /api/auth-v2/login` — Admin login
 - `GET /api/print/thermal-page?order_ids=&token=` — Server-rendered thermal receipt
-- `POST /api/print/jobs` — Create print job, returns orders + format config
-- `POST /api/print/monday-trigger` — Monday.com webhook for batch printing
+- `POST /api/print/jobs` — Create print job
+- `POST /api/wallet/admin/transactions/bulk-delete` — Permanently delete transactions
+- `POST /api/wallet/admin/transactions/bulk-archive` — Archive transactions
+- `POST /api/wallet/admin/transactions/bulk-unarchive` — Restore transactions
 
 ## DB Schema (Key)
-- `store_textbook_orders.items[]`: `book_id`, `book_code`, `book_name`, `price`, `quantity_ordered`, `status`
-- Soft-delete fields: `is_archived`, `archived_at`
+- `chipi_transactions`: transaction_id, user_id, transaction_type, amount, description, status, archived, archived_at, created_at
+- `store_textbook_orders.items[]`: book_id, book_code, book_name, price, quantity_ordered, status
+- Soft-delete fields: `archived`, `archived_at`
 
 ## Admin Credentials
 - Email: `teck@koh.one` / Password: `Acdb##0897`
