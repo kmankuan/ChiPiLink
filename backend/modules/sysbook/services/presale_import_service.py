@@ -251,6 +251,16 @@ class PreSaleImportService:
         }
         await db.store_textbook_orders.insert_one(order)
         order.pop("_id", None)
+
+        # Update reserved_quantity on matching inventory products
+        for item in parsed["items"]:
+            if item.get("matched") and item.get("book_id") and not item["book_id"].startswith("unmatched_"):
+                qty = item.get("quantity_ordered", 1)
+                await db.store_products.update_one(
+                    {"book_id": item["book_id"]},
+                    {"$inc": {"reserved_quantity": qty}}
+                )
+
         logger.info(f"Created pre-sale order {order_id} for {parsed['student_name']} (grade {parsed['grade']})")
         return order
 
