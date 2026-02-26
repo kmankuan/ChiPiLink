@@ -194,7 +194,7 @@ def _build_thermal_html(orders, fmt):
 
         receipt = f'<div style="padding: 2mm 0; {page_break}">'
         # Header
-        receipt += f'<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:2mm; margin-bottom:2mm;">'
+        receipt += '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:2mm; margin-bottom:2mm;">'
         receipt += f'<div style="font-size:14px; font-weight:bold;">{escape(title)}</div>'
         if h.get("show_date", True):
             receipt += f'<div style="font-size:9px; color:#555;">{now_str}</div>'
@@ -254,7 +254,7 @@ def _build_thermal_html(orders, fmt):
             receipt += f'<div style="display:flex; justify-content:space-between; font-size:9px;">{"".join(footer_parts)}</div>'
         if f.get("show_signature_line", True):
             label = f.get("signature_label", "Received by")
-            receipt += f'<div style="margin-top:8mm;"><div style="border-top:1px solid #666; width:60%; margin:0 auto;"></div>'
+            receipt += '<div style="margin-top:8mm;"><div style="border-top:1px solid #666; width:60%; margin:0 auto;"></div>'
             receipt += f'<div style="text-align:center; font-size:8px; color:#555; margin-top:1mm;">{escape(label)}</div></div>'
         if f.get("custom_text"):
             receipt += f'<div style="font-size:8px; color:#555; font-style:italic; margin-top:2mm;">{escape(f["custom_text"])}</div>'
