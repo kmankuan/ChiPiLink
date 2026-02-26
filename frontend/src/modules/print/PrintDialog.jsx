@@ -157,17 +157,17 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   <title>Package Lists</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Courier New', monospace; width: ${paperWidth}; }
+    body { font-family: Verdana, Arial, Helvetica, sans-serif; width: ${paperWidth}; font-weight: 500; }
     .package-list-page { padding: 8px; page-break-after: always; }
     .package-list-page:last-child { page-break-after: auto; }
-    table { width: 100%; border-collapse: collapse; }
+    table { width: 100%; border-collapse: collapse; font-family: Verdana, Arial, Helvetica, sans-serif; }
     th, td { padding: 2px 4px; text-align: left; font-size: 11px; }
     th { border-bottom: 1px solid #333; font-weight: bold; }
     td { border-bottom: 1px dotted #ccc; }
     .text-center { text-align: center; }
     .text-right { text-align: right; }
     .font-bold { font-weight: bold; }
-    .font-mono { font-family: 'Courier New', monospace; }
+    .font-mono { font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: bold; }
     .border-b { border-bottom: 1px solid #ddd; }
     .border-dashed { border-style: dashed; }
     .mb-2 { margin-bottom: 4px; }
