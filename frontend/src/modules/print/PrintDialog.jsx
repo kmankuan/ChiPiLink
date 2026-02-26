@@ -192,7 +192,13 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const handleThermalPrint = () => {
     setPrinting(true);
 
-    const html = buildThermalReceiptHTML(orders, formatConfig);
+    const html = buildThermalHTML(printRef.current);
+    if (!html) {
+      toast.error('No content to print');
+      setPrinting(false);
+      return;
+    }
+
     const printWindow = window.open('', '_blank', 'width=320,height=600');
     if (!printWindow) {
       toast.error('Pop-up blocked. Please allow pop-ups for this site.');
