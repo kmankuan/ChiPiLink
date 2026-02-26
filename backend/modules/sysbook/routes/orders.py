@@ -273,6 +273,30 @@ async def update_order_status(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.put("/admin/mark-printed")
+async def mark_orders_printed(
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Mark orders as printed, track print count and timestamp"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    order_ids = data.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="No order IDs provided")
+
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.store_textbook_orders.update_many(
+        {"order_id": {"$in": order_ids}},
+        {
+            "$set": {"printed_at": now, "last_activity": "printed", "last_activity_at": now},
+            "$inc": {"print_count": 1}
+        }
+    )
+    return {"status": "ok", "updated": result.modified_count}
+
+
 @router.put("/admin/{order_id}/items/{book_id}/approve-reorder")
 async def approve_reorder(
     order_id: str,
