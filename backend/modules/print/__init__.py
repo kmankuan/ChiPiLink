@@ -10,6 +10,7 @@ Monday.com Batch Printing:
   click the Print button on 10 rows and get one combined print job.
 """
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 from datetime import datetime, timezone
 from typing import Optional
 import asyncio
