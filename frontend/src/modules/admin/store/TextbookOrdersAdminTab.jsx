@@ -354,6 +354,7 @@ export default function TextbookOrdersAdminTab() {
                       <TableHead>Total</TableHead>
                       <TableHead className="hidden lg:table-cell">Date</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className="w-[60px] text-center">Activity</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -400,7 +401,37 @@ export default function TextbookOrdersAdminTab() {
                           </Select>
                         </TableCell>
                         <TableCell>
+                          <div className="flex items-center justify-center gap-1" data-testid={`order-activity-${order.order_id}`}>
+                            {order.printed_at ? (
+                              <span title={`Printed ${order.print_count || 1}x — ${new Date(order.printed_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}>
+                                <PrinterCheck className="h-4 w-4 text-green-600" />
+                              </span>
+                            ) : (
+                              <span title="Not printed yet">
+                                <Printer className="h-4 w-4 text-gray-300" />
+                              </span>
+                            )}
+                            {order.link_status === 'linked' ? (
+                              <span title="Linked to user">
+                                <Link2 className="h-3.5 w-3.5 text-blue-500" />
+                              </span>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <div className="flex items-center gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setSinglePrintOpen(true);
+                              }}
+                              title="Print"
+                              data-testid={`quick-print-${order.order_id}`}
+                            >
+                              <Printer className="h-4 w-4 text-amber-600" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
