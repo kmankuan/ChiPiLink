@@ -190,59 +190,39 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   };
 
   /** Print to thermal printer (LR2000E) — uses the Windows default printer */
-  const handleThermalPrint = async () => {
+  const handleThermalPrint = () => {
     setPrinting(true);
 
-    // Always fetch fresh thermal HTML directly from the server
-    // This bypasses any React state/caching issues
-    let html = null;
-    try {
-      const res = await fetch(`${API_URL}/api/print/thermal-receipt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ order_ids: orderIds }),
-      });
-      if (res.ok) {
-        html = await res.text();
-      }
-    } catch (err) {
-      console.error('Failed to fetch thermal HTML:', err);
-    }
+    // Open a real server-rendered page (not document.write)
+    // This ensures the browser fully renders the HTML with all styles
+    const ids = orderIds.join(',');
+    const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(ids)}&token=${encodeURIComponent(token)}`;
+    const printWindow = window.open(url, '_blank', 'width=400,height=600');
 
-    if (!html) {
-      toast.error('Failed to generate receipt');
-      setPrinting(false);
-      return;
-    }
-
-    const printWindow = window.open('', '_blank', 'width=320,height=600');
     if (!printWindow) {
       toast.error('Pop-up blocked. Please allow pop-ups for this site.');
       setPrinting(false);
       return;
     }
 
-    printWindow.document.write(html);
-    printWindow.document.close();
+    // Monitor the popup — when it closes, mark job complete
+    const checkClosed = setInterval(() => {
+      if (printWindow.closed) {
+        clearInterval(checkClosed);
+        setPrinting(false);
+        markJobComplete();
+        toast.success(`${orders.length} receipt(s) sent to printer`);
+      }
+    }, 1000);
 
-    printWindow.onafterprint = () => {
-      printWindow.close();
-      setPrinting(false);
-      markJobComplete();
-      toast.success(`${orders.length} receipt(s) sent to printer`);
-    };
-
+    // Fallback timeout after 60s
     setTimeout(() => {
-      printWindow.print();
-      // Fallback close after 15s if onafterprint doesn't fire
-      setTimeout(() => {
-        if (!printWindow.closed) {
-          printWindow.close();
-          setPrinting(false);
-          markJobComplete();
-        }
-      }, 15000);
-    }, 500);
+      clearInterval(checkClosed);
+      if (!printWindow.closed) {
+        setPrinting(false);
+        markJobComplete();
+      }
+    }, 60000);
   };
 
   /** Standard browser print (for regular paper printers) */
