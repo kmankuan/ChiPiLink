@@ -75,7 +75,7 @@ export default function PackageListPreview({ order, formatConfig, isLast = false
                 </td>
               )}
               {b.show_item_code && (
-                <td className="py-1 font-mono text-gray-500">{item.book_id?.slice(-6) || '—'}</td>
+                <td className="py-1 font-mono text-gray-500">{item.book_code || item.book_id?.slice(-6) || '—'}</td>
               )}
               <td className="py-1 font-medium">{item.book_name || item.name}</td>
               {b.show_item_quantity && (
