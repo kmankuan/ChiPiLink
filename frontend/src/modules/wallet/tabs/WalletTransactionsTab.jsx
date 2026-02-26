@@ -72,6 +72,10 @@ export default function WalletTransactionsTab() {
     setBulkLoading(true);
     try {
       const ids = selectedIds();
+      if (!ids.length) {
+        toast.error('No transactions selected');
+        return;
+      }
       if (action === 'archive') {
         await axios.post(`${API_URL}/api/wallet/admin/transactions/bulk-archive`, { transaction_ids: ids }, { headers });
         toast.success(`${ids.length} transaction(s) archived`);
@@ -86,7 +90,11 @@ export default function WalletTransactionsTab() {
       setConfirmAction(null);
       fetchTransactions();
     } catch (err) {
-      toast.error(err.response?.data?.detail || `${action} failed`);
+      const detail = err.response?.data?.detail;
+      const status = err.response?.status;
+      const msg = detail || (status ? `Server error (${status})` : 'Network error — please retry');
+      toast.error(`${action} failed: ${msg}`);
+      console.error(`[WalletTransactions] ${action} failed:`, { status, detail, ids: selectedIds().length, error: err.message });
     } finally {
       setBulkLoading(false);
     }
