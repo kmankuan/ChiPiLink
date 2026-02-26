@@ -482,6 +482,8 @@ class PreSaleImportService:
 
     def _parse_subitem_name(self, name: str) -> tuple:
         """Parse 'CODE - Book Name' or 'CODE Book Name' from subitem name.
+        Codes can contain letters, digits, hyphens, underscores, slashes.
+        Examples: 'G11-1 Writing & Grammar...', 'G10/11-2 Biology Text...'
         Returns (book_code, book_name)"""
         if not name:
             return ("", "")
@@ -490,10 +492,14 @@ class PreSaleImportService:
             parts = name.split(" - ", 1)
             code = parts[0].strip()
             bname = parts[1].strip() if len(parts) > 1 else name
-            if re.match(r'^[A-Z0-9\-_]{2,}', code):
+            if re.match(r'^[A-Z0-9][A-Z0-9\-_/]{1,}', code):
                 return (code, bname)
-        # Try "CODE Name" (code is uppercase/alphanumeric prefix)
-        match = re.match(r'^([A-Z0-9\-_]{2,})\s+(.+)', name)
+        # Try "CODE Name" (code is alphanumeric prefix with hyphens/slashes/underscores)
+        match = re.match(r'^([A-Z0-9][A-Z0-9\-_/]*\d)\s+(.+)', name)
+        if match:
+            return (match.group(1), match.group(2))
+        # Fallback: looser pattern — code must start with letter, end with digit
+        match = re.match(r'^([A-Za-z][A-Za-z0-9\-_/]*\d)\s+(.+)', name)
         if match:
             return (match.group(1), match.group(2))
         return ("", name)
