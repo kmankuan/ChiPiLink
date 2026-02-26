@@ -58,10 +58,12 @@ function buildThermalReceiptHTML(orders, formatConfig = {}) {
     if (items.length > 0) {
       html += `<div class="section-head">ITEMS (${items.length})</div>`;
       items.forEach((item, i) => {
-        const name = item.title || item.name || item.book_title || `Item ${i + 1}`;
-        const qty = item.quantity || item.qty || 1;
+        const code = item.book_code || '';
+        const name = item.book_name || item.name || item.title || item.book_title || `Item ${i + 1}`;
+        const qty = item.quantity_ordered || item.quantity || item.qty || 1;
         const price = item.price ? `$${Number(item.price).toFixed(2)}` : '';
-        html += `<div class="row"><span>${qty}x ${name}</span><span>${price}</span></div>`;
+        const label = code ? `${code} - ${name}` : name;
+        html += `<div class="row"><span>${qty}x ${label}</span><span>${price}</span></div>`;
       });
       html += `<div class="sep"></div>`;
       if (total > 0) {
