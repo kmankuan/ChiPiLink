@@ -116,8 +116,11 @@ class TextbookMondayAdapter(BaseMondayAdapter):
                         subitem_values[col_id] = value
 
                 try:
+                    book_code = item.get("book_code", "")
+                    book_name = item["book_name"]
+                    sub_name = f"{book_code} {book_name}" if book_code else book_name
                     sub_id = await self.client.create_subitem(
-                        item_id, f"{item['book_name']} (x{item['quantity_ordered']})",
+                        item_id, sub_name,
                         subitem_values
                     )
                     if sub_id:
