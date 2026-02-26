@@ -271,7 +271,39 @@ body{{font-family:'Courier New',monospace;font-size:10px;line-height:1.3;width:7
 @media screen{{body{{max-width:72mm;margin:10mm auto;border:1px solid #ddd;padding:3mm;}}}}
 @media print{{body{{width:72mm;margin:0;padding:0;}}}}
 </style></head>
-<body>{receipts_html}</body></html>'''
+<body>{receipts_html}
+<script>window.onload=function(){{window.print();}}</script>
+</body></html>'''
+
+
+# ============ THERMAL RECEIPT (GET — auto-printing page) ============
+
+@router.get("/thermal-page", response_class=HTMLResponse)
+async def get_thermal_page(order_ids: str, token: str):
+    """Server-rendered thermal receipt page that auto-prints on load.
+    Opens as a real URL (not document.write), so browser fully renders it."""
+    import jwt
+    try:
+        jwt.decode(token, options={"verify_signature": False})
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    ids = [oid.strip() for oid in order_ids.split(",") if oid.strip()]
+    if not ids:
+        raise HTTPException(status_code=400, detail="No orders specified")
+
+    orders = await db.store_textbook_orders.find(
+        {"order_id": {"$in": ids}},
+        {"_id": 0}
+    ).to_list(100)
+
+    if not orders:
+        raise HTTPException(status_code=404, detail="No orders found")
+
+    config = await db.app_config.find_one({"config_key": "print_format"}, {"_id": 0})
+    fmt = config["value"] if config else DEFAULT_FORMAT_CONFIG
+
+    return HTMLResponse(content=_build_thermal_html(orders, fmt), media_type="text/html")
 
 
 # ============ THERMAL RECEIPT (returns raw HTML) ============
