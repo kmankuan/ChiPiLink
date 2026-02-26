@@ -39,7 +39,7 @@ function buildThermalReceiptHTML(orders, formatConfig = {}) {
     const grade = order.grade || '';
     const orderId = (order.order_id || '').slice(-8);
     const items = order.items || order.books || [];
-    const total = items.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || it.qty || 1)), 0);
+    const total = items.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity_ordered || it.quantity || it.qty || 1)), 0);
 
     let html = `<div class="receipt${idx < orders.length - 1 ? ' page-break' : ''}">`;
 
