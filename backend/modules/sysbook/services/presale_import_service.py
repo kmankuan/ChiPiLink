@@ -505,30 +505,96 @@ class PreSaleImportService:
         return ("", name)
 
     async def _match_book(self, code: str, name: str, grade: str) -> Optional[Dict]:
-        """Try to match a book to inventory by code or name"""
-        # 1. Try exact code match
+        """Try to match a book to inventory by code or name with fuzzy fallbacks"""
+        PROJ = {"_id": 0, "product_id": 1, "book_id": 1, "code": 1, "name": 1, "price": 1, "grade": 1}
+
+        # 1. Exact code match
         if code:
             product = await db.store_products.find_one(
                 {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
-                {"_id": 0, "product_id": 1, "code": 1, "name": 1, "price": 1}
+                PROJ
             )
             if product:
                 return product
 
-        # 2. Try name match (case-insensitive contains)
+            # 1b. Partial code match — code contains "/" which might be stored differently
+            # e.g., "G10/11-2" in Monday vs "G10/11-2" or "G10-11-2" in inventory
+            alt_code = code.replace("/", "-")
+            if alt_code != code:
+                product = await db.store_products.find_one(
+                    {"code": {"$regex": f"^{re.escape(alt_code)}$", "$options": "i"}, "is_sysbook": True},
+                    PROJ
+                )
+                if product:
+                    return product
+
+            # 1c. Try code as a prefix or contained in inventory code
+            product = await db.store_products.find_one(
+                {"code": {"$regex": re.escape(code), "$options": "i"}, "is_sysbook": True},
+                PROJ
+            )
+            if product:
+                return product
+
+        # 2. Try extracting a code-like pattern from the name itself
+        if not code and name:
+            code_in_name = re.match(r'^([A-Za-z]\d+[/\-]?\d*[/\-]\d+)', name)
+            if code_in_name:
+                extracted_code = code_in_name.group(1)
+                product = await db.store_products.find_one(
+                    {"code": {"$regex": f"^{re.escape(extracted_code)}$", "$options": "i"}, "is_sysbook": True},
+                    PROJ
+                )
+                if product:
+                    return product
+                # Also try with / replaced by -
+                alt = extracted_code.replace("/", "-")
+                if alt != extracted_code:
+                    product = await db.store_products.find_one(
+                        {"code": {"$regex": f"^{re.escape(alt)}$", "$options": "i"}, "is_sysbook": True},
+                        PROJ
+                    )
+                    if product:
+                        return product
+
+        # 3. Name-based matching (case-insensitive substring)
         if name:
+            # Try first 30 chars
             products = await db.store_products.find(
                 {"name": {"$regex": re.escape(name[:30]), "$options": "i"}, "is_sysbook": True},
-                {"_id": 0, "product_id": 1, "code": 1, "name": 1, "price": 1}
+                PROJ
             ).to_list(5)
             if len(products) == 1:
                 return products[0]
-            # If multiple matches, try to narrow by grade
             if products and grade:
                 for p in products:
                     if grade.lower() in (p.get("grade", "") or "").lower():
                         return p
-                return products[0]  # Return first match
+                return products[0]
+            if products:
+                return products[0]
+
+            # 4. Word-overlap fuzzy match — find products sharing significant words
+            name_words = set(w.lower() for w in re.findall(r'[a-zA-Z]{3,}', name))
+            if len(name_words) >= 2:
+                # Search by any significant word
+                word_regex = "|".join(re.escape(w) for w in list(name_words)[:4])
+                candidates = await db.store_products.find(
+                    {"name": {"$regex": word_regex, "$options": "i"}, "is_sysbook": True},
+                    PROJ
+                ).to_list(20)
+                if candidates:
+                    best = None
+                    best_score = 0
+                    for p in candidates:
+                        p_words = set(w.lower() for w in re.findall(r'[a-zA-Z]{3,}', p.get("name", "")))
+                        overlap = len(name_words & p_words)
+                        score = overlap / max(len(name_words), 1)
+                        if score > best_score:
+                            best_score = score
+                            best = p
+                    if best and best_score >= 0.4:
+                        return best
 
         return None
 
