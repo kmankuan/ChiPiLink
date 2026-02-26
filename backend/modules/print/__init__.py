@@ -291,6 +291,18 @@ async def create_print_job(data: dict, admin=Depends(lambda: get_admin_user)):
     if not orders:
         raise HTTPException(status_code=404, detail="No orders found")
 
+    # Normalize item fields so ALL frontend versions can read them correctly
+    # Old JS reads: item.title || item.name, item.quantity || item.qty
+    # New JS reads: item.book_name, item.quantity_ordered
+    for order in orders:
+        for item in order.get("items", []):
+            bname = item.get("book_name") or item.get("name") or ""
+            item["name"] = bname
+            item["title"] = bname
+            item["book_title"] = bname
+            item["quantity"] = item.get("quantity_ordered") or item.get("quantity") or 1
+            item["qty"] = item["quantity"]
+
     # Get format config
     config = await db.app_config.find_one({"config_key": "print_format"}, {"_id": 0})
     fmt = config["value"] if config else DEFAULT_FORMAT_CONFIG
