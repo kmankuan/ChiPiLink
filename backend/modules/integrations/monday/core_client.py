@@ -233,25 +233,54 @@ class MondayCoreClient:
         except Exception:
             return False
 
-    async def get_board_items(self, board_id: str, limit: int = 50) -> list:
-        """Fetch items from a board with all column values"""
-        data = await self.execute(
-            f'''query {{
-                boards(ids: [{board_id}]) {{
-                    items_page(limit: {limit}) {{
+    async def get_board_items(self, board_id: str, limit: int = 200) -> list:
+        """Fetch ALL items from a board with cursor-based pagination"""
+        all_items = []
+        cursor = None
+        page_limit = min(limit, 500)  # Monday.com max per page is 500
+
+        while True:
+            if cursor:
+                query = f'''query {{
+                    next_items_page(limit: {page_limit}, cursor: "{cursor}") {{
+                        cursor
                         items {{
                             id name group {{ id title }}
                             column_values {{ id text value type }}
                         }}
                     }}
-                }}
-            }}''',
-            timeout=30.0
-        )
-        boards = data.get("boards", [])
-        if not boards:
-            return []
-        return boards[0].get("items_page", {}).get("items", [])
+                }}'''
+            else:
+                query = f'''query {{
+                    boards(ids: [{board_id}]) {{
+                        items_page(limit: {page_limit}) {{
+                            cursor
+                            items {{
+                                id name group {{ id title }}
+                                column_values {{ id text value type }}
+                            }}
+                        }}
+                    }}
+                }}'''
+
+            data = await self.execute(query, timeout=30.0)
+
+            if cursor:
+                page_data = data.get("next_items_page", {})
+            else:
+                boards = data.get("boards", [])
+                if not boards:
+                    return []
+                page_data = boards[0].get("items_page", {})
+
+            items = page_data.get("items", [])
+            all_items.extend(items)
+
+            cursor = page_data.get("cursor")
+            if not cursor or not items:
+                break
+
+        return all_items
 
     async def delete_item(self, item_id: str) -> bool:
         """Delete an item from any board"""
