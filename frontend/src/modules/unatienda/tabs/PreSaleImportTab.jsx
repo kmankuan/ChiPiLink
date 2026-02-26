@@ -166,7 +166,8 @@ export default function PreSaleImportTab({ token: propToken }) {
         toast.error(err.detail || 'Preview failed');
       }
     } catch (error) {
-      toast.error('Error previewing import');
+      console.error('Preview import error:', error);
+      toast.error('Error connecting to server. Please try again.');
     } finally {
       setPreviewing(false);
     }
