@@ -29,7 +29,6 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token }) {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [formatConfig, setFormatConfig] = useState(null);
-  // thermalHtml removed — thermal print now fetches HTML fresh from backend at print time
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
