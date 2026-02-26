@@ -6,6 +6,7 @@ from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel
 import asyncio
+import logging
 
 from core.auth import get_current_user, get_admin_user
 from core.database import db
@@ -13,6 +14,8 @@ from modules.users.services.wallet_service import wallet_service
 from modules.users.models.wallet_models import (
     Currency, PaymentMethod, PointsEarnType
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/wallet", tags=["Wallet"])
 
