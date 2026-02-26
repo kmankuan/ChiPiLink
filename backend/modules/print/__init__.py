@@ -200,7 +200,7 @@ def _build_thermal_html(orders, fmt):
         if h.get("show_date", True):
             receipt += f'<div style="font-size:9px; color:#555;">{now_str}</div>'
         if h.get("show_order_id", True):
-            receipt += f'<div style="font-size:8px; font-family:monospace; color:#555; margin-top:1mm;">{escape(order.get("order_id", ""))}</div>'
+            receipt += f'<div style="font-size:8px; font-family:Verdana,Arial,sans-serif; color:#555; margin-top:1mm;">{escape(order.get("order_id", ""))}</div>'
         receipt += '</div>'
         # Student
         if b.get("show_student_name", True):
