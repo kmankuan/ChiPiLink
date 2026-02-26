@@ -44,7 +44,7 @@ class PreSaleImportService:
 
     async def fetch_importable_items(self, board_id: str) -> List[Dict]:
         """Fetch items from Monday.com board that are marked for import via the trigger column"""
-        items = await monday_client.get_board_items(board_id, limit=200)
+        items = await monday_client.get_board_items(board_id, limit=500)
         importable = []
         for item in items:
             cols = {c["id"]: c for c in item.get("column_values", [])}
@@ -52,6 +52,7 @@ class PreSaleImportService:
             trigger_text = trigger_col.get("text", "").strip()
             if trigger_text and trigger_text in SYNC_TRIGGER_LABELS:
                 importable.append(item)
+        logger.info(f"[presale] Board {board_id}: fetched {len(items)} total items, {len(importable)} ready for import")
         return importable
 
     async def preview_import(self, board_id: str) -> Dict:
