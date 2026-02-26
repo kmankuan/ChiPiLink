@@ -749,6 +749,7 @@ export default function TextbookOrdersAdminTab() {
         onOpenChange={setSinglePrintOpen}
         orderIds={selectedOrder ? [selectedOrder.order_id] : []}
         token={localStorage.getItem('auth_token')}
+        onPrintComplete={fetchData}
       />
 
       {/* Approve Reorder Dialog */}
