@@ -18,7 +18,6 @@ import {
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
-import PrintConfigTab from './PrintConfigTab';
 import HelpGuideEditorTab from './HelpGuideEditorTab';
 
 const API = RESOLVED_API_URL;
