@@ -266,6 +266,13 @@ def _build_thermal_html(orders, fmt):
             receipt += f'<div style="text-align:center; font-size:9px; color:#000; font-weight:500; margin-top:1mm;">{escape(label)}</div></div>'
         if f.get("custom_text"):
             receipt += f'<div style="font-size:9px; color:#000; font-weight:500; font-style:italic; margin-top:2mm;">{escape(f["custom_text"])}</div>'
+        if f.get("show_notes_space"):
+            notes_label = escape(f.get("notes_label", "Notes"))
+            notes_lines = int(f.get("notes_lines", 3))
+            receipt += f'<div style="margin-top:3mm;"><div style="font-size:9px; font-weight:600; color:#000; margin-bottom:1mm;">{notes_label}:</div>'
+            for _ in range(notes_lines):
+                receipt += '<div style="border-bottom:1px dotted #888; height:6mm; margin-bottom:1mm;"></div>'
+            receipt += '</div>'
         receipt += '</div></div>'
         receipts_html += receipt
 
