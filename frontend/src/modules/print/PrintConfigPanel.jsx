@@ -56,7 +56,7 @@ export default function PrintConfigPanel() {
     if (mainTab === 'history') fetchHistory();
   }, [mainTab, historyPage]);
 
-  const fetchConfig = async () => {
+  const fetchConfig = async (retries = 2) => {
     setLoading(true);
     try {
       const [fmtRes, printerRes] = await Promise.all([
@@ -67,6 +67,9 @@ export default function PrintConfigPanel() {
         const data = await fmtRes.json();
         setFormat(data.format);
         setTemplate(data.template || '');
+      } else if (retries > 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchConfig(retries - 1);
       }
       if (printerRes.ok) {
         const data = await printerRes.json();
@@ -74,6 +77,10 @@ export default function PrintConfigPanel() {
       }
     } catch (err) {
       console.error('Error fetching config:', err);
+      if (retries > 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchConfig(retries - 1);
+      }
     } finally {
       setLoading(false);
     }
