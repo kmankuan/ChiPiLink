@@ -58,6 +58,9 @@ export default function HelpGuide() {
       <section id="ordering-textbooks">
         <h2>How to Order Textbooks</h2>
         <p>Once your student is linked, you can browse and order the textbooks assigned to their grade.</p>
+        <div style={{ margin: '16px 0', textAlign: 'center' }}>
+          <img src="/guides/guide-ordering.gif" alt="Ordering walkthrough" style={{ maxWidth: 320, borderRadius: 12, border: '1px solid #ddd' }} />
+        </div>
 
         <h3>Step 1: Go to the Textbook Store</h3>
         <ol>
