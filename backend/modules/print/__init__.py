@@ -271,8 +271,8 @@ def _build_thermal_html(orders, fmt):
 <style>
 *{{margin:0;padding:0;box-sizing:border-box;}}
 @page{{size:72mm auto;margin:2mm 3mm;}}
-body{{font-family:Verdana,Arial,Helvetica,sans-serif;font-size:10px;line-height:1.4;width:72mm;color:#000;background:#fff;font-weight:500;}}
-table{{font-family:Verdana,Arial,Helvetica,sans-serif;}}
+body{{font-family:{font_family};font-size:{base_font_size};line-height:1.4;width:72mm;color:#000;background:#fff;font-weight:500;}}
+table{{font-family:{font_family};}}
 @media screen{{body{{max-width:72mm;margin:10mm auto;border:1px solid #ddd;padding:3mm;}}}}
 @media print{{body{{width:72mm;margin:0;padding:0;}}}}
 </style></head>
