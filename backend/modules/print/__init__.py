@@ -183,6 +183,9 @@ def _build_thermal_html(orders, fmt):
     h = fmt.get("header", {})
     b = fmt.get("body", {})
     f = fmt.get("footer", {})
+    s = fmt.get("style", {})
+    font_family = s.get("font_family", "Verdana, Arial, Helvetica, sans-serif")
+    base_font_size = s.get("font_size", "12px")
     now_str = datetime.now(timezone.utc).strftime("%m/%d/%Y, %H:%M:%S")
     title = h.get("title", "Package List")
 
