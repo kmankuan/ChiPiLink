@@ -41,7 +41,7 @@ async def close_database():
 async def seed_admin_user():
     """
     Ensure an admin user exists with valid credentials.
-    Always force-sets password_hash and is_admin to guarantee login works.
+    Only updates password_hash if current hash doesn't verify correctly.
     Retries up to 3 times on failure.
     """
     import logging
@@ -51,11 +51,11 @@ async def seed_admin_user():
 
     for attempt in range(3):
         try:
-            hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             coll = AuthCollections.USERS
             existing = await db[coll].find_one({"email": admin_email})
 
             if not existing:
+                hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
                 admin_doc = {
                     "user_id": f"admin_{uuid.uuid4().hex[:8]}",
                     "name": "Administrador",
@@ -71,16 +71,38 @@ async def seed_admin_user():
                 res = await db[coll].insert_one(admin_doc)
                 logger.info(f"Admin CREATED in '{coll}' db='{db.name}': {admin_email} uid={admin_doc['user_id']} ack={res.acknowledged}")
             else:
-                res = await db[coll].update_one(
-                    {"email": admin_email},
-                    {"$set": {"password_hash": hashed_password, "is_admin": True}}
-                )
-                verify = bcrypt.checkpw(admin_password.encode('utf-8'), hashed_password.encode('utf-8'))
-                logger.info(
-                    f"Admin ENSURED in '{coll}' db='{db.name}': {admin_email} "
-                    f"uid={existing.get('user_id')} matched={res.matched_count} "
-                    f"modified={res.modified_count} hash_ok={verify}"
-                )
+                # Check if existing hash verifies — only update if it doesn't
+                current_hash = existing.get("password_hash", "")
+                needs_update = False
+                update_fields = {}
+
+                if not current_hash:
+                    needs_update = True
+                else:
+                    try:
+                        hash_ok = bcrypt.checkpw(admin_password.encode('utf-8'), current_hash.encode('utf-8'))
+                        if not hash_ok:
+                            needs_update = True
+                    except Exception:
+                        needs_update = True
+
+                if not existing.get("is_admin"):
+                    update_fields["is_admin"] = True
+
+                if needs_update:
+                    hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                    update_fields["password_hash"] = hashed_password
+                    logger.info(f"Admin hash UPDATED for {admin_email} (old hash was invalid)")
+
+                if update_fields:
+                    res = await db[coll].update_one({"email": admin_email}, {"$set": update_fields})
+                    logger.info(
+                        f"Admin ENSURED in '{coll}' db='{db.name}': {admin_email} "
+                        f"uid={existing.get('user_id')} matched={res.matched_count} "
+                        f"modified={res.modified_count} fields={list(update_fields.keys())}"
+                    )
+                else:
+                    logger.info(f"Admin OK in '{coll}' db='{db.name}': {admin_email} uid={existing.get('user_id')} (no changes needed)")
             return  # Success, exit retry loop
 
         except Exception as e:
