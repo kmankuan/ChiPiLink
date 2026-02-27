@@ -116,27 +116,42 @@ async def seed_admin_user():
 async def seed_site_config():
     """
     Create default site configuration if it doesn't exist.
+    Checks BOTH the legacy 'site_config' and new 'core_site_config' collections.
+    Only creates defaults if neither has a config — never overwrites existing data.
     """
     try:
-        existing_config = await db[CoreCollections.SITE_CONFIG].find_one({"config_id": "main"})
-        
-        if not existing_config:
-            config_doc = {
-                "config_id": "main",
-                "site_name": "ChiPi Link",
-                "description": "Tu Super App",
-                "color_primario": "#16a34a",
-                "color_secundario": "#0f766e",
-                "footer_texto": "© 2025 ChiPi Link - Todos los derechos reservados",
-                "meta_titulo": "ChiPi Link | Tu Super App",
-                "meta_description": "La mejor plataforma para tu negocio"
-            }
-            
-            await db[CoreCollections.SITE_CONFIG].insert_one(config_doc)
-            print("✅ Site config created")
-        else:
-            print("✅ Site config already exists")
-            
+        # Check the collection the API actually reads from
+        existing_api = await db.site_config.find_one({"config_id": "main"})
+        existing_core = await db[CoreCollections.SITE_CONFIG].find_one({"config_id": "main"})
+
+        if existing_api:
+            print(f"✅ Site config exists in site_config (site_name={existing_api.get('site_name', '?')})")
+            # Also ensure core_site_config has it
+            if not existing_core:
+                await db[CoreCollections.SITE_CONFIG].insert_one({
+                    "config_id": "main", "site_name": existing_api.get("site_name", "ChiPi Link")
+                })
+            return
+
+        if existing_core:
+            print(f"✅ Site config exists in core_site_config")
+            return
+
+        config_doc = {
+            "config_id": "main",
+            "site_name": "ChiPi Link",
+            "descripcion": "Tu Super App",
+            "color_primario": "#16a34a",
+            "color_secundario": "#0f766e",
+            "footer_texto": "© 2025 ChiPi Link - Todos los derechos reservados",
+            "meta_titulo": "ChiPi Link | Tu Super App",
+            "meta_description": "La mejor plataforma para tu negocio"
+        }
+
+        await db.site_config.insert_one({**config_doc})
+        await db[CoreCollections.SITE_CONFIG].insert_one({**config_doc})
+        print("✅ Site config created (fresh install)")
+
     except Exception as e:
         print(f"⚠️ Error seeding site config: {e}")
 
