@@ -569,7 +569,6 @@ export default function DevControlModule() {
           <TabsTrigger value="principles" className="gap-1.5 text-xs" data-testid="tab-principles"><BookOpen className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.principles', 'Principles')}</span><span className="sm:hidden">Rules</span></TabsTrigger>
           <TabsTrigger value="api" className="gap-1.5 text-xs" data-testid="tab-api"><Globe className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.api', 'API Reference')}</span><span className="sm:hidden">API</span></TabsTrigger>
           <TabsTrigger value="roadmap" className="gap-1.5 text-xs" data-testid="tab-roadmap"><Map className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.roadmap', 'Roadmap')}</span><span className="sm:hidden">Plan</span></TabsTrigger>
-          <TabsTrigger value="print-config" className="gap-1.5 text-xs" data-testid="tab-print-config"><Printer className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.printConfig', 'Print Config')}</span><span className="sm:hidden">Print</span></TabsTrigger>
           <TabsTrigger value="help-guide" className="gap-1.5 text-xs" data-testid="tab-help-guide"><FileText className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.helpGuide', 'Help Guide')}</span><span className="sm:hidden">Guide</span></TabsTrigger>
         </TabsList>
 
