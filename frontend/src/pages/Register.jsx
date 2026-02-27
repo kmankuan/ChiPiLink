@@ -201,7 +201,7 @@ export default function Register() {
             <div className="p-2 rounded-xl bg-primary text-primary-foreground">
               <Book className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <span className="font-serif text-xl sm:text-2xl font-bold truncate">{siteConfig?.site_name || 'Mi Tienda'}</span>
+            <span className="font-serif text-xl sm:text-2xl font-bold truncate">{siteConfig?.site_name || 'ChiPi Link'}</span>
           </div>
 
           <div className="mb-6">

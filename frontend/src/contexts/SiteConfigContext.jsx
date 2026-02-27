@@ -6,7 +6,7 @@ const BACKEND_URL = RESOLVED_API_URL;
 
 const SiteConfigContext = createContext({
   siteConfig: {
-    site_name: 'Mi Tienda',
+    site_name: 'ChiPi Link',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
@@ -20,7 +20,7 @@ const SiteConfigContext = createContext({
 
 export function SiteConfigProvider({ children }) {
   const [siteConfig, setSiteConfig] = useState({
-    site_name: 'Mi Tienda',
+    site_name: 'ChiPi Link',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
