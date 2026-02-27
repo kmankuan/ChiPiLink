@@ -182,7 +182,11 @@ export default function PreSaleImportTab({ token: propToken }) {
       });
       if (res.ok) {
         const data = await res.json();
-        toast.success(`Imported ${data.imported} orders (${data.skipped} skipped, ${data.errors} errors)`);
+        if (data.errors > 0) {
+          toast.warning(`Imported ${data.imported} orders, ${data.skipped} skipped, ${data.errors} failed. Check logs or retry for remaining items.`, { duration: 8000 });
+        } else {
+          toast.success(`Imported ${data.imported} orders${data.skipped ? ` (${data.skipped} skipped)` : ''}`);
+        }
         setShowPreview(false);
         setPreviewData(null);
         fetchOrders();
