@@ -215,10 +215,10 @@ export default function PrintConfigPanel() {
             <TabsContent value="simple" className="space-y-4">
               {format && (
                 <>
-                  {/* Paper Settings */}
+                  {/* Paper & Typography Settings */}
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">{t('print.paperSettings', 'Paper Settings')}</CardTitle>
+                      <CardTitle className="text-sm">{t('print.paperSettings', 'Paper & Typography')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-4">
@@ -232,15 +232,41 @@ export default function PrintConfigPanel() {
                         </Select>
                       </div>
                       <div className="flex items-center gap-4">
+                        <Label className="w-24">{t('print.fontFamily', 'Font')}</Label>
+                        <Select value={format.style?.font_family || 'Verdana, Arial, Helvetica, sans-serif'} onValueChange={(v) => updateFormat('style', 'font_family', v)}>
+                          <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Verdana, Arial, Helvetica, sans-serif">Verdana (Recommended)</SelectItem>
+                            <SelectItem value="Arial, Helvetica, sans-serif">Arial</SelectItem>
+                            <SelectItem value="Tahoma, Geneva, sans-serif">Tahoma</SelectItem>
+                            <SelectItem value="'Trebuchet MS', sans-serif">Trebuchet MS</SelectItem>
+                            <SelectItem value="Georgia, serif">Georgia (Serif)</SelectItem>
+                            <SelectItem value="'Courier New', monospace">Courier New (Mono)</SelectItem>
+                            <SelectItem value="'Lucida Console', monospace">Lucida Console (Mono)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-4">
                         <Label className="w-24">{t('print.fontSize', 'Font Size')}</Label>
                         <Select value={format.style?.font_size || '12px'} onValueChange={(v) => updateFormat('style', 'font_size', v)}>
                           <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="8px">Extra Small (8px)</SelectItem>
+                            <SelectItem value="9px">Very Small (9px)</SelectItem>
                             <SelectItem value="10px">Small (10px)</SelectItem>
+                            <SelectItem value="11px">Medium-Small (11px)</SelectItem>
                             <SelectItem value="12px">Medium (12px)</SelectItem>
+                            <SelectItem value="13px">Medium-Large (13px)</SelectItem>
                             <SelectItem value="14px">Large (14px)</SelectItem>
+                            <SelectItem value="16px">Extra Large (16px)</SelectItem>
                           </SelectContent>
                         </Select>
+                      </div>
+                      {/* Font Preview */}
+                      <div className="mt-2 p-3 border rounded-lg bg-white text-center">
+                        <span style={{ fontFamily: format.style?.font_family || 'Verdana', fontSize: format.style?.font_size || '12px', color: '#000' }}>
+                          The quick brown fox — 0123456789 — $49.99
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
