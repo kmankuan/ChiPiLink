@@ -196,8 +196,12 @@ export default function PreSaleImportTab({ token: propToken }) {
         setPreviewData(null);
         fetchOrders();
       } else {
-        const err = await res.json();
-        toast.error(err.detail || 'Import failed');
+        let errMsg = `Import failed (HTTP ${res.status})`;
+        try {
+          const err = await res.json();
+          errMsg = err.detail || errMsg;
+        } catch { /* non-JSON response body */ }
+        toast.error(errMsg);
       }
     } catch (error) {
       console.error('Import execution error:', error);
