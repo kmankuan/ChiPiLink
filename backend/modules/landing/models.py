@@ -19,7 +19,7 @@ class BloquePagina(BaseModel):
 
 class ConfiguracionSitio(BaseModel):
     """Global site configuration"""
-    site_name: str = "Mi Tienda"
+    site_name: str = "ChiPi Link"
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     descripcion: str = "Plataforma de comercio electronic"
