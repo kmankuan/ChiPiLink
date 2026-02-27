@@ -870,7 +870,7 @@ function TemplatesSection() {
                   <div>
                     <p className="text-xs font-semibold mb-2">Footer</p>
                     <div className="flex gap-4 flex-wrap mb-2">
-                      {[['show_total','Total'],['show_item_count','Item Count'],['show_signature_line','Signature Line']].map(([key,label]) => (
+                      {[['show_total','Total'],['show_item_count','Item Count'],['show_signature_line','Signature Line'],['show_notes_space','Notes Space']].map(([key,label]) => (
                         <label key={key} className="flex items-center gap-1.5 text-[10px] cursor-pointer">
                           <input type="checkbox" checked={cfg?.footer?.[key] ?? true} onChange={e => updateEditFooter(key, e.target.checked)} disabled={!isEditing} className="rounded" />{label}
                         </label>
