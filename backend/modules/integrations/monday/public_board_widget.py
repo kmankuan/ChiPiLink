@@ -120,6 +120,8 @@ async def get_widget_data():
         "subtitle": config.get("subtitle", ""),
         "display_style": config.get("display_style", "cards"),
         "columns": columns_to_show,
+        "show_subitems": config.get("show_subitems", False),
+        "subitem_columns": config.get("subitem_columns_to_show", []),
         "items": items[:max_items],
     }
 
