@@ -200,7 +200,12 @@ export default function PreSaleImportTab({ token: propToken }) {
         toast.error(err.detail || 'Import failed');
       }
     } catch (error) {
-      toast.error('Error executing import');
+      console.error('Import execution error:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Import timed out — the operation took too long. Try importing fewer items or retry.');
+      } else {
+        toast.error('Error executing import: ' + (error.message || 'Network error'));
+      }
     } finally {
       setImporting(false);
     }
