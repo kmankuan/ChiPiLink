@@ -34,21 +34,33 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const user = await login(formData.email, formData.password);
-      if (user.is_admin) {
-        toast.success(`Welcome, ${user.name}!`);
-        navigate('/admin');
-      } else {
-        toast.error(t('admin.notAdmin', 'This account does not have admin access'));
-        navigate('/');
+    // Retry once on network/transient errors (gateway restarts, etc.)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const user = await login(formData.email, formData.password);
+        if (user.is_admin) {
+          toast.success(`Welcome, ${user.name}!`);
+          navigate('/admin');
+        } else {
+          toast.error(t('admin.notAdmin', 'This account does not have admin access'));
+          navigate('/');
+        }
+        return; // Success, exit
+      } catch (error) {
+        const status = error.response?.status;
+        const isAuthError = status === 401 || status === 400;
+        if (isAuthError || attempt === 1) {
+          // Auth error (wrong credentials) or second attempt failed
+          const message = error.response?.data?.detail || t('auth.loginError', 'Login failed. Please verify your credentials or try again.');
+          toast.error(message);
+          break;
+        }
+        // First attempt failed with a non-auth error — retry after brief pause
+        console.warn(`Login attempt ${attempt + 1} failed (${error.message}), retrying...`);
+        await new Promise(r => setTimeout(r, 1500));
       }
-    } catch (error) {
-      const message = error.response?.data?.detail || t('auth.loginError', 'Login failed');
-      toast.error(message);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
