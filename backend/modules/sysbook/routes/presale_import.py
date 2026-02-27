@@ -28,14 +28,20 @@ async def preview_import(admin: dict = Depends(get_admin_user)):
 
 
 @router.post("/execute")
-async def execute_import(admin: dict = Depends(get_admin_user)):
-    """Import pre-sale orders from Monday.com into the app as awaiting_link orders"""
+async def execute_import(
+    data: dict = Body(default={}),
+    admin: dict = Depends(get_admin_user)
+):
+    """Import pre-sale orders from Monday.com into the app as awaiting_link orders.
+    Optionally accepts cached preview items to avoid re-fetching from Monday.com."""
     board_config = await monday_config_service.get_config()
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
     admin_user_id = admin.get("user_id", "admin")
-    result = await presale_import_service.import_presale_orders(board_id, admin_user_id)
+    # Accept pre-parsed items from preview to avoid duplicate Monday API calls
+    cached_items = data.get("items") if data else None
+    result = await presale_import_service.import_presale_orders(board_id, admin_user_id, cached_items=cached_items)
     return result
 
 
