@@ -136,6 +136,23 @@ class PreSaleImportService:
             "details": {"imported": imported, "skipped": skipped, "errors": errors}
         }
 
+    async def _parse_monday_item_safe(self, item: Dict, board_id: str) -> Optional[Dict]:
+        """Parse a Monday.com item with retry on failure (rate limits, timeouts)"""
+        import asyncio
+        for attempt in range(3):
+            try:
+                return await self._parse_monday_item(item, board_id)
+            except Exception as e:
+                err_str = str(e).lower()
+                if attempt < 2 and any(kw in err_str for kw in ["rate", "complexity", "budget", "timeout", "failed after"]):
+                    wait = (attempt + 1) * 3  # 3s, 6s
+                    logger.warning(f"[presale] Parse attempt {attempt+1} failed for item {item.get('id')}: {e}, retrying in {wait}s...")
+                    await asyncio.sleep(wait)
+                else:
+                    logger.error(f"[presale] Parse failed for item {item.get('id')} after {attempt+1} attempts: {e}")
+                    return None
+        return None
+
     async def _parse_monday_item(self, item: Dict, board_id: str) -> Optional[Dict]:
         """Parse a Monday.com item into order data"""
         monday_item_id = str(item.get("id", ""))
