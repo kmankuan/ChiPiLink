@@ -213,6 +213,15 @@ export default function PrintConfigPanel() {
 
             {/* Simple Mode: Field Toggles */}
             <TabsContent value="simple" className="space-y-4">
+              {!format && !loading && (
+                <div className="text-center py-8 space-y-3">
+                  <p className="text-sm text-muted-foreground">{t('print.configLoadFailed', 'Could not load print configuration.')}</p>
+                  <Button variant="outline" size="sm" onClick={fetchConfig}>
+                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> {t('common.retry', 'Retry')}
+                  </Button>
+                </div>
+              )}
+              {loading && <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>}
               {format && (
                 <>
                   {/* Paper & Typography Settings */}
