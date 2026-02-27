@@ -76,6 +76,7 @@ DEFAULT_FORMAT_CONFIG = {
         "show_barcode": False,
     },
     "style": {
+        "font_family": "Verdana, Arial, Helvetica, sans-serif",
         "font_size": "12px",
         "compact_mode": False,
     }
