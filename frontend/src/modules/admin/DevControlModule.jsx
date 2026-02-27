@@ -13,7 +13,7 @@ import {
   ChevronRight, ChevronDown, FileCode, Folder, Search,
   Copy, Database, GitCommit, Package, Bot,
   ShieldCheck, Activity, LayoutGrid, Gauge,
-  Send, MessageSquare, RotateCcw
+  Send, MessageSquare, RotateCcw, Printer, FileText
 } from 'lucide-react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
