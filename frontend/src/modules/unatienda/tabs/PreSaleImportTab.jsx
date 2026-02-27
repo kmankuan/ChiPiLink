@@ -176,10 +176,14 @@ export default function PreSaleImportTab({ token: propToken }) {
   const handleImport = async () => {
     setImporting(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout for large imports
       const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         if (data.errors > 0) {
