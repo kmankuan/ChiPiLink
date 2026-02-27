@@ -93,6 +93,7 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 
 // Bulk Import Page
 import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
+import HelpGuide from '@/pages/HelpGuide';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
