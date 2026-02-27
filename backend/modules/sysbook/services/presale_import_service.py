@@ -66,20 +66,34 @@ class PreSaleImportService:
                 previews.append(parsed)
         return {"count": len(previews), "items": previews}
 
-    async def import_presale_orders(self, board_id: str, admin_user_id: str) -> Dict:
-        """Import pre-sale orders from Monday.com into the app"""
+    async def import_presale_orders(self, board_id: str, admin_user_id: str, cached_items: List[Dict] = None) -> Dict:
+        """Import pre-sale orders from Monday.com into the app.
+        If cached_items (from preview) are provided, skip re-fetching from Monday.com."""
         import asyncio
         await self._load_subitem_config()
-        items = await self.fetch_importable_items(board_id)
+
+        # Use cached preview data if available, otherwise fetch fresh
+        if cached_items:
+            logger.info(f"[presale] Using {len(cached_items)} cached preview items (skipping Monday.com re-fetch)")
+            parsed_items = cached_items
+        else:
+            items = await self.fetch_importable_items(board_id)
+            parsed_items = []
+            for idx, item in enumerate(items):
+                if idx > 0:
+                    await asyncio.sleep(0.5)
+                parsed = await self._parse_monday_item_safe(item, board_id)
+                if parsed:
+                    parsed_items.append(parsed)
+
         imported = []
         skipped = []
         errors = []
+        total = len(parsed_items)
+        logger.info(f"[presale] Starting import of {total} orders from board {board_id}")
 
-        total = len(items)
-        logger.info(f"[presale] Starting import of {total} items from board {board_id}")
-
-        for idx, item in enumerate(items):
-            monday_item_id = str(item.get("id", ""))
+        for idx, parsed in enumerate(parsed_items):
+            monday_item_id = str(parsed.get("monday_item_id", ""))
             try:
                 # Skip if already imported
                 existing = await db.store_textbook_orders.find_one(
@@ -87,15 +101,6 @@ class PreSaleImportService:
                 )
                 if existing:
                     skipped.append({"monday_id": monday_item_id, "reason": "already_imported", "order_id": existing.get("order_id")})
-                    continue
-
-                # Throttle API calls to avoid Monday.com rate/complexity limits
-                if idx > 0:
-                    await asyncio.sleep(0.5)
-
-                parsed = await self._parse_monday_item_safe(item, board_id)
-                if not parsed:
-                    skipped.append({"monday_id": monday_item_id, "reason": "parse_failed"})
                     continue
 
                 order = await self._create_presale_order(parsed, monday_item_id, admin_user_id)
@@ -110,7 +115,10 @@ class PreSaleImportService:
                 logger.info(f"[presale] Imported {idx+1}/{total}: {parsed['student_name']} ({len(parsed['items'])} items)")
 
                 # Update Monday.com trigger column to "Done" to prevent re-import
+                # Throttle these calls to respect rate limits
                 try:
+                    if idx > 0 and idx % 5 == 0:
+                        await asyncio.sleep(1)  # Extra pause every 5 items
                     await monday_client.update_column_values(
                         board_id, monday_item_id,
                         {SYNC_TRIGGER_COL: {"label": "Done"}},
@@ -118,11 +126,14 @@ class PreSaleImportService:
                     )
                 except Exception as e:
                     logger.warning(f"Failed to update trigger column for item {monday_item_id}: {e}")
+                    # Rate limit on trigger update — pause and continue
+                    err_str = str(e).lower()
+                    if "rate" in err_str or "complexity" in err_str or "budget" in err_str:
+                        await asyncio.sleep(3)
 
             except Exception as e:
                 logger.error(f"Error importing Monday item {monday_item_id} ({idx+1}/{total}): {e}")
                 errors.append({"monday_id": monday_item_id, "error": str(e)})
-                # On rate limit errors, add a longer pause before continuing
                 err_str = str(e).lower()
                 if "rate" in err_str or "complexity" in err_str or "budget" in err_str:
                     logger.info(f"[presale] Rate limit hit at item {idx+1}/{total}, pausing 5s...")
