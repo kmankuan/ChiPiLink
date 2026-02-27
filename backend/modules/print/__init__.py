@@ -74,6 +74,9 @@ DEFAULT_FORMAT_CONFIG = {
         "signature_label": "Received by",
         "custom_text": "",
         "show_barcode": False,
+        "show_notes_space": False,
+        "notes_lines": 3,
+        "notes_label": "Notes",
     },
     "style": {
         "font_family": "Verdana, Arial, Helvetica, sans-serif",
