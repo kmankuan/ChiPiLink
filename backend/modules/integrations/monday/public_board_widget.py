@@ -128,10 +128,37 @@ async def _fetch_and_cache(config: dict) -> list:
     """Fetch board items from Monday.com and cache in DB."""
     board_id = config["board_id"]
     columns_to_show = config.get("columns_to_show", [])
+    subitem_columns_to_show = config.get("subitem_columns_to_show", [])
+    show_subitems = config.get("show_subitems", False)
     group_filter = config.get("group_filter")
     max_items = config.get("max_items", 10)
 
-    raw_items = await monday_client.get_board_items(board_id, limit=max_items + 10)
+    # Build query — include subitems if configured
+    if show_subitems:
+        query = f"""
+            query {{
+                boards(ids: [{board_id}]) {{
+                    items_page(limit: {max_items + 10}) {{
+                        items {{
+                            id
+                            name
+                            group {{ id title }}
+                            column_values {{ id text }}
+                            subitems {{
+                                id
+                                name
+                                column_values {{ id text }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+        """
+        data = await monday_client.execute(query)
+        boards = data.get("boards", [])
+        raw_items = boards[0]["items_page"]["items"] if boards else []
+    else:
+        raw_items = await monday_client.get_board_items(board_id, limit=max_items + 10)
 
     # Filter by group if configured
     if group_filter:
@@ -139,20 +166,42 @@ async def _fetch_and_cache(config: dict) -> list:
 
     # Transform to clean format
     items = []
+    col_ids = [c.get("id", c) if isinstance(c, dict) else c for c in columns_to_show] if columns_to_show else None
+    sub_col_ids = [c.get("id", c) if isinstance(c, dict) else c for c in subitem_columns_to_show] if subitem_columns_to_show else None
+
     for raw in raw_items[:max_items]:
         col_values = {}
         for cv in raw.get("column_values", []):
             col_id = cv.get("id")
-            if columns_to_show and col_id not in [c.get("id", c) if isinstance(c, dict) else c for c in columns_to_show]:
+            if col_ids and col_id not in col_ids:
                 continue
             col_values[col_id] = cv.get("text", "")
 
-        items.append({
+        item = {
             "id": raw["id"],
             "name": raw.get("name", ""),
             "group": raw.get("group", {}).get("title", ""),
             "columns": col_values,
-        })
+        }
+
+        # Include subitems if configured
+        if show_subitems and raw.get("subitems"):
+            subs = []
+            for sub in raw["subitems"]:
+                sub_cols = {}
+                for cv in sub.get("column_values", []):
+                    col_id = cv.get("id")
+                    if sub_col_ids and col_id not in sub_col_ids:
+                        continue
+                    sub_cols[col_id] = cv.get("text", "")
+                subs.append({
+                    "id": sub["id"],
+                    "name": sub.get("name", ""),
+                    "columns": sub_cols,
+                })
+            item["subitems"] = subs
+
+        items.append(item)
 
     # Save cache
     await db[CACHE_COLLECTION].update_one(
