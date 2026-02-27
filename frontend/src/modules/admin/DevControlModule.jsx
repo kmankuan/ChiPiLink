@@ -584,6 +584,8 @@ export default function DevControlModule() {
         <TabsContent value="principles"><PrinciplesTab /></TabsContent>
         <TabsContent value="api"><ApiReferenceTab /></TabsContent>
         <TabsContent value="roadmap"><RoadmapTab /></TabsContent>
+        <TabsContent value="print-config"><PrintConfigTab /></TabsContent>
+        <TabsContent value="help-guide"><HelpGuideEditorTab /></TabsContent>
       </Tabs>
     </div>
   );
