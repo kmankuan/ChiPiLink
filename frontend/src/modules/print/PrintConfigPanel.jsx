@@ -174,18 +174,26 @@ export default function PrintConfigPanel() {
   return (
     <div className="space-y-6" data-testid="print-config-panel">
       <Tabs value={mainTab} onValueChange={setMainTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="format" className="gap-2">
             <FileText className="h-4 w-4" />
-            {t('print.formatConfig', 'Package List Format')}
+            <span className="hidden sm:inline">{t('print.formatConfig', 'Package List Format')}</span>
+            <span className="sm:hidden">Format</span>
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="gap-2" data-testid="templates-tab">
+            <Copy className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('print.templates', 'Templates')}</span>
+            <span className="sm:hidden">Templates</span>
           </TabsTrigger>
           <TabsTrigger value="printer" className="gap-2">
             <Printer className="h-4 w-4" />
-            {t('print.printerConfig', 'Printer Settings')}
+            <span className="hidden sm:inline">{t('print.printerConfig', 'Printer Settings')}</span>
+            <span className="sm:hidden">Printer</span>
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2">
             <History className="h-4 w-4" />
-            {t('print.history', 'Print History')}
+            <span className="hidden sm:inline">{t('print.history', 'Print History')}</span>
+            <span className="sm:hidden">History</span>
           </TabsTrigger>
         </TabsList>
 
