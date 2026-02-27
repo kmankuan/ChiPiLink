@@ -116,6 +116,9 @@ export default function HelpGuide() {
       <section id="messages">
         <h2>How to Communicate with School Staff</h2>
         <p>ChiPi Link has a built-in messaging system so you can communicate directly with the school about your orders or any questions.</p>
+        <div style={{ margin: '16px 0', textAlign: 'center' }}>
+          <img src="/guides/guide-messages.gif" alt="Messages walkthrough" style={{ maxWidth: 320, borderRadius: 12, border: '1px solid #ddd' }} />
+        </div>
 
         <h3>Sending a Message</h3>
         <ol>
