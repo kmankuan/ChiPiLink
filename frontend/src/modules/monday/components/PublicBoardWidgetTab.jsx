@@ -1,42 +1,42 @@
 /**
- * PublicBoardWidgetTab — Admin config for the Monday.com public board widget.
- * Allows selecting a board, columns to display, style, and preview.
+ * PublicBoardWidgetTab — Admin config for Monday.com public board widget.
+ * Supports column selection, subitem column selection, group filtering, and display options.
  */
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from '@/components/ui/card';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { Save, RefreshCw, Loader2, Eye, Columns3 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+import { Loader2, RefreshCw, Eye, Save, Columns, List, LayoutGrid } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
+const hdrs = () => ({
+  Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+  'Content-Type': 'application/json',
+});
 
 export default function PublicBoardWidgetTab() {
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}` };
-
-  const [config, setConfig] = useState(null);
+  const { t } = useTranslation();
+  const [config, setConfig] = useState({});
   const [boards, setBoards] = useState([]);
   const [columns, setColumns] = useState([]);
+  const [subColumns, setSubColumns] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [loadingCols, setLoadingCols] = useState(false);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingCols, setLoadingCols] = useState(false);
 
-  // Load config + boards
   useEffect(() => {
     Promise.all([
-      fetch(`${API}/api/monday/public-board-widget/config`, { headers }).then(r => r.json()),
-      fetch(`${API}/api/monday/boards`, { headers }).then(r => r.json()),
+      fetch(`${API}/api/monday/public-board-widget/config`, { headers: hdrs() }).then(r => r.json()),
+      fetch(`${API}/api/monday/boards`, { headers: hdrs() }).then(r => r.json()),
     ]).then(([cfg, bData]) => {
       setConfig(cfg);
       setBoards(bData.boards || []);
@@ -48,13 +48,16 @@ export default function PublicBoardWidgetTab() {
     if (!boardId) return;
     setLoadingCols(true);
     try {
-      const [colRes, grpRes] = await Promise.all([
-        fetch(`${API}/api/monday/boards/${boardId}/columns`, { headers }).then(r => r.json()),
-        fetch(`${API}/api/monday/boards/${boardId}/groups`, { headers }).then(r => r.json()),
+      // Fetch columns, groups, and subitem columns in parallel — handle partial failures
+      const [colRes, grpRes, subColRes] = await Promise.allSettled([
+        fetch(`${API}/api/monday/boards/${boardId}/columns`, { headers: hdrs() }).then(r => r.json()),
+        fetch(`${API}/api/monday/boards/${boardId}/groups`, { headers: hdrs() }).then(r => r.json()),
+        fetch(`${API}/api/monday/boards/${boardId}/subitem-columns`, { headers: hdrs() }).then(r => r.json()),
       ]);
-      setColumns(colRes.columns || []);
-      setGroups(grpRes.groups || []);
-    } catch {
+      if (colRes.status === 'fulfilled') setColumns(colRes.value.columns || []);
+      if (grpRes.status === 'fulfilled') setGroups(grpRes.value.groups || []);
+      if (subColRes.status === 'fulfilled') setSubColumns(subColRes.value.columns || []);
+    } catch (e) {
       toast.error('Failed to load board details');
     }
     setLoadingCols(false);
@@ -67,6 +70,7 @@ export default function PublicBoardWidgetTab() {
       board_id: boardId,
       board_name: board?.name || '',
       columns_to_show: [],
+      subitem_columns_to_show: [],
       group_filter: null,
     }));
     loadBoardDetails(boardId);
@@ -75,11 +79,26 @@ export default function PublicBoardWidgetTab() {
   const toggleColumn = (colId, colTitle) => {
     setConfig(prev => {
       const current = prev.columns_to_show || [];
-      const exists = current.find(c => c.id === colId);
-      if (exists) {
-        return { ...prev, columns_to_show: current.filter(c => c.id !== colId) };
-      }
-      return { ...prev, columns_to_show: [...current, { id: colId, title: colTitle }] };
+      const exists = current.some(c => (c.id || c) === colId);
+      return {
+        ...prev,
+        columns_to_show: exists
+          ? current.filter(c => (c.id || c) !== colId)
+          : [...current, { id: colId, title: colTitle }],
+      };
+    });
+  };
+
+  const toggleSubColumn = (colId, colTitle) => {
+    setConfig(prev => {
+      const current = prev.subitem_columns_to_show || [];
+      const exists = current.some(c => (c.id || c) === colId);
+      return {
+        ...prev,
+        subitem_columns_to_show: exists
+          ? current.filter(c => (c.id || c) !== colId)
+          : [...current, { id: colId, title: colTitle }],
+      };
     });
   };
 
@@ -87,166 +106,64 @@ export default function PublicBoardWidgetTab() {
     setSaving(true);
     try {
       const res = await fetch(`${API}/api/monday/public-board-widget/config`, {
-        method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+        method: 'PUT',
+        headers: hdrs(),
         body: JSON.stringify(config),
       });
-      if (res.ok) toast.success('Widget config saved');
-      else toast.error('Failed to save');
-    } catch {
-      toast.error('Network error');
-    }
-    setSaving(false);
+      if (res.ok) toast.success(t('monday.widgetSaved', 'Widget configuration saved'));
+      else toast.error('Save failed');
+    } catch { toast.error('Save failed'); }
+    finally { setSaving(false); }
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
       const res = await fetch(`${API}/api/monday/public-board-widget/refresh`, {
-        method: 'POST', headers,
+        method: 'POST',
+        headers: hdrs(),
       });
-      const data = await res.json();
-      if (res.ok) toast.success(`Cache refreshed: ${data.items_cached} items`);
-      else toast.error(data.detail || 'Refresh failed');
-    } catch {
-      toast.error('Network error');
-    }
-    setRefreshing(false);
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Refreshed: ${data.items_count || 0} items cached`);
+      } else toast.error('Refresh failed');
+    } catch { toast.error('Refresh failed'); }
+    finally { setRefreshing(false); }
   };
 
-  if (!config) return <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>;
-
-  const selectedColIds = (config.columns_to_show || []).map(c => c.id);
+  const selectedCols = (config.columns_to_show || []).map(c => c.id || c);
+  const selectedSubCols = (config.subitem_columns_to_show || []).map(c => c.id || c);
 
   return (
-    <div className="space-y-4" data-testid="public-board-widget-config">
-      {/* Enable / Title */}
+    <div className="space-y-4" data-testid="public-board-widget-tab">
+      {/* Enable + Board Selection */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base">Public Board Widget</CardTitle>
-              <CardDescription className="text-xs">Display Monday.com board content on the landing page</CardDescription>
+              <CardTitle className="text-sm">{t('monday.widgetConfig', 'Public Board Widget')}</CardTitle>
+              <CardDescription className="text-xs">{t('monday.widgetDesc', 'Display Monday.com board items on your landing page')}</CardDescription>
             </div>
-            <Switch
-              checked={config.enabled}
-              onCheckedChange={(v) => setConfig(p => ({ ...p, enabled: v }))}
-              data-testid="widget-enabled-switch"
-            />
+            <Switch checked={config.enabled || false} onCheckedChange={v => setConfig(p => ({ ...p, enabled: v }))} />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Widget Title</Label>
-              <Input
-                value={config.title || ''}
-                onChange={e => setConfig(p => ({ ...p, title: e.target.value }))}
-                placeholder="Projects"
-                data-testid="widget-title-input"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Subtitle</Label>
-              <Input
-                value={config.subtitle || ''}
-                onChange={e => setConfig(p => ({ ...p, subtitle: e.target.value }))}
-                placeholder="Our latest community projects"
-                data-testid="widget-subtitle-input"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Board Selection */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Board & Columns</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Monday.com Board</Label>
-            <Select value={config.board_id || ''} onValueChange={handleBoardChange}>
-              <SelectTrigger data-testid="widget-board-select">
-                <SelectValue placeholder="Select a board..." />
-              </SelectTrigger>
-              <SelectContent>
-                {boards.map(b => (
-                  <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Group filter */}
-          {groups.length > 0 && (
-            <div className="space-y-1.5">
-              <Label className="text-xs">Group Filter (optional)</Label>
-              <Select
-                value={config.group_filter || 'all'}
-                onValueChange={v => setConfig(p => ({ ...p, group_filter: v === 'all' ? null : v }))}
-              >
-                <SelectTrigger data-testid="widget-group-select">
-                  <SelectValue />
-                </SelectTrigger>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs">{t('monday.selectBoard', 'Board')}</Label>
+              <Select value={config.board_id || ''} onValueChange={handleBoardChange}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select board..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All groups</SelectItem>
-                  {groups.map(g => (
-                    <SelectItem key={g.id} value={g.id}>{g.title}</SelectItem>
+                  {boards.map(b => (
+                    <SelectItem key={b.id} value={String(b.id)}>{b.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          )}
-
-          {/* Column selection */}
-          {columns.length > 0 && (
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1">
-                <Columns3 className="h-3 w-3" /> Columns to Display
-              </Label>
-              <div className="flex flex-wrap gap-1.5" data-testid="widget-column-chips">
-                {columns
-                  .filter(c => c.id !== 'name' && c.type !== 'auto_number')
-                  .map(c => {
-                    const selected = selectedColIds.includes(c.id);
-                    return (
-                      <Badge
-                        key={c.id}
-                        variant={selected ? 'default' : 'outline'}
-                        className={`cursor-pointer text-[10px] transition-colors ${selected ? 'bg-emerald-600 hover:bg-emerald-700' : 'hover:bg-slate-100'}`}
-                        onClick={() => toggleColumn(c.id, c.title)}
-                      >
-                        {c.title}
-                      </Badge>
-                    );
-                  })}
-              </div>
-              {selectedColIds.length === 0 && (
-                <p className="text-[10px] text-muted-foreground">Click columns to select which ones to show. If none selected, all will be shown.</p>
-              )}
-            </div>
-          )}
-          {loadingCols && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-        </CardContent>
-      </Card>
-
-      {/* Display Settings */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Display Settings</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Display Style</Label>
-              <Select
-                value={config.display_style || 'cards'}
-                onValueChange={v => setConfig(p => ({ ...p, display_style: v }))}
-              >
-                <SelectTrigger data-testid="widget-style-select">
-                  <SelectValue />
-                </SelectTrigger>
+            <div>
+              <Label className="text-xs">{t('monday.displayStyle', 'Display Style')}</Label>
+              <Select value={config.display_style || 'cards'} onValueChange={v => setConfig(p => ({ ...p, display_style: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cards">Cards</SelectItem>
                   <SelectItem value="table">Table</SelectItem>
@@ -254,37 +171,136 @@ export default function PublicBoardWidgetTab() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Max Items</Label>
-              <Input
-                type="number" min={1} max={50}
-                value={config.max_items || 10}
-                onChange={e => setConfig(p => ({ ...p, max_items: parseInt(e.target.value) || 10 }))}
-                data-testid="widget-max-items"
-              />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs">{t('monday.widgetTitle', 'Widget Title')}</Label>
+              <Input value={config.title || ''} onChange={e => setConfig(p => ({ ...p, title: e.target.value }))} className="mt-1" placeholder="Projects" />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Refresh Interval (min)</Label>
-              <Input
-                type="number" min={1} max={60}
-                value={config.refresh_minutes || 10}
-                onChange={e => setConfig(p => ({ ...p, refresh_minutes: parseInt(e.target.value) || 10 }))}
-                data-testid="widget-refresh-minutes"
-              />
+            <div>
+              <Label className="text-xs">{t('monday.widgetSubtitle', 'Subtitle')}</Label>
+              <Input value={config.subtitle || ''} onChange={e => setConfig(p => ({ ...p, subtitle: e.target.value }))} className="mt-1" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs">{t('monday.maxItems', 'Max Items')}</Label>
+              <Input type="number" min={1} max={50} value={config.max_items || 10} onChange={e => setConfig(p => ({ ...p, max_items: parseInt(e.target.value) || 10 }))} className="mt-1" />
+            </div>
+            <div>
+              <Label className="text-xs">{t('monday.refreshMinutes', 'Auto-refresh (minutes)')}</Label>
+              <Input type="number" min={1} max={60} value={config.refresh_minutes || 10} onChange={e => setConfig(p => ({ ...p, refresh_minutes: parseInt(e.target.value) || 10 }))} className="mt-1" />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <Button onClick={handleSave} disabled={saving} className="gap-1.5" data-testid="widget-save-btn">
-          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-          Save Configuration
+      {/* Column Selection */}
+      {config.board_id && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Columns className="h-4 w-4" /> {t('monday.columnConfig', 'Item Columns')}
+            </CardTitle>
+            <CardDescription className="text-xs">{t('monday.columnDesc', 'Select which columns to display. Leave empty to show all.')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingCols ? (
+              <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {columns.filter(c => c.type !== 'subtasks').map(col => (
+                  <Badge
+                    key={col.id}
+                    variant={selectedCols.includes(col.id) ? 'default' : 'outline'}
+                    className="cursor-pointer text-xs"
+                    onClick={() => toggleColumn(col.id, col.title)}
+                    data-testid={`col-${col.id}`}
+                  >
+                    {col.title}
+                    <span className="ml-1 text-[9px] opacity-60">({col.type})</span>
+                  </Badge>
+                ))}
+                {columns.length === 0 && <p className="text-xs text-muted-foreground">No columns found. Click Refresh to load.</p>}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Subitems Configuration */}
+      {config.board_id && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <List className="h-4 w-4" /> {t('monday.subitemConfig', 'Subitems')}
+                </CardTitle>
+                <CardDescription className="text-xs">{t('monday.subitemDesc', 'Show subitems under each item with selected columns')}</CardDescription>
+              </div>
+              <Switch checked={config.show_subitems || false} onCheckedChange={v => setConfig(p => ({ ...p, show_subitems: v }))} />
+            </div>
+          </CardHeader>
+          {config.show_subitems && (
+            <CardContent>
+              {loadingCols ? (
+                <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {subColumns.map(col => (
+                    <Badge
+                      key={col.id}
+                      variant={selectedSubCols.includes(col.id) ? 'default' : 'outline'}
+                      className="cursor-pointer text-xs"
+                      onClick={() => toggleSubColumn(col.id, col.title)}
+                      data-testid={`subcol-${col.id}`}
+                    >
+                      {col.title}
+                      <span className="ml-1 text-[9px] opacity-60">({col.type})</span>
+                    </Badge>
+                  ))}
+                  {subColumns.length === 0 && <p className="text-xs text-muted-foreground">No subitem columns found. Make sure the board has subitems.</p>}
+                </div>
+              )}
+            </CardContent>
+          )}
+        </Card>
+      )}
+
+      {/* Group Filter */}
+      {config.board_id && groups.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">{t('monday.groupFilter', 'Group Filter')}</CardTitle>
+            <CardDescription className="text-xs">{t('monday.groupDesc', 'Optionally show only items from a specific group')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select value={config.group_filter || 'all'} onValueChange={v => setConfig(p => ({ ...p, group_filter: v === 'all' ? null : v }))}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Groups</SelectItem>
+                {groups.map(g => (
+                  <SelectItem key={g.id} value={g.id}>{g.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={() => window.open('/', '_blank')} data-testid="preview-widget-btn">
+          <Eye className="h-3.5 w-3.5 mr-1.5" /> {t('common.preview', 'Preview')}
         </Button>
-        <Button variant="outline" onClick={handleRefresh} disabled={refreshing || !config.board_id} className="gap-1.5" data-testid="widget-refresh-btn">
-          {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-          Refresh Cache
+        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing || !config.board_id} data-testid="refresh-widget-btn">
+          {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
+          {t('monday.refreshCache', 'Refresh Cache')}
+        </Button>
+        <Button size="sm" onClick={handleSave} disabled={saving} data-testid="save-widget-btn">
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Save className="h-3.5 w-3.5 mr-1.5" />}
+          {t('common.save', 'Save')}
         </Button>
       </div>
     </div>
