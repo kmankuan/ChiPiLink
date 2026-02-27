@@ -113,7 +113,7 @@ export default function LandingPageEditor() {
   const [blocks, setBlocks] = useState([]);
   const [templates, setTemplates] = useState({});
   const [siteConfig, setSiteConfig] = useState({
-    site_name: 'Mi Tienda',
+    site_name: 'ChiPi Link',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
