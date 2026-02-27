@@ -76,7 +76,7 @@ class PreSaleImportService:
         await self._load_subitem_config()
 
         # Use cached preview data if available, otherwise fetch fresh
-        if cached_items:
+        if cached_items is not None and len(cached_items) > 0:
             logger.info(f"[presale] Using {len(cached_items)} cached preview items (skipping Monday.com re-fetch)")
             parsed_items = cached_items
         else:
