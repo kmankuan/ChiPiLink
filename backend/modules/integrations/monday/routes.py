@@ -461,6 +461,33 @@ async def get_board_columns(board_id: str, admin: dict = Depends(get_admin_user)
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/boards/{board_id}/groups")
+async def get_board_groups(board_id: str, admin: dict = Depends(get_admin_user)):
+    """Get all groups of a specific board"""
+    from modules.integrations.monday.core_client import monday_client
+    try:
+        data = await monday_client.execute(f"""
+            query {{
+                boards(ids: [{board_id}]) {{
+                    id
+                    groups {{
+                        id
+                        title
+                        color
+                    }}
+                }}
+            }}
+        """)
+        boards = data.get("boards", [])
+        if not boards:
+            raise HTTPException(status_code=404, detail="Board not found")
+        return {"groups": boards[0].get("groups", [])}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/boards/{board_id}/subitem-columns")
 async def get_subitem_columns(board_id: str, admin: dict = Depends(get_admin_user)):
     """Get subitem columns for a board (searches items until one with subitems is found)"""
