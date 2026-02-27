@@ -192,6 +192,7 @@ const navGroups = [
     group: 'Configuration',
     items: [
       { id: 'site-config', labelKey: 'nav.siteConfig', icon: Settings, permission: 'admin.site_config' },
+      { id: 'print-config', labelKey: 'nav.printConfig', fallbackLabel: 'Print & Package', icon: Printer, permission: 'admin.site_config' },
       { id: 'privacy', labelKey: 'nav.privacy', icon: EyeOff, permission: 'admin.site_config' },
       { id: 'auth-config', labelKey: 'nav.authentication', icon: Shield, permission: 'admin.site_config' },
       { id: 'ui-style', labelKey: 'nav.uiStyle', icon: Paintbrush, permission: 'admin.site_config' },
