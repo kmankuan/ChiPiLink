@@ -57,11 +57,14 @@ class PreSaleImportService:
 
     async def preview_import(self, board_id: str) -> Dict:
         """Preview what would be imported — no DB changes"""
+        import asyncio
         await self._load_subitem_config()
         items = await self.fetch_importable_items(board_id)
         previews = []
-        for item in items:
-            parsed = await self._parse_monday_item(item, board_id)
+        for idx, item in enumerate(items):
+            if idx > 0:
+                await asyncio.sleep(0.3)  # Throttle to avoid Monday.com rate limits
+            parsed = await self._parse_monday_item_safe(item, board_id)
             if parsed:
                 previews.append(parsed)
         return {"count": len(previews), "items": previews}
