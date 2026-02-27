@@ -457,6 +457,103 @@ async def get_monday_webhook_status(admin=Depends(lambda: get_admin_user)):
     return {"configured": True, **config.get("value", {})}
 
 
+# ============ PRINT TEMPLATES ============
+
+TEMPLATES_COLLECTION = "print_templates"
+
+@router.get("/templates")
+async def list_templates(admin=Depends(lambda: get_admin_user)):
+    """List all saved print templates"""
+    templates = await db[TEMPLATES_COLLECTION].find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    if not templates:
+        # Seed with current default as a template
+        import uuid
+        default_tpl = {
+            "id": str(uuid.uuid4()),
+            "name": "Default Thermal",
+            "description": "Default thermal receipt template for 72mm printers",
+            "format_config": DEFAULT_FORMAT_CONFIG,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "created_by": "system",
+        }
+        await db[TEMPLATES_COLLECTION].insert_one({**default_tpl})
+        templates = [default_tpl]
+    return {"templates": templates}
+
+@router.post("/templates")
+async def create_template(data: dict, admin=Depends(lambda: get_admin_user)):
+    """Create a new print template (optionally cloned from an existing one)"""
+    import uuid
+    clone_from = data.get("clone_from")
+    if clone_from:
+        source = await db[TEMPLATES_COLLECTION].find_one({"id": clone_from}, {"_id": 0})
+        if not source:
+            raise HTTPException(status_code=404, detail="Source template not found")
+        fmt = source["format_config"]
+    else:
+        fmt = data.get("format_config", DEFAULT_FORMAT_CONFIG)
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        "name": data.get("name", "New Template"),
+        "description": data.get("description", ""),
+        "format_config": fmt,
+        "is_active": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": admin.get("email", "") if isinstance(admin, dict) else "",
+    }
+    await db[TEMPLATES_COLLECTION].insert_one({**doc})
+    return doc
+
+@router.put("/templates/{template_id}")
+async def update_template(template_id: str, data: dict, admin=Depends(lambda: get_admin_user)):
+    """Update a print template's config, name, or description"""
+    update_fields = {}
+    for field in ["name", "description", "format_config"]:
+        if field in data:
+            update_fields[field] = data[field]
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_fields["updated_by"] = admin.get("email", "") if isinstance(admin, dict) else ""
+    result = await db[TEMPLATES_COLLECTION].update_one({"id": template_id}, {"$set": update_fields})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return {"success": True}
+
+@router.delete("/templates/{template_id}")
+async def delete_template(template_id: str, admin=Depends(lambda: get_admin_user)):
+    """Delete a print template (cannot delete active template)"""
+    tpl = await db[TEMPLATES_COLLECTION].find_one({"id": template_id}, {"_id": 0})
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Template not found")
+    if tpl.get("is_active"):
+        raise HTTPException(status_code=400, detail="Cannot delete the active template")
+    await db[TEMPLATES_COLLECTION].delete_one({"id": template_id})
+    return {"success": True}
+
+@router.post("/templates/{template_id}/activate")
+async def activate_template(template_id: str, admin=Depends(lambda: get_admin_user)):
+    """Set a template as active and apply its config to the print format"""
+    tpl = await db[TEMPLATES_COLLECTION].find_one({"id": template_id}, {"_id": 0})
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Template not found")
+    # Deactivate all, activate this one
+    await db[TEMPLATES_COLLECTION].update_many({}, {"$set": {"is_active": False}})
+    await db[TEMPLATES_COLLECTION].update_one({"id": template_id}, {"$set": {"is_active": True}})
+    # Apply to print_format config
+    now = datetime.now(timezone.utc).isoformat()
+    await db.app_config.update_one(
+        {"config_key": "print_format"},
+        {"$set": {"config_key": "print_format", "value": tpl["format_config"], "updated_at": now}},
+        upsert=True,
+    )
+    return {"success": True, "applied_config": tpl["format_config"]}
+
+
 # ============ MONDAY.COM WEBHOOK (with batch support) ============
 
 async def _finalize_batch(batch_id: str, order_ids: list, monday_item_ids: list):
