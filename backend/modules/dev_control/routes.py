@@ -694,3 +694,196 @@ async def ai_quick_action(data: dict, admin: dict = Depends(get_admin_user)):
 
     # Delegate to the chat endpoint
     return await ai_helper_chat({"message": prompt, "session_id": ""}, admin)
+
+
+# ============== HELP GUIDE EDITOR ==============
+
+HELP_GUIDE_COLLECTION = "help_guide_content"
+
+DEFAULT_HELP_GUIDE = {
+    "title": "ChiPi Link — User Guide",
+    "intro": "Welcome to ChiPi Link, your school's platform for ordering textbooks, tracking your orders, and communicating with school staff. This guide walks you through everything you need to get started.",
+    "sections": [
+        {
+            "id": "getting-started",
+            "title": "Getting Started",
+            "type": "text",
+            "content": "ChiPi Link uses LaoPan for secure login. You do not need to create a separate account — just sign in with your LaoPan credentials.",
+            "image_url": "",
+            "order": 0,
+        },
+        {
+            "id": "how-to-login",
+            "title": "How to Log In",
+            "type": "steps",
+            "content": "",
+            "image_url": "/guides/guide-login.gif",
+            "steps": [
+                "Open your browser and go to laopan.online.",
+                "If you already have a LaoPan account, enter your email and password, then click \"Sign In\".",
+                "If you do not have an account yet, click \"Register\" and follow the steps to create one.",
+                "After logging in to LaoPan, you will be redirected to the ChiPi Link app automatically.",
+                "If you are not redirected, go to the ChiPi Link website and click \"Sign In with LaoPan\".",
+            ],
+            "tips": [
+                {"title": "Forgot your password?", "content": "Go to laopan.online and click \"Forgot Password\" to reset it via email."},
+                {"title": "Not receiving the verification email?", "content": "Check your spam/junk folder. If it's not there, try again or contact the school."},
+                {"title": "Seeing an error after login?", "content": "Try clearing your browser cache or using a private/incognito window."},
+            ],
+            "order": 1,
+        },
+        {
+            "id": "link-student",
+            "title": "How to Link Your Student",
+            "type": "steps",
+            "content": "Before you can order textbooks, you need to link your child (student) to your account.",
+            "image_url": "",
+            "steps": [
+                "After logging in, go to \"Mi Cuenta\" (My Account) from the top menu.",
+                "Look for the \"Students\" or \"Estudiantes\" section.",
+                "Click \"Add Student\" or \"Agregar Estudiante\".",
+                "Enter your child's full name and select their grade level.",
+                "Click \"Save\". Your student is now linked to your account.",
+            ],
+            "tips": [],
+            "order": 2,
+        },
+        {
+            "id": "ordering-textbooks",
+            "title": "How to Order Textbooks",
+            "type": "steps",
+            "content": "Once your student is linked, you can browse and order the textbooks assigned to their grade.",
+            "image_url": "/guides/guide-ordering.gif",
+            "steps": [
+                "From the main page, click on \"Unatienda\" in the navigation menu.",
+                "The store shows textbooks available for your student's grade. Each book shows its name, code, and price.",
+                "Select the books you want to order by clicking \"Add\" or adjusting the quantity.",
+                "When you are ready, click \"Submit Order\" or \"Enviar Pedido\".",
+                "You will see a confirmation with your order summary.",
+            ],
+            "tips": [],
+            "order": 3,
+        },
+        {
+            "id": "order-statuses",
+            "title": "Order Statuses Explained",
+            "type": "list",
+            "content": "",
+            "image_url": "",
+            "items": [
+                {"title": "Submitted / Enviado", "content": "Your order has been received and is being reviewed."},
+                {"title": "Awaiting Link", "content": "The order is imported but not yet linked to a user account."},
+                {"title": "Processing / En Proceso", "content": "The school is preparing your textbooks."},
+                {"title": "Ready / Listo", "content": "Your textbooks are ready for pickup or delivery."},
+                {"title": "Delivered / Entregado", "content": "Your textbooks have been handed to you."},
+                {"title": "Cancelled / Cancelado", "content": "The order was cancelled."},
+            ],
+            "order": 4,
+        },
+        {
+            "id": "check-order-status",
+            "title": "How to Check Your Order Status",
+            "type": "steps",
+            "content": "",
+            "image_url": "",
+            "steps": [
+                "Log in to your account.",
+                "Click on \"Orders\" or \"Pedidos\" in the menu.",
+                "You will see a list of all your orders with their current status.",
+                "Click on any order to see the full details.",
+            ],
+            "tips": [],
+            "order": 5,
+        },
+        {
+            "id": "messages",
+            "title": "How to Communicate with School Staff",
+            "type": "steps",
+            "content": "ChiPi Link has a built-in messaging system so you can communicate directly with the school.",
+            "image_url": "/guides/guide-messages.gif",
+            "steps": [
+                "Log in to your account.",
+                "Go to \"Orders\" and open the order you want to discuss.",
+                "Look for the message icon (chat bubble) on the order.",
+                "Click it to open the conversation.",
+                "Type your message and press Send.",
+            ],
+            "tips": [
+                {"title": "When to use messages", "content": "Ask about order status, request changes, report issues with textbooks, ask about prices, or confirm pickup details."},
+                {"title": "Tips", "content": "Be specific — include your student's name and grade. You will receive a notification when the school responds."},
+            ],
+            "order": 6,
+        },
+        {
+            "id": "faq",
+            "title": "Frequently Asked Questions",
+            "type": "faq",
+            "content": "",
+            "image_url": "",
+            "items": [
+                {"title": "Can I order textbooks for multiple children?", "content": "Yes. Link each child as a separate student in your account. Then place orders for each one individually."},
+                {"title": "Can I change my order after submitting?", "content": "Contact the school through the in-app messaging system as soon as possible."},
+                {"title": "How do I know when my books are ready?", "content": "Check the order status in the \"Orders\" section. When it changes to \"Ready\" or \"Listo\", your textbooks are available."},
+                {"title": "What payment methods are accepted?", "content": "Payment options are communicated by the school. Check with school staff."},
+                {"title": "I cannot find a textbook in the store.", "content": "Send a message to the school through the app. They can help you find the right textbook."},
+                {"title": "I am having technical problems.", "content": "Try refreshing your browser or clearing your cache. If the problem persists, contact the school."},
+            ],
+            "order": 7,
+        },
+        {
+            "id": "quick-reference",
+            "title": "Quick Reference",
+            "type": "list",
+            "content": "",
+            "image_url": "",
+            "items": [
+                {"title": "Login", "content": "Go to laopan.online -> Sign in -> You are redirected to ChiPi Link."},
+                {"title": "Link Student", "content": "Mi Cuenta -> Students -> Add Student -> Enter name and grade -> Save."},
+                {"title": "Order Textbooks", "content": "Unatienda -> Browse books -> Add to order -> Submit Order."},
+                {"title": "Check Status", "content": "Orders -> Click on your order -> See status of each item."},
+                {"title": "Message Staff", "content": "Orders -> Click message icon on order -> Type and send."},
+            ],
+            "order": 8,
+        },
+    ],
+}
+
+
+@router.get("/help-guide")
+async def get_help_guide(admin: dict = Depends(get_admin_user)):
+    """Get the help guide content for editing"""
+    doc = await db[HELP_GUIDE_COLLECTION].find_one({"doc_type": "guide"}, {"_id": 0})
+    if not doc:
+        return {"guide": DEFAULT_HELP_GUIDE, "source": "default"}
+    return {"guide": doc.get("content", DEFAULT_HELP_GUIDE), "source": "database", "updated_at": doc.get("updated_at"), "updated_by": doc.get("updated_by")}
+
+
+@router.put("/help-guide")
+async def update_help_guide(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update the help guide content"""
+    guide = data.get("guide")
+    if not guide:
+        raise HTTPException(status_code=400, detail="Guide content is required")
+    now = datetime.now(timezone.utc).isoformat()
+    await db[HELP_GUIDE_COLLECTION].update_one(
+        {"doc_type": "guide"},
+        {"$set": {
+            "doc_type": "guide",
+            "content": guide,
+            "updated_at": now,
+            "updated_by": admin.get("email", "admin"),
+        }},
+        upsert=True,
+    )
+    return {"success": True, "updated_at": now}
+
+
+# Public endpoint (no auth) for the help guide page to consume
+public_router = APIRouter(prefix="/help-guide", tags=["Help Guide"])
+
+@public_router.get("/content")
+async def get_help_guide_public():
+    """Public endpoint returning the help guide content"""
+    doc = await db[HELP_GUIDE_COLLECTION].find_one({"doc_type": "guide"}, {"_id": 0})
+    guide = doc.get("content", DEFAULT_HELP_GUIDE) if doc else DEFAULT_HELP_GUIDE
+    return {"guide": guide}
