@@ -20,6 +20,9 @@ export default function HelpGuide() {
 
       <section id="how-to-login">
         <h2>How to Log In</h2>
+        <div style={{ margin: '16px 0', textAlign: 'center' }}>
+          <img src="/guides/guide-login.gif" alt="Login walkthrough" style={{ maxWidth: 320, borderRadius: 12, border: '1px solid #ddd' }} />
+        </div>
         <ol>
           <li>Open your browser and go to <strong>laopan.online</strong>.</li>
           <li>If you already have a LaoPan account, enter your email and password, then click <strong>"Sign In"</strong>.</li>
