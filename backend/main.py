@@ -224,8 +224,9 @@ from modules.widget import widget_router
 api_router.include_router(widget_router)
 
 # Dev Control Module
-from modules.dev_control import dev_control_router
+from modules.dev_control import dev_control_router, help_guide_public_router
 api_router.include_router(dev_control_router)
+api_router.include_router(help_guide_public_router)
 
 # Wallet Topups Module
 from modules.wallet_topups import wallet_topups_router
