@@ -22,7 +22,7 @@ School textbook order management platform with Monday.com integration for order 
 - **Quick Print Button**: Printer icon directly in table row Actions column
 - Pre-sale import: cursor-based pagination, `/` in codes, fuzzy book matching, "Listo" trigger label
 - **Chatbot Help Guide**: Public `/help-guide` page with structured content for chatbot training, animated GIFs
-- **Print Configuration (Feb 27, 2026)**: Configurable font family/size for thermal prints, template CRUD system (create, clone, edit, delete, activate) in Dev Control > Print Config tab
+- **Print Configuration (Feb 27, 2026)**: Configurable font family/size for thermal prints, template CRUD system (create, clone, edit, delete, activate). Moved from Sysbook to **Configuration** section in sidebar since printing is app-wide. Templates tab integrated into the existing Print & Package panel alongside Package List Format, Printer Settings, and Print History.
 - **Help Guide Editor (Feb 27, 2026)**: Dual-mode editor (structured form + raw JSON code) in Dev Control > Help Guide tab. Content stored in MongoDB, public page renders dynamically from API
 
 ### Key Files
