@@ -369,6 +369,11 @@ export default function PrintConfigPanel() {
           </Tabs>
         </TabsContent>
 
+        {/* ─── Templates ─── */}
+        <TabsContent value="templates" className="space-y-4">
+          <TemplatesSection />
+        </TabsContent>
+
         {/* ─── Printer Settings (System Printer) ─── */}
         <TabsContent value="printer" className="space-y-4">
           {/* LR2000E Status Card */}
