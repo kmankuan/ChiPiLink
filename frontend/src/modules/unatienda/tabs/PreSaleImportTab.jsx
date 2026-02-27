@@ -181,6 +181,7 @@ export default function PreSaleImportTab({ token: propToken }) {
       const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: previewData?.items || [] }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
