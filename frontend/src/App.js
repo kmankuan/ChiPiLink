@@ -294,6 +294,9 @@ function AppRouter() {
       <Route path="/embed/widget" element={<EmbedWidget />} />
       <Route path="/auth/widget-complete" element={<WidgetAuthComplete />} />
       
+      {/* Hidden Help Guide - for chatbot training */}
+      <Route path="/help-guide" element={<HelpGuide />} />
+      
       {/* Public Checkout Routes */}
       <Route path="/checkout/:pedidoId" element={<><Header /><Checkout /></>} />
       <Route path="/payment/result" element={<><Header /><PaymentResult /></>} />
