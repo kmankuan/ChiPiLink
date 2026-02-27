@@ -349,6 +349,29 @@ export default function PrintConfigPanel() {
                         <Label className="text-xs">{t('print.customText', 'Custom Footer Text')}</Label>
                         <Textarea value={format.footer?.custom_text || ''} onChange={(e) => updateFormat('footer', 'custom_text', e.target.value)} rows={2} className="mt-1" />
                       </div>
+                      <Separator />
+                      <ToggleRow label={t('print.showNotesSpace', 'Show Notes Space')} checked={format.footer?.show_notes_space} onChange={(v) => updateFormat('footer', 'show_notes_space', v)} />
+                      {format.footer?.show_notes_space && (
+                        <div className="space-y-3 pl-2 border-l-2 border-primary/20">
+                          <div>
+                            <Label className="text-xs">{t('print.notesLabel', 'Notes Label')}</Label>
+                            <Input value={format.footer?.notes_label || 'Notes'} onChange={(e) => updateFormat('footer', 'notes_label', e.target.value)} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">{t('print.notesLines', 'Number of Lines')}</Label>
+                            <div className="flex items-center gap-3 mt-1">
+                              <input
+                                type="range"
+                                min="1" max="10"
+                                value={format.footer?.notes_lines || 3}
+                                onChange={(e) => updateFormat('footer', 'notes_lines', parseInt(e.target.value))}
+                                className="flex-1"
+                              />
+                              <span className="text-sm font-mono w-6 text-center">{format.footer?.notes_lines || 3}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </>
