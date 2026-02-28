@@ -1,10 +1,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Search, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
-function ItemCard({ item, showSubitems }) {
+/** Resolve i18n field: try lang-specific, fall back to default */
+function i18nField(data, field, lang) {
+  if (!data) return '';
+  if (lang === 'es' && data[`${field}_es`]) return data[`${field}_es`];
+  if (lang === 'zh' && data[`${field}_zh`]) return data[`${field}_zh`];
+  return data[field] || '';
+}
+
+/** Resolve column title from column_titles map, falling back to the ID */
+function colTitle(colId, columnTitles) {
+  return columnTitles?.[colId] || colId;
+}
+
+function ItemCard({ item, showSubitems, columnTitles }) {
   const [expanded, setExpanded] = useState(false);
   const hasSubs = showSubitems && item.subitems?.length > 0;
 
@@ -27,6 +41,7 @@ function ItemCard({ item, showSubitems }) {
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
           {Object.entries(item.columns).map(([key, val]) => val ? (
             <span key={key} className="text-xs text-muted-foreground">
+              <span className="text-[10px] opacity-70">{colTitle(key, columnTitles)}: </span>
               <span className="font-medium text-foreground">{val}</span>
             </span>
           ) : null)}
@@ -41,7 +56,9 @@ function ItemCard({ item, showSubitems }) {
               {Object.keys(sub.columns || {}).length > 0 && (
                 <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
                   {Object.entries(sub.columns).map(([k, v]) => v ? (
-                    <span key={k} className="text-muted-foreground">{v}</span>
+                    <span key={k} className="text-muted-foreground">
+                      <span className="text-[10px] opacity-70">{colTitle(k, columnTitles)}: </span>{v}
+                    </span>
                   ) : null)}
                 </div>
               )}
@@ -53,14 +70,10 @@ function ItemCard({ item, showSubitems }) {
   );
 }
 
-function ItemTable({ items, showSubitems, columns }) {
+function ItemTable({ items, showSubitems, columns, columnTitles }) {
   const colIds = columns?.length > 0
     ? columns.map(c => c.id || c)
     : items.length > 0 ? Object.keys(items[0].columns || {}) : [];
-
-  const colTitles = columns?.length > 0
-    ? columns.reduce((acc, c) => { acc[c.id || c] = c.title || c.id || c; return acc; }, {})
-    : colIds.reduce((acc, id) => { acc[id] = id; return acc; }, {});
 
   return (
     <div className="overflow-x-auto rounded-lg border">
@@ -68,12 +81,14 @@ function ItemTable({ items, showSubitems, columns }) {
         <thead className="bg-muted/50">
           <tr>
             <th className="text-left p-2 text-xs font-semibold">Name</th>
-            {colIds.map(id => <th key={id} className="text-left p-2 text-xs font-semibold">{colTitles[id] || id}</th>)}
+            {colIds.map(id => (
+              <th key={id} className="text-left p-2 text-xs font-semibold">{colTitle(id, columnTitles)}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {items.map(item => (
-            <ItemTableRow key={item.id} item={item} colIds={colIds} showSubitems={showSubitems} />
+            <ItemTableRow key={item.id} item={item} colIds={colIds} showSubitems={showSubitems} columnTitles={columnTitles} />
           ))}
         </tbody>
       </table>
@@ -81,7 +96,7 @@ function ItemTable({ items, showSubitems, columns }) {
   );
 }
 
-function ItemTableRow({ item, colIds, showSubitems }) {
+function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
   const [expanded, setExpanded] = useState(false);
   const hasSubs = showSubitems && item.subitems?.length > 0;
 
@@ -111,6 +126,8 @@ function ItemTableRow({ item, colIds, showSubitems }) {
 }
 
 export default function MondayBoardWidget() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || 'en';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,14 +168,25 @@ export default function MondayBoardWidget() {
 
   const style = data.display_style || 'cards';
   const showSubitems = data.show_subitems || false;
+  const searchOnly = data.search_only || false;
+  const columnTitles = data.column_titles || {};
+
+  const title = i18nField(data, 'title', lang);
+  const subtitle = i18nField(data, 'subtitle', lang);
+  const placeholder = i18nField(data, 'search_placeholder', lang) || (
+    lang === 'es' ? 'Buscar...' : lang === 'zh' ? '搜索...' : 'Search...'
+  );
+
+  const hasQuery = searchQuery.trim().length > 0;
+  const showItems = searchOnly ? hasQuery : true;
 
   return (
     <div className="space-y-4" data-testid="monday-board-widget">
       {/* Header + Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          {data.title && <h3 className="text-lg font-bold">{data.title}</h3>}
-          {data.subtitle && <p className="text-sm text-muted-foreground">{data.subtitle}</p>}
+          {title && <h3 className="text-lg font-bold">{title}</h3>}
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </div>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -166,47 +194,59 @@ export default function MondayBoardWidget() {
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search items..."
+            placeholder={placeholder}
             className="w-full h-9 pl-8 pr-3 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
             data-testid="widget-search-input"
           />
         </div>
       </div>
 
-      {/* Items */}
-      {filteredItems.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">
-          {searchQuery ? 'No matching items found.' : 'No items to display.'}
-        </p>
-      ) : style === 'table' ? (
-        <ItemTable items={filteredItems} showSubitems={showSubitems} columns={data.columns} />
-      ) : style === 'list' ? (
-        <div className="divide-y rounded-lg border">
-          {filteredItems.map(item => (
-            <div key={item.id} className="p-3 flex items-center gap-3 hover:bg-muted/30" data-testid={`widget-item-${item.id}`}>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{item.name}</p>
-                {Object.values(item.columns || {}).filter(Boolean).length > 0 && (
-                  <p className="text-xs text-muted-foreground truncate">{Object.values(item.columns).filter(Boolean).join(' · ')}</p>
-                )}
-              </div>
-              {item.group && <span className="text-[10px] text-muted-foreground shrink-0">{item.group}</span>}
+      {/* Items — only show if not in search_only mode or user has typed */}
+      {showItems ? (
+        <>
+          {filteredItems.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              {searchQuery
+                ? (lang === 'es' ? 'No se encontraron resultados.' : lang === 'zh' ? '未找到匹配项。' : 'No matching items found.')
+                : (lang === 'es' ? 'No hay elementos para mostrar.' : lang === 'zh' ? '没有要显示的项目。' : 'No items to display.')}
+            </p>
+          ) : style === 'table' ? (
+            <ItemTable items={filteredItems} showSubitems={showSubitems} columns={data.columns} columnTitles={columnTitles} />
+          ) : style === 'list' ? (
+            <div className="divide-y rounded-lg border">
+              {filteredItems.map(item => (
+                <div key={item.id} className="p-3 flex items-center gap-3 hover:bg-muted/30" data-testid={`widget-item-${item.id}`}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    {Object.entries(item.columns || {}).filter(([,v]) => Boolean(v)).length > 0 && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {Object.entries(item.columns).filter(([,v]) => Boolean(v)).map(([k,v]) => `${colTitle(k, columnTitles)}: ${v}`).join(' · ')}
+                      </p>
+                    )}
+                  </div>
+                  {item.group && <span className="text-[10px] text-muted-foreground shrink-0">{item.group}</span>}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredItems.map(item => (
-            <ItemCard key={item.id} item={item} showSubitems={showSubitems} />
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredItems.map(item => (
+                <ItemCard key={item.id} item={item} showSubitems={showSubitems} columnTitles={columnTitles} />
+              ))}
+            </div>
+          )}
 
-      {/* Item count */}
-      <p className="text-[10px] text-muted-foreground text-right">
-        {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
-        {searchQuery && ` matching "${searchQuery}"`}
-      </p>
+          {/* Item count */}
+          <p className="text-[10px] text-muted-foreground text-right">
+            {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
+            {searchQuery && ` matching "${searchQuery}"`}
+          </p>
+        </>
+      ) : (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          {lang === 'es' ? 'Escribe un nombre para buscar.' : lang === 'zh' ? '输入名称进行搜索。' : 'Type a name to search.'}
+        </p>
+      )}
     </div>
   );
 }
