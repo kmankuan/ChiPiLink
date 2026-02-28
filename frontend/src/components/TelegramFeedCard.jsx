@@ -111,16 +111,14 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
               return (
                 <div key={idx} className="relative overflow-hidden bg-neutral-200" style={span}>
                   {src ? (
-                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  ) : isItemVideo ? (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
-                      <Play className="h-4 w-4 text-white/60 fill-white/60" />
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
-                      <ImageIcon className="h-4 w-4 text-slate-400" />
-                    </div>
-                  )}
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy"
+                      onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex'); }}
+                    />
+                  ) : null}
+                  {/* Fallback shown if img fails */}
+                  <div className="w-full h-full items-center justify-center bg-neutral-100" style={{ display: src ? 'none' : 'flex' }}>
+                    {isItemVideo ? <Play className="h-4 w-4 text-slate-400 fill-slate-400" /> : <ImageIcon className="h-4 w-4 text-slate-400" />}
+                  </div>
                   {isItemVideo && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-6 h-6 rounded-full bg-black/40 flex items-center justify-center">
