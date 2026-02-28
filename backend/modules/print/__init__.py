@@ -215,6 +215,8 @@ def _build_thermal_html(orders, fmt):
         if b.get("show_grade", True) and order.get("grade"):
             yr = f' &mdash; {order["year"]}' if order.get("year") else ''
             receipt += f'<div style="font-size:9px; color:#000; font-weight:600;">Grade: {escape(str(order["grade"]))}{yr}</div>'
+        if order.get("paid_date"):
+            receipt += f'<div style="font-size:9px; color:#000; font-weight:500;">Paid: {escape(str(order["paid_date"]))}</div>'
         receipt += '<div style="border-top:1px dashed #000; margin:1.5mm 0;"></div>'
         # Items table
         receipt += '<table style="width:100%; border-collapse:collapse; font-size:9px;">'
