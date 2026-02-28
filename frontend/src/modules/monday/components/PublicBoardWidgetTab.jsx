@@ -105,10 +105,23 @@ export default function PublicBoardWidgetTab() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Build column_titles map from selected columns and subcolumns
+      const colTitlesMap = {};
+      for (const c of (config.columns_to_show || [])) {
+        if (typeof c === 'object' && c.id && c.title) colTitlesMap[c.id] = c.title;
+      }
+      for (const c of (config.subitem_columns_to_show || [])) {
+        if (typeof c === 'object' && c.id && c.title) colTitlesMap[c.id] = c.title;
+      }
+      // Also include titles from columns list (for any that might not be in selections)
+      for (const c of columns) { if (c.id && c.title) colTitlesMap[c.id] = c.title; }
+      for (const c of subColumns) { if (c.id && c.title) colTitlesMap[c.id] = c.title; }
+
+      const payload = { ...config, column_titles: colTitlesMap };
       const res = await fetch(`${API}/api/monday/public-board-widget/config`, {
         method: 'PUT',
         headers: hdrs(),
-        body: JSON.stringify(config),
+        body: JSON.stringify(payload),
       });
       if (res.ok) toast.success(t('monday.widgetSaved', 'Widget configuration saved'));
       else toast.error('Save failed');
