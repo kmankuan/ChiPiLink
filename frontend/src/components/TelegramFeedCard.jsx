@@ -536,8 +536,10 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
     setLoadingMore(true);
     try {
       const limit = container.post_limit || 10;
+      const offset = posts.length;
       const url = new URL(`${API_URL}/api/community-v2/feed/public/recent`);
       url.searchParams.set('limit', limit);
+      url.searchParams.set('offset', offset);
       if (channel_id) url.searchParams.set('channel_id', channel_id);
 
       const res = await fetch(url);
@@ -548,7 +550,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
         if (newPosts.length > 0) {
           setPosts(prev => [...prev, ...newPosts]);
         }
-        setHasMore(newPosts.length > 0);
+        setHasMore(newPosts.length > 0 && (offset + newPosts.length) < (data.total || 0));
       }
     } catch {
       /* ignore */
