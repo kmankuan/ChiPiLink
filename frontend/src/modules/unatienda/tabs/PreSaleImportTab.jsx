@@ -368,10 +368,18 @@ export default function PreSaleImportTab({ token: propToken }) {
         loading={loading}
         onRefresh={fetchOrders}
         actions={
-          <Button variant="outline" size="sm" onClick={handlePreview} disabled={previewing} className="gap-1 h-7 text-xs" data-testid="preview-import-btn">
-            {previewing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
-            Preview Import
-          </Button>
+          <div className="flex items-center gap-1.5">
+            {orders.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleSyncToInventory} disabled={syncing} className="gap-1 h-7 text-xs" data-testid="sync-inventory-btn">
+                {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Package className="h-3 w-3" />}
+                Sync to Inventory
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handlePreview} disabled={previewing} className="gap-1 h-7 text-xs" data-testid="preview-import-btn">
+              {previewing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
+              Preview Import
+            </Button>
+          </div>
         }
       />
 
