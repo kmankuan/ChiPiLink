@@ -233,15 +233,16 @@ async def _fetch_and_cache(config: dict) -> list:
 
         items.append(item)
 
-    # Save cache
+    # Save cache (include live column titles)
     await db[CACHE_COLLECTION].update_one(
         {"config_key": "widget_cache"},
         {"$set": {
             "config_key": "widget_cache",
             "items": items,
+            "live_col_titles": live_col_titles,
             "cached_at": datetime.now(timezone.utc).isoformat(),
         }},
         upsert=True,
     )
 
-    return items
+    return items, live_col_titles
