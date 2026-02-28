@@ -116,7 +116,7 @@ export default function MondayBoardWidget() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch(`${API}/api/monday/public-board-widget/items`)
+    fetch(`${API}/api/monday/public-board-widget`)
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
