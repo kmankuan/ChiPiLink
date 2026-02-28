@@ -185,6 +185,24 @@ class PreSaleImportService:
         # Parse grade from label text
         grade = self._normalize_grade(grade_text)
 
+        # Auto-detect Date Paid column
+        paid_date = None
+        for col_data in item.get("column_values", []):
+            col_id = col_data.get("id", "").lower()
+            col_type = col_data.get("type", "").lower()
+            col_title = col_data.get("title", "").lower() if col_data.get("title") else ""
+            col_text = (col_data.get("text") or "").strip()
+
+            # Match by column type (date) + keyword in id or title
+            is_date_col = col_type == "date" or col_id.startswith("date")
+            has_paid_keyword = any(kw in col_id or kw in col_title for kw in DATE_PAID_KEYWORDS)
+            if is_date_col and has_paid_keyword and col_text:
+                paid_date = col_text
+                break
+            # Also check for any date column with "paid"/"pago" in its text-based id
+            if not paid_date and has_paid_keyword and col_text:
+                paid_date = col_text
+
         # Fetch subitems (each = a book)
         subitems = await monday_client.get_subitems(monday_item_id)
         items = []
