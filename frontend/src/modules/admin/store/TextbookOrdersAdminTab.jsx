@@ -112,6 +112,8 @@ export default function TextbookOrdersAdminTab() {
   const [chatStudent, setChatStudent] = useState(null);
   const [singlePrintOpen, setSinglePrintOpen] = useState(false);
   const [archiveCount, setArchiveCount] = useState(0);
+  const [sortField, setSortField] = useState(null); // 'paid_date', 'date', etc.
+  const [sortDir, setSortDir] = useState('desc');
 
   useEffect(() => {
     fetchData();
