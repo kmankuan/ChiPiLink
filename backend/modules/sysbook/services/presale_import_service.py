@@ -316,6 +316,7 @@ class PreSaleImportService:
             "imported_by": admin_user_id,
             "imported_at": now,
             "link_status": "unlinked",
+            "paid_date": parsed.get("paid_date"),
             "created_at": now,
             "updated_at": now,
         }
