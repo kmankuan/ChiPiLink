@@ -300,14 +300,59 @@ class PreSaleImportService:
         await db.store_textbook_orders.insert_one(order)
         order.pop("_id", None)
 
-        # Update reserved_quantity on inventory products (all items are matched)
+        # Auto-create inventory products for unmatched items, then set reserved_quantity
         for item in parsed["items"]:
-            if item.get("book_id"):
-                qty = item.get("quantity_ordered", 1)
-                await db.store_products.update_one(
-                    {"book_id": item["book_id"]},
-                    {"$inc": {"reserved_quantity": qty}}
-                )
+            qty = item.get("quantity_ordered", 1)
+            if not item.get("matched") or item.get("book_id", "").startswith("unmatched_"):
+                # Check if a product with same code already exists (may have been created by a prior order in this batch)
+                code = item.get("book_code", "")
+                name = item.get("book_name", "")
+                grade = parsed.get("grade", "")
+                existing = None
+                if code:
+                    existing = await db.store_products.find_one(
+                        {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
+                        {"_id": 0, "book_id": 1}
+                    )
+                if not existing and name:
+                    existing = await db.store_products.find_one(
+                        {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"}, "is_sysbook": True, "grade": grade},
+                        {"_id": 0, "book_id": 1}
+                    )
+                if existing:
+                    new_book_id = existing["book_id"]
+                else:
+                    new_book_id = f"book_{uuid.uuid4().hex[:12]}"
+                    new_product = {
+                        "book_id": new_book_id,
+                        "name": name,
+                        "code": code,
+                        "grade": grade,
+                        "price": item.get("price", 0),
+                        "inventory_quantity": 0,
+                        "reserved_quantity": 0,
+                        "is_sysbook": True,
+                        "active": True,
+                        "created_at": now,
+                        "source": "presale_import",
+                    }
+                    await db.store_products.insert_one(new_product)
+                    logger.info(f"[presale] Auto-created product {new_book_id}: {code} - {name} (grade {grade})")
+                # Update the order item with the real book_id
+                item["book_id"] = new_book_id
+                item["matched"] = True
+
+            # Increment reserved_quantity
+            await db.store_products.update_one(
+                {"book_id": item["book_id"]},
+                {"$inc": {"reserved_quantity": qty}}
+            )
+
+        # Save the updated items (with corrected book_ids) back to the order
+        await db.store_textbook_orders.update_one(
+            {"order_id": order_id},
+            {"$set": {"items": order["items"]}}
+        )
 
         logger.info(f"Created pre-sale order {order_id} for {parsed['student_name']} (grade {parsed['grade']})")
         return order
