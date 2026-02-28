@@ -314,9 +314,9 @@ class PreSaleImportService:
         await db.store_textbook_orders.insert_one(order)
         order.pop("_id", None)
 
-        # Update reserved_quantity on matching inventory products
+        # Update reserved_quantity on inventory products (all items are matched)
         for item in parsed["items"]:
-            if item.get("matched") and item.get("book_id") and not item["book_id"].startswith("unmatched_"):
+            if item.get("book_id"):
                 qty = item.get("quantity_ordered", 1)
                 await db.store_products.update_one(
                     {"book_id": item["book_id"]},
