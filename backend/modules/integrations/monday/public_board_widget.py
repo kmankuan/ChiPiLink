@@ -108,12 +108,14 @@ async def get_widget_data():
 
     if needs_refresh:
         try:
-            items = await _fetch_and_cache(config)
+            items, live_col_titles = await _fetch_and_cache(config)
         except Exception as e:
             logger.error(f"Widget auto-refresh failed: {e}")
             items = cache.get("items", []) if cache else []
+            live_col_titles = cache.get("live_col_titles", {}) if cache else {}
     else:
         items = cache.get("items", [])
+        live_col_titles = cache.get("live_col_titles", {})
 
     columns_to_show = config.get("columns_to_show", [])
     max_items = config.get("max_items", 10)
