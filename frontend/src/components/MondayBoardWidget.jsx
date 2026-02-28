@@ -95,6 +95,12 @@ function ItemTable({ items, showSubitems, columns, columnTitles }) {
   );
 }
 
+/** Get column value — handles the special "name" column (item name in Monday.com) */
+function colVal(item, colId) {
+  if (colId === 'name') return item.name || item.columns?.name || '';
+  return item.columns?.[colId] || '';
+}
+
 function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
   const [expanded, setExpanded] = useState(false);
   const hasSubs = showSubitems && item.subitems?.length > 0;
@@ -111,10 +117,10 @@ function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
                     {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                   </button>
                 )}
-                <span className="font-medium">{item.columns?.[id] || ''}</span>
+                <span className="font-medium">{colVal(item, id)}</span>
               </div>
             ) : (
-              <span className="text-muted-foreground">{item.columns?.[id] || ''}</span>
+              <span className="text-muted-foreground">{colVal(item, id)}</span>
             )}
           </td>
         ))}
