@@ -243,6 +243,34 @@ export default function PreSaleImportTab({ token: propToken }) {
     }
   };
 
+  const handleSyncToInventory = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`${API}/api/sysbook/presale-import/sync-inventory`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const parts = [];
+        if (data.created > 0) parts.push(`${data.created} products created`);
+        if (data.matched > 0) parts.push(`${data.matched} matched`);
+        if (data.updated_orders > 0) parts.push(`${data.updated_orders} orders updated`);
+        parts.push(`${data.total_reserved_units || 0} units reserved`);
+        toast.success(`Inventory synced: ${parts.join(', ')}`, { duration: 6000 });
+        fetchOrders();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Sync failed');
+      }
+    } catch (error) {
+      console.error('Sync to inventory error:', error);
+      toast.error('Error syncing to inventory');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   // Filtering
   const filteredOrders = useMemo(() => {
     let result = orders;
