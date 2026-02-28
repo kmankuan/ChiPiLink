@@ -1,0 +1,48 @@
+{
+  "summary": "Presale Sync to Inventory Feature - ALL TESTS PASSED. Backend: 6/6 API tests pass. Frontend: All UI elements verified (Sync to Inventory button, Pre-sale column in inventory).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "POST /api/sysbook/presale-import/sync-inventory returns sync results (created, matched, updated_orders, total_reserved_units)",
+    "GET /api/sysbook/inventory/products shows products with reserved_quantity > 0 after sync",
+    "After sync, presale order items all have matched: true",
+    "Sync is idempotent - calling twice doesn't create duplicate products (second call: created=0)",
+    "Pre-sale column values in inventory match expected reservations from orders",
+    "GET /api/sysbook/presale-import/orders returns orders with correct structure",
+    "UI: Sync to Inventory button appears on Pre-Sale Import admin page (/admin#presale-import)",
+    "UI: Pre-sale column visible in Sysbook Inventory table (/admin#sysbook-inventory)",
+    "UI: Pre-sale column shows correct reserved quantities with amber/red highlighting"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_presale_sync_inventory.py",
+    "/app/test_reports/pytest/pytest_results_presale_sync_inventory.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_presale_sync_inventory.py"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 tests)",
+    "frontend": "100% (all UI elements verified)"
+  },
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "Acdb##0897",
+      "endpoint": "POST /api/auth-v2/login",
+      "admin_pages": ["/admin#presale-import", "/admin#sysbook-inventory"]
+    }
+  },
+  "seed_data_creation": "No new seed data created. Tested against existing 31 presale orders with 308 items and 116 inventory products.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Presale Sync to Inventory feature fully working. sync_presale_to_inventory() method in presale_import_service.py aggregates presale items, creates missing products, links items (matched=true), and sets reserved_quantity. The sync is idempotent - subsequent calls find 0 unmatched items. Pre-sale column in SysbookInventoryTable.jsx shows reserved_quantity values. 116 products, 31 orders, 308 total items all matched."
+}
