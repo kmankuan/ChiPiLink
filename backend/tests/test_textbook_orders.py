@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://doc-editor-panel.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://monday-widget-fix.preview.emergentagent.com')
 
 # Test credentials
 TEST_CLIENT = {

@@ -8,7 +8,7 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://doc-editor-panel.preview.emergentagent.com"
+    BASE_URL = "https://monday-widget-fix.preview.emergentagent.com"
 
 
 class TestCrmChatAdminConfig:

@@ -20,7 +20,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://doc-editor-panel.preview.emergentagent.com"
+    BASE_URL = "https://monday-widget-fix.preview.emergentagent.com"
 
 # Admin credentials
 ADMIN_EMAIL = "teck@koh.one"
