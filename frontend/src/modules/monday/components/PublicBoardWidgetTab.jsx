@@ -195,6 +195,56 @@ export default function PublicBoardWidgetTab() {
               <Input value={config.subtitle || ''} onChange={e => setConfig(p => ({ ...p, subtitle: e.target.value }))} className="mt-1" />
             </div>
           </div>
+
+          {/* i18n: Spanish translations */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs text-orange-600">Title (ES)</Label>
+              <Input value={config.title_es || ''} onChange={e => setConfig(p => ({ ...p, title_es: e.target.value }))} className="mt-1" placeholder="Titulo en español" />
+            </div>
+            <div>
+              <Label className="text-xs text-orange-600">Subtitle (ES)</Label>
+              <Input value={config.subtitle_es || ''} onChange={e => setConfig(p => ({ ...p, subtitle_es: e.target.value }))} className="mt-1" />
+            </div>
+          </div>
+
+          {/* i18n: Chinese translations */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs text-red-600">Title (ZH)</Label>
+              <Input value={config.title_zh || ''} onChange={e => setConfig(p => ({ ...p, title_zh: e.target.value }))} className="mt-1" placeholder="中文标题" />
+            </div>
+            <div>
+              <Label className="text-xs text-red-600">Subtitle (ZH)</Label>
+              <Input value={config.subtitle_zh || ''} onChange={e => setConfig(p => ({ ...p, subtitle_zh: e.target.value }))} className="mt-1" />
+            </div>
+          </div>
+
+          {/* Search Only toggle + Search placeholder */}
+          <Separator />
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-3">
+              <Switch checked={config.search_only || false} onCheckedChange={v => setConfig(p => ({ ...p, search_only: v }))} data-testid="search-only-toggle" />
+              <div>
+                <Label className="text-xs">{t('monday.searchOnly', 'Search-Only Mode')}</Label>
+                <p className="text-[10px] text-muted-foreground">Hide items until user types a search query</p>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Search Placeholder (EN)</Label>
+              <Input value={config.search_placeholder || ''} onChange={e => setConfig(p => ({ ...p, search_placeholder: e.target.value }))} className="mt-1" placeholder="Search..." />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs text-orange-600">Search Placeholder (ES)</Label>
+              <Input value={config.search_placeholder_es || ''} onChange={e => setConfig(p => ({ ...p, search_placeholder_es: e.target.value }))} className="mt-1" placeholder="Buscar..." />
+            </div>
+            <div>
+              <Label className="text-xs text-red-600">Search Placeholder (ZH)</Label>
+              <Input value={config.search_placeholder_zh || ''} onChange={e => setConfig(p => ({ ...p, search_placeholder_zh: e.target.value }))} className="mt-1" placeholder="搜索..." />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs">{t('monday.maxItems', 'Max Items')}</Label>
