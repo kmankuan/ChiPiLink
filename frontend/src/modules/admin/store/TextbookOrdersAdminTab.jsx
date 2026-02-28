@@ -353,6 +353,7 @@ export default function TextbookOrdersAdminTab() {
                       <TableHead className="hidden md:table-cell">Items</TableHead>
                       <TableHead>Total</TableHead>
                       <TableHead className="hidden lg:table-cell">Date</TableHead>
+                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" data-testid="sort-paid-date">Paid</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-[60px] text-center">Activity</TableHead>
                       <TableHead>Actions</TableHead>
