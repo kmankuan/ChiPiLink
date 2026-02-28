@@ -297,6 +297,28 @@ async def mark_orders_printed(
     return {"status": "ok", "updated": result.modified_count}
 
 
+@router.put("/admin/{order_id}/paid-date")
+async def update_paid_date(
+    order_id: str,
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update the paid_date field on an order"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    paid_date = data.get("paid_date")  # ISO string or None to clear
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"paid_date": paid_date, "updated_at": now}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {"status": "ok", "paid_date": paid_date}
+
+
+
 @router.put("/admin/{order_id}/items/{book_id}/approve-reorder")
 async def approve_reorder(
     order_id: str,
