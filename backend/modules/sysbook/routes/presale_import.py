@@ -55,6 +55,18 @@ async def get_presale_orders(
     return {"orders": orders, "count": len(orders)}
 
 
+@router.post("/sync-inventory")
+async def sync_presale_to_inventory(admin: dict = Depends(get_admin_user)):
+    """Sync presale orders to inventory: create missing products and set reserved_quantity"""
+    try:
+        result = await presale_import_service.sync_presale_to_inventory()
+        return result
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"[presale] Sync to inventory failed: {e}")
+        raise HTTPException(500, f"Error syncing presale to inventory: {str(e)}")
+
+
 @router.post("/link")
 async def manual_link_order(
     data: dict = Body(...),
