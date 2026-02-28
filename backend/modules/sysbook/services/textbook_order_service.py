@@ -512,6 +512,8 @@ class TextbookOrderService(BaseService):
             "items": items,
             "status": new_status,
             "last_submitted_at": now,
+            "submitted_at": now if not order.get("submitted_at") else order["submitted_at"],
+            "paid_date": now if not order.get("paid_date") else order["paid_date"],
             "submissions": submissions,
             "notes": notes,
             "total_amount": total_amount,
