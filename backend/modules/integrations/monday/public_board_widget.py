@@ -45,7 +45,11 @@ async def save_widget_config(body: dict, admin: dict = Depends(get_admin_user)):
         allowed = {
             "enabled", "board_id", "board_name", "title", "subtitle",
             "columns_to_show", "max_items", "display_style", "group_filter",
-            "refresh_minutes",
+            "refresh_minutes", "show_subitems", "subitem_columns_to_show",
+            "search_only", "search_placeholder",
+            "title_es", "title_zh", "subtitle_es", "subtitle_zh",
+            "search_placeholder_es", "search_placeholder_zh",
+            "column_titles",
         }
         update = {k: v for k, v in body.items() if k in allowed}
         update["config_key"] = "widget"
