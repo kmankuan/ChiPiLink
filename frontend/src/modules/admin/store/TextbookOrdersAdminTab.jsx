@@ -134,7 +134,7 @@ function PaidDateCell({ orderId, paidDate, onUpdate }) {
         ${paidDate ? 'text-green-700 font-medium bg-green-50' : 'text-muted-foreground hover:text-foreground'}`}
       title="Click to set paid date"
       data-testid={`paid-date-display-${orderId}`}>
-      {paidDate ? new Date(paidDate).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}
+      {paidDate ? (() => { const [y,m,d] = (paidDate.slice(0,10)).split('-'); return new Date(y, m-1, d).toLocaleDateString('en', { month: 'short', day: 'numeric' }); })() : '—'}
     </span>
   );
 }
