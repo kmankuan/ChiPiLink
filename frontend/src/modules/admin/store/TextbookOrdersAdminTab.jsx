@@ -240,8 +240,27 @@ export default function TextbookOrdersAdminTab() {
     return true;
   });
 
-  const orderSelection = useTableSelection(filteredOrders, 'order_id');
-  const orderPagination = usePagination(filteredOrders, 25);
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (!sortField) return 0;
+    const fieldMap = { paid_date: 'paid_date', date: 'submitted_at' };
+    const key = fieldMap[sortField] || sortField;
+    const aVal = a[key] || '';
+    const bVal = b[key] || '';
+    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('desc');
+    }
+  };
+
+  const orderSelection = useTableSelection(sortedOrders, 'order_id');
+  const orderPagination = usePagination(sortedOrders, 25);
   const pageOrders = orderPagination.paginated;
 
   const handleBulkArchiveOrders = async () => {
