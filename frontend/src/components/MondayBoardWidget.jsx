@@ -145,8 +145,8 @@ export default function MondayBoardWidget() {
 
   const filteredItems = useMemo(() => {
     if (!data?.items) return [];
-    if (!searchQuery.trim()) return data.items;
-    const q = searchQuery.toLowerCase();
+    const q = searchQuery.trim().toLowerCase();
+    if (q.length < 3) return data.items;
     return data.items.filter(item => {
       if (item.name?.toLowerCase().includes(q)) return true;
       if (item.group?.toLowerCase().includes(q)) return true;
