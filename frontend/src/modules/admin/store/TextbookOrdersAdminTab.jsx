@@ -90,6 +90,55 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-700',
 };
 
+function PaidDateCell({ orderId, paidDate, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(paidDate ? paidDate.slice(0, 10) : '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async (dateVal) => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/paid-date`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paid_date: dateVal || null }),
+      });
+      if (res.ok) {
+        toast.success(dateVal ? 'Paid date updated' : 'Paid date cleared');
+        onUpdate();
+      } else toast.error('Failed to update');
+    } catch { toast.error('Error updating paid date'); }
+    finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <input type="date" value={value} onChange={(e) => setValue(e.target.value)}
+          className="h-6 text-xs border rounded px-1 w-28" autoFocus
+          data-testid={`paid-date-input-${orderId}`}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleSave(value); if (e.key === 'Escape') setEditing(false); }} />
+        <button onClick={() => handleSave(value)} disabled={saving}
+          className="text-green-600 hover:text-green-800 text-xs font-bold" data-testid={`paid-date-save-${orderId}`}>
+          {saving ? '...' : '✓'}
+        </button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+      </div>
+    );
+  }
+
+  return (
+    <span onClick={() => { setValue(paidDate ? paidDate.slice(0, 10) : ''); setEditing(true); }}
+      className={`cursor-pointer rounded px-1.5 py-0.5 transition-colors hover:ring-1 hover:ring-primary/40
+        ${paidDate ? 'text-green-700 font-medium bg-green-50' : 'text-muted-foreground hover:text-foreground'}`}
+      title="Click to set paid date"
+      data-testid={`paid-date-display-${orderId}`}>
+      {paidDate ? new Date(paidDate).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}
+    </span>
+  );
+}
+
 export default function TextbookOrdersAdminTab() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
