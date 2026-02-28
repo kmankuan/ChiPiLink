@@ -121,8 +121,9 @@ function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
       </tr>
       {hasSubs && expanded && item.subitems.map(sub => (
         <tr key={sub.id} className="bg-primary/5 border-b">
-          <td className="p-2 pl-8 text-[11px] text-muted-foreground">{sub.name}</td>
-          {colIds.map(id => <td key={id} className="p-2 text-[11px] text-muted-foreground">{sub.columns?.[id] || ''}</td>)}
+          {colIds.map((id, i) => (
+            <td key={id} className={`p-2 text-[11px] text-muted-foreground ${i === 0 ? 'pl-8' : ''}`}>{i === 0 ? sub.name : (sub.columns?.[id] || '')}</td>
+          ))}
         </tr>
       ))}
     </>
