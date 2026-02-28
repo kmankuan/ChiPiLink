@@ -80,7 +80,6 @@ function ItemTable({ items, showSubitems, columns, columnTitles }) {
       <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>
-            <th className="text-left p-2 text-xs font-semibold">Name</th>
             {colIds.map(id => (
               <th key={id} className="text-left p-2 text-xs font-semibold">{colTitle(id, columnTitles)}</th>
             ))}
@@ -103,17 +102,22 @@ function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
   return (
     <>
       <tr className="border-b hover:bg-muted/30">
-        <td className="p-2 text-xs">
-          <div className="flex items-center gap-1.5">
-            {hasSubs && (
-              <button onClick={() => setExpanded(!expanded)} className="p-0.5">
-                {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-              </button>
+        {colIds.map((id, i) => (
+          <td key={id} className="p-2 text-xs">
+            {i === 0 ? (
+              <div className="flex items-center gap-1.5">
+                {hasSubs && (
+                  <button onClick={() => setExpanded(!expanded)} className="p-0.5">
+                    {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                  </button>
+                )}
+                <span className="font-medium">{item.columns?.[id] || ''}</span>
+              </div>
+            ) : (
+              <span className="text-muted-foreground">{item.columns?.[id] || ''}</span>
             )}
-            <span className="font-medium">{item.name}</span>
-          </div>
-        </td>
-        {colIds.map(id => <td key={id} className="p-2 text-xs text-muted-foreground">{item.columns?.[id] || ''}</td>)}
+          </td>
+        ))}
       </tr>
       {hasSubs && expanded && item.subitems.map(sub => (
         <tr key={sub.id} className="bg-primary/5 border-b">
