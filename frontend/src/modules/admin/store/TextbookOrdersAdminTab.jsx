@@ -412,11 +412,7 @@ export default function TextbookOrdersAdminTab() {
                           {order.submitted_at ? new Date(order.submitted_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : order.created_at ? new Date(order.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-xs" data-testid={`paid-date-${order.order_id}`}>
-                          {order.paid_date ? (
-                            <span className="text-green-700 font-medium">{new Date(order.paid_date).toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
+                          <PaidDateCell orderId={order.order_id} paidDate={order.paid_date} onUpdate={fetchData} />
                         </TableCell>
                         <TableCell>
                           <Select
