@@ -240,24 +240,10 @@ class PreSaleImportService:
                 book_id = match.get("product_id", "") or match.get("book_id", "")
                 book_code = match.get("code", book_code)
                 book_name = match.get("name", book_name)
+                matched = True
             else:
-                # Auto-create inventory product for unmatched books
-                book_id = f"book_{uuid.uuid4().hex[:12]}"
-                new_product = {
-                    "book_id": book_id,
-                    "name": book_name,
-                    "code": book_code,
-                    "grade": grade,
-                    "price": price,
-                    "inventory_quantity": 0,
-                    "reserved_quantity": 0,
-                    "is_sysbook": True,
-                    "active": True,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "source": "presale_import",
-                }
-                await db.store_products.insert_one(new_product)
-                logger.info(f"[presale] Auto-created inventory product {book_id}: {book_code} - {book_name} (grade {grade})")
+                book_id = f"unmatched_{uuid.uuid4().hex[:8]}"
+                matched = False
 
             subtotal = price * quantity
             total += subtotal
@@ -272,7 +258,7 @@ class PreSaleImportService:
                 "status": "ordered",
                 "ordered_at": datetime.now(timezone.utc).isoformat(),
                 "monday_subitem_id": si_id,
-                "matched": True,
+                "matched": matched,
             })
 
         return {
