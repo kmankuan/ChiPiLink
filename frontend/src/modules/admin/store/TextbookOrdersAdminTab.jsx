@@ -373,8 +373,12 @@ export default function TextbookOrdersAdminTab() {
                       <TableHead className="hidden md:table-cell">Grade</TableHead>
                       <TableHead className="hidden md:table-cell">Items</TableHead>
                       <TableHead>Total</TableHead>
-                      <TableHead className="hidden lg:table-cell">Date</TableHead>
-                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" data-testid="sort-paid-date">Paid</TableHead>
+                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" onClick={() => handleSort('date')} data-testid="sort-date">
+                        Date {sortField === 'date' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      </TableHead>
+                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" onClick={() => handleSort('paid_date')} data-testid="sort-paid-date">
+                        Paid {sortField === 'paid_date' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      </TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-[60px] text-center">Activity</TableHead>
                       <TableHead>Actions</TableHead>
