@@ -195,6 +195,10 @@ async def _fetch_and_cache(config: dict) -> list:
                 continue
             col_values[col_id] = cv.get("text", "")
 
+        # Monday.com "name" is a special property, not in column_values
+        if col_ids and "name" in col_ids:
+            col_values["name"] = raw.get("name", "")
+
         item = {
             "id": raw["id"],
             "name": raw.get("name", ""),
