@@ -130,19 +130,20 @@ async def get_posts(
 # ---- Public Feed Preview (no auth) ----
 
 @router.get("/public/recent")
-async def get_recent_posts_public(limit: int = 5, channel_id: Optional[int] = None):
+async def get_recent_posts_public(limit: int = 5, channel_id: Optional[int] = None, offset: int = 0):
     """Public: Get latest posts for landing page preview (no auth required).
-    Groups posts with the same media_group_id into albums."""
+    Groups posts with the same media_group_id into albums.
+    Use offset to paginate for 'load older' feature."""
     query = {}
     if channel_id:
         query["channel_id"] = channel_id
     # Fetch more than limit to account for grouping
     raw_posts = await db.community_posts.find(
         query, {"_id": 0}
-    ).sort("date", -1).limit(min(limit * 3, 30)).to_list(None)
+    ).sort("date", -1).skip(offset).limit(min(limit * 3, 30)).to_list(None)
     total = await db.community_posts.count_documents(query)
     grouped = _group_posts_by_media(raw_posts)
-    return {"posts": grouped[:limit], "total": total}
+    return {"posts": grouped[:limit], "total": total, "offset": offset}
 
 
 # ---- Feed Containers (Multi-channel support) ----
