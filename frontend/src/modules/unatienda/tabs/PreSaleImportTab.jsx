@@ -50,6 +50,7 @@ export default function PreSaleImportTab({ token: propToken }) {
   const [suggestions, setSuggestions] = useState([]);
   const [confirmingId, setConfirmingId] = useState(null);
   const [unlinking, setUnlinking] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => { fetchOrders(); fetchStudents(); fetchSuggestions(); }, []);
 
