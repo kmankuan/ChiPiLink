@@ -118,8 +118,9 @@ async def get_widget_data():
     columns_to_show = config.get("columns_to_show", [])
     max_items = config.get("max_items", 10)
 
-    # Build column title mapping from board metadata
+    # Build column title mapping — live titles from board override admin config
     column_titles = config.get("column_titles", {})
+    column_titles.update(live_col_titles)
 
     return {
         "enabled": True,
