@@ -194,6 +194,76 @@ function ThresholdCell({ product, globalThreshold, onSave }) {
   );
 }
 
+/* ── Presale Cell (Editable with Confirmation) ── */
+function PresaleCell({ product, onSave }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [newValue, setNewValue] = useState('');
+  const [saving, setSaving] = useState(false);
+  const reserved = product.reserved_quantity || 0;
+
+  const handleOpen = () => { setNewValue(String(reserved)); setShowConfirm(true); };
+
+  const handleConfirm = async () => {
+    const val = parseInt(newValue);
+    if (isNaN(val) || val < 0) { toast.error('Enter a valid number'); return; }
+    if (val === reserved) { setShowConfirm(false); return; }
+    setSaving(true);
+    try {
+      await onSave(product.book_id, 'reserved_quantity', val);
+      setShowConfirm(false);
+    } catch {} finally { setSaving(false); }
+  };
+
+  return (
+    <>
+      <div onClick={handleOpen}
+        className={`cursor-pointer rounded px-2 py-1 text-center font-semibold transition-all hover:ring-2 hover:ring-primary/50
+          ${reserved > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'text-muted-foreground'}`}
+        title={`${reserved} pre-sale reserved. Click to edit.`}
+        data-testid={`presale-cell-${product.book_id}`}>
+        {reserved > 0 ? reserved : '—'}
+      </div>
+      <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Edit Pre-sale Quantity</DialogTitle>
+            <DialogDescription className="text-xs">
+              <strong>{product.name}</strong> ({product.code || '—'})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-1">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground w-16">Current:</span>
+              <span className="font-semibold text-amber-700">{reserved}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Label className="text-xs w-16">New:</Label>
+              <Input type="number" min="0" value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleConfirm(); }}
+                autoFocus className="h-8 w-24 text-center"
+                data-testid={`presale-input-${product.book_id}`} />
+            </div>
+            {parseInt(newValue) !== reserved && !isNaN(parseInt(newValue)) && (
+              <div className="text-xs text-center p-2 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-700">
+                Changing pre-sale from <strong>{reserved}</strong> to <strong>{parseInt(newValue)}</strong>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" size="sm" onClick={() => setShowConfirm(false)}>Cancel</Button>
+            <Button size="sm" onClick={handleConfirm} disabled={saving} className="gap-1"
+              data-testid={`presale-confirm-${product.book_id}`}>
+              {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 /* ── Cell Renderer ── */
 function renderCellContent(col, product, { updateProductField, onAdjustStock, globalThreshold }) {
   const bookId = product.book_id;
