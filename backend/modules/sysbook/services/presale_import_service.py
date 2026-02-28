@@ -289,6 +289,7 @@ class PreSaleImportService:
             "items": items,
             "total": total,
             "monday_item_id": monday_item_id,
+            "paid_date": paid_date,
         }
 
     async def _create_presale_order(self, parsed: Dict, monday_item_id: str, admin_user_id: str) -> Dict:
