@@ -492,6 +492,140 @@ class PreSaleImportService:
         orders = await db.store_textbook_orders.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
         return orders
 
+    async def sync_presale_to_inventory(self) -> Dict:
+        """Sync presale orders to inventory:
+        1. Aggregate all presale order items by book_code+book_name+grade
+        2. Create inventory products for unmatched books
+        3. Re-link presale order items to inventory products (update book_id + matched)
+        4. Recalculate reserved_quantity on all affected inventory products
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        orders = await db.store_textbook_orders.find(
+            {"source": "monday_import"}, {"_id": 0}
+        ).to_list(1000)
+
+        if not orders:
+            return {"created": 0, "matched": 0, "updated_orders": 0, "message": "No presale orders found"}
+
+        # Step 1: Aggregate unique books from presale items
+        # key = (book_code, book_name, grade) -> {total_qty, order_refs}
+        from collections import defaultdict
+        book_agg = defaultdict(lambda: {"total_qty": 0, "order_refs": [], "price": 0.0, "book_name": "", "book_code": "", "grade": ""})
+
+        for order in orders:
+            grade = order.get("grade", "")
+            for item in order.get("items", []):
+                code = item.get("book_code", "")
+                name = item.get("book_name", "")
+                key = f"{code}||{name}||{grade}"
+                book_agg[key]["total_qty"] += item.get("quantity_ordered", 1)
+                book_agg[key]["order_refs"].append(order["order_id"])
+                book_agg[key]["book_code"] = code
+                book_agg[key]["book_name"] = name
+                book_agg[key]["grade"] = grade
+                if item.get("price", 0) > book_agg[key]["price"]:
+                    book_agg[key]["price"] = item["price"]
+
+        created_count = 0
+        matched_count = 0
+        # Map from (code, name, grade) -> book_id for re-linking
+        book_id_map = {}
+
+        # Step 2: For each unique book, find or create inventory product
+        for key, agg in book_agg.items():
+            code = agg["book_code"]
+            name = agg["book_name"]
+            grade = agg["grade"]
+
+            # Try to find existing product by code or name
+            existing = None
+            if code:
+                existing = await db.store_products.find_one(
+                    {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
+                    {"_id": 0, "book_id": 1}
+                )
+            if not existing and name:
+                existing = await db.store_products.find_one(
+                    {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"}, "is_sysbook": True},
+                    {"_id": 0, "book_id": 1}
+                )
+
+            if existing:
+                book_id = existing["book_id"]
+                matched_count += 1
+            else:
+                # Create new inventory product
+                book_id = f"book_{uuid.uuid4().hex[:12]}"
+                product = {
+                    "book_id": book_id,
+                    "name": name,
+                    "code": code,
+                    "grade": grade,
+                    "price": agg["price"],
+                    "inventory_quantity": 0,
+                    "reserved_quantity": 0,
+                    "is_sysbook": True,
+                    "active": True,
+                    "created_at": now,
+                    "source": "presale_sync",
+                }
+                await db.store_products.insert_one(product)
+                created_count += 1
+
+            book_id_map[key] = book_id
+
+        # Step 3: Reset all reserved_quantity on sysbook products to 0, then recalculate
+        await db.store_products.update_many(
+            {"is_sysbook": True},
+            {"$set": {"reserved_quantity": 0}}
+        )
+
+        # Step 4: Re-link presale order items and recalculate reserved_quantity
+        updated_orders = 0
+        reserved_totals = defaultdict(int)
+
+        for order in orders:
+            grade = order.get("grade", "")
+            items = order.get("items", [])
+            changed = False
+
+            for item in items:
+                code = item.get("book_code", "")
+                name = item.get("book_name", "")
+                key = f"{code}||{name}||{grade}"
+                new_book_id = book_id_map.get(key)
+
+                if new_book_id:
+                    old_book_id = item.get("book_id", "")
+                    if old_book_id != new_book_id or not item.get("matched"):
+                        item["book_id"] = new_book_id
+                        item["matched"] = True
+                        changed = True
+                    reserved_totals[new_book_id] += item.get("quantity_ordered", 1)
+
+            if changed:
+                await db.store_textbook_orders.update_one(
+                    {"order_id": order["order_id"]},
+                    {"$set": {"items": items, "updated_at": now}}
+                )
+                updated_orders += 1
+
+        # Step 5: Set reserved_quantity on each product
+        for book_id, total_reserved in reserved_totals.items():
+            await db.store_products.update_one(
+                {"book_id": book_id},
+                {"$set": {"reserved_quantity": total_reserved}}
+            )
+
+        logger.info(f"[presale-sync] Created {created_count} products, matched {matched_count} existing, updated {updated_orders} orders, reserved quantities set for {len(reserved_totals)} products")
+        return {
+            "created": created_count,
+            "matched": matched_count,
+            "updated_orders": updated_orders,
+            "products_with_reservations": len(reserved_totals),
+            "total_reserved_units": sum(reserved_totals.values()),
+        }
+
     # ---- Helper methods ----
 
     def _normalize_grade(self, grade_text: str) -> str:
