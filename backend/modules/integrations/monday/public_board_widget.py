@@ -145,7 +145,7 @@ async def get_widget_data():
     }
 
 
-async def _fetch_and_cache(config: dict) -> list:
+async def _fetch_and_cache(config: dict) -> tuple:
     """Fetch board items from Monday.com and cache in DB."""
     board_id = config["board_id"]
     columns_to_show = config.get("columns_to_show", [])
