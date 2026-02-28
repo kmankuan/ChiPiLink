@@ -24,6 +24,9 @@ SYNC_TRIGGER_COL = "color_mm0mnmrs"
 # Status labels on the sync trigger column that mean "ready to import"
 SYNC_TRIGGER_LABELS = ["Ready", "ready", "Listo", "listo"]
 
+# Keywords to auto-detect the "Date Paid" column (case-insensitive match on column title/id)
+DATE_PAID_KEYWORDS = ["date_paid", "paid", "pago", "fecha_pago", "fecha_pagado", "payment_date"]
+
 
 class PreSaleImportService:
     """Import pre-sale orders from Monday.com and auto-link on registration"""
