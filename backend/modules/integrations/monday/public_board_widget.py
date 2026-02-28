@@ -74,7 +74,7 @@ async def refresh_widget_cache(admin: dict = Depends(get_admin_user)):
         if not config or not config.get("board_id"):
             return JSONResponse(content={"detail": "Widget not configured"}, status_code=400)
 
-        items = await _fetch_and_cache(config)
+        items, _ = await _fetch_and_cache(config)
         return {"status": "refreshed", "items_cached": len(items)}
     except Exception as e:
         logger.error(f"Refresh widget cache error: {e}")
