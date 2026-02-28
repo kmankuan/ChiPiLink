@@ -181,7 +181,7 @@ export default function MondayBoardWidget() {
     lang === 'es' ? 'Buscar...' : lang === 'zh' ? '搜索...' : 'Search...'
   );
 
-  const hasQuery = searchQuery.trim().length > 0;
+  const hasQuery = searchQuery.trim().length >= 3;
   const showItems = searchOnly ? hasQuery : true;
 
   return (
