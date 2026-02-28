@@ -152,10 +152,12 @@ async def _fetch_and_cache(config: dict) -> list:
     max_items = config.get("max_items", 10)
 
     # Build query — include subitems if configured
+    # Also fetch board columns for title mapping
     if show_subitems:
         query = f"""
             query {{
                 boards(ids: [{board_id}]) {{
+                    columns {{ id title }}
                     items_page(limit: {max_items + 10}) {{
                         items {{
                             id
@@ -175,8 +177,13 @@ async def _fetch_and_cache(config: dict) -> list:
         data = await monday_client.execute(query)
         boards = data.get("boards", [])
         raw_items = boards[0]["items_page"]["items"] if boards else []
+        # Build live column title map from the board
+        live_col_titles = {}
+        for col in (boards[0].get("columns", []) if boards else []):
+            live_col_titles[col["id"]] = col.get("title", col["id"])
     else:
         raw_items = await monday_client.get_board_items(board_id, limit=max_items + 10)
+        live_col_titles = {}
 
     # Filter by group if configured
     if group_filter:
