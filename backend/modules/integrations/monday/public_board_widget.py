@@ -118,14 +118,26 @@ async def get_widget_data():
     columns_to_show = config.get("columns_to_show", [])
     max_items = config.get("max_items", 10)
 
+    # Build column title mapping from board metadata
+    column_titles = config.get("column_titles", {})
+
     return {
         "enabled": True,
         "title": config.get("title", "Projects"),
         "subtitle": config.get("subtitle", ""),
+        "title_es": config.get("title_es", ""),
+        "title_zh": config.get("title_zh", ""),
+        "subtitle_es": config.get("subtitle_es", ""),
+        "subtitle_zh": config.get("subtitle_zh", ""),
+        "search_placeholder": config.get("search_placeholder", ""),
+        "search_placeholder_es": config.get("search_placeholder_es", ""),
+        "search_placeholder_zh": config.get("search_placeholder_zh", ""),
         "display_style": config.get("display_style", "cards"),
         "columns": columns_to_show,
+        "column_titles": column_titles,
         "show_subitems": config.get("show_subitems", False),
         "subitem_columns": config.get("subitem_columns_to_show", []),
+        "search_only": config.get("search_only", False),
         "items": items[:max_items],
     }
 
