@@ -55,7 +55,7 @@ export default function PackageListPreview({ order, formatConfig, isLast = false
         )}
         {order.paid_date && (
           <p className="text-xs text-gray-600">
-            Paid: {new Date(order.paid_date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+            Paid: {(() => { const [y,m,d] = (order.paid_date.slice(0,10)).split('-'); return new Date(y, m-1, d).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' }); })()}
           </p>
         )}
       </div>
