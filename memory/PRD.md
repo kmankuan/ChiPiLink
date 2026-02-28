@@ -24,6 +24,7 @@ School textbook order management platform with Monday.com integration for order 
 - **Chatbot Help Guide**: Public `/help-guide` page with structured content for chatbot training, animated GIFs
 - **Print Configuration (Feb 27, 2026)**: Configurable font family/size for thermal prints, template CRUD system (create, clone, edit, delete, activate). Moved from Sysbook to **Configuration** section in sidebar since printing is app-wide. Templates tab integrated into the existing Print & Package panel alongside Package List Format, Printer Settings, and Print History.
 - **Help Guide Editor (Feb 27, 2026)**: Dual-mode editor (structured form + raw JSON code) in Dev Control > Help Guide tab. Content stored in MongoDB, public page renders dynamically from API
+- **Presale Sync to Inventory (Feb 28, 2026)**: New `POST /api/sysbook/presale-import/sync-inventory` endpoint that auto-creates inventory products from presale order items, re-links all items to inventory (`matched: true`), and recalculates `reserved_quantity` on each product. Idempotent — safe to run multiple times. "Sync to Inventory" button added to Pre-Sale Import admin page.
 
 ### Key Files
 - `frontend/src/modules/admin/DevControlModule.jsx` — Dev Control with all admin tabs
@@ -44,6 +45,7 @@ School textbook order management platform with Monday.com integration for order 
 - `GET /api/dev-control/help-guide` — Get help guide content (admin)
 - `PUT /api/dev-control/help-guide` — Save help guide content (admin)
 - `GET /api/help-guide/content` — Public help guide content (no auth)
+- `POST /api/sysbook/presale-import/sync-inventory` — Sync presale orders to inventory (creates products, sets reserved_quantity)
 
 ### Key DB Collections
 - `print_templates` — Print template configurations
