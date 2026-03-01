@@ -755,10 +755,11 @@ class PreSaleImportService:
         return ("", name)
 
     async def _match_book(self, code: str, name: str, grade: str) -> Optional[Dict]:
-        """Try to match a book to inventory by code or name with fuzzy fallbacks"""
+        """Try to match a book to inventory by code or name.
+        IMPORTANT: Name-based matching is always grade-scoped to prevent cross-grade mismatches."""
         PROJ = {"_id": 0, "product_id": 1, "book_id": 1, "code": 1, "name": 1, "price": 1, "grade": 1}
 
-        # 1. Exact code match
+        # 1. Exact code match (code is globally unique, so no grade filter needed)
         if code:
             product = await db.store_products.find_one(
                 {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
@@ -768,7 +769,6 @@ class PreSaleImportService:
                 return product
 
             # 1b. Partial code match — code contains "/" which might be stored differently
-            # e.g., "G10/11-2" in Monday vs "G10/11-2" or "G10-11-2" in inventory
             alt_code = code.replace("/", "-")
             if alt_code != code:
                 product = await db.store_products.find_one(
@@ -778,7 +778,7 @@ class PreSaleImportService:
                 if product:
                     return product
 
-            # 1c. Try code as a prefix or contained in inventory code
+            # 1c. Try code contained in inventory code (still exact code, no grade needed)
             product = await db.store_products.find_one(
                 {"code": {"$regex": re.escape(code), "$options": "i"}, "is_sysbook": True},
                 PROJ
@@ -797,7 +797,6 @@ class PreSaleImportService:
                 )
                 if product:
                     return product
-                # Also try with / replaced by -
                 alt = extracted_code.replace("/", "-")
                 if alt != extracted_code:
                     product = await db.store_products.find_one(
@@ -807,30 +806,28 @@ class PreSaleImportService:
                     if product:
                         return product
 
-        # 3. Name-based matching (case-insensitive substring)
-        if name:
-            # Try first 30 chars
+        # 3. Name-based matching — MUST match grade to avoid cross-grade mismatches
+        if name and grade:
+            grade_filter = {"grade": {"$regex": f"^{re.escape(grade)}$", "$options": "i"}, "is_sysbook": True}
+
+            # 3a. Exact name prefix match within same grade
             products = await db.store_products.find(
-                {"name": {"$regex": re.escape(name[:30]), "$options": "i"}, "is_sysbook": True},
+                {**grade_filter, "name": {"$regex": re.escape(name[:30]), "$options": "i"}},
                 PROJ
             ).to_list(5)
             if len(products) == 1:
                 return products[0]
-            if products and grade:
-                for p in products:
-                    if grade.lower() in (p.get("grade", "") or "").lower():
-                        return p
-                return products[0]
-            if products:
-                return products[0]
+            if len(products) > 1:
+                # Pick best match by longest common prefix
+                best = max(products, key=lambda p: len(os.path.commonprefix([name.lower(), (p.get("name", "")).lower()])))
+                return best
 
-            # 4. Word-overlap fuzzy match — find products sharing significant words
+            # 3b. Word-overlap fuzzy match within same grade
             name_words = set(w.lower() for w in re.findall(r'[a-zA-Z]{3,}', name))
             if len(name_words) >= 2:
-                # Search by any significant word
                 word_regex = "|".join(re.escape(w) for w in list(name_words)[:4])
                 candidates = await db.store_products.find(
-                    {"name": {"$regex": word_regex, "$options": "i"}, "is_sysbook": True},
+                    {**grade_filter, "name": {"$regex": word_regex, "$options": "i"}},
                     PROJ
                 ).to_list(20)
                 if candidates:
@@ -843,7 +840,7 @@ class PreSaleImportService:
                         if score > best_score:
                             best_score = score
                             best = p
-                    if best and best_score >= 0.4:
+                    if best and best_score >= 0.5:
                         return best
 
         return None
