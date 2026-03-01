@@ -182,6 +182,40 @@ export default function SiteConfigModule() {
               placeholder="© 2025 Mi Tienda. Todos los derechos reservados."
             />
           </div>
+
+          <div className="space-y-3 p-3 rounded-lg border bg-muted/30">
+            <Label className="text-sm font-semibold">Landing Page Footer Tagline</Label>
+            <p className="text-xs text-muted-foreground">Displayed at the bottom of the public landing page. Supports EN / ES / ZH.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <Label className="text-xs">English</Label>
+                <Input
+                  value={config.landing_footer || ''}
+                  onChange={(e) => setConfig({ ...config, landing_footer: e.target.value })}
+                  placeholder="A dream born from Covid-19"
+                  data-testid="landing-footer-en"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Español</Label>
+                <Input
+                  value={config.landing_footer_es || ''}
+                  onChange={(e) => setConfig({ ...config, landing_footer_es: e.target.value })}
+                  placeholder="Un sueño nacido del Covid-19"
+                  data-testid="landing-footer-es"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">中文</Label>
+                <Input
+                  value={config.landing_footer_zh || ''}
+                  onChange={(e) => setConfig({ ...config, landing_footer_zh: e.target.value })}
+                  placeholder="源于新冠疫情的梦想"
+                  data-testid="landing-footer-zh"
+                />
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
