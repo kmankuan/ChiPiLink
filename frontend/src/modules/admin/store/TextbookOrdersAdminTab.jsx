@@ -174,14 +174,14 @@ function AddItemToOrder({ order, onAdded }) {
             ) : results.length > 0 ? (
               <div className="space-y-1">
                 {results.map(p => (
-                  <div key={p.book_id} className="flex items-center justify-between gap-2 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
-                    <div className="min-w-0 flex-1">
+                  <div key={p.book_id} className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
+                    <div className="min-w-0 flex-1 overflow-hidden">
                       <p className="text-xs font-medium truncate">{p.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
                     </div>
-                    <Button size="sm" variant="ghost" className="h-6 px-2 text-xs shrink-0" onClick={() => handleAdd(p)}
+                    <Button size="sm" className="h-7 w-7 min-w-[28px] p-0 shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={() => handleAdd(p)}
                       disabled={adding === p.book_id} data-testid={`add-btn-${p.book_id}`}>
-                      {adding === p.book_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                      {adding === p.book_id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                     </Button>
                   </div>
                 ))}
