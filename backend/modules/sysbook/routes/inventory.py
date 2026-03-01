@@ -28,6 +28,39 @@ class BatchStockAdjustment(BaseModel):
     adjustments: List[StockAdjustment]
 
 
+
+@router.get("/products/{book_id}/purchasers")
+async def get_product_purchasers(book_id: str, admin: dict = Depends(get_admin_user)):
+    """Get all students/users who have this book in their orders, with quantities."""
+    orders = await db.store_textbook_orders.find(
+        {"items.book_id": book_id},
+        {"_id": 0, "order_id": 1, "student_name": 1, "parent_name": 1,
+         "user_name": 1, "user_email": 1, "grade": 1, "items": 1, "status": 1, "paid_date": 1}
+    ).to_list(500)
+
+    purchasers = []
+    total_qty = 0
+    for order in orders:
+        for item in order.get("items", []):
+            if item.get("book_id") == book_id:
+                qty = item.get("quantity_ordered", 1)
+                total_qty += qty
+                purchasers.append({
+                    "order_id": order["order_id"],
+                    "student_name": order.get("student_name", ""),
+                    "parent_name": order.get("parent_name", ""),
+                    "user_name": order.get("user_name", ""),
+                    "user_email": order.get("user_email", ""),
+                    "grade": order.get("grade", ""),
+                    "quantity": qty,
+                    "status": order.get("status", ""),
+                    "paid_date": order.get("paid_date"),
+                })
+                break
+
+    return {"book_id": book_id, "total_qty": total_qty, "purchasers": purchasers}
+
+
 @router.get("/dashboard")
 async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):
     """Textbook inventory overview — PCA products only."""
