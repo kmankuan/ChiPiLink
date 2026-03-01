@@ -57,7 +57,9 @@ import {
   PrinterCheck,
   Check,
   X,
-  Trash2
+  Trash2,
+  Plus,
+  Search
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
