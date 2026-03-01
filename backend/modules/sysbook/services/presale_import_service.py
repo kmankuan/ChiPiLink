@@ -607,16 +607,18 @@ class PreSaleImportService:
             name = agg["book_name"]
             grade = agg["grade"]
 
-            # Try to find existing product by code or name
+            # Try to find existing product by code or name+grade
             existing = None
             if code:
                 existing = await db.store_products.find_one(
                     {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
                     {"_id": 0, "book_id": 1}
                 )
-            if not existing and name:
+            if not existing and name and grade:
                 existing = await db.store_products.find_one(
-                    {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"}, "is_sysbook": True},
+                    {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"},
+                     "grade": {"$regex": f"^{re.escape(grade)}$", "$options": "i"},
+                     "is_sysbook": True},
                     {"_id": 0, "book_id": 1}
                 )
 
