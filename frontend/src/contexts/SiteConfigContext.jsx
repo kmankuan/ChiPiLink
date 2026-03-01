@@ -12,7 +12,10 @@ const SiteConfigContext = createContext({
     color_secundario: '#0f766e',
     email_contacto: '',
     telefono_contacto: '',
-    footer_texto: '© 2025 Todos los derechos reservados'
+    footer_texto: '© 2025 Todos los derechos reservados',
+    landing_footer: 'A dream born from Covid-19',
+    landing_footer_es: 'Un sueño nacido del Covid-19',
+    landing_footer_zh: '源于新冠疫情的梦想'
   },
   loading: true,
   refreshConfig: () => {}
@@ -26,7 +29,10 @@ export function SiteConfigProvider({ children }) {
     color_secundario: '#0f766e',
     email_contacto: '',
     telefono_contacto: '',
-    footer_texto: '© 2025 Todos los derechos reservados'
+    footer_texto: '© 2025 Todos los derechos reservados',
+    landing_footer: 'A dream born from Covid-19',
+    landing_footer_es: 'Un sueño nacido del Covid-19',
+    landing_footer_zh: '源于新冠疫情的梦想'
   });
   const [loading, setLoading] = useState(true);
 
