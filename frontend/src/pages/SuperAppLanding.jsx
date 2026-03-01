@@ -590,23 +590,25 @@ export default function SuperAppLanding() {
 
   return (
     <div className="min-h-screen bg-background">
-      {LayoutComponent ? (
-        <LayoutComponent communityData={communityData} moduleStatuses={moduleStatuses} />
-      ) : (
-        <ClassicLayout
-          communityData={communityData}
-          moduleStatuses={moduleStatuses}
-          blocks={blocks}
-          isAdmin={isAdmin}
-          isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
-          hasChanges={hasChanges}
-          saving={saving}
-          saveAllChanges={saveAllChanges}
-          toggleBlockVisibility={toggleBlockVisibility}
-          moveBlock={moveBlock}
-        />
-      )}
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+        {LayoutComponent ? (
+          <LayoutComponent communityData={communityData} moduleStatuses={moduleStatuses} />
+        ) : (
+          <ClassicLayout
+            communityData={communityData}
+            moduleStatuses={moduleStatuses}
+            blocks={blocks}
+            isAdmin={isAdmin}
+            isEditMode={isEditMode}
+            setIsEditMode={setIsEditMode}
+            hasChanges={hasChanges}
+            saving={saving}
+            saveAllChanges={saveAllChanges}
+            toggleBlockVisibility={toggleBlockVisibility}
+            moveBlock={moveBlock}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
