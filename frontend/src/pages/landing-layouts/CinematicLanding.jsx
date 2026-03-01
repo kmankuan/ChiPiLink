@@ -29,6 +29,7 @@ const MODULES = [
 export default function CinematicLanding({ communityData, moduleStatuses }) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { siteConfig } = useSiteConfig();
   const navigate = useNavigate();
   const landingImages = useLandingImages();
   const [scrollY, setScrollY] = useState(0);
@@ -234,7 +235,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/20">ChiPi Link &mdash; Panama</p>
           <p className="text-[10px] text-white/10 tracking-wider uppercase">
-            {t('landing.footer', 'Connecting communities since 2024')}
+            {siteConfig?.landing_footer || siteConfig?.footer_texto || t('landing.footer', 'A dream born from Covid-19')}
           </p>
         </div>
       </footer>
