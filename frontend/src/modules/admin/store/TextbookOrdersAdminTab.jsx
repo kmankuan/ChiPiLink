@@ -373,6 +373,7 @@ export default function TextbookOrdersAdminTab() {
   const [archiveCount, setArchiveCount] = useState(0);
   const [sortField, setSortField] = useState(null); // 'paid_date', 'date', etc.
   const [sortDir, setSortDir] = useState('desc');
+  const [recentlyAdded, setRecentlyAdded] = useState(new Set());
 
   useEffect(() => {
     fetchData();
