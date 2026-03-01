@@ -835,6 +835,7 @@ export default function TextbookOrdersAdminTab() {
                         <TableHead className="text-xs">Book</TableHead>
                         <TableHead className="text-xs text-right">Price</TableHead>
                         <TableHead className="text-xs text-right">Qty</TableHead>
+                        <TableHead className="text-xs w-8"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -846,6 +847,9 @@ export default function TextbookOrdersAdminTab() {
                           <TableCell className="text-sm">{item.book_name}</TableCell>
                           <TableCell className="text-sm text-right font-medium">${item.price?.toFixed(2)}</TableCell>
                           <TableCell className="text-sm text-right">x{item.quantity_ordered}</TableCell>
+                          <TableCell className="p-0">
+                            <RemoveItemButton orderId={selectedOrder.order_id} item={item} onRemoved={(updatedOrder) => { setSelectedOrder(updatedOrder); fetchData(); }} />
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
