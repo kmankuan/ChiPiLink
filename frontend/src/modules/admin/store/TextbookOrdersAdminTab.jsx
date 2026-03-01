@@ -980,7 +980,10 @@ export default function TextbookOrdersAdminTab() {
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Selected Items</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-muted-foreground">Selected Items</p>
+                  <AddItemToOrder order={selectedOrder} onAdded={(updatedOrder) => { setSelectedOrder(updatedOrder); fetchData(); }} />
+                </div>
                 <ScrollArea className="h-[200px]">
                   <Table>
                     <TableHeader>
