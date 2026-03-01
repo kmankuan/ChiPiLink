@@ -92,6 +92,53 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-700',
 };
 
+function RemoveItemButton({ orderId, item, onRemoved }) {
+  const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState(false);
+
+  const handleRemove = async () => {
+    setRemoving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/items/${item.book_id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Removed "${item.book_name}" from order. Presale qty updated.`);
+        onRemoved(data.order);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to remove item');
+      }
+    } catch { toast.error('Error removing item'); }
+    finally { setRemoving(false); setConfirming(false); }
+  };
+
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-red-600 hover:text-red-800" onClick={handleRemove} disabled={removing}
+          title="Confirm remove" data-testid={`confirm-remove-${item.book_id}`}>
+          {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground" onClick={() => setConfirming(false)} title="Cancel">
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-red-600"
+      onClick={() => setConfirming(true)} title="Remove item"
+      data-testid={`remove-item-${item.book_id}`}>
+      <Trash2 className="h-3 w-3" />
+    </Button>
+  );
+}
+
 function EditableGradeField({ order, onUpdate }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(order.grade || '');
