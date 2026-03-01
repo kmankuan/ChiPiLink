@@ -93,6 +93,110 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-700',
 };
 
+function AddItemToOrder({ order, onAdded }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [adding, setAdding] = useState(null);
+  const debounceRef = useRef(null);
+
+  const doSearch = async (q) => {
+    if (q.length < 2) { setResults([]); return; }
+    setSearching(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const params = new URLSearchParams({ search: q, limit: '20' });
+      if (order.grade) params.set('grade', order.grade);
+      const res = await fetch(`${API}/api/sysbook/inventory/products?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const existingIds = new Set((order.items || []).map(i => i.book_id));
+        setResults((data.products || []).filter(p => !existingIds.has(p.book_id)));
+      }
+    } catch {} finally { setSearching(false); }
+  };
+
+  const handleSearch = (val) => {
+    setSearch(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => doSearch(val), 300);
+  };
+
+  const handleAdd = async (product) => {
+    setAdding(product.book_id);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${order.order_id}/items`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ book_id: product.book_id, quantity: 1 }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Added "${product.name}" to order`);
+        onAdded(data.order);
+        setOpen(false);
+        setSearch('');
+        setResults([]);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to add item');
+      }
+    } catch { toast.error('Error adding item'); }
+    finally { setAdding(null); }
+  };
+
+  return (
+    <>
+      <Button variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setOpen(true)} data-testid="add-item-btn">
+        <Plus className="h-3 w-3" /> Add Item
+      </Button>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSearch(''); setResults([]); } }}>
+        <DialogContent className="max-w-md max-h-[70vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Add Item to Order</DialogTitle>
+            <DialogDescription className="text-xs">
+              Search inventory{order.grade ? ` (Grade ${order.grade})` : ''} — type code or book name
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input value={search} onChange={e => handleSearch(e.target.value)} placeholder="e.g. G6-3 or Math"
+              className="pl-8 h-8 text-sm" autoFocus data-testid="add-item-search" />
+          </div>
+          <ScrollArea className="flex-1 max-h-[300px]">
+            {searching ? (
+              <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            ) : results.length > 0 ? (
+              <div className="space-y-1">
+                {results.map(p => (
+                  <div key={p.book_id} className="flex items-center justify-between gap-2 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium truncate">{p.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
+                    </div>
+                    <Button size="sm" variant="ghost" className="h-6 px-2 text-xs shrink-0" onClick={() => handleAdd(p)}
+                      disabled={adding === p.book_id} data-testid={`add-btn-${p.book_id}`}>
+                      {adding === p.book_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : search.length >= 2 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No products found</p>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-4">Type at least 2 characters to search</p>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 function RemoveItemButton({ orderId, item, onRemoved }) {
   const [confirming, setConfirming] = useState(false);
   const [removing, setRemoving] = useState(false);
