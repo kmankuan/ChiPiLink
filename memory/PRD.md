@@ -37,6 +37,7 @@ School textbook order management platform with Monday.com integration for order 
 
 ### Completed (Mar 1, 2026)
 - **Add Item to Order (Mar 1, 2026)**: Admin can add inventory products to existing orders via a search dialog in the order details panel. Search is filtered by order's grade, excludes already-added items, and auto-updates `reserved_quantity` on the product. Backend: `POST /api/sysbook/orders/admin/{order_id}/items`. Frontend: `AddItemToOrder` component in `TextbookOrdersAdminTab.jsx`. Tested: 14/14 backend + all frontend flows passed.
+- **Recently Added Badge (Mar 1, 2026)**: Newly added items in the order details dialog show a green "NEW" badge and subtle emerald row highlight. Badge is session-scoped — clears when the dialog is closed. Helps admins quickly distinguish newly added items from original order items.
 
 ### Key Files
 - `frontend/src/modules/admin/store/TextbookOrdersAdminTab.jsx` — Order management with add/remove item, editable grade, paid date
