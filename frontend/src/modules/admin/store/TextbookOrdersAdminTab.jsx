@@ -206,7 +206,7 @@ function RemoveItemButton({ orderId, item, onRemoved }) {
     setRemoving(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/items/${item.book_id}`, {
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/items/${encodeURIComponent(item.book_id)}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
