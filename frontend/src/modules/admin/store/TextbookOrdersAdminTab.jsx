@@ -156,7 +156,7 @@ function AddItemToOrder({ order, onAdded }) {
         <Plus className="h-3 w-3" /> Add Item
       </Button>
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSearch(''); setResults([]); } }}>
-        <DialogContent className="max-w-md max-h-[70vh] flex flex-col">
+        <DialogContent className="max-w-md max-h-[70vh] flex flex-col overflow-visible">
           <DialogHeader>
             <DialogTitle className="text-sm">Add Item to Order</DialogTitle>
             <DialogDescription className="text-xs">
