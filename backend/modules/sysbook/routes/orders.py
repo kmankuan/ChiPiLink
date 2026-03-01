@@ -411,6 +411,55 @@ async def update_order_grade(
 
 
 
+@router.delete("/admin/{order_id}/items/{book_id}")
+async def remove_order_item(
+    order_id: str,
+    book_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Remove an item from an order and decrement reserved_quantity on the inventory product"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    now = datetime.now(timezone.utc).isoformat()
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    items = order.get("items", [])
+    removed = None
+    new_items = []
+    for item in items:
+        if item.get("book_id") == book_id and removed is None:
+            removed = item
+        else:
+            new_items.append(item)
+
+    if not removed:
+        raise HTTPException(status_code=404, detail="Item not found in order")
+
+    # Decrement reserved_quantity on the inventory product
+    qty = removed.get("quantity_ordered", 1)
+    if removed.get("matched") and book_id and not book_id.startswith("unmatched_"):
+        await db.store_products.update_one(
+            {"book_id": book_id},
+            {"$inc": {"reserved_quantity": -qty}}
+        )
+
+    # Recalculate total
+    new_total = sum(i.get("price", 0) * i.get("quantity_ordered", 1) for i in new_items)
+
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"items": new_items, "total_amount": new_total, "updated_at": now}}
+    )
+
+    # Return updated order
+    updated = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    return {"status": "ok", "removed_book": removed.get("book_name"), "order": updated}
+
+
+
 @router.put("/admin/{order_id}/items/{book_id}/approve-reorder")
 async def approve_reorder(
     order_id: str,
