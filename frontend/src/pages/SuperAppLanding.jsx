@@ -29,15 +29,15 @@ import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 
-// Layout components
-import BentoGridLanding from './landing-layouts/BentoGridLanding';
-import TabHubLanding from './landing-layouts/TabHubLanding';
-import SocialFeedLanding from './landing-layouts/SocialFeedLanding';
-import MagazineLanding from './landing-layouts/MagazineLanding';
-import LivingGridLanding from './landing-layouts/LivingGridLanding';
-import CinematicLanding from './landing-layouts/CinematicLanding';
-import HorizonLanding from './landing-layouts/HorizonLanding';
-import MosaicCommunityLanding from './landing-layouts/MosaicCommunityLanding';
+// Layout components — lazy loaded (only active layout is fetched)
+const BentoGridLanding = lazy(() => import('./landing-layouts/BentoGridLanding'));
+const TabHubLanding = lazy(() => import('./landing-layouts/TabHubLanding'));
+const SocialFeedLanding = lazy(() => import('./landing-layouts/SocialFeedLanding'));
+const MagazineLanding = lazy(() => import('./landing-layouts/MagazineLanding'));
+const LivingGridLanding = lazy(() => import('./landing-layouts/LivingGridLanding'));
+const CinematicLanding = lazy(() => import('./landing-layouts/CinematicLanding'));
+const HorizonLanding = lazy(() => import('./landing-layouts/HorizonLanding'));
+const MosaicCommunityLanding = lazy(() => import('./landing-layouts/MosaicCommunityLanding'));
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
