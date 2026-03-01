@@ -825,6 +825,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
           aVal = (a.inventory_quantity || 0) - (a.reserved_quantity || 0);
           bVal = (b.inventory_quantity || 0) - (b.reserved_quantity || 0);
         } else if (sortConfig.key === 'presale') { aVal = a.reserved_quantity || 0; bVal = b.reserved_quantity || 0; }
+        else if (sortConfig.key === 'purchased') { aVal = purchasedSummary[a.book_id]?.qty || 0; bVal = purchasedSummary[b.book_id]?.qty || 0; }
         else if (sortConfig.key === 'status') { aVal = a.active !== false ? 1 : 0; bVal = b.active !== false ? 1 : 0; }
         else { aVal = (a[sortConfig.key] || '').toString().toLowerCase(); bVal = (b[sortConfig.key] || '').toString().toLowerCase(); }
         if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
