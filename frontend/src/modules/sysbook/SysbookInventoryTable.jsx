@@ -448,7 +448,7 @@ function SysbookTable({ products, columns, columnWidths, onResize, sortConfig, o
                 <td key={col.key}
                   className={`p-1 ${col.sticky ? 'sticky left-0 z-10 bg-background border-r' : ''} ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
                   style={{ width: `${columnWidths[col.key] || col.width}px`, minWidth: `${columnWidths[col.key] || col.width}px` }}>
-                  {renderCellContent(col, p, { updateProductField, onAdjustStock, globalThreshold })}
+                  {renderCellContent(col, p, { updateProductField, onAdjustStock, globalThreshold, purchasedSummary })}
                 </td>
               ))}
               <td className="p-1 text-right" style={{ width: `${columnWidths.actions || 80}px` }}>
