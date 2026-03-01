@@ -386,6 +386,8 @@ function renderCellContent(col, product, { updateProductField, onAdjustStock, gl
       return <ThresholdCell product={product} globalThreshold={globalThreshold} onSave={updateProductField} />;
     case 'presale':
       return <PresaleCell product={product} onSave={updateProductField} />;
+    case 'purchased':
+      return <PurchasedCell product={product} purchasedData={helpers?.purchasedSummary?.[product.book_id]} />;
     case 'status':
       return (
         <Badge variant={product.active !== false ? "default" : "secondary"} className="cursor-pointer"
