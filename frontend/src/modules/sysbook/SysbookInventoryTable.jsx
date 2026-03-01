@@ -768,14 +768,21 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
       let url = `${API_PREFIX}/products?limit=500`;
       if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
       if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-      const data = await res.json();
+      const [prodRes, purchRes] = await Promise.all([
+        fetch(url, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_PREFIX}/purchased-summary`, { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      const data = await prodRes.json();
       const all = data.products || [];
       setProducts(all);
       setFilters({
         grades: [...new Set(all.map(p => p.grade).filter(Boolean))].sort(),
         subjects: [...new Set(all.map(p => p.subject).filter(Boolean))].sort(),
       });
+      if (purchRes.ok) {
+        const ps = await purchRes.json();
+        setPurchasedSummary(ps);
+      }
     } catch { toast.error('Error loading inventory'); }
     finally { setLoading(false); }
   };
