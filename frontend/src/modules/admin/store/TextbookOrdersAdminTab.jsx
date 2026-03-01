@@ -174,12 +174,10 @@ function AddItemToOrder({ order, onAdded }) {
             ) : results.length > 0 ? (
               <div className="space-y-1">
                 {results.map(p => (
-                  <div key={p.book_id} className="flex items-center gap-2 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
-                    <div className="min-w-0 flex-1 overflow-hidden">
-                      <p className="text-xs font-medium truncate">{p.name}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
-                    </div>
-                    <Button size="sm" className="h-7 w-7 min-w-[28px] p-0 shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={() => handleAdd(p)}
+                  <div key={p.book_id} className="relative pr-10 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
+                    <p className="text-xs font-medium truncate">{p.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
+                    <Button size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 min-w-[28px] p-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={() => handleAdd(p)}
                       disabled={adding === p.book_id} data-testid={`add-btn-${p.book_id}`}>
                       {adding === p.book_id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                     </Button>
