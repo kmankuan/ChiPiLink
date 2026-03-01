@@ -90,6 +90,61 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-700',
 };
 
+function EditableGradeField({ order, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(order.grade || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    const newGrade = value.trim();
+    if (!newGrade || newGrade === order.grade) { setEditing(false); return; }
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${order.order_id}/grade`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade: newGrade }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Grade updated to ${newGrade}. ${data.products_relinked || 0} items re-linked to inventory.`);
+        onUpdate({ ...order, grade: newGrade });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to update grade');
+      }
+    } catch { toast.error('Error updating grade'); }
+    finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <Input value={value} onChange={e => setValue(e.target.value)} className="h-7 w-20 text-sm"
+          autoFocus onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false); }}
+          data-testid={`grade-input-${order.order_id}`} />
+        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-green-600" onClick={handleSave} disabled={saving}
+          data-testid={`grade-save-${order.order_id}`}>
+          {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground" onClick={() => setEditing(false)}>
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <span onClick={() => { setValue(order.grade || ''); setEditing(true); }}
+      className="font-medium cursor-pointer rounded px-1.5 py-0.5 hover:bg-accent hover:ring-1 hover:ring-primary/30 transition-colors"
+      title="Click to edit grade"
+      data-testid={`grade-display-${order.order_id}`}>
+      {order.grade || '—'}
+    </span>
+  );
+}
+
 function PaidDateCell({ orderId, paidDate, onUpdate }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(paidDate ? paidDate.slice(0, 10) : '');
