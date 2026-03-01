@@ -982,7 +982,12 @@ export default function TextbookOrdersAdminTab() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-muted-foreground">Selected Items</p>
-                  <AddItemToOrder order={selectedOrder} onAdded={(updatedOrder) => { setSelectedOrder(updatedOrder); fetchData(); }} />
+                  <AddItemToOrder order={selectedOrder} onAdded={(updatedOrder) => {
+                    const oldIds = new Set((selectedOrder.items || []).map(i => i.book_id));
+                    const newItem = (updatedOrder.items || []).find(i => !oldIds.has(i.book_id));
+                    if (newItem) setRecentlyAdded(prev => new Set([...prev, newItem.book_id]));
+                    setSelectedOrder(updatedOrder); fetchData();
+                  }} />
                 </div>
                 <ScrollArea className="h-[200px]">
                   <Table>
