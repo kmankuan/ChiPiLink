@@ -346,6 +346,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
                 <img
                   src={post.imagen_portada || img.mosaic_gathering}
                   alt={post.titulo}
+                  loading="lazy"
                   className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
