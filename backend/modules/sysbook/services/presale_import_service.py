@@ -788,6 +788,11 @@ class PreSaleImportService:
             if product:
                 return product
 
+            # Code exists but no match found — DO NOT fall through to fuzzy name matching
+            # This prevents cross-grade mismatches. Caller will auto-create a new product.
+            return None
+
+        # FALLBACK: Only used when no code is available
         # 2. Try extracting a code-like pattern from the name itself
         if not code and name:
             code_in_name = re.match(r'^([A-Za-z]\d+[/\-]?\d*[/\-]\d+)', name)
