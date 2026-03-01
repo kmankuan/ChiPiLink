@@ -373,7 +373,12 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <p className="text-xs font-bold tracking-tight" style={{ color: '#c4b5a0' }}>ChiPi Link</p>
           <p className="text-[10px] tracking-wider uppercase" style={{ color: '#d4c5b0' }}>
-            {siteConfig?.landing_footer || siteConfig?.footer_texto || t('landing.footer', 'A dream born from Covid-19')}
+            {(() => {
+              const lang = t('locale', 'en');
+              if (lang === 'es' && siteConfig?.landing_footer_es) return siteConfig.landing_footer_es;
+              if (lang === 'zh' && siteConfig?.landing_footer_zh) return siteConfig.landing_footer_zh;
+              return siteConfig?.landing_footer || t('landing.footer', 'A dream born from Covid-19');
+            })()}
           </p>
         </div>
       </footer>

@@ -235,7 +235,12 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/20">ChiPi Link &mdash; Panama</p>
           <p className="text-[10px] text-white/10 tracking-wider uppercase">
-            {siteConfig?.landing_footer || siteConfig?.footer_texto || t('landing.footer', 'A dream born from Covid-19')}
+            {(() => {
+              const lang = t('locale', 'en');
+              if (lang === 'es' && siteConfig?.landing_footer_es) return siteConfig.landing_footer_es;
+              if (lang === 'zh' && siteConfig?.landing_footer_zh) return siteConfig.landing_footer_zh;
+              return siteConfig?.landing_footer || t('landing.footer', 'A dream born from Covid-19');
+            })()}
           </p>
         </div>
       </footer>
