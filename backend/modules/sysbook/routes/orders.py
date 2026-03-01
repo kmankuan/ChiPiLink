@@ -458,6 +458,61 @@ async def remove_order_item(
     updated = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
     return {"status": "ok", "removed_book": removed.get("book_name"), "order": updated}
 
+@router.post("/admin/{order_id}/items")
+async def add_order_item(
+    order_id: str,
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Add an item to an order from inventory and increment reserved_quantity"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    book_id = data.get("book_id")
+    quantity = data.get("quantity", 1)
+    if not book_id:
+        raise HTTPException(status_code=400, detail="book_id is required")
+
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    product = await db.store_products.find_one({"book_id": book_id, "is_sysbook": True}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found in inventory")
+
+    now = datetime.now(timezone.utc).isoformat()
+    new_item = {
+        "book_id": book_id,
+        "book_code": product.get("code", ""),
+        "book_name": product.get("name", ""),
+        "price": product.get("price", 0),
+        "quantity_ordered": quantity,
+        "max_quantity": quantity,
+        "status": "ordered",
+        "ordered_at": now,
+        "matched": True,
+    }
+
+    items = order.get("items", [])
+    items.append(new_item)
+    new_total = sum(i.get("price", 0) * i.get("quantity_ordered", 1) for i in items)
+
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"items": items, "total_amount": new_total, "updated_at": now}}
+    )
+
+    # Increment reserved_quantity
+    await db.store_products.update_one(
+        {"book_id": book_id},
+        {"$inc": {"reserved_quantity": quantity}}
+    )
+
+    updated = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    return {"status": "ok", "added_book": product.get("name"), "order": updated}
+
+
 
 
 @router.put("/admin/{order_id}/items/{book_id}/approve-reorder")
