@@ -61,6 +61,23 @@ async def get_product_purchasers(book_id: str, admin: dict = Depends(get_admin_u
     return {"book_id": book_id, "total_qty": total_qty, "purchasers": purchasers}
 
 
+@router.get("/purchased-summary")
+async def get_purchased_summary(admin: dict = Depends(get_admin_user)):
+    """Get total purchased quantity per book_id across all orders."""
+    pipeline = [
+        {"$unwind": "$items"},
+        {"$group": {
+            "_id": "$items.book_id",
+            "total_qty": {"$sum": "$items.quantity_ordered"},
+            "order_count": {"$sum": 1},
+        }},
+    ]
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(5000)
+    summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
+    return summary
+
+
+
 @router.get("/dashboard")
 async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):
     """Textbook inventory overview — PCA products only."""
