@@ -265,6 +265,100 @@ function PresaleCell({ product, onSave }) {
   );
 }
 
+/* ── Purchased Cell (Clickable, opens purchasers dialog) ── */
+function PurchasedCell({ product, purchasedData }) {
+  const [showDialog, setShowDialog] = useState(false);
+  const [purchasers, setPurchasers] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const qty = purchasedData?.qty || 0;
+  const orderCount = purchasedData?.orders || 0;
+
+  const fetchPurchasers = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API_PREFIX}/products/${product.book_id}/purchasers`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPurchasers(data.purchasers || []);
+      }
+    } catch {} finally { setLoading(false); }
+  };
+
+  const handleClick = () => {
+    if (qty === 0) return;
+    setShowDialog(true);
+    if (!purchasers) fetchPurchasers();
+  };
+
+  return (
+    <>
+      <div onClick={handleClick}
+        className={`rounded px-2 py-1 text-center font-semibold transition-all
+          ${qty > 0 ? 'cursor-pointer bg-blue-100 text-blue-700 dark:bg-blue-900/30 hover:ring-2 hover:ring-blue-400/50' : 'text-muted-foreground'}`}
+        title={qty > 0 ? `${qty} purchased in ${orderCount} orders. Click for details.` : 'No purchases'}
+        data-testid={`purchased-cell-${product.book_id}`}>
+        {qty > 0 ? qty : '—'}
+      </div>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Purchased: {product.name}</DialogTitle>
+            <DialogDescription className="text-xs">
+              {product.code || ''} · Grade {product.grade || '—'} · {qty} units in {orderCount} orders
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            ) : purchasers && purchasers.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 sticky top-0">
+                  <tr>
+                    <th className="text-left p-2 text-xs font-semibold">Student</th>
+                    <th className="text-left p-2 text-xs font-semibold">Parent/User</th>
+                    <th className="text-center p-2 text-xs font-semibold">Grade</th>
+                    <th className="text-center p-2 text-xs font-semibold">Qty</th>
+                    <th className="text-center p-2 text-xs font-semibold">Paid</th>
+                    <th className="text-center p-2 text-xs font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {purchasers.map((p, i) => (
+                    <tr key={i} className="border-b hover:bg-muted/30">
+                      <td className="p-2 text-xs font-medium">{p.student_name || '—'}</td>
+                      <td className="p-2 text-xs text-muted-foreground">{p.parent_name || p.user_name || p.user_email || '—'}</td>
+                      <td className="p-2 text-xs text-center">{p.grade || '—'}</td>
+                      <td className="p-2 text-xs text-center font-semibold">{p.quantity}</td>
+                      <td className="p-2 text-xs text-center">
+                        {p.paid_date ? (() => { const [y,m,d] = p.paid_date.slice(0,10).split('-'); return new Date(y,m-1,d).toLocaleDateString('en',{month:'short',day:'numeric'}); })() : '—'}
+                      </td>
+                      <td className="p-2 text-xs text-center">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium
+                          ${p.status === 'submitted' ? 'bg-blue-100 text-blue-700' :
+                            p.status === 'ready' ? 'bg-green-100 text-green-700' :
+                            p.status === 'awaiting_link' ? 'bg-orange-100 text-orange-700' :
+                            'bg-gray-100 text-gray-700'}`}>
+                          {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No purchasers found</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 /* ── Cell Renderer ── */
 function renderCellContent(col, product, { updateProductField, onAdjustStock, globalThreshold }) {
   const bookId = product.book_id;
