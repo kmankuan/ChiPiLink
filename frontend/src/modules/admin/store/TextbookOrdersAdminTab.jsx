@@ -156,7 +156,7 @@ function AddItemToOrder({ order, onAdded }) {
         <Plus className="h-3 w-3" /> Add Item
       </Button>
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSearch(''); setResults([]); } }}>
-        <DialogContent className="max-w-md max-h-[70vh] flex flex-col overflow-visible">
+        <DialogContent className="max-w-md max-h-[70vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-sm">Add Item to Order</DialogTitle>
             <DialogDescription className="text-xs">
@@ -168,16 +168,18 @@ function AddItemToOrder({ order, onAdded }) {
             <Input value={search} onChange={e => handleSearch(e.target.value)} placeholder="e.g. G6-3 or Math"
               className="pl-8 h-8 text-sm" autoFocus data-testid="add-item-search" />
           </div>
-          <ScrollArea className="flex-1 max-h-[300px] overflow-hidden">
+          <div className="flex-1 overflow-y-auto" style={{ maxHeight: 300 }}>
             {searching ? (
               <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
             ) : results.length > 0 ? (
               <div className="space-y-1">
                 {results.map(p => (
-                  <div key={p.book_id} className="relative pr-10 p-2 rounded hover:bg-muted/50 border-b" data-testid={`search-result-${p.book_id}`}>
-                    <p className="text-xs font-medium truncate">{p.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
-                    <Button size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 min-w-[28px] p-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={() => handleAdd(p)}
+                  <div key={p.book_id} className="grid grid-cols-[1fr_36px] items-center gap-2 p-2 rounded hover:bg-muted/50 border-b cursor-pointer" onClick={() => !adding && handleAdd(p)} data-testid={`search-result-${p.book_id}`}>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium truncate">{p.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
+                    </div>
+                    <Button size="sm" className="h-8 w-8 p-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={(e) => { e.stopPropagation(); handleAdd(p); }}
                       disabled={adding === p.book_id} data-testid={`add-btn-${p.book_id}`}>
                       {adding === p.book_id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                     </Button>
@@ -189,7 +191,7 @@ function AddItemToOrder({ order, onAdded }) {
             ) : (
               <p className="text-xs text-muted-foreground text-center py-4">Type at least 2 characters to search</p>
             )}
-          </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
     </>
