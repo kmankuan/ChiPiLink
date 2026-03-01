@@ -755,7 +755,7 @@ export default function TextbookOrdersAdminTab() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Grade</p>
-                  <p className="font-medium">{selectedOrder.grade}</p>
+                  <EditableGradeField order={selectedOrder} onUpdate={(updated) => { setSelectedOrder(updated); fetchData(); }} />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">User</p>
