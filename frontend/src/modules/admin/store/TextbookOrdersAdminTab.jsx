@@ -54,7 +54,9 @@ import {
   MessageCircle,
   Printer,
   Link2,
-  PrinterCheck
+  PrinterCheck,
+  Check,
+  X
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
