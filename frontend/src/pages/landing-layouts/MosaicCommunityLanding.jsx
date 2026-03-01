@@ -294,6 +294,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
                     <img
                       src={post.imagen_portada || img.mosaic_culture}
                       alt={post.titulo}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {post.categoria && (
