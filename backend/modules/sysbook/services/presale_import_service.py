@@ -818,8 +818,8 @@ class PreSaleImportService:
             if len(products) == 1:
                 return products[0]
             if len(products) > 1:
-                # Pick best match by longest common prefix
-                best = max(products, key=lambda p: len(os.path.commonprefix([name.lower(), (p.get("name", "")).lower()])))
+                # Pick best match by name similarity
+                best = min(products, key=lambda p: abs(len(name) - len(p.get("name", ""))))
                 return best
 
             # 3b. Word-overlap fuzzy match within same grade
