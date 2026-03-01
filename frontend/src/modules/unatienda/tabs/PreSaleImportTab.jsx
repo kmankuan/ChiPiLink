@@ -195,44 +195,51 @@ export default function PreSaleImportTab({ token: propToken }) {
 
   const handleImport = async () => {
     setImporting(true);
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout for large imports
-      const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: previewData?.items || [] }),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.errors > 0) {
-          toast.warning(`Imported ${data.imported} orders, ${data.skipped} skipped, ${data.errors} failed. Check logs or retry for remaining items.`, { duration: 8000 });
-        } else {
-          toast.success(`Imported ${data.imported} orders${data.skipped ? ` (${data.skipped} skipped)` : ''}`);
+    let lastError = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        if (attempt > 0) {
+          toast.info(`Retrying import (attempt ${attempt + 1}/3)...`);
+          await new Promise(r => setTimeout(r, attempt * 3000));
         }
-        setShowPreview(false);
-        setPreviewData(null);
-        fetchOrders();
-      } else {
-        let errMsg = `Import failed (HTTP ${res.status})`;
-        try {
-          const err = await res.json();
-          errMsg = err.detail || errMsg;
-        } catch { /* non-JSON response body */ }
-        toast.error(errMsg);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
+        const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: previewData?.items || [] }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.errors > 0) {
+            toast.warning(`Imported ${data.imported} orders, ${data.skipped} skipped, ${data.errors} failed. Check logs or retry for remaining items.`, { duration: 8000 });
+          } else {
+            toast.success(`Imported ${data.imported} orders${data.skipped ? ` (${data.skipped} skipped)` : ''}`);
+          }
+          setShowPreview(false);
+          setPreviewData(null);
+          fetchOrders();
+          setImporting(false);
+          return;
+        } else {
+          lastError = `HTTP ${res.status}`;
+          try { const err = await res.json(); lastError = err.detail || lastError; } catch {}
+          if (res.status >= 500 && attempt < 2) continue;
+          toast.error(lastError);
+          setImporting(false);
+          return;
+        }
+      } catch (error) {
+        lastError = error.name === 'AbortError' ? 'Request timed out' : (error.message || 'Connection error');
+        console.error(`Import attempt ${attempt + 1} failed:`, error);
+        if (attempt === 2) {
+          toast.error(`Import failed after 3 attempts: ${lastError}. Please try again.`);
+        }
       }
-    } catch (error) {
-      console.error('Import execution error:', error);
-      if (error.name === 'AbortError') {
-        toast.error('Import timed out — the operation took too long. Try importing fewer items or retry.');
-      } else {
-        toast.error('Error executing import: ' + (error.message || 'Network error'));
-      }
-    } finally {
-      setImporting(false);
     }
+    setImporting(false);
   };
 
   const handleManualLink = async (order, student) => {
