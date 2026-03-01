@@ -319,6 +319,98 @@ async def update_paid_date(
 
 
 
+@router.put("/admin/{order_id}/grade")
+async def update_order_grade(
+    order_id: str,
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update grade on an order and re-link items to correct inventory products"""
+    import re
+    from core.database import db
+    from datetime import datetime, timezone
+
+    new_grade = (data.get("grade") or "").strip()
+    if not new_grade:
+        raise HTTPException(status_code=400, detail="Grade is required")
+
+    now = datetime.now(timezone.utc).isoformat()
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    old_grade = order.get("grade", "")
+    products_relinked = 0
+
+    # Decrement reserved_quantity on old products
+    for item in order.get("items", []):
+        if item.get("matched") and item.get("book_id"):
+            qty = item.get("quantity_ordered", 1)
+            await db.store_products.update_one(
+                {"book_id": item["book_id"]},
+                {"$inc": {"reserved_quantity": -qty}}
+            )
+
+    # Re-link each item to a product with the new grade
+    items = order.get("items", [])
+    for item in items:
+        code = item.get("book_code", "")
+        name = item.get("book_name", "")
+        qty = item.get("quantity_ordered", 1)
+
+        # Find product matching code+grade or name+grade
+        existing = None
+        if code:
+            existing = await db.store_products.find_one(
+                {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "grade": new_grade, "is_sysbook": True},
+                {"_id": 0, "book_id": 1}
+            )
+        if not existing and name:
+            existing = await db.store_products.find_one(
+                {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"}, "grade": new_grade, "is_sysbook": True},
+                {"_id": 0, "book_id": 1}
+            )
+
+        if existing:
+            item["book_id"] = existing["book_id"]
+            item["matched"] = True
+        else:
+            # Create new product for this grade
+            import uuid
+            new_book_id = f"book_{uuid.uuid4().hex[:12]}"
+            await db.store_products.insert_one({
+                "book_id": new_book_id,
+                "name": name,
+                "code": code,
+                "grade": new_grade,
+                "price": item.get("price", 0),
+                "inventory_quantity": 0,
+                "reserved_quantity": 0,
+                "is_sysbook": True,
+                "active": True,
+                "created_at": now,
+                "source": "grade_change",
+            })
+            item["book_id"] = new_book_id
+            item["matched"] = True
+
+        # Increment reserved_quantity on new product
+        await db.store_products.update_one(
+            {"book_id": item["book_id"]},
+            {"$inc": {"reserved_quantity": qty}}
+        )
+        products_relinked += 1
+
+    # Update order
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"grade": new_grade, "items": items, "updated_at": now}}
+    )
+
+    return {"status": "ok", "grade": new_grade, "old_grade": old_grade, "products_relinked": products_relinked}
+
+
+
 @router.put("/admin/{order_id}/items/{book_id}/approve-reorder")
 async def approve_reorder(
     order_id: str,
