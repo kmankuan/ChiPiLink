@@ -139,6 +139,7 @@ const HeroCarousel = ({ posts }) => {
         src={currentPost.imagen_portada || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200'}
         alt={currentPost.titulo}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        fetchpriority="high"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
@@ -196,6 +197,7 @@ const NewsCard = ({ post }) => {
         src={post.imagen_portada || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400'}
         alt={post.titulo}
         className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+        loading="lazy"
       />
     </button>
   );
@@ -239,6 +241,7 @@ const GalleryCard = ({ album }) => {
         src={album.portada || album.imagenes?.[0]?.url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
         alt={album.titulo}
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
