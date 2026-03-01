@@ -360,7 +360,8 @@ function PurchasedCell({ product, purchasedData }) {
 }
 
 /* ── Cell Renderer ── */
-function renderCellContent(col, product, { updateProductField, onAdjustStock, globalThreshold }) {
+function renderCellContent(col, product, helpers) {
+  const { updateProductField, onAdjustStock, globalThreshold } = helpers;
   const bookId = product.book_id;
   switch (col.key) {
     case 'price':
