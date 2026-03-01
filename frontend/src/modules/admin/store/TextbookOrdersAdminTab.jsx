@@ -948,7 +948,7 @@ export default function TextbookOrdersAdminTab() {
       )}
 
       {/* Order Details Dialog */}
-      <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
+      <Dialog open={showOrderDialog} onOpenChange={(v) => { setShowOrderDialog(v); if (!v) setRecentlyAdded(new Set()); }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Order Details</DialogTitle>
