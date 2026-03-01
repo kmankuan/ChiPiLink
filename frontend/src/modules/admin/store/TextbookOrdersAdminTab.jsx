@@ -1002,11 +1002,18 @@ export default function TextbookOrdersAdminTab() {
                     </TableHeader>
                     <TableBody>
                       {selectedOrder.items?.filter(i => i.quantity_ordered > 0).map((item) => (
-                        <TableRow key={item.book_id}>
+                        <TableRow key={item.book_id} className={recentlyAdded.has(item.book_id) ? 'bg-emerald-50/70 animate-in fade-in duration-500' : ''}>
                           <TableCell className="text-xs font-mono text-muted-foreground" data-testid={`item-code-${item.book_id}`}>
                             {item.book_code || '-'}
                           </TableCell>
-                          <TableCell className="text-sm">{item.book_name}</TableCell>
+                          <TableCell className="text-sm">
+                            <span className="flex items-center gap-1.5">
+                              {item.book_name}
+                              {recentlyAdded.has(item.book_id) && (
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 bg-emerald-100 text-emerald-700 border-emerald-300 font-semibold shrink-0" data-testid={`new-badge-${item.book_id}`}>NEW</Badge>
+                              )}
+                            </span>
+                          </TableCell>
                           <TableCell className="text-sm text-right font-medium">${item.price?.toFixed(2)}</TableCell>
                           <TableCell className="text-sm text-right">x{item.quantity_ordered}</TableCell>
                           <TableCell className="p-0">
