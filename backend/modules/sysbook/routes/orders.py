@@ -499,7 +499,7 @@ async def add_order_item(
 
     items = order.get("items", [])
     items.append(new_item)
-    new_total = sum(i.get("price", 0) * i.get("quantity_ordered", 1) for i in items)
+    new_total = sum((i.get("price") or 0) * (i.get("quantity_ordered") or 1) for i in items)
 
     await db.store_textbook_orders.update_one(
         {"order_id": order_id},
