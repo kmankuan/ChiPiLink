@@ -58,8 +58,7 @@ import {
   Check,
   X,
   Trash2,
-  Plus,
-  Search
+  Plus
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
