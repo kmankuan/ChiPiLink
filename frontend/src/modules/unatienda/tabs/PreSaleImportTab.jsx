@@ -151,27 +151,46 @@ export default function PreSaleImportTab({ token: propToken }) {
 
   const handlePreview = async () => {
     setPreviewing(true);
-    try {
-      const res = await fetch(`${API}/api/sysbook/presale-import/preview`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setPreviewData(data);
-        setShowPreview(true);
-        if (data.count === 0) {
-          toast.info('No items ready for import. Set the sync trigger column on Monday.com to "Ready" or "Listo" first.');
+    let lastError = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        if (attempt > 0) {
+          toast.info(`Retrying preview (attempt ${attempt + 1}/3)...`);
+          await new Promise(r => setTimeout(r, attempt * 2000));
         }
-      } else {
-        const err = await res.json();
-        toast.error(err.detail || 'Preview failed');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
+        const res = await fetch(`${API}/api/sysbook/presale-import/preview`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          setPreviewData(data);
+          setShowPreview(true);
+          if (data.count === 0) {
+            toast.info('No items ready for import. Set the sync trigger column on Monday.com to "Ready" or "Listo" first.');
+          }
+          setPreviewing(false);
+          return;
+        } else {
+          const err = await res.json().catch(() => ({}));
+          lastError = err.detail || `HTTP ${res.status}`;
+          if (res.status >= 500 && attempt < 2) continue;
+          toast.error(lastError);
+          setPreviewing(false);
+          return;
+        }
+      } catch (error) {
+        lastError = error.name === 'AbortError' ? 'Request timed out' : 'Connection error';
+        console.error(`Preview attempt ${attempt + 1} failed:`, error);
+        if (attempt === 2) {
+          toast.error(`Preview failed after 3 attempts: ${lastError}. The Monday.com API may be slow — please try again.`);
+        }
       }
-    } catch (error) {
-      console.error('Preview import error:', error);
-      toast.error('Error connecting to server. Please try again.');
-    } finally {
-      setPreviewing(false);
     }
+    setPreviewing(false);
   };
 
   const handleImport = async () => {
