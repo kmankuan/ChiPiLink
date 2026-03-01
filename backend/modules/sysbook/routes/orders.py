@@ -438,16 +438,19 @@ async def remove_order_item(
     if not removed:
         raise HTTPException(status_code=404, detail="Item not found in order")
 
-    # Decrement reserved_quantity on the inventory product
-    qty = removed.get("quantity_ordered", 1)
+    # Decrement reserved_quantity on the inventory product (skip if unmatched or not in inventory)
+    qty = removed.get("quantity_ordered") or 1
     if removed.get("matched") and book_id and not book_id.startswith("unmatched_"):
-        await db.store_products.update_one(
-            {"book_id": book_id},
-            {"$inc": {"reserved_quantity": -qty}}
-        )
+        try:
+            await db.store_products.update_one(
+                {"book_id": book_id},
+                {"$inc": {"reserved_quantity": -qty}}
+            )
+        except Exception:
+            pass  # Product may not exist in inventory — that's fine
 
-    # Recalculate total
-    new_total = sum(i.get("price", 0) * i.get("quantity_ordered", 1) for i in new_items)
+    # Recalculate total (safely handle null prices)
+    new_total = sum((i.get("price") or 0) * (i.get("quantity_ordered") or 1) for i in new_items)
 
     await db.store_textbook_orders.update_one(
         {"order_id": order_id},
