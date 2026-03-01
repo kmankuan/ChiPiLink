@@ -30,6 +30,10 @@ class ConfiguracionSitio(BaseModel):
     direccion: Optional[str] = None
     redes_sociales: dict = {}  # {facebook: url, instagram: url, etc}
     footer_texto: str = "© 2025 Todos los derechos reservados"
+    # Landing page footer tagline (i18n)
+    landing_footer: Optional[str] = "A dream born from Covid-19"
+    landing_footer_es: Optional[str] = "Un sueño nacido del Covid-19"
+    landing_footer_zh: Optional[str] = "源于新冠疫情的梦想"
     # SEO & Meta Tags
     meta_titulo: Optional[str] = None  # Browser tab title (falls back to site_name)
     meta_description: Optional[str] = None  # Meta description for SEO
