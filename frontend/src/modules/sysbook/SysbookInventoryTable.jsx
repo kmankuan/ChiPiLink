@@ -1119,7 +1119,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
                   onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
                   dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop}
-                  globalThreshold={globalThreshold} />
+                  globalThreshold={globalThreshold} purchasedSummary={purchasedSummary} />
               </div>
             </CardContent>
           </Card>
