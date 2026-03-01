@@ -25,6 +25,7 @@ function formatDate(dateStr) {
 export default function HorizonLanding({ communityData }) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { siteConfig } = useSiteConfig();
   const navigate = useNavigate();
   const landingImages = useLandingImages();
   const [heroVisible, setHeroVisible] = useState(false);
@@ -424,7 +425,7 @@ export default function HorizonLanding({ communityData }) {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-xs font-bold tracking-tight" style={{ color: '#ccc' }}>ChiPi Link</p>
           <p className="text-[10px] tracking-wider uppercase" style={{ color: '#ddd' }}>
-            {t('landing.footer', 'Connecting communities since 2024')}
+            {siteConfig?.landing_footer || siteConfig?.footer_texto || t('landing.footer', 'A dream born from Covid-19')}
           </p>
         </div>
       </footer>
