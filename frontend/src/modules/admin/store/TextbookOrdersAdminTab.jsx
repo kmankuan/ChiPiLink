@@ -168,7 +168,7 @@ function AddItemToOrder({ order, onAdded }) {
             <Input value={search} onChange={e => handleSearch(e.target.value)} placeholder="e.g. G6-3 or Math"
               className="pl-8 h-8 text-sm" autoFocus data-testid="add-item-search" />
           </div>
-          <ScrollArea className="flex-1 max-h-[300px]">
+          <ScrollArea className="flex-1 max-h-[300px] overflow-hidden">
             {searching ? (
               <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
             ) : results.length > 0 ? (
