@@ -666,6 +666,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
   const { t: translate } = useTranslation();
 
   const [products, setProducts] = useState([]);
+  const [purchasedSummary, setPurchasedSummary] = useState({});
   const [filters, setFilters] = useState({ grades: [], subjects: [] });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
