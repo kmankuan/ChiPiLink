@@ -141,7 +141,7 @@ function MosaicTile({ image, title, subtitle, onClick, span = '', testId, overla
       className={`group relative overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-xl active:scale-[0.98] text-left ${span}`}
       data-testid={testId}
     >
-      <img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <img src={image} alt={title} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
       <div className={`absolute inset-0 bg-gradient-to-t ${overlay}`} />
       <div className="relative h-full flex flex-col justify-end p-4 sm:p-5">
         {badge && (
