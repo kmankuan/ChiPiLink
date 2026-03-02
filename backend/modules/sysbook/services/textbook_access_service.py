@@ -237,6 +237,9 @@ class TextbookAccessService(BaseService):
             "student_number": data.student_number,
             "relation_type": data.relation_type.value,
             "relation_other": data.relation_other if data.relation_type == RelationType.OTHER else None,
+            "guardian_name": getattr(data, 'guardian_name', None) or None,
+            "guardian_email": getattr(data, 'guardian_email', None) or None,
+            "guardian_phone": getattr(data, 'guardian_phone', None) or None,
             "enrollments": [enrollment]
         }
         
