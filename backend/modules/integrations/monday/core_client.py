@@ -252,11 +252,16 @@ class MondayCoreClient:
         except Exception:
             return False
 
-    async def get_board_items(self, board_id: str, limit: int = 200) -> list:
-        """Fetch ALL items from a board with cursor-based pagination"""
+    async def get_board_items(self, board_id: str, limit: int = 200, include_subitems: bool = False) -> list:
+        """Fetch ALL items from a board with cursor-based pagination.
+        Set include_subitems=True to fetch subitems inline (avoids N+1 calls)."""
         all_items = []
         cursor = None
         page_limit = min(limit, 500)  # Monday.com max per page is 500
+
+        subitems_fragment = """
+            subitems { id name column_values { id text value type } }
+        """ if include_subitems else ""
 
         while True:
             if cursor:
@@ -266,6 +271,7 @@ class MondayCoreClient:
                         items {{
                             id name group {{ id title }}
                             column_values {{ id text value type }}
+                            {subitems_fragment}
                         }}
                     }}
                 }}'''
@@ -277,12 +283,13 @@ class MondayCoreClient:
                             items {{
                                 id name group {{ id title }}
                                 column_values {{ id text value type }}
+                                {subitems_fragment}
                             }}
                         }}
                     }}
                 }}'''
 
-            data = await self.execute(query, timeout=30.0)
+            data = await self.execute(query, timeout=45.0)
 
             if cursor:
                 page_data = data.get("next_items_page", {})

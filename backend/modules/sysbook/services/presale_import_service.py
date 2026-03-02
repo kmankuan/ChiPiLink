@@ -46,8 +46,9 @@ class PreSaleImportService:
                 self._subitem_price_col = sub_map["price"]
 
     async def fetch_importable_items(self, board_id: str) -> List[Dict]:
-        """Fetch items from Monday.com board that are marked for import via the trigger column"""
-        items = await monday_client.get_board_items(board_id, limit=500)
+        """Fetch items from Monday.com board that are marked for import via the trigger column.
+        Includes subitems inline to avoid N+1 API calls."""
+        items = await monday_client.get_board_items(board_id, limit=500, include_subitems=True)
         importable = []
         for item in items:
             cols = {c["id"]: c for c in item.get("column_values", [])}
@@ -60,13 +61,10 @@ class PreSaleImportService:
 
     async def preview_import(self, board_id: str) -> Dict:
         """Preview what would be imported — no DB changes"""
-        import asyncio
         await self._load_subitem_config()
         items = await self.fetch_importable_items(board_id)
         previews = []
-        for idx, item in enumerate(items):
-            if idx > 0:
-                await asyncio.sleep(0.3)  # Throttle to avoid Monday.com rate limits
+        for item in items:
             parsed = await self._parse_monday_item_safe(item, board_id)
             if parsed:
                 previews.append(parsed)
@@ -85,9 +83,7 @@ class PreSaleImportService:
         else:
             items = await self.fetch_importable_items(board_id)
             parsed_items = []
-            for idx, item in enumerate(items):
-                if idx > 0:
-                    await asyncio.sleep(0.5)
+            for item in items:
                 parsed = await self._parse_monday_item_safe(item, board_id)
                 if parsed:
                     parsed_items.append(parsed)
@@ -203,8 +199,10 @@ class PreSaleImportService:
             if not paid_date and has_paid_keyword and col_text:
                 paid_date = col_text
 
-        # Fetch subitems (each = a book)
-        subitems = await monday_client.get_subitems(monday_item_id)
+        # Use subitems from inline data (included in get_board_items), fallback to separate API call
+        subitems = item.get("subitems") or []
+        if not subitems:
+            subitems = await monday_client.get_subitems(monday_item_id)
         items = []
         total = 0.0
 

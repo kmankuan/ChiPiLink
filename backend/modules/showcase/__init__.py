@@ -223,6 +223,8 @@ async def delete_banner(banner_id: str):
 
 DEFAULT_PLAYER_CONFIG = {
     "album_title": "",
+    "album_title_es": "",
+    "album_title_zh": "",
     "album_url": "",
     "autoplay": True,
     "interval_ms": 5000,
