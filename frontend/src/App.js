@@ -390,6 +390,7 @@ function App() {
                       <ImpersonationBanner />
                       <AppRouter />
                       <BottomNav />
+                      <PushNotificationManager />
                       <CartDrawer />
                       {/* CXGenie widget removed - access via header support button instead */}
                       <Toaster 
