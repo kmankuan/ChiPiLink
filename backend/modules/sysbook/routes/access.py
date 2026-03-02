@@ -24,11 +24,14 @@ async def get_config():
     Get configuration data for textbook access forms.
     Returns available years, grades, and relation types.
     """
+    from core.database import db
+    access_config = await db.app_config.find_one({"key": "sysbook_access_config"}, {"_id": 0})
     return {
         "available_years": textbook_access_service.get_available_years(),
         "current_year": textbook_access_service.get_current_school_year(),
         "grades": textbook_access_service.get_available_grades(),
-        "relation_types": textbook_access_service.get_relation_types()
+        "relation_types": textbook_access_service.get_relation_types(),
+        "require_approval": (access_config or {}).get("require_approval", False),
     }
 
 
