@@ -178,9 +178,6 @@ export default function LinkingPage({ embedded = false }) {
       grade: '',
       relation_type: '',
       relation_other: '',
-      guardian_name: guardianProfile?.guardian_name || '',
-      guardian_email: guardianProfile?.guardian_email || '',
-      guardian_phone: guardianProfile?.guardian_phone || '',
     });
   };
 
