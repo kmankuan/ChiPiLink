@@ -27,11 +27,11 @@ export default function Login() {
   const laopanEnabled = laopanConfig?.enabled;
   const siteName = siteConfig?.site_name || 'ChiPi Link';
   const logoUrl = siteConfig?.logo_url;
-  const bgImage = siteConfig?.login_bg_image || 'https://images.unsplash.com/photo-1715520530023-cc8a1b2044ab?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200';
+  const bgImage = siteConfig?.login_bg_image || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200';
   const overlayColor = siteConfig?.login_bg_overlay_color || siteConfig?.color_primario || '#16a34a';
   const overlayOpacity = siteConfig?.login_bg_overlay_opacity ?? 0.7;
   const heading = siteConfig?.login_heading || t('auth.login', 'Sign In');
-  const subtext = siteConfig?.login_subtext || t('auth.laopan.description', 'Sign in or register on LaoPan.online to access');
+  const subtext = siteConfig?.login_subtext || siteConfig?.descripcion || t('auth.subtitle', 'A dream born from Covid-19');
   const layout = siteConfig?.login_layout || 'split';
   const logoSize = siteConfig?.login_logo_size || 'md';
 
