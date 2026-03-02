@@ -340,6 +340,28 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Recharge webhook registration skipped: {e}")
 
+        # Register textbook orders board webhook for order-level status sync
+        try:
+            from modules.store.integrations.monday_textbook_adapter import textbook_monday_adapter
+            from modules.integrations.monday.webhook_router import register_handler as register_wh
+            txb_board_config = await db['monday_configs'].find_one(
+                {"key": "store.textbook_orders.board"}, {"_id": 0}
+            )
+            txb_board_id = txb_board_config.get("data", {}).get("board_id") if txb_board_config else None
+            if not txb_board_id:
+                # Fallback: check monday_integration_config
+                txb_int_config = await db['monday_integration_config'].find_one(
+                    {"config_key": "store.textbook_orders.board"}, {"_id": 0}
+                )
+                txb_board_id = txb_int_config.get("board_id") if txb_int_config else None
+            if txb_board_id:
+                register_wh(str(txb_board_id), textbook_monday_adapter.handle_order_status_webhook)
+                logger.info(f"Textbook orders webhook registered for board: {txb_board_id}")
+            else:
+                logger.info("Textbook orders board not configured, skipping webhook")
+        except Exception as e:
+            logger.warning(f"Textbook orders webhook registration skipped: {e}")
+
         # Background pollers — start after another short delay to avoid event loop contention
         await asyncio.sleep(1)
 
