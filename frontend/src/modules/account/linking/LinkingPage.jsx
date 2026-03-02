@@ -562,6 +562,48 @@ export default function LinkingPage({ embedded = false }) {
                 />
               </div>
             )}
+
+            {/* Guardian Information */}
+            <div className="space-y-3 pt-2 border-t">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Guardian Information</Label>
+              {guardianProfile?.guardian_name && (
+                <p className="text-[10px] text-muted-foreground -mt-1">Auto-filled from your profile</p>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="guardianName">Full Name</Label>
+                <Input
+                  id="guardianName"
+                  value={formData.guardian_name}
+                  onChange={(e) => handleChange('guardian_name', e.target.value)}
+                  placeholder="Guardian full name"
+                  data-testid="input-guardian-name"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="guardianEmail">Email</Label>
+                  <Input
+                    id="guardianEmail"
+                    type="email"
+                    value={formData.guardian_email}
+                    onChange={(e) => handleChange('guardian_email', e.target.value)}
+                    placeholder="email@example.com"
+                    data-testid="input-guardian-email"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="guardianPhone">Cellphone</Label>
+                  <Input
+                    id="guardianPhone"
+                    type="tel"
+                    value={formData.guardian_phone}
+                    onChange={(e) => handleChange('guardian_phone', e.target.value)}
+                    placeholder="+507 6000-0000"
+                    data-testid="input-guardian-phone"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <DialogFooter className="gap-2">
