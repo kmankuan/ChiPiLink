@@ -149,6 +149,12 @@ export default function LinkingPage({ embedded = false }) {
       console.log('[LinkingPage] Students loaded:', studentsRes.data?.students?.length || 0);
       setStudents(studentsRes.data?.students || []);
       
+      // Load guardian profile for auto-fill
+      try {
+        const guardianRes = await api.get('/api/sysbook/access/my-guardian-profile');
+        setGuardianProfile(guardianRes.data || null);
+      } catch {} // Non-critical
+      
       setLoadError(null);
     } catch (err) {
       console.error('[LinkingPage] Load data error:', err);
