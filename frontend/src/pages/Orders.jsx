@@ -19,7 +19,8 @@ import {
   Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag,
   ChevronDown, ChevronUp, MessageCircle,
   ShoppingCart, Plus, Minus, Trash2, Book, ArrowRight,
-  Lock, AlertCircle, GraduationCap, ClipboardList
+  Lock, AlertCircle, GraduationCap, ClipboardList,
+  Pencil, Send, Clock, CheckCircle2, Check, X, Truck, Ban, CreditCard, TimerOff, Package
 } from 'lucide-react';
 import CrmChat from '@/components/chat/CrmChat';
 import { useCrmNotifications } from '@/hooks/useCrmNotifications';
