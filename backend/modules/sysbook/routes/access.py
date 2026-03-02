@@ -424,35 +424,3 @@ async def update_access_config(data: dict, admin: dict = Depends(get_admin_user)
         upsert=True,
     )
     return {"success": True}
-
-
-# ============== GUARDIAN PROFILE (auto-fill for multi-student parents) ==============
-
-@router.get("/my-guardian-profile")
-async def get_guardian_profile(current_user: dict = Depends(get_current_user)):
-    """Get saved guardian profile for auto-fill in link student form"""
-    from core.database import db
-    profile = await db.auth_users.find_one(
-        {"user_id": current_user["user_id"]},
-        {"_id": 0, "guardian_name": 1, "guardian_email": 1, "guardian_phone": 1}
-    )
-    return {
-        "guardian_name": (profile or {}).get("guardian_name", ""),
-        "guardian_email": (profile or {}).get("guardian_email", ""),
-        "guardian_phone": (profile or {}).get("guardian_phone", ""),
-    }
-
-
-@router.put("/my-guardian-profile")
-async def update_guardian_profile(data: dict, current_user: dict = Depends(get_current_user)):
-    """Save guardian profile for auto-fill"""
-    from core.database import db
-    await db.auth_users.update_one(
-        {"user_id": current_user["user_id"]},
-        {"$set": {
-            "guardian_name": (data.get("guardian_name") or "").strip(),
-            "guardian_email": (data.get("guardian_email") or "").strip(),
-            "guardian_phone": (data.get("guardian_phone") or "").strip(),
-        }}
-    )
-    return {"success": True}
