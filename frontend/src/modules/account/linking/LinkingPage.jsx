@@ -97,7 +97,6 @@ export default function LinkingPage({ embedded = false }) {
   const [loadError, setLoadError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [guardianProfile, setGuardianProfile] = useState(null);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -109,9 +108,6 @@ export default function LinkingPage({ embedded = false }) {
     grade: '',
     relation_type: '',
     relation_other: '',
-    guardian_name: '',
-    guardian_email: '',
-    guardian_phone: '',
   });
 
   // Load initial data
