@@ -30,6 +30,9 @@ import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 
 // Layout components — lazy loaded (only active layout is fetched)
+// Eagerly import the default/active layout to prevent loading issues
+import MosaicCommunityLanding from './landing-layouts/MosaicCommunityLanding';
+// Lazy load the rest (only fetched if admin switches layout)
 const BentoGridLanding = lazy(() => import('./landing-layouts/BentoGridLanding'));
 const TabHubLanding = lazy(() => import('./landing-layouts/TabHubLanding'));
 const SocialFeedLanding = lazy(() => import('./landing-layouts/SocialFeedLanding'));
@@ -37,7 +40,6 @@ const MagazineLanding = lazy(() => import('./landing-layouts/MagazineLanding'));
 const LivingGridLanding = lazy(() => import('./landing-layouts/LivingGridLanding'));
 const CinematicLanding = lazy(() => import('./landing-layouts/CinematicLanding'));
 const HorizonLanding = lazy(() => import('./landing-layouts/HorizonLanding'));
-const MosaicCommunityLanding = lazy(() => import('./landing-layouts/MosaicCommunityLanding'));
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
@@ -510,28 +512,25 @@ export default function SuperAppLanding() {
 
   const fetchData = async (attempt = 1) => {
     try {
-      setLoading(true);
-      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing), { timeout: 15000 });
+      if (attempt === 1) setLoading(true);
+      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing), { timeout: 10000 });
       setCommunityData(response.data);
-      // Cache for fallback on next load failure
       try { sessionStorage.setItem('chipi_landing_cache', JSON.stringify(response.data)); } catch {}
     } catch (err) {
       console.error(`Error fetching community data (attempt ${attempt}):`, err?.message);
-      // Retry once
-      if (attempt < 2) {
-        setTimeout(() => fetchData(attempt + 1), 2000);
-        return;
-      }
-      // Use cached data as fallback
+      // Use cached data immediately as fallback
       try {
         const cached = sessionStorage.getItem('chipi_landing_cache');
         if (cached) {
           setCommunityData(JSON.parse(cached));
-          console.log('Using cached landing data');
         }
       } catch {}
+      // Retry silently in background
+      if (attempt < 2) {
+        setTimeout(() => fetchData(attempt + 1), 3000);
+      }
     } finally {
-      if (attempt >= 2 || !loading) setLoading(false);
+      setLoading(false);
     }
   };
 

@@ -3,7 +3,7 @@
  * Layouts: split (desktop image + form), centered, fullscreen
  * Uses siteConfig for branding: logo, bg image, colors, text
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,8 +23,16 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [configTimeout, setConfigTimeout] = useState(false);
 
-  const laopanEnabled = laopanConfig?.enabled;
+  // Hard timeout: never show spinner for more than 3s
+  useEffect(() => {
+    if (laopanConfig !== null) return;
+    const timer = setTimeout(() => setConfigTimeout(true), 3000);
+    return () => clearTimeout(timer);
+  }, [laopanConfig]);
+
+  const laopanEnabled = laopanConfig?.enabled || (configTimeout && laopanConfig === null);
   const siteName = siteConfig?.site_name || 'ChiPi Link';
   const logoUrl = siteConfig?.logo_url;
   const bgImage = siteConfig?.login_bg_image || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200';
@@ -95,7 +103,7 @@ export default function Login() {
       </div>
 
       {/* Login Buttons */}
-      {laopanConfig === null ? (
+      {laopanConfig === null && !configTimeout ? (
         <div className="flex justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>

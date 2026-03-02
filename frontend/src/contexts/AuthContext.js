@@ -38,9 +38,8 @@ export function AuthProvider({ children }) {
       setLaopanConfig(response.data);
     } catch (error) {
       console.error(`LaoPan config fetch error (attempt ${attempt}):`, error?.message);
-      // Retry up to 3 times before giving up
-      if (attempt < 3) {
-        setTimeout(() => fetchLaopanConfig(attempt + 1), 1500 * attempt);
+      if (attempt < 2) {
+        setTimeout(() => fetchLaopanConfig(attempt + 1), 1000);
       } else {
         setLaopanConfig({ enabled: false });
       }
