@@ -22,7 +22,7 @@ class ConfiguracionSitio(BaseModel):
     site_name: str = "ChiPi Link"
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
-    descripcion: str = "Plataforma de comercio electronic"
+    descripcion: str = "A dream born from Covid-19"
     color_primario: str = "#16a34a"
     color_secundario: str = "#0f766e"
     email_contacto: Optional[str] = None
