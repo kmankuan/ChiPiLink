@@ -364,7 +364,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ MONDAY.COM BOARD WIDGET — replaces CTA when configured ═══ */}
       <section
-        className={`px-0 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
         data-testid="monday-widget-section"
       >
         <MondayBoardWidget />
