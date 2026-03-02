@@ -20,6 +20,9 @@ export default function Login() {
   const { loginWithLaoPan, laopanConfig, login } = useAuth();
   const { siteConfig } = useSiteConfig();
   const [laopanLoading, setLaopanLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const laopanEnabled = laopanConfig?.enabled;
   const siteName = siteConfig?.site_name || 'ChiPi Link';
