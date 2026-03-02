@@ -44,6 +44,8 @@ School textbook order management platform with Monday.com integration for order 
 - **Monday.com Widget Border Spacing (Mar 2, 2026)**: Added `px-4` mobile padding to the Monday.com board widget section in MosaicCommunityLanding so it doesn't touch screen edges.
 - **Transparent Auto-hide Bottom Nav (Mar 2, 2026)**: Redesigned BottomNav with transparent background, `drop-shadow` on icons for visibility over any background. Chrome-style auto-hide: bar slides down when scrolling down, slides back up on scroll up. Shows on route change. Configurable transition via `translate-y-full`.
 - **Remove Item Null Price Fix (Mar 2, 2026)**: Fixed TypeError when removing presale items with `null` prices. Changed `i.get("price", 0)` to `(i.get("price") or 0)` in total calculations. Also URL-encodes book_id in frontend delete requests.
+- **Orders Page: Message Button Cleanup (Mar 2, 2026)**: Removed broken "Messages" button (OrderChat) from My Orders page. Renamed "Support" to "Message" using the working CRM Chat (Monday.com integration). Single button now with MessageCircle icon.
+- **Bottom Nav Notification Badge (Mar 2, 2026)**: Added combined notification count (CRM + order notifications) to the "My Orders" nav item and profile avatar in the bottom nav. Red badge shows unread count. Uses both `useNotifications` and `useCrmNotifications` hooks.
 
 ### Key Files
 - `frontend/src/modules/admin/store/TextbookOrdersAdminTab.jsx` — Order management with add/remove item, editable grade, paid date
