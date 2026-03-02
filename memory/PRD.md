@@ -84,12 +84,12 @@ School textbook order management platform with Monday.com integration for order 
 - `store_products` — Products with `reserved_quantity` updated by add/remove/grade-change operations
 
 ## Prioritized Backlog
+- (P1) Admin UI config for badge customization (color + icon per status)
 - (P1) Explore automatic help guide updates linked to feature development
 - (P2) On-demand landing page redesign tool for administrators
 - (P3) Extend Monday.com synchronization for general product inventory
 - (P3) ChipiPoints gamification system
 - (P3) Email notifications for key events
-- (Refactor) Delete likely unused `PrintConfigTab.jsx` in dev_control
 - (Refactor) Break down `TextbookOrdersAdminTab.jsx` into smaller child components
 
 ## Admin Credentials
