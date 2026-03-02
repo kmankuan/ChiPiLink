@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import {
   Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag,
-  ChevronDown, ChevronUp, MessageCircle, Headphones,
+  ChevronDown, ChevronUp, MessageCircle,
   ShoppingCart, Plus, Minus, Trash2, Book, ArrowRight,
   Lock, AlertCircle, GraduationCap, ClipboardList
 } from 'lucide-react';
