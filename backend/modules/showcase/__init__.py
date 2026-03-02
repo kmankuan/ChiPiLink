@@ -222,6 +222,7 @@ async def delete_banner(banner_id: str):
 # ═══════════════════════════════════════════
 
 DEFAULT_PLAYER_CONFIG = {
+    "album_title": "",
     "album_url": "",
     "autoplay": True,
     "interval_ms": 5000,
@@ -270,6 +271,21 @@ async def update_media_player(body: dict):
         upsert=True
     )
     return {"status": "ok", "config": body}
+
+
+@admin_router.patch("/media-player")
+async def patch_media_player(body: dict):
+    """Admin: Partially update media player config fields (without replacing items)."""
+    body.pop("_id", None)
+    set_fields = {f"value.{k}": v for k, v in body.items()}
+    set_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.app_config.update_one(
+        {"config_key": "media_player"},
+        {"$set": set_fields},
+        upsert=True
+    )
+    return {"status": "ok"}
+
 
 
 @admin_router.post("/media-player/add-item")

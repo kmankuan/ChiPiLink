@@ -10,6 +10,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 const API_URL = RESOLVED_API_URL;
 
 const DEFAULT_CONFIG = {
+  album_title: '',
   autoplay: true,
   interval_ms: 5000,
   loop: true,
@@ -344,6 +345,13 @@ export default function MediaPlayer() {
 
       {/* Gradient for controls */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+      {/* Album Title */}
+      {config?.album_title && (
+        <div className="absolute top-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-b from-black/60 via-black/20 to-transparent z-10 pointer-events-none" data-testid="album-title">
+          <h3 className="text-white text-sm sm:text-base font-bold tracking-tight drop-shadow-lg">{config.album_title}</h3>
+        </div>
+      )}
 
       {/* Caption */}
       {first?.caption && (

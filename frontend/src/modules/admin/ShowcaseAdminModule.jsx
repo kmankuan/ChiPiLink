@@ -299,6 +299,19 @@ export default function ShowcaseAdminModule() {
     setBanners(prev => prev.map((b, i) => i === index ? saved : b));
   };
 
+
+  const saveMediaConfig = async (fields) => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/media-player`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(fields)
+      });
+      if (res.ok) toast.success('Saved!');
+      else toast.error('Failed to save');
+    } catch { toast.error('Error saving'); }
+  };
+
   const fetchAlbum = async () => {
     if (!albumUrl) return;
     setFetching(true);
@@ -844,6 +857,28 @@ export default function ShowcaseAdminModule() {
 
         {/* ═══ MEDIA PLAYER TAB ═══ */}
         <TabsContent value="media" className="space-y-4 mt-4">
+          {/* Album Title */}
+          <div className="border rounded-xl p-4 space-y-3 bg-card">
+            <div className="flex items-center gap-2">
+              <Type className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-bold">Album Title</h3>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Displayed as an overlay header on the media player
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={mediaConfig?.album_title || ''}
+                onChange={e => setMediaConfig(prev => ({ ...prev, album_title: e.target.value }))}
+                placeholder="e.g. Our Community, PinPan Events..."
+                className="h-8 text-xs flex-1"
+                data-testid="album-title-input"
+              />
+              <Button size="sm" className="h-8 text-xs" onClick={() => saveMediaConfig({ album_title: mediaConfig?.album_title || '' })}
+                data-testid="save-album-title-btn">Save</Button>
+            </div>
+          </div>
+
           {/* Google Photos Album URL */}
           <div className="border rounded-xl p-4 space-y-3 bg-card">
             <div className="flex items-center gap-2">
