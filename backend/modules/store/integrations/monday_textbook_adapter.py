@@ -202,6 +202,59 @@ class TextbookMondayAdapter(BaseMondayAdapter):
 
         return {"processed": updated, "order_id": order.get("order_id"), "new_status": new_app_status}
 
+    async def sync_order_statuses(self, order_id: str) -> dict:
+        """Manual sync: fetch all subitem statuses from Monday.com"""
+        order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+        if not order:
+            raise ValueError("Order not found")
+
+        monday_item_ids = order.get("monday_item_ids", [])
+        if not monday_item_ids:
+            return {"synced": False, "reason": "Order not linked to Monday.com"}
+
+        from modules.sysbook.models.textbook_order import DEFAULT_STATUS_MAPPING
+        status_mapping = await self.get_status_mapping() or DEFAULT_STATUS_MAPPING
+        board_config = await self.get_board_config()
+        sub_mapping = board_config.get("subitem_column_mapping", {})
+        status_col = sub_mapping.get("status", "status")
+
+        items = order.get("items", [])
+        items_updated = 0
+
+        for mid in monday_item_ids:
+            try:
+                subitems = await self.client.get_subitems(mid)
+                for si in subitems:
+                    si_id = str(si.get("id"))
+                    status_text = ""
+                    for col in si.get("column_values", []):
+                        if col.get("id") == status_col:
+                            status_text = col.get("text", "")
+                            break
+                    if not status_text:
+                        continue
+                    new_status = status_mapping.get(status_text)
+                    if not new_status:
+                        continue
+                    for item in items:
+                        if item.get("monday_subitem_id") == si_id and item.get("status") != new_status:
+                            item["status"] = new_status
+                            item["status_updated_at"] = datetime.now(timezone.utc).isoformat()
+                            item["status_source"] = "manual_sync"
+                            items_updated += 1
+                            break
+            except Exception as e:
+                logger.error(f"Error syncing item {mid}: {e}")
+
+        if items_updated:
+            await db.store_textbook_orders.update_one(
+                {"order_id": order_id},
+                {"$set": {"items": items, "last_synced_at": datetime.now(timezone.utc).isoformat()}}
+            )
+
+        return {"synced": True, "items_updated": items_updated}
+
+
     # ---- Order-Level Status Sync (parent item webhook) ----
 
     # Default mapping from Monday.com order status labels → app order statuses
