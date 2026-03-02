@@ -857,25 +857,46 @@ export default function ShowcaseAdminModule() {
 
         {/* ═══ MEDIA PLAYER TAB ═══ */}
         <TabsContent value="media" className="space-y-4 mt-4">
-          {/* Album Title */}
+          {/* Album Title (i18n) + Shuffle */}
           <div className="border rounded-xl p-4 space-y-3 bg-card">
             <div className="flex items-center gap-2">
               <Type className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-bold">Album Title</h3>
+              <h3 className="text-sm font-bold">Album Title & Display</h3>
             </div>
             <p className="text-[10px] text-muted-foreground">
-              Displayed as an overlay header on the media player
+              Label shown above the media player. Supports EN / ES / ZH.
             </p>
-            <div className="flex gap-2">
-              <Input
-                value={mediaConfig?.album_title || ''}
-                onChange={e => setMediaConfig(prev => ({ ...prev, album_title: e.target.value }))}
-                placeholder="e.g. Our Community, PinPan Events..."
-                className="h-8 text-xs flex-1"
-                data-testid="album-title-input"
-              />
-              <Button size="sm" className="h-8 text-xs" onClick={() => saveMediaConfig({ album_title: mediaConfig?.album_title || '' })}
-                data-testid="save-album-title-btn">Save</Button>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <label className="text-[10px] font-medium text-muted-foreground">English</label>
+                <Input value={mediaConfig?.album_title || ''} onChange={e => setMediaConfig(prev => ({ ...prev, album_title: e.target.value }))}
+                  placeholder="Our Community" className="h-8 text-xs" data-testid="album-title-en" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-medium text-muted-foreground">Español</label>
+                <Input value={mediaConfig?.album_title_es || ''} onChange={e => setMediaConfig(prev => ({ ...prev, album_title_es: e.target.value }))}
+                  placeholder="Nuestra Comunidad" className="h-8 text-xs" data-testid="album-title-es" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-medium text-muted-foreground">中文</label>
+                <Input value={mediaConfig?.album_title_zh || ''} onChange={e => setMediaConfig(prev => ({ ...prev, album_title_zh: e.target.value }))}
+                  placeholder="我们的社区" className="h-8 text-xs" data-testid="album-title-zh" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between pt-1 border-t">
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="shuffle-toggle" checked={mediaConfig?.shuffle || false}
+                  onChange={e => setMediaConfig(prev => ({ ...prev, shuffle: e.target.checked }))}
+                  className="rounded" data-testid="shuffle-toggle" />
+                <label htmlFor="shuffle-toggle" className="text-xs font-medium">Shuffle (random order)</label>
+              </div>
+              <Button size="sm" className="h-7 text-xs px-3" data-testid="save-album-settings"
+                onClick={() => saveMediaConfig({
+                  album_title: mediaConfig?.album_title || '',
+                  album_title_es: mediaConfig?.album_title_es || '',
+                  album_title_zh: mediaConfig?.album_title_zh || '',
+                  shuffle: mediaConfig?.shuffle || false,
+                })}>Save</Button>
             </div>
           </div>
 

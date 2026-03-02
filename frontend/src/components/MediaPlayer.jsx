@@ -5,6 +5,7 @@
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Image } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
@@ -95,6 +96,8 @@ function buildSlides(items, orientations, fitMode) {
 }
 
 export default function MediaPlayer() {
+  const { i18n } = useTranslation();
+  const lang = i18n?.language?.substring(0, 2) || 'en';
   const [config, setConfig] = useState(null);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -290,15 +293,27 @@ export default function MediaPlayer() {
   const imgObjFit = fitMode === 'contain' ? 'object-contain' : (fitMode === 'smart' ? 'object-contain' : 'object-cover');
   const needBlurBg = fitMode !== 'cover';
 
+  // i18n album title
+  const albumTitle = (lang === 'es' && config?.album_title_es) ? config.album_title_es
+    : (lang === 'zh' && config?.album_title_zh) ? config.album_title_zh
+    : config?.album_title || '';
+
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full rounded-none sm:rounded-2xl overflow-hidden bg-black group"
-      style={{ aspectRatio: '16/9' }}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      data-testid="media-player"
-    >
+    <div data-testid="media-player-wrapper">
+      {/* Album Title — label above the player */}
+      {albumTitle && (
+        <div className="px-1 mb-1.5" data-testid="album-title">
+          <h3 className="text-sm sm:text-base font-bold tracking-tight text-foreground/80">{albumTitle}</h3>
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        className="relative w-full rounded-2xl overflow-hidden bg-black group"
+        style={{ aspectRatio: '16/9' }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        data-testid="media-player"
+      >
       {/* Slide content */}
       <div key={slideKey} className="absolute inset-0" style={{ animation: `mp-slide-${slideDir.current > 0 ? 'l' : 'r'} .35s ease-out` }}>
         {isVideo ? (
@@ -345,13 +360,6 @@ export default function MediaPlayer() {
 
       {/* Gradient for controls */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-      {/* Album Title */}
-      {config?.album_title && (
-        <div className="absolute top-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-b from-black/60 via-black/20 to-transparent z-10 pointer-events-none" data-testid="album-title">
-          <h3 className="text-white text-sm sm:text-base font-bold tracking-tight drop-shadow-lg">{config.album_title}</h3>
-        </div>
-      )}
 
       {/* Caption */}
       {first?.caption && (
@@ -417,6 +425,7 @@ export default function MediaPlayer() {
         @keyframes mp-slide-l { from { opacity:0; transform:translateX(30px) } to { opacity:1; transform:translateX(0) } }
         @keyframes mp-slide-r { from { opacity:0; transform:translateX(-30px) } to { opacity:1; transform:translateX(0) } }
       `}</style>
+      </div>
     </div>
   );
 }
