@@ -46,6 +46,7 @@ School textbook order management platform with Monday.com integration for order 
 - **Remove Item Null Price Fix (Mar 2, 2026)**: Fixed TypeError when removing presale items with `null` prices. Changed `i.get("price", 0)` to `(i.get("price") or 0)` in total calculations. Also URL-encodes book_id in frontend delete requests.
 - **Orders Page: Message Button Cleanup (Mar 2, 2026)**: Removed broken "Messages" button (OrderChat) from My Orders page. Renamed "Support" to "Message" using the working CRM Chat (Monday.com integration). Single button now with MessageCircle icon.
 - **Bottom Nav Notification Badge (Mar 2, 2026)**: Added combined notification count (CRM + order notifications) to the "My Orders" nav item and profile avatar in the bottom nav. Red badge shows unread count. Uses both `useNotifications` and `useCrmNotifications` hooks.
+- **Push Notifications via OneSignal (Mar 2, 2026)**: Integrated OneSignal push notifications for key user events. Frontend: `PushNotificationManager` component auto-links OneSignal identity to user on login (`setExternalUserId`), tags user role, and shows a subtle subscribe prompt 5s after login for unsubscribed users. Backend: `push_helpers.py` with fire-and-forget `notify_new_message()` and `notify_order_status()`. Push triggers added to: admin CRM reply, admin CRM topic create, and order status change endpoints. All push calls are non-blocking (`asyncio.create_task`).
 
 ### Key Files
 - `frontend/src/modules/admin/store/TextbookOrdersAdminTab.jsx` — Order management with add/remove item, editable grade, paid date
