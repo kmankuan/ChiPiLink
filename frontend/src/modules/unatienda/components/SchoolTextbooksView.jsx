@@ -110,6 +110,10 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
 
     setSubmitting(true);
     try {
+      // Save guardian info to localStorage for next student
+      if (guardian.name) {
+        localStorage.setItem(GUARDIAN_KEY, JSON.stringify(guardian));
+      }
       await axios.post(`${API_URL}/api/sysbook/access/students`, {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
@@ -119,6 +123,9 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
         grade: form.grade,
         relation_type: form.relation_type,
         relation_other: form.relation_type === 'other' ? form.relation_other.trim() : null,
+        guardian_name: guardian.name?.trim() || null,
+        guardian_email: guardian.email?.trim() || null,
+        guardian_phone: guardian.phone?.trim() || null,
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(v.success);
       onSuccess();
