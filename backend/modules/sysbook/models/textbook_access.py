@@ -111,6 +111,10 @@ class StudentRecordCreate(BaseModel):
     relation_other: Optional[str] = None
     year: int  # Initial enrollment year
     grade: str  # Initial grade
+    # Guardian info (optional, saved to user profile for auto-fill)
+    guardian_name: Optional[str] = None
+    guardian_email: Optional[str] = None
+    guardian_phone: Optional[str] = None
 
 
 class StudentRecordUpdate(BaseModel):
