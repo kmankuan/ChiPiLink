@@ -268,6 +268,16 @@ async def update_order_status(
             order_id=order_id,
             status=status
         )
+        # Fire-and-forget push notification for status change
+        try:
+            from modules.notifications.push_helpers import notify_order_status
+            import asyncio
+            user_id = order.get("user_id")
+            student_name = order.get("student_name", "")
+            if user_id:
+                asyncio.create_task(notify_order_status(user_id, student_name, order_id, status.value))
+        except Exception:
+            pass
         return order
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
