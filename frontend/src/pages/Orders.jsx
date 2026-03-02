@@ -21,9 +21,7 @@ import {
   ShoppingCart, Plus, Minus, Trash2, Book, ArrowRight,
   Lock, AlertCircle, GraduationCap, ClipboardList
 } from 'lucide-react';
-import OrderChat from '@/components/chat/OrderChat';
 import CrmChat from '@/components/chat/CrmChat';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useCrmNotifications } from '@/hooks/useCrmNotifications';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
