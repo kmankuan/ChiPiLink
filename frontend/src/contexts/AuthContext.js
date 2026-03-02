@@ -53,23 +53,29 @@ export function AuthProvider({ children }) {
       return;
     }
     
-    try {
-      const response = await api.get(AUTH_ENDPOINTS.me);
-      setUser(response.data);
-    } catch (error) {
-      console.error('Auth check error:', error);
-      // Only clear auth on 401 (unauthorized) - token is invalid/expired
-      // Don't clear on network errors or other issues
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        setUser(null);
-        localStorage.removeItem('auth_token');
-        setToken(null);
+    // Try up to 2 times (handles transient 401s during deploys/restarts)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await api.get(AUTH_ENDPOINTS.me);
+        setUser(response.data);
+        setLoading(false);
+        return;
+      } catch (error) {
+        if (attempt === 0 && error.response?.status === 401) {
+          // First 401 — wait briefly and retry (backend might be restarting)
+          await new Promise(r => setTimeout(r, 1000));
+          continue;
+        }
+        console.error('Auth check error:', error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          setUser(null);
+          localStorage.removeItem('auth_token');
+          setToken(null);
+        }
+        break;
       }
-      // For network errors or other issues, keep the existing user state
-      // This prevents accidental logouts due to temporary connectivity issues
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }, [api]);
 
   useEffect(() => {
