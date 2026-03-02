@@ -1,9 +1,10 @@
 /**
  * BottomNav — Primary navigation for ALL screen sizes.
- * Native app-style bottom bar. Replaces the traditional header.
- * Includes: Home, Explore, Store (with cart badge), Club, Profile/Login
- * Plus quick-access: Cart drawer, Theme toggle, Language
+ * Native app-style bottom bar with:
+ * - Transparent background with icon shadows for visibility
+ * - Chrome-style auto-hide: hides on scroll down, shows on scroll up
  */
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -34,10 +35,11 @@ function NavItem({ icon: Icon, label, to, active, badge, onClick }) {
       {...props}
       data-testid={`bottomnav-${label?.toLowerCase().replace(/\s/g, '-')}`}
       className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2 sm:px-4 min-w-0 transition-all duration-200 relative ${
-        active ? 'text-foreground' : 'text-muted-foreground/60'
+        active ? 'text-foreground' : 'text-muted-foreground/70'
       }`}
+      style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
     >
-      <div className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-all duration-200 ${active ? 'bg-primary/10' : ''}`}>
+      <div className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-all duration-200 ${active ? 'bg-background/60 backdrop-blur-sm' : ''}`}>
         <Icon className={`h-[18px] w-[18px] transition-transform duration-200 ${active ? 'scale-110' : ''}`} />
         {badge > 0 && (
           <span className="absolute -top-1 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white px-0.5 shadow-sm">
@@ -62,6 +64,42 @@ export default function BottomNav() {
   const { totalUnread } = useNotifications();
   const path = location.pathname;
 
+  // Chrome-style auto-hide: track scroll direction
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const delta = currentY - lastScrollY.current;
+
+        // Show when scrolling up (delta < -5) or near top
+        if (delta < -5 || currentY < 50) {
+          setVisible(true);
+        }
+        // Hide when scrolling down (delta > 10) and not near top
+        else if (delta > 10 && currentY > 100) {
+          setVisible(false);
+        }
+
+        lastScrollY.current = currentY;
+        ticking.current = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Always show on route change
+  useEffect(() => {
+    setVisible(true);
+  }, [path]);
+
   if (path.startsWith('/embed') || path.startsWith('/auth/')) return null;
 
   const isHome = path === '/' || path === '';
@@ -77,7 +115,11 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="bottom-nav fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/10 safe-area-bottom" data-testid="bottom-nav">
+    <nav
+      className={`bottom-nav fixed left-0 right-0 z-50 safe-area-bottom transition-transform duration-300 ease-in-out ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+      style={{ bottom: 0, background: 'transparent' }}
+      data-testid="bottom-nav"
+    >
       <div className="flex items-stretch justify-around h-[58px] max-w-2xl mx-auto px-1">
         {/* Core nav items */}
         <NavItem icon={Home} label={t('common.home', 'Home')} to="/" active={isHome} />
@@ -89,7 +131,7 @@ export default function BottomNav() {
           <NavItem icon={Trophy} label={t('common.club', 'Club')} to="/pinpanclub" active={isClub} />
         )}
 
-        {/* Orders & Cart — unified page */}
+        {/* Orders & Cart */}
         <NavItem icon={ClipboardList} label={t('cart.myOrders', 'My Orders')} to="/orders" active={isStore && path.startsWith('/orders')} badge={itemCount} />
 
         {/* Profile / User menu */}
@@ -99,10 +141,11 @@ export default function BottomNav() {
               <button
                 data-testid="bottomnav-profile-menu"
                 className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2 sm:px-4 min-w-0 transition-all duration-200 ${
-                  isProfile || isAdminPage ? 'text-foreground' : 'text-muted-foreground/60'
+                  isProfile || isAdminPage ? 'text-foreground' : 'text-muted-foreground/70'
                 }`}
+                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
               >
-                <div className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-all duration-200 ${isProfile || isAdminPage ? 'bg-primary/10' : ''}`}>
+                <div className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-all duration-200 ${isProfile || isAdminPage ? 'bg-background/60 backdrop-blur-sm' : ''}`}>
                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white text-[9px] font-bold">
                     {(user?.nombre || 'U')[0].toUpperCase()}
                   </div>
@@ -128,7 +171,6 @@ export default function BottomNav() {
                 <DropdownMenuItem asChild><Link to="/pinpanclub" className="flex items-center gap-2"><Trophy className="h-4 w-4" />PinPanClub</Link></DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              {/* Theme + Language */}
               <DropdownMenuItem onClick={toggleTheme} className="flex items-center gap-2">
                 {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
