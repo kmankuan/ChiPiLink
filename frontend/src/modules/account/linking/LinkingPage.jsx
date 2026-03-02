@@ -240,9 +240,6 @@ export default function LinkingPage({ embedded = false }) {
         grade: formData.grade,
         relation_type: formData.relation_type,
         relation_other: formData.relation_type === 'other' ? formData.relation_other.trim() : null,
-        guardian_name: formData.guardian_name?.trim() || null,
-        guardian_email: formData.guardian_email?.trim() || null,
-        guardian_phone: formData.guardian_phone?.trim() || null,
       };
 
       await api.post('/api/sysbook/access/students', payload);
