@@ -377,3 +377,63 @@ async def delete_school(
     if not success:
         raise HTTPException(status_code=404, detail="School not found")
     return {"success": True}
+
+
+# ============== ACCESS CONFIG (approval settings) ==============
+
+@router.get("/admin/access-config")
+async def get_access_config(admin: dict = Depends(get_admin_user)):
+    """Get access/linking configuration"""
+    from core.database import db
+    config = await db.app_config.find_one({"key": "sysbook_access_config"}, {"_id": 0})
+    return config or {"key": "sysbook_access_config", "require_approval": False}
+
+
+@router.put("/admin/access-config")
+async def update_access_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update access/linking configuration"""
+    from core.database import db
+    from datetime import datetime, timezone
+    await db.app_config.update_one(
+        {"key": "sysbook_access_config"},
+        {"$set": {
+            "key": "sysbook_access_config",
+            "require_approval": data.get("require_approval", False),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": admin["user_id"],
+        }},
+        upsert=True,
+    )
+    return {"success": True}
+
+
+# ============== GUARDIAN PROFILE (auto-fill for multi-student parents) ==============
+
+@router.get("/my-guardian-profile")
+async def get_guardian_profile(current_user: dict = Depends(get_current_user)):
+    """Get saved guardian profile for auto-fill in link student form"""
+    from core.database import db
+    profile = await db.auth_users.find_one(
+        {"user_id": current_user["user_id"]},
+        {"_id": 0, "guardian_name": 1, "guardian_email": 1, "guardian_phone": 1}
+    )
+    return {
+        "guardian_name": (profile or {}).get("guardian_name", ""),
+        "guardian_email": (profile or {}).get("guardian_email", ""),
+        "guardian_phone": (profile or {}).get("guardian_phone", ""),
+    }
+
+
+@router.put("/my-guardian-profile")
+async def update_guardian_profile(data: dict, current_user: dict = Depends(get_current_user)):
+    """Save guardian profile for auto-fill"""
+    from core.database import db
+    await db.auth_users.update_one(
+        {"user_id": current_user["user_id"]},
+        {"$set": {
+            "guardian_name": (data.get("guardian_name") or "").strip(),
+            "guardian_email": (data.get("guardian_email") or "").strip(),
+            "guardian_phone": (data.get("guardian_phone") or "").strip(),
+        }}
+    )
+    return {"success": True}
