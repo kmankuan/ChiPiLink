@@ -638,19 +638,11 @@ export default function Orders() {
         </TabsContent>
       </Tabs>
 
-      {/* Order Chat */}
-      <OrderChat
-        orderId={chatOrder?.order_id}
-        studentName={chatOrder?.student_name}
-        isOpen={!!chatOrder}
-        onClose={() => { setChatOrder(null); refreshUnread(); }}
-        lang={i18n?.language || 'en'}
-      />
-
-      {/* CRM Chat */}
+      {/* CRM Chat (Message) */}
       <CrmChat
         studentId={crmChatStudent?.id}
         studentName={crmChatStudent?.name}
+        orderId={crmChatStudent?.orderId}
         isOpen={!!crmChatStudent}
         onClose={() => { setCrmChatStudent(null); refreshCrmUnread(); }}
       />
