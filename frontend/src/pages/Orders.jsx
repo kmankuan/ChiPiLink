@@ -206,7 +206,6 @@ export default function Orders() {
   const { t, i18n } = useTranslation();
   const { api, token } = useAuth();
   const { itemCount } = useCart();
-  const { perOrder, markOrderRead, refreshUnread } = useNotifications();
   const { perStudent: crmPerStudent, markStudentRead, refreshUnread: refreshCrmUnread } = useCrmNotifications();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -219,7 +218,6 @@ export default function Orders() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [ordersSubTab, setOrdersSubTab] = useState('textbooks');
   const [expandedOrders, setExpandedOrders] = useState({});
-  const [chatOrder, setChatOrder] = useState(null);
   const [crmChatStudent, setCrmChatStudent] = useState(null);
 
   const toggleOrderExpansion = (orderId) => {
