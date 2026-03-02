@@ -63,6 +63,8 @@ export default function BottomNav() {
   const { itemCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { totalUnread } = useNotifications();
+  const { totalUnread: crmUnread } = useCrmNotifications();
+  const allUnread = (totalUnread || 0) + (crmUnread || 0);
   const path = location.pathname;
 
   // Chrome-style auto-hide: track scroll direction
