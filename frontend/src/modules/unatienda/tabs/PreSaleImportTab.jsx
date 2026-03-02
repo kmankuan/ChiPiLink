@@ -149,97 +149,82 @@ export default function PreSaleImportTab({ token: propToken }) {
     finally { setUnlinking(null); }
   };
 
+  // Poll a background job until done
+  const pollJob = async (jobId, onDone, onError) => {
+    for (let i = 0; i < 120; i++) { // max ~4 min
+      await new Promise(r => setTimeout(r, 2000));
+      try {
+        const res = await fetch(`${API}/api/sysbook/presale-import/job/${jobId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) continue;
+        const job = await res.json();
+        if (job.status === 'done') { onDone(job.result); return; }
+        if (job.status === 'error') { onError(job.error); return; }
+      } catch { /* retry */ }
+    }
+    onError('Job timed out after 4 minutes');
+  };
+
   const handlePreview = async () => {
     setPreviewing(true);
-    let lastError = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        if (attempt > 0) {
-          toast.info(`Retrying preview (attempt ${attempt + 1}/3)...`);
-          await new Promise(r => setTimeout(r, attempt * 2000));
-        }
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 90000);
-        const res = await fetch(`${API}/api/sysbook/presale-import/preview`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          setPreviewData(data);
+    try {
+      const res = await fetch(`${API}/api/sysbook/presale-import/preview`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) { toast.error('Failed to start preview'); setPreviewing(false); return; }
+      const { job_id } = await res.json();
+      toast.info('Fetching from Monday.com... This may take up to a minute.');
+      await pollJob(job_id,
+        (result) => {
+          setPreviewData(result);
           setShowPreview(true);
-          if (data.count === 0) {
-            toast.info('No items ready for import. Set the sync trigger column on Monday.com to "Ready" or "Listo" first.');
-          }
+          if (result.count === 0) toast.info('No items ready for import. Set the sync trigger column on Monday.com to "Ready" or "Listo" first.');
           setPreviewing(false);
-          return;
-        } else {
-          const err = await res.json().catch(() => ({}));
-          lastError = err.detail || `HTTP ${res.status}`;
-          if (res.status >= 500 && attempt < 2) continue;
-          toast.error(lastError);
+        },
+        (error) => {
+          toast.error(`Preview failed: ${error}`);
           setPreviewing(false);
-          return;
         }
-      } catch (error) {
-        lastError = error.name === 'AbortError' ? 'Request timed out' : 'Connection error';
-        console.error(`Preview attempt ${attempt + 1} failed:`, error);
-        if (attempt === 2) {
-          toast.error(`Preview failed after 3 attempts: ${lastError}. The Monday.com API may be slow — please try again.`);
-        }
-      }
+      );
+    } catch (error) {
+      toast.error('Connection error');
+      setPreviewing(false);
     }
-    setPreviewing(false);
   };
 
   const handleImport = async () => {
     setImporting(true);
-    let lastError = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        if (attempt > 0) {
-          toast.info(`Retrying import (attempt ${attempt + 1}/3)...`);
-          await new Promise(r => setTimeout(r, attempt * 3000));
-        }
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 120000);
-        const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: previewData?.items || [] }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.errors > 0) {
-            toast.warning(`Imported ${data.imported} orders, ${data.skipped} skipped, ${data.errors} failed. Check logs or retry for remaining items.`, { duration: 8000 });
+    try {
+      const res = await fetch(`${API}/api/sysbook/presale-import/execute`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: previewData?.items || [] }),
+      });
+      if (!res.ok) { toast.error('Failed to start import'); setImporting(false); return; }
+      const { job_id } = await res.json();
+      toast.info('Importing orders... Please wait.');
+      await pollJob(job_id,
+        (result) => {
+          if (result.errors > 0) {
+            toast.warning(`Imported ${result.imported} orders, ${result.skipped} skipped, ${result.errors} failed.`, { duration: 8000 });
           } else {
-            toast.success(`Imported ${data.imported} orders${data.skipped ? ` (${data.skipped} skipped)` : ''}`);
+            toast.success(`Imported ${result.imported} orders${result.skipped ? ` (${result.skipped} skipped)` : ''}`);
           }
           setShowPreview(false);
           setPreviewData(null);
           fetchOrders();
           setImporting(false);
-          return;
-        } else {
-          lastError = `HTTP ${res.status}`;
-          try { const err = await res.json(); lastError = err.detail || lastError; } catch {}
-          if (res.status >= 500 && attempt < 2) continue;
-          toast.error(lastError);
+        },
+        (error) => {
+          toast.error(`Import failed: ${error}`);
           setImporting(false);
-          return;
         }
-      } catch (error) {
-        lastError = error.name === 'AbortError' ? 'Request timed out' : (error.message || 'Connection error');
-        console.error(`Import attempt ${attempt + 1} failed:`, error);
-        if (attempt === 2) {
-          toast.error(`Import failed after 3 attempts: ${lastError}. Please try again.`);
-        }
-      }
+      );
+    } catch (error) {
+      toast.error('Connection error');
+      setImporting(false);
     }
-    setImporting(false);
   };
 
   const handleManualLink = async (order, student) => {

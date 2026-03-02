@@ -1,30 +1,64 @@
 """
 Sysbook Module - Pre-Sale Import Routes
 Admin endpoints for importing pre-sale orders from Monday.com
+Uses background jobs to avoid HTTP timeout on large boards.
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Optional
+import asyncio
+import uuid
+from datetime import datetime, timezone
 from core.auth import get_admin_user
+from core.database import db
 from modules.sysbook.services.presale_import_service import presale_import_service
 from modules.store.services.monday_config_service import monday_config_service
 
 router = APIRouter(prefix="/presale-import", tags=["Sysbook - Pre-Sale Import"])
 
+# In-memory job store (survives within same process)
+_jobs = {}
+
+
+async def _run_preview_job(job_id: str, board_id: str):
+    """Background task for preview"""
+    try:
+        _jobs[job_id]["status"] = "running"
+        result = await presale_import_service.preview_import(board_id)
+        _jobs[job_id].update({"status": "done", "result": result})
+    except Exception as e:
+        _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
+async def _run_import_job(job_id: str, board_id: str, admin_user_id: str, cached_items=None):
+    """Background task for import"""
+    try:
+        _jobs[job_id]["status"] = "running"
+        result = await presale_import_service.import_presale_orders(board_id, admin_user_id, cached_items=cached_items)
+        _jobs[job_id].update({"status": "done", "result": result})
+    except Exception as e:
+        _jobs[job_id].update({"status": "error", "error": str(e)})
+
 
 @router.get("/preview")
 async def preview_import(admin: dict = Depends(get_admin_user)):
-    """Preview items from Monday.com that are ready to import (trigger column set)"""
+    """Start preview as background job — returns job_id immediately"""
     board_config = await monday_config_service.get_config()
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
-    try:
-        result = await presale_import_service.preview_import(board_id)
-        return result
-    except Exception as e:
-        import logging
-        logging.getLogger(__name__).error(f"[presale] Preview failed: {e}")
-        raise HTTPException(500, f"Error fetching from Monday.com: {str(e)}")
+    job_id = f"pj_{uuid.uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "starting", "created_at": datetime.now(timezone.utc).isoformat()}
+    asyncio.create_task(_run_preview_job(job_id, board_id))
+    return {"job_id": job_id, "status": "starting"}
+
+
+@router.get("/job/{job_id}")
+async def get_job_status(job_id: str, admin: dict = Depends(get_admin_user)):
+    """Poll for job status"""
+    job = _jobs.get(job_id)
+    if not job:
+        raise HTTPException(404, "Job not found")
+    return job
 
 
 @router.post("/execute")
@@ -32,17 +66,17 @@ async def execute_import(
     data: dict = Body(default={}),
     admin: dict = Depends(get_admin_user)
 ):
-    """Import pre-sale orders from Monday.com into the app as awaiting_link orders.
-    Optionally accepts cached preview items to avoid re-fetching from Monday.com."""
+    """Start import as background job — returns job_id immediately"""
     board_config = await monday_config_service.get_config()
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
     admin_user_id = admin.get("user_id", "admin")
-    # Accept pre-parsed items from preview to avoid duplicate Monday API calls
     cached_items = data.get("items") if data else None
-    result = await presale_import_service.import_presale_orders(board_id, admin_user_id, cached_items=cached_items)
-    return result
+    job_id = f"ij_{uuid.uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "starting", "created_at": datetime.now(timezone.utc).isoformat()}
+    asyncio.create_task(_run_import_job(job_id, board_id, admin_user_id, cached_items))
+    return {"job_id": job_id, "status": "starting"}
 
 
 @router.get("/orders")
