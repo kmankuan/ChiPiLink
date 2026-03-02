@@ -7,7 +7,7 @@ const BACKEND_URL = RESOLVED_API_URL;
 const SiteConfigContext = createContext({
   siteConfig: {
     site_name: 'ChiPi Link',
-    descripcion: 'Plataforma de comercio electrónico',
+    descripcion: 'A dream born from Covid-19',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
     email_contacto: '',
@@ -24,7 +24,7 @@ const SiteConfigContext = createContext({
 export function SiteConfigProvider({ children }) {
   const [siteConfig, setSiteConfig] = useState({
     site_name: 'ChiPi Link',
-    descripcion: 'Plataforma de comercio electrónico',
+    descripcion: 'A dream born from Covid-19',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
     email_contacto: '',
