@@ -111,8 +111,29 @@ export default function Login() {
           </p>
         </div>
       ) : (
-        <div className="text-center text-muted-foreground py-8">
-          <p className="text-sm">{t('auth.laopan.notConfigured', 'Login is not yet configured.')}</p>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">{t('auth.email', 'Email')}</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com"
+                className="pl-10 h-11 rounded-xl" data-testid="login-email" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">{t('auth.password', 'Password')}</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="********"
+                className="pl-10 h-11 rounded-xl" data-testid="login-password"
+                onKeyDown={e => { if (e.key === 'Enter') handleEmailLogin(); }} />
+            </div>
+          </div>
+          <Button className="w-full h-12 rounded-xl text-sm font-medium" onClick={handleEmailLogin} disabled={loginLoading}
+            data-testid="login-submit">
+            {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            {t('auth.loginButton', 'Sign In')}
+          </Button>
         </div>
       )}
     </div>
