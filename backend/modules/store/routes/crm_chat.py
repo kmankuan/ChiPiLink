@@ -90,7 +90,18 @@ async def admin_create_topic(student_id: str, body: dict, admin: dict = Depends(
     if not subject or not message:
         raise HTTPException(status_code=400, detail="Subject and message are required")
     try:
-        return await crm_chat_service.admin_create_topic(student_id, admin["user_id"], subject, message)
+        result = await crm_chat_service.admin_create_topic(student_id, admin["user_id"], subject, message)
+        # Fire-and-forget push notification
+        try:
+            from core.database import db
+            from modules.notifications.push_helpers import notify_new_message
+            student = await db.store_students.find_one({"student_id": student_id}, {"_id": 0, "user_id": 1, "name": 1})
+            if student and student.get("user_id"):
+                import asyncio
+                asyncio.create_task(notify_new_message(student["user_id"], student.get("name", ""), f"{subject}: {message[:80]}"))
+        except Exception as e:
+            logger.warning(f"Push notification failed (non-fatal): {e}")
+        return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
