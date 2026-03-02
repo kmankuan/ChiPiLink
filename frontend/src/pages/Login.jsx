@@ -47,6 +47,23 @@ export default function Login() {
     }
   };
 
+  const handleEmailLogin = async () => {
+    if (!email.trim() || !password) {
+      toast.error(t('auth.fillFields', 'Please fill in all fields'));
+      return;
+    }
+    setLoginLoading(true);
+    try {
+      await login(email.trim(), password);
+      toast.success(t('auth.loginSuccess', 'Welcome!'));
+      navigate('/');
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || t('auth.loginFailed', 'Login failed. Please verify your credentials or try again.'));
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
   const logoSizeClass = { sm: 'h-8 w-8', md: 'h-12 w-12', lg: 'h-16 w-16' }[logoSize] || 'h-12 w-12';
 
   const LoginForm = () => (
