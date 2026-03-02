@@ -85,13 +85,13 @@ const ORDER_STATUSES = [
 ];
 
 const STATUS_COLORS = {
-  draft: 'bg-gray-100 text-gray-700',
-  submitted: 'bg-blue-100 text-blue-700',
-  awaiting_link: 'bg-orange-100 text-orange-700',
-  processing: 'bg-amber-100 text-amber-700',
-  ready: 'bg-green-100 text-green-700',
-  delivered: 'bg-emerald-100 text-emerald-700',
-  cancelled: 'bg-red-100 text-red-700',
+  draft: 'bg-gray-500 text-white',
+  submitted: 'bg-blue-600 text-white',
+  awaiting_link: 'bg-orange-500 text-white',
+  processing: 'bg-amber-500 text-white',
+  ready: 'bg-green-600 text-white',
+  delivered: 'bg-emerald-600 text-white',
+  cancelled: 'bg-red-600 text-white',
 };
 
 function AddItemToOrder({ order, onAdded }) {
