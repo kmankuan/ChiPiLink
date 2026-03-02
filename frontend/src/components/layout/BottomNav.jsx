@@ -152,9 +152,9 @@ export default function BottomNav() {
                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white text-[9px] font-bold">
                     {(user?.nombre || 'U')[0].toUpperCase()}
                   </div>
-                  {totalUnread > 0 && (
+                  {allUnread > 0 && (
                     <span className="absolute -top-1 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white px-0.5">
-                      {totalUnread > 9 ? '9+' : totalUnread}
+                      {allUnread > 9 ? '9+' : allUnread}
                     </span>
                   )}
                 </div>
