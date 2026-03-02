@@ -385,7 +385,7 @@ function App() {
               <CartProvider>
                 <BrowserRouter>
                   <LayoutProvider>
-                    <div className="App min-h-screen bg-background noise-bg app-content pb-[66px]">
+                    <div className="App min-h-screen bg-background noise-bg app-content pb-[60px]">
                       <ImpersonationBanner />
                       <AppRouter />
                       <BottomNav />
