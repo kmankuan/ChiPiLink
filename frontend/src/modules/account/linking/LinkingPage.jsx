@@ -187,7 +187,10 @@ export default function LinkingPage({ embedded = false }) {
       year: new Date().getFullYear(),
       grade: '',
       relation_type: '',
-      relation_other: ''
+      relation_other: '',
+      guardian_name: guardianProfile?.guardian_name || '',
+      guardian_email: guardianProfile?.guardian_email || '',
+      guardian_phone: guardianProfile?.guardian_phone || '',
     });
   };
 
