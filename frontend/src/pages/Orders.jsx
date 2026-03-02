@@ -271,61 +271,50 @@ export default function Orders() {
   );
 
   const getStatusBadge = (status) => {
-    const styles = {
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      preparing: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-      shipped: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-      delivered: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      paid: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      payment_rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      payment_cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
-      payment_expired: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+    const cfg = {
+      pending:            { bg: 'bg-yellow-500', text: 'text-yellow-950', icon: Clock, label: t('orders.statusPending', 'Pending') },
+      confirmed:          { bg: 'bg-blue-600', text: 'text-white', icon: CheckCircle2, label: t('orders.statusConfirmed', 'Confirmed') },
+      preparing:          { bg: 'bg-purple-600', text: 'text-white', icon: Package, label: t('orders.statusPreparing', 'Preparing') },
+      shipped:            { bg: 'bg-indigo-600', text: 'text-white', icon: Truck, label: t('orders.statusShipped', 'Shipped') },
+      delivered:          { bg: 'bg-green-600', text: 'text-white', icon: Check, label: t('orders.statusDelivered', 'Delivered') },
+      cancelled:          { bg: 'bg-red-600', text: 'text-white', icon: X, label: t('orders.statusCancelled', 'Cancelled') },
+      paid:               { bg: 'bg-green-600', text: 'text-white', icon: CreditCard, label: t('orders.statusPaid', 'Paid') },
+      payment_rejected:   { bg: 'bg-red-600', text: 'text-white', icon: Ban, label: t('orders.statusPaymentRejected', 'Rejected') },
+      payment_cancelled:  { bg: 'bg-gray-500', text: 'text-white', icon: X, label: t('orders.statusPaymentCancelled', 'Cancelled') },
+      payment_expired:    { bg: 'bg-gray-500', text: 'text-white', icon: TimerOff, label: t('orders.statusPaymentExpired', 'Expired') },
     };
-    const labelMap = {
-      pending: t('orders.statusPending', 'Pending'),
-      confirmed: t('orders.statusConfirmed', 'Confirmed'),
-      preparing: t('orders.statusPreparing', 'Preparing'),
-      shipped: t('orders.statusShipped', 'Shipped'),
-      delivered: t('orders.statusDelivered', 'Delivered'),
-      cancelled: t('orders.statusCancelled', 'Cancelled'),
-      paid: t('orders.statusPaid', 'Paid'),
-      payment_rejected: t('orders.statusPaymentRejected', 'Payment Rejected'),
-      payment_cancelled: t('orders.statusPaymentCancelled', 'Payment Cancelled'),
-      payment_expired: t('orders.statusPaymentExpired', 'Payment Expired'),
-    };
-    return <Badge className={styles[status] || styles.pending}>{labelMap[status] || status}</Badge>;
+    const c = cfg[status] || cfg.pending;
+    const Icon = c.icon;
+    return <Badge className={`${c.bg} ${c.text} rounded-full px-3 py-0.5 text-xs font-bold gap-1 inline-flex items-center`}><Icon className="h-3 w-3" />{c.label}</Badge>;
   };
 
   const getTextbookStatusBadge = (status) => {
-    const styles = {
-      draft: 'bg-gray-100 text-gray-700', submitted: 'bg-blue-100 text-blue-700',
-      processing: 'bg-amber-100 text-amber-700', ready: 'bg-green-100 text-green-700',
-      delivered: 'bg-emerald-100 text-emerald-700', cancelled: 'bg-red-100 text-red-700',
+    const cfg = {
+      draft:      { bg: 'bg-gray-500', text: 'text-white', icon: Pencil, label: t('orders.statusDraft', 'Draft') },
+      submitted:  { bg: 'bg-blue-600', text: 'text-white', icon: Send, label: t('orders.statusSubmitted', 'Submitted') },
+      processing: { bg: 'bg-amber-500', text: 'text-white', icon: Clock, label: t('orders.statusProcessing', 'Processing') },
+      ready:      { bg: 'bg-green-600', text: 'text-white', icon: CheckCircle2, label: t('orders.statusReady', 'Ready') },
+      delivered:  { bg: 'bg-emerald-600', text: 'text-white', icon: Check, label: t('orders.statusDelivered', 'Delivered') },
+      cancelled:  { bg: 'bg-red-600', text: 'text-white', icon: X, label: t('orders.statusCancelled', 'Cancelled') },
     };
-    const labelMap = {
-      draft: t('orders.statusDraft', 'Draft'), submitted: t('orders.statusSubmitted', 'Submitted'),
-      processing: t('orders.statusProcessing', 'Processing'), ready: t('orders.statusReady', 'Ready'),
-      delivered: t('orders.statusDelivered', 'Delivered'), cancelled: t('orders.statusCancelled', 'Cancelled'),
-    };
-    return <Badge className={styles[status] || styles.draft}>{labelMap[status] || status}</Badge>;
+    const c = cfg[status] || cfg.draft;
+    const Icon = c.icon;
+    return <Badge className={`${c.bg} ${c.text} rounded-full px-3 py-0.5 text-xs font-bold gap-1 inline-flex items-center`}><Icon className="h-3 w-3" />{c.label}</Badge>;
   };
 
   const getItemStatusBadge = (status) => {
-    const styles = {
-      available: 'bg-gray-100 text-gray-600 text-[10px]', ordered: 'bg-blue-100 text-blue-700 text-[10px]',
-      processing: 'bg-amber-100 text-amber-700 text-[10px]', ready_for_pickup: 'bg-green-100 text-green-700 text-[10px]',
-      delivered: 'bg-emerald-100 text-emerald-700 text-[10px]', issue: 'bg-red-100 text-red-700 text-[10px]',
-      out_of_stock: 'bg-gray-200 text-gray-500 text-[10px]',
+    const cfg = {
+      available:        { bg: 'bg-gray-500', text: 'text-white', icon: BookOpen, label: t('orders.itemAvailable', 'Available') },
+      ordered:          { bg: 'bg-blue-600', text: 'text-white', icon: Send, label: t('orders.itemOrdered', 'Ordered') },
+      processing:       { bg: 'bg-amber-500', text: 'text-white', icon: Clock, label: t('orders.itemProcessing', 'Processing') },
+      ready_for_pickup: { bg: 'bg-green-600', text: 'text-white', icon: CheckCircle2, label: t('orders.itemReady', 'Ready') },
+      delivered:        { bg: 'bg-emerald-600', text: 'text-white', icon: Check, label: t('orders.itemDelivered', 'Delivered') },
+      issue:            { bg: 'bg-red-600', text: 'text-white', icon: AlertCircle, label: t('orders.itemIssue', 'Issue') },
+      out_of_stock:     { bg: 'bg-gray-400', text: 'text-white', icon: Ban, label: t('orders.itemOutOfStock', 'Out of Stock') },
     };
-    const labelMap = {
-      available: t('orders.itemAvailable', 'Available'), ordered: t('orders.itemOrdered', 'Ordered'),
-      processing: t('orders.itemProcessing', 'Processing'), ready_for_pickup: t('orders.itemReady', 'Ready'),
-      delivered: t('orders.itemDelivered', 'Delivered'), issue: t('orders.itemIssue', 'Issue'),
-      out_of_stock: t('orders.itemOutOfStock', 'Out of Stock'),
-    };
-    return <Badge className={styles[status] || styles.ordered}>{labelMap[status] || status}</Badge>;
+    const c = cfg[status] || cfg.ordered;
+    const Icon = c.icon;
+    return <Badge className={`${c.bg} ${c.text} rounded-full px-2.5 py-0.5 text-[10px] font-bold gap-1 inline-flex items-center`}><Icon className="h-2.5 w-2.5" />{c.label}</Badge>;
   };
 
   const getDeliveryProgress = (items) => {
