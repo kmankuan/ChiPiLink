@@ -4,16 +4,20 @@
  * Uses siteConfig for branding: logo, bg image, colors, text
  */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { ExternalLink, Loader2, UserPlus } from 'lucide-react';
+import { ExternalLink, Loader2, UserPlus, Mail, Lock } from 'lucide-react';
 
 export default function Login() {
   const { t } = useTranslation();
-  const { loginWithLaoPan, laopanConfig } = useAuth();
+  const navigate = useNavigate();
+  const { loginWithLaoPan, laopanConfig, login } = useAuth();
   const { siteConfig } = useSiteConfig();
   const [laopanLoading, setLaopanLoading] = useState(false);
 
