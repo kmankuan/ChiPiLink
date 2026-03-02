@@ -593,13 +593,8 @@ export default function SuperAppLanding() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // Don't block page render on community data — render layout immediately
+  // Individual sections (Telegram, MediaPlayer, etc.) handle their own loading
 
   // Determine which layout to render
   const selectedLayout = uiStyle?.layout || 'mosaic_community';
