@@ -32,13 +32,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   // Fetch LaoPan OAuth configuration
-  const fetchLaopanConfig = useCallback(async () => {
+  const fetchLaopanConfig = useCallback(async (attempt = 1) => {
     try {
       const response = await api.get(AUTH_ENDPOINTS.laopanConfig);
       setLaopanConfig(response.data);
     } catch (error) {
-      console.error('LaoPan config fetch error:', error);
-      setLaopanConfig({ enabled: false });
+      console.error(`LaoPan config fetch error (attempt ${attempt}):`, error?.message);
+      // Retry up to 3 times before giving up
+      if (attempt < 3) {
+        setTimeout(() => fetchLaopanConfig(attempt + 1), 1500 * attempt);
+      } else {
+        setLaopanConfig({ enabled: false });
+      }
     }
   }, [api]);
 
