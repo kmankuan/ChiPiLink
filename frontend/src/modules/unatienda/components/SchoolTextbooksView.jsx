@@ -160,11 +160,16 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   }
 
   const texts = {
-    en: { title: 'Link Student', firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel', selectPlaceholder: '-- Select --', firstNamePh: 'John', lastNamePh: 'Doe' },
-    es: { title: 'Vincular Estudiante', firstName: 'Nombre', lastName: 'Apellido', school: 'Escuela', grade: 'Grado', studentNo: 'Numero de Estudiante (opcional)', relationship: 'Su Relacion', other: 'Especificar relacion', submit: 'Vincular Estudiante', cancel: 'Cancelar', selectPlaceholder: '-- Seleccionar --', firstNamePh: 'Juan', lastNamePh: 'Perez' },
-    zh: { title: '关联学生', firstName: '名', lastName: '姓', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消', selectPlaceholder: '-- 选择 --', firstNamePh: '名', lastNamePh: '姓' },
+    en: { title: 'Link Student', firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel', selectPlaceholder: '-- Select --', firstNamePh: 'John', lastNamePh: 'Doe',
+      guardianTitle: 'Guardian Information', guardianName: 'Full Name', guardianEmail: 'Email', guardianPhone: 'Cellphone', guardianEdit: 'Edit', guardianConfirm: 'Confirm', guardianUseSame: 'Use same guardian info?', guardianYes: 'Yes', guardianNo: 'Change' },
+    es: { title: 'Vincular Estudiante', firstName: 'Nombre', lastName: 'Apellido', school: 'Escuela', grade: 'Grado', studentNo: 'Numero de Estudiante (opcional)', relationship: 'Su Relacion', other: 'Especificar relacion', submit: 'Vincular Estudiante', cancel: 'Cancelar', selectPlaceholder: '-- Seleccionar --', firstNamePh: 'Juan', lastNamePh: 'Perez',
+      guardianTitle: 'Informacion del Acudiente', guardianName: 'Nombre Completo', guardianEmail: 'Correo', guardianPhone: 'Celular', guardianEdit: 'Editar', guardianConfirm: 'Confirmar', guardianUseSame: 'Usar misma informacion del acudiente?', guardianYes: 'Si', guardianNo: 'Cambiar' },
+    zh: { title: '关联学生', firstName: '名', lastName: '姓', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消', selectPlaceholder: '-- 选择 --', firstNamePh: '名', lastNamePh: '姓',
+      guardianTitle: '监护人信息', guardianName: '全名', guardianEmail: '邮箱', guardianPhone: '手机', guardianEdit: '编辑', guardianConfirm: '确认', guardianUseSame: '使用相同的监护人信息？', guardianYes: '是', guardianNo: '更改' },
   };
   const ft = texts[lang] || texts.es;
+
+  const gSet = (k, v) => setGuardian(p => ({ ...p, [k]: v }));
 
   return (
     <Card className="border-primary/30 shadow-sm">
@@ -176,6 +181,49 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
           </div>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCancel}><X className="h-4 w-4" /></Button>
         </div>
+
+        {/* ═══ GUARDIAN HEADER ═══ */}
+        <div className="rounded-lg border bg-muted/30 p-3 space-y-2" data-testid="guardian-header">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{ft.guardianTitle}</Label>
+            {guardianConfirmed && !editingGuardian && (
+              <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" onClick={() => setEditingGuardian(true)}>{ft.guardianEdit}</Button>
+            )}
+          </div>
+          {guardianConfirmed && !editingGuardian ? (
+            <div className="flex items-center gap-3 text-xs">
+              <User className="h-4 w-4 text-primary shrink-0" />
+              <div className="min-w-0">
+                <p className="font-medium truncate">{guardian.name}</p>
+                <p className="text-muted-foreground truncate">{[guardian.email, guardian.phone].filter(Boolean).join(' · ') || '—'}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <Label className="text-[10px]">{ft.guardianName}</Label>
+                <Input value={guardian.name} onChange={e => gSet('name', e.target.value)} placeholder={ft.guardianName} className="h-8 text-xs" data-testid="input-guardian-name" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px]">{ft.guardianEmail}</Label>
+                <Input type="email" value={guardian.email} onChange={e => gSet('email', e.target.value)} placeholder="email@example.com" className="h-8 text-xs" data-testid="input-guardian-email" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px]">{ft.guardianPhone}</Label>
+                <Input type="tel" value={guardian.phone} onChange={e => gSet('phone', e.target.value)} placeholder="+507 6000-0000" className="h-8 text-xs" data-testid="input-guardian-phone" />
+              </div>
+            </div>
+          )}
+          {editingGuardian && guardian.name && (
+            <div className="flex justify-end">
+              <Button size="sm" variant="secondary" className="h-6 text-[10px] px-3" onClick={() => { setGuardianConfirmed(true); setEditingGuardian(false); }}>
+                <Check className="h-3 w-3 mr-1" />{ft.guardianConfirm}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* ═══ STUDENT FIELDS ═══ */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
