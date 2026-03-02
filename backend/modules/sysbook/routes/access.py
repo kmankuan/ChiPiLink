@@ -61,21 +61,6 @@ async def create_student(
             data=data
         )
 
-        # Save guardian profile for auto-fill on next student link
-        try:
-            from core.database import db as _db
-            guardian_update = {}
-            if data.guardian_name: guardian_update["guardian_name"] = data.guardian_name.strip()
-            if data.guardian_email: guardian_update["guardian_email"] = data.guardian_email.strip()
-            if data.guardian_phone: guardian_update["guardian_phone"] = data.guardian_phone.strip()
-            if guardian_update:
-                await _db.auth_users.update_one(
-                    {"user_id": current_user["user_id"]},
-                    {"$set": guardian_update}
-                )
-        except Exception:
-            pass
-
         # Suggest pre-sale order link (admin must confirm)
         try:
             from modules.sysbook.services.presale_import_service import presale_import_service
