@@ -105,7 +105,18 @@ async def admin_reply(
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     try:
-        return await crm_chat_service.admin_reply_to_topic(student_id, update_id, admin["user_id"], message)
+        result = await crm_chat_service.admin_reply_to_topic(student_id, update_id, admin["user_id"], message)
+        # Fire-and-forget push notification to the student's parent user
+        try:
+            from core.database import db
+            from modules.notifications.push_helpers import notify_new_message
+            student = await db.store_students.find_one({"student_id": student_id}, {"_id": 0, "user_id": 1, "name": 1})
+            if student and student.get("user_id"):
+                import asyncio
+                asyncio.create_task(notify_new_message(student["user_id"], student.get("name", ""), message[:100]))
+        except Exception as e:
+            logger.warning(f"Push notification failed (non-fatal): {e}")
+        return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
