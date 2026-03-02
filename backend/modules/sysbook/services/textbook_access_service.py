@@ -209,16 +209,21 @@ class TextbookAccessService(BaseService):
         if data.relation_type == RelationType.OTHER and not data.relation_other:
             raise ValueError("Please specify the relationship type")
         
+        # Check if approval is required
+        access_config = await db.app_config.find_one({"key": "sysbook_access_config"}, {"_id": 0})
+        require_approval = (access_config or {}).get("require_approval", False)
+        initial_status = RequestStatus.PENDING.value if require_approval else RequestStatus.APPROVED.value
+        
         # Create initial enrollment
         enrollment = {
             "year": data.year,
             "grade": data.grade,
             "is_editable": self.is_year_editable(data.year),
-            "status": RequestStatus.PENDING.value,
-            "approved_at": None,
-            "approved_by": None,
+            "status": initial_status,
+            "approved_at": None if require_approval else datetime.now(timezone.utc).isoformat(),
+            "approved_by": None if require_approval else "auto",
             "rejection_reason": None,
-            "admin_notes": None
+            "admin_notes": None if require_approval else "Auto-approved (approval not required)"
         }
         
         full_name = f"{data.first_name} {data.last_name}".strip()
