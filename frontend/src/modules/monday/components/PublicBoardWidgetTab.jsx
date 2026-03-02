@@ -146,6 +146,7 @@ export default function PublicBoardWidgetTab() {
 
   const selectedCols = (config.columns_to_show || []).map(c => c.id || c);
   const selectedSubCols = (config.subitem_columns_to_show || []).map(c => c.id || c);
+  const selectedSearchCols = config.search_columns || [];
 
   return (
     <div className="space-y-4" data-testid="public-board-widget-tab">
@@ -243,6 +244,35 @@ export default function PublicBoardWidgetTab() {
             <div>
               <Label className="text-xs text-red-600">Search Placeholder (ZH)</Label>
               <Input value={config.search_placeholder_zh || ''} onChange={e => setConfig(p => ({ ...p, search_placeholder_zh: e.target.value }))} className="mt-1" placeholder="搜索..." />
+            </div>
+          </div>
+          {/* Search Columns — which columns to search */}
+          <div>
+            <Label className="text-xs font-semibold">Search Columns</Label>
+            <p className="text-[10px] text-muted-foreground mb-1.5">Select which columns the search bar filters by. If none selected, searches all columns.</p>
+            <div className="flex flex-wrap gap-1.5">
+              {/* Name column (always available) */}
+              <button
+                onClick={() => {
+                  const cur = config.search_columns || [];
+                  setConfig(p => ({ ...p, search_columns: cur.includes('name') ? cur.filter(c => c !== 'name') : [...cur, 'name'] }));
+                }}
+                className={`px-2 py-1 rounded text-[10px] font-medium border transition-colors ${
+                  selectedSearchCols.includes('name') ? 'bg-primary text-white border-primary' : 'bg-muted/50 border-border hover:border-primary/50'
+                }`}
+              >Name</button>
+              {columns.map(col => (
+                <button
+                  key={col.id}
+                  onClick={() => {
+                    const cur = config.search_columns || [];
+                    setConfig(p => ({ ...p, search_columns: cur.includes(col.id) ? cur.filter(c => c !== col.id) : [...cur, col.id] }));
+                  }}
+                  className={`px-2 py-1 rounded text-[10px] font-medium border transition-colors ${
+                    selectedSearchCols.includes(col.id) ? 'bg-primary text-white border-primary' : 'bg-muted/50 border-border hover:border-primary/50'
+                  }`}
+                >{col.title || col.id}</button>
+              ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

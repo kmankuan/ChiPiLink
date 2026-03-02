@@ -19,6 +19,20 @@ function colTitle(colId, columnTitles) {
   return columnTitles?.[colId] || colId;
 }
 
+/** Highlight matching text in a string */
+function HighlightText({ text, query }) {
+  if (!query || query.length < 3 || !text) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-yellow-200 text-yellow-900 rounded-sm px-0.5">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
 function ItemCard({ item, showSubitems, columnTitles }) {
   const [expanded, setExpanded] = useState(false);
   const hasSubs = showSubitems && item.subitems?.length > 0;
@@ -71,7 +85,7 @@ function ItemCard({ item, showSubitems, columnTitles }) {
   );
 }
 
-function ItemTable({ items, showSubitems, columns, columnTitles }) {
+function ItemTable({ items, showSubitems, columns, columnTitles, query }) {
   const colIds = columns?.length > 0
     ? columns.map(c => c.id || c)
     : items.length > 0 ? Object.keys(items[0].columns || {}) : [];
@@ -88,7 +102,7 @@ function ItemTable({ items, showSubitems, columns, columnTitles }) {
         </thead>
         <tbody>
           {items.map(item => (
-            <ItemTableRow key={item.id} item={item} colIds={colIds} showSubitems={showSubitems} columnTitles={columnTitles} />
+            <ItemTableRow key={item.id} item={item} colIds={colIds} showSubitems={showSubitems} columnTitles={columnTitles} query={query} />
           ))}
         </tbody>
       </table>
@@ -102,7 +116,7 @@ function colVal(item, colId) {
   return item.columns?.[colId] || '';
 }
 
-function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
+function ItemTableRow({ item, colIds, showSubitems, columnTitles, query }) {
   const [expanded, setExpanded] = useState(false);
   const hasSubs = showSubitems && item.subitems?.length > 0;
 
@@ -118,10 +132,10 @@ function ItemTableRow({ item, colIds, showSubitems, columnTitles }) {
                     {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                   </button>
                 )}
-                <span className="font-medium">{colVal(item, id)}</span>
+                <span className="font-medium"><HighlightText text={colVal(item, id)} query={query} /></span>
               </div>
             ) : (
-              <span className="text-muted-foreground">{colVal(item, id)}</span>
+              <span className="text-muted-foreground"><HighlightText text={colVal(item, id)} query={query} /></span>
             )}
           </td>
         ))}
@@ -151,11 +165,21 @@ export default function MondayBoardWidget() {
       .catch(() => setLoading(false));
   }, []);
 
+  const searchColumns = data?.search_columns || [];
+
   const filteredItems = useMemo(() => {
     if (!data?.items) return [];
     const q = searchQuery.trim().toLowerCase();
     if (q.length < 3) return data.items;
     return data.items.filter(item => {
+      // If search_columns configured, only search those columns
+      if (searchColumns.length > 0) {
+        return searchColumns.some(colId => {
+          const val = colId === 'name' ? item.name : (item.columns?.[colId] || '');
+          return val?.toLowerCase().includes(q);
+        });
+      }
+      // Fallback: search all columns
       if (item.name?.toLowerCase().includes(q)) return true;
       if (item.group?.toLowerCase().includes(q)) return true;
       if (Object.values(item.columns || {}).some(v => v?.toLowerCase().includes(q))) return true;
@@ -166,7 +190,7 @@ export default function MondayBoardWidget() {
       })) return true;
       return false;
     });
-  }, [data, searchQuery]);
+  }, [data, searchQuery, searchColumns]);
 
   if (loading) {
     return (
@@ -222,7 +246,7 @@ export default function MondayBoardWidget() {
                 : (lang === 'es' ? 'No hay elementos para mostrar.' : lang === 'zh' ? '没有要显示的项目。' : 'No items to display.')}
             </p>
           ) : style === 'table' ? (
-            <ItemTable items={filteredItems} showSubitems={showSubitems} columns={data.columns} columnTitles={columnTitles} />
+            <ItemTable items={filteredItems} showSubitems={showSubitems} columns={data.columns} columnTitles={columnTitles} query={searchQuery} />
           ) : style === 'list' ? (
             <div className="divide-y rounded-lg border">
               {filteredItems.map(item => (

@@ -49,7 +49,7 @@ async def save_widget_config(body: dict, admin: dict = Depends(get_admin_user)):
             "search_only", "search_placeholder",
             "title_es", "title_zh", "subtitle_es", "subtitle_zh",
             "search_placeholder_es", "search_placeholder_zh",
-            "column_titles",
+            "column_titles", "search_columns",
         }
         update = {k: v for k, v in body.items() if k in allowed}
         update["config_key"] = "widget"
@@ -141,6 +141,7 @@ async def get_widget_data():
         "show_subitems": config.get("show_subitems", False),
         "subitem_columns": config.get("subitem_columns_to_show", []),
         "search_only": config.get("search_only", False),
+        "search_columns": config.get("search_columns", []),
         "items": items[:max_items],
     }
 
