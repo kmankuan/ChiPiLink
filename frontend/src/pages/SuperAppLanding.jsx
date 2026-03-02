@@ -508,15 +508,30 @@ export default function SuperAppLanding() {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (attempt = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing));
+      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing), { timeout: 15000 });
       setCommunityData(response.data);
-    } catch {
-      console.error('Error fetching community data');
+      // Cache for fallback on next load failure
+      try { sessionStorage.setItem('chipi_landing_cache', JSON.stringify(response.data)); } catch {}
+    } catch (err) {
+      console.error(`Error fetching community data (attempt ${attempt}):`, err?.message);
+      // Retry once
+      if (attempt < 2) {
+        setTimeout(() => fetchData(attempt + 1), 2000);
+        return;
+      }
+      // Use cached data as fallback
+      try {
+        const cached = sessionStorage.getItem('chipi_landing_cache');
+        if (cached) {
+          setCommunityData(JSON.parse(cached));
+          console.log('Using cached landing data');
+        }
+      } catch {}
     } finally {
-      setLoading(false);
+      if (attempt >= 2 || !loading) setLoading(false);
     }
   };
 
