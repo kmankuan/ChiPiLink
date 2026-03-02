@@ -51,6 +51,8 @@ class ConfiguracionSitio(BaseModel):
     login_subtext: Optional[str] = None  # Custom subtitle
     login_layout: str = "split"  # split | centered | fullscreen
     login_logo_size: str = "md"  # sm | md | lg
+    # Section title style for landing page
+    section_title_style: str = "bar"  # bar | uppercase | pill | underline | chip | dot
 
 
 class PaginaBuilder(BaseModel):

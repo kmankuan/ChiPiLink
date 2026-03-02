@@ -11,6 +11,7 @@ import {
   Film, FileText, Image as ImageIcon, ChevronDown, Loader2, Pause, ExternalLink, Link2
 } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
+import SectionTitle from '@/components/ui/SectionTitle';
 
 const API_URL = RESOLVED_API_URL;
 
@@ -581,19 +582,9 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: header_bg }}>
-            <MessageCircle className="h-4 w-4" style={{ color: icon_color }} />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold tracking-tight" style={{ color: '#2d2217' }}>{title}</h3>
-            <p className="text-[10px]" style={{ color: '#b8956a' }}>
-              {show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-3 pt-3 pb-1">
+        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle} />
+        <div className="flex items-center gap-2 shrink-0">
           {/* Autoplay toggle - hidden by default, admin-configurable */}
           {show_autoplay_btn && posts.length > 1 && (
             <button
@@ -814,19 +805,9 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: header_bg }}>
-            <MessageCircle className="h-4 w-4" style={{ color: icon_color }} />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold tracking-tight" style={{ color: '#2d2217' }}>{title}</h3>
-            <p className="text-[10px]" style={{ color: '#b8956a' }}>
-              {show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-3 pt-3 pb-1">
+        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle} />
+        <div className="flex items-center gap-2 shrink-0">
           {header_links.length > 0 && header_links.map((link, idx) => {
             const isExternal = link.url?.startsWith('http');
             return (

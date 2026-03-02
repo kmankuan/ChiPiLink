@@ -42,6 +42,7 @@ export default function SiteConfigModule() {
     login_subtext: '',
     login_layout: 'split',
     login_logo_size: 'md',
+    section_title_style: 'bar',
   });
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function SiteConfigModule() {
           login_subtext: safeString(data.login_subtext),
           login_layout: data.login_layout || 'split',
           login_logo_size: data.login_logo_size || 'md',
+          section_title_style: data.section_title_style || 'bar',
         });
       }
     } catch (error) {
@@ -281,6 +283,45 @@ export default function SiteConfigModule() {
                 />
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section Title Style */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Section Title Style
+          </CardTitle>
+          <CardDescription>
+            Choose how section headings appear on the landing page (media player, community feed, etc.)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[
+              { id: 'bar', label: 'Left Bar', preview: '┃ Title' },
+              { id: 'uppercase', label: 'Uppercase', preview: 'TITLE ——' },
+              { id: 'pill', label: 'Pill Badge', preview: '● Title' },
+              { id: 'underline', label: 'Underline', preview: 'Title ▁▁' },
+              { id: 'chip', label: 'Chip', preview: '[Title]' },
+              { id: 'dot', label: 'Dot + Bold', preview: '• Title' },
+            ].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setConfig({ ...config, section_title_style: s.id })}
+                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                  config.section_title_style === s.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-muted hover:border-muted-foreground/30'
+                }`}
+                data-testid={`section-style-${s.id}`}
+              >
+                <span className="text-xs font-semibold block">{s.label}</span>
+                <span className="text-[10px] text-muted-foreground font-mono">{s.preview}</span>
+              </button>
+            ))}
           </div>
         </CardContent>
       </Card>

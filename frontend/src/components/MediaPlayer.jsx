@@ -6,6 +6,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SectionTitle from '@/components/ui/SectionTitle';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API_URL = RESOLVED_API_URL;
@@ -300,12 +301,7 @@ export default function MediaPlayer() {
 
   return (
     <div data-testid="media-player-wrapper">
-      {/* Album Title — label above the player */}
-      {albumTitle && (
-        <div className="px-1 mb-1.5" data-testid="album-title">
-          <h3 className="text-sm sm:text-base font-bold tracking-tight text-foreground/80">{albumTitle}</h3>
-        </div>
-      )}
+      {albumTitle && <SectionTitle title={albumTitle} />}
       <div
         ref={containerRef}
         className="relative w-full rounded-2xl overflow-hidden bg-black group"

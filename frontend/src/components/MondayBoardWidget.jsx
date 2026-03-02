@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
+import SectionTitle from '@/components/ui/SectionTitle';
 
 const API = RESOLVED_API_URL;
 
@@ -196,8 +197,7 @@ export default function MondayBoardWidget() {
       {/* Header + Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          {title && <h3 className="text-lg font-bold">{title}</h3>}
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+          {title && <SectionTitle title={title} subtitle={subtitle} />}
         </div>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
