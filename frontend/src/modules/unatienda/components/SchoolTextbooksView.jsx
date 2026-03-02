@@ -58,6 +58,14 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const [loading, setLoading] = useState(true);
   const [schoolsError, setSchoolsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Guardian info — persisted in localStorage, shown as header
+  const GUARDIAN_KEY = 'chipilink_guardian_info';
+  const savedGuardian = JSON.parse(localStorage.getItem(GUARDIAN_KEY) || 'null');
+  const [guardian, setGuardian] = useState(savedGuardian || { name: '', email: '', phone: '' });
+  const [guardianConfirmed, setGuardianConfirmed] = useState(!!savedGuardian?.name);
+  const [editingGuardian, setEditingGuardian] = useState(!savedGuardian?.name);
+
   const [form, setForm] = useState({
     first_name: '', last_name: '', school_id: '', student_number: '',
     year: new Date().getFullYear(), grade: '', relation_type: '', relation_other: '',
