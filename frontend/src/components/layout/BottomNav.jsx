@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useCrmNotifications } from '@/hooks/useCrmNotifications';
 import {
   Home, Compass, ShoppingBag, Trophy, User, LogIn,
   Sun, Moon, ClipboardList, Settings, LogOut, Bell,
