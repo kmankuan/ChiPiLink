@@ -195,9 +195,18 @@ def _build_thermal_html(orders, fmt):
     receipts_html = ""
     for idx, order in enumerate(orders):
         items = [i for i in order.get("items", []) if (i.get("quantity_ordered") or i.get("quantity") or 0) > 0]
+        def _safe_price(i):
+            try:
+                return float(i.get("price") or 0)
+            except (TypeError, ValueError):
+                return 0.0
         total = order.get("total_amount") or sum(
-            (i.get("price") or 0) * (i.get("quantity_ordered") or i.get("quantity") or 1) for i in items
+            _safe_price(i) * (i.get("quantity_ordered") or i.get("quantity") or 1) for i in items
         )
+        try:
+            total = float(total)
+        except (TypeError, ValueError):
+            total = 0.0
         page_break = 'page-break-after: always;' if idx < len(orders) - 1 else ''
 
         receipt = f'<div style="padding: 2mm 0; {page_break}">'
@@ -237,7 +246,10 @@ def _build_thermal_html(orders, fmt):
             code = item.get("book_code") or ""
             name = item.get("book_name") or item.get("name") or "—"
             qty = item.get("quantity_ordered") or item.get("quantity") or 1
-            price = item.get("price") or 0
+            try:
+                price = float(item.get("price") or 0)
+            except (TypeError, ValueError):
+                price = 0.0
             status = item.get("status") or ""
             receipt += '<tr style="border-bottom:1px dotted #000;">'
             if b.get("show_checkboxes", True):
