@@ -17,10 +17,11 @@ import { toast } from 'sonner';
 import {
   BookOpen, Check, ChevronRight, Clock, GraduationCap,
   Loader2, Lock, Package, Plus, Send, User, UserPlus, X,
-  Wallet, AlertTriangle, Mail, Phone
+  Wallet, AlertTriangle, Mail, Phone, ArrowRight, Building2, Banknote, CheckCircle2
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import DepositFlow from '@/modules/account/wallet/DepositFlow';
 import { ExpandableText } from '../../../components/ui/expandable-text';
 import { useGuardedAction } from '@/hooks/useGuardedAction';
 import RESOLVED_API_URL from '@/config/apiUrl';
@@ -338,7 +339,8 @@ export default function SchoolTextbooksView({
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [allStudents, setAllStudents] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
-  const [summaryStudent, setSummaryStudent] = useState(null); // student object for summary modal
+  const [summaryStudent, setSummaryStudent] = useState(null);
+  const [depositOpen, setDepositOpen] = useState(false);
   
   const texts = {
     en: {
@@ -732,6 +734,44 @@ export default function SchoolTextbooksView({
                         <span>{orderedItems.length} {t.itemsOf} {items.length} {t.purchased.toLowerCase()}</span>
                         {orderedTotal > 0 && <span className="font-medium text-foreground">{t.purchased}: ${orderedTotal.toFixed(2)}</span>}
                       </div>
+
+                      {/* Order Status Stepper */}
+                      {orderData?.status && orderedItems.length > 0 && (() => {
+                        const steps = [
+                          { key: 'submitted', label: lang === 'es' ? 'Enviado' : 'Submitted', icon: Send },
+                          { key: 'paid', label: lang === 'es' ? 'Pagado' : 'Paid', icon: Wallet },
+                          { key: 'processing', label: lang === 'es' ? 'Procesando' : 'Processing', icon: Package },
+                          { key: 'ready', label: lang === 'es' ? 'Listo' : 'Ready', icon: CheckCircle2 },
+                        ];
+                        const statusOrder = { submitted: 0, awaiting_link: 0, paid: 1, processing: 2, ready: 3, delivered: 4 };
+                        const currentIdx = statusOrder[orderData.status] ?? 0;
+                        return (
+                          <div className="px-4 py-2.5 bg-muted/10 border-b" data-testid={`order-stepper-${studentId}`}>
+                            <div className="flex items-center justify-between">
+                              {steps.map((step, idx) => {
+                                const StepIcon = step.icon;
+                                const isDone = idx < currentIdx;
+                                const isCurrent = idx === currentIdx;
+                                return (
+                                  <div key={step.key} className="flex items-center flex-1">
+                                    <div className="flex flex-col items-center gap-0.5">
+                                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                        isDone ? 'bg-green-500 text-white' : isCurrent ? 'bg-purple-600 text-white ring-2 ring-purple-200' : 'bg-muted text-muted-foreground'
+                                      }`}>
+                                        {isDone ? <Check className="h-3 w-3" /> : <StepIcon className="h-3 w-3" />}
+                                      </div>
+                                      <span className={`text-[9px] font-medium ${isCurrent ? 'text-purple-700' : isDone ? 'text-green-700' : 'text-muted-foreground'}`}>{step.label}</span>
+                                    </div>
+                                    {idx < steps.length - 1 && (
+                                      <div className={`flex-1 h-0.5 mx-1 mt-[-12px] rounded ${isDone ? 'bg-green-400' : 'bg-muted'}`} />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })()}
                       
                       {/* Item list */}
                       <div className="divide-y" data-testid={`textbook-list-${studentId}`}>
@@ -823,11 +863,32 @@ export default function SchoolTextbooksView({
                             </span>
                             <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
                           </div>
-                          {/* Insufficient balance warning */}
+                          {/* Insufficient balance — enhanced guidance */}
                           {selectedList.length > 0 && walletBalance !== null && walletBalance < selectedTotal && (
-                            <div className="flex items-center gap-1.5 mb-2 px-2 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 text-[10px]" data-testid={`insufficient-warning-${studentId}`}>
-                              <AlertTriangle className="h-3 w-3 shrink-0" />
-                              {lang === 'es' ? 'Saldo insuficiente para completar el pedido' : 'Insufficient balance to complete order'}
+                            <div className="mb-2 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 p-2.5 space-y-2" data-testid={`topup-guide-${studentId}`}>
+                              <div className="flex items-center gap-1.5 text-red-700 text-[11px] font-semibold">
+                                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                                {lang === 'es'
+                                  ? `Necesitas $${(selectedTotal - (walletBalance || 0)).toFixed(2)} más para completar el pedido`
+                                  : `You need $${(selectedTotal - (walletBalance || 0)).toFixed(2)} more to complete your order`}
+                              </div>
+                              <p className="text-[10px] text-red-600/80">
+                                {lang === 'es'
+                                  ? 'Recarga tu billetera con una de estas opciones:'
+                                  : 'Top up your wallet with one of these options:'}
+                              </p>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="flex-1 h-8 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-100"
+                                  onClick={() => navigate('/mi-cuenta?tab=wallet')} data-testid={`goto-wallet-${studentId}`}>
+                                  <Wallet className="h-3 w-3" />
+                                  {lang === 'es' ? 'Ir a Billetera' : 'Go to Wallet'}
+                                </Button>
+                                <Button variant="default" size="sm" className="flex-1 h-8 text-[10px] gap-1 bg-red-600 hover:bg-red-700 text-white"
+                                  onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
+                                  <Banknote className="h-3 w-3" />
+                                  {lang === 'es' ? 'Recargar Ahora' : 'Top Up Now'}
+                                </Button>
+                              </div>
                             </div>
                           )}
                           <div className="flex items-center justify-between gap-3 pb-safe">
@@ -918,6 +979,19 @@ export default function SchoolTextbooksView({
           />
         );
       })()}
+
+      {/* Inline Deposit Dialog */}
+      <DepositFlow
+        open={depositOpen}
+        onOpenChange={setDepositOpen}
+        token={token}
+        onSuccess={() => {
+          // Refresh wallet balance after deposit
+          axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
+            .catch(() => {});
+        }}
+      />
     </div>
   );
 }
