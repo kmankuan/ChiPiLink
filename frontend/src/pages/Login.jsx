@@ -35,26 +35,13 @@ export default function Login() {
       const params = new URLSearchParams(window.location.search);
       const redirectTo = params.get('redirect');
       await loginWithLaoPan(redirectTo);
-    } catch {
-      toast.error(t('auth.laopan.error', 'Error connecting to LaoPan.online'));
-      setLaopanLoading(false);
-    }
-  };
-
-  const handleEmailLogin = async () => {
-    if (!email.trim() || !password) {
-      toast.error(t('auth.fillFields', 'Please fill in all fields'));
-      return;
-    }
-    setLoginLoading(true);
-    try {
-      await login(email.trim(), password);
-      toast.success(t('auth.loginSuccess', 'Welcome!'));
-      navigate('/');
+      // If loginWithLaoPan succeeds, it redirects — so we only reach here on failure
     } catch (err) {
-      toast.error(err?.response?.data?.detail || t('auth.loginFailed', 'Login failed. Please verify your credentials or try again.'));
+      console.error('LaoPan login error:', err);
+      toast.error(t('auth.laopan.error', 'Error connecting to LaoPan.online. Please try again.'));
     } finally {
-      setLoginLoading(false);
+      // Always reset loading so button is clickable again
+      setTimeout(() => setLaopanLoading(false), 1500);
     }
   };
 
