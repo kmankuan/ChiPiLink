@@ -6,7 +6,10 @@ from fastapi import APIRouter, Depends, Request
 from core.auth import get_admin_user
 from core.database import db
 from datetime import datetime, timezone
-import psutil
+try:
+    import psutil
+except ImportError:
+    psutil = None
 import os
 import time
 
@@ -66,9 +69,15 @@ def _get_ws_connections():
 @router.get("/health")
 async def system_health(admin: dict = Depends(get_admin_user)):
     """Lightweight health snapshot — no blocking calls"""
-    proc = psutil.Process(os.getpid())
-    mem = proc.memory_info()
-    sys_mem = psutil.virtual_memory()
+    if psutil:
+        proc = psutil.Process(os.getpid())
+        mem = proc.memory_info()
+        sys_mem = psutil.virtual_memory()
+        process_info = {"memory_mb": round(mem.rss / (1024 * 1024), 1), "cpu_percent": 0, "threads": proc.num_threads()}
+        system_info = {"memory_percent": sys_mem.percent, "cpu_percent": psutil.cpu_percent(interval=None)}
+    else:
+        process_info = {"memory_mb": 0, "cpu_percent": 0, "threads": 0}
+        system_info = {"memory_percent": 0, "cpu_percent": 0}
     uptime_s = time.time() - _stats["started_at"]
 
     fe_avg = {"load_ms": 0, "errors": 0, "reports": len(_frontend_perf)}
@@ -80,15 +89,8 @@ async def system_health(admin: dict = Depends(get_admin_user)):
         "status": "ok",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "uptime_hours": round(uptime_s / 3600, 1),
-        "process": {
-            "memory_mb": round(mem.rss / (1024 * 1024), 1),
-            "cpu_percent": 0,  # Non-blocking: use system-level only
-            "threads": proc.num_threads(),
-        },
-        "system": {
-            "memory_percent": sys_mem.percent,
-            "cpu_percent": psutil.cpu_percent(interval=None),  # Non-blocking (returns cached value)
-        },
+        "process": process_info,
+        "system": system_info,
         "database": {"size_mb": None, "collections": None},  # Skip heavy dbStats
         "requests": {
             "total": _stats["requests"],

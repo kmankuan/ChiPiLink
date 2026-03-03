@@ -269,15 +269,20 @@ async def track_requests_middleware(request, call_next):
     try:
         response = await call_next(request)
         duration_ms = (_time.time() - start) * 1000
-        from modules.admin.system_monitor import track_request, track_user_activity
-        track_request(duration_ms, is_error=response.status_code >= 500)
-        # Only track IP, don't decode JWT (too expensive for every request)
-        if request.client:
-            track_user_activity(ip=request.client.host)
+        try:
+            from modules.admin.system_monitor import track_request, track_user_activity
+            track_request(duration_ms, is_error=response.status_code >= 500)
+            if request.client:
+                track_user_activity(ip=request.client.host)
+        except Exception:
+            pass  # Monitor module failure must never break the app
         return response
     except Exception as e:
-        from modules.admin.system_monitor import track_request
-        track_request((_time.time() - start) * 1000, is_error=True)
+        try:
+            from modules.admin.system_monitor import track_request
+            track_request((_time.time() - start) * 1000, is_error=True)
+        except Exception:
+            pass
         raise
 
 # ============== LIFECYCLE EVENTS ==============
