@@ -269,8 +269,19 @@ async def track_requests_middleware(request, call_next):
     try:
         response = await call_next(request)
         duration_ms = (_time.time() - start) * 1000
-        from modules.admin.system_monitor import track_request
+        from modules.admin.system_monitor import track_request, track_user_activity
         track_request(duration_ms, is_error=response.status_code >= 500)
+        # Track active user from auth header
+        auth = request.headers.get("authorization", "")
+        if auth.startswith("Bearer "):
+            try:
+                import jwt
+                payload = jwt.decode(auth[7:], options={"verify_signature": False})
+                track_user_activity(user_id=payload.get("sub"), ip=request.client.host if request.client else None)
+            except Exception:
+                pass
+        elif request.client:
+            track_user_activity(ip=request.client.host)
         return response
     except Exception as e:
         from modules.admin.system_monitor import track_request

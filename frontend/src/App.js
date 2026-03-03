@@ -99,6 +99,7 @@ import HelpGuide from '@/pages/HelpGuide';
 import CartDrawer from '@/components/cart/CartDrawer';
 import { ImpersonationBanner } from '@/components/shared/ImpersonationBanner';
 import PushNotificationManager from '@/components/notifications/PushNotificationManager';
+import PerfBeacon from '@/components/common/PerfBeacon';
 // CXGenieWidget removed - access via header support button instead
 
 import '@/App.css';
@@ -391,6 +392,7 @@ function App() {
                       <AppRouter />
                       <BottomNav />
                       <PushNotificationManager />
+                      <PerfBeacon />
                       <CartDrawer />
                       {/* CXGenie widget removed - access via header support button instead */}
                       <Toaster 

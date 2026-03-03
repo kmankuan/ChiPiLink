@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Activity, Cpu, HardDrive, Database, Clock, AlertTriangle,
-  Zap, Users, Settings, X, GripHorizontal
+  Zap, Users, Settings, X, GripHorizontal, Wifi, MonitorSmartphone, Globe
 } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -15,16 +15,21 @@ const API = RESOLVED_API_URL;
 const ALL_INDICATORS = [
   { id: 'memory', label: 'Memory', icon: HardDrive, getValue: h => `${h?.process?.memory_mb || 0}MB`, warn: h => (h?.process?.memory_mb || 0) > 500 },
   { id: 'cpu', label: 'CPU', icon: Cpu, getValue: h => `${h?.system?.cpu_percent || 0}%`, warn: h => (h?.system?.cpu_percent || 0) > 80 },
+  { id: 'active_users', label: 'Users', icon: Users, getValue: h => h?.active_users?.users_5m || 0, warn: () => false },
+  { id: 'live_ws', label: 'Live', icon: Wifi, getValue: h => h?.websockets?.total || 0, warn: () => false },
   { id: 'requests', label: 'Reqs', icon: Activity, getValue: h => h?.requests?.total || 0, warn: () => false },
   { id: 'errors', label: 'Errors', icon: AlertTriangle, getValue: h => h?.requests?.errors || 0, warn: h => (h?.requests?.errors || 0) > 0 },
+  { id: 'fe_load', label: 'Load', icon: MonitorSmartphone, getValue: h => h?.frontend?.load_ms ? `${h.frontend.load_ms}ms` : '-', warn: h => (h?.frontend?.load_ms || 0) > 5000 },
+  { id: 'fe_errors', label: 'JS Err', icon: Globe, getValue: h => h?.frontend?.errors || 0, warn: h => (h?.frontend?.errors || 0) > 0 },
   { id: 'slow', label: 'Slow', icon: Clock, getValue: h => h?.requests?.slow_5s || 0, warn: h => (h?.requests?.slow_5s || 0) > 3 },
   { id: 'uptime', label: 'Up', icon: Zap, getValue: h => `${h?.uptime_hours || 0}h`, warn: () => false },
   { id: 'db', label: 'DB', icon: Database, getValue: h => `${h?.database?.size_mb || '?'}MB`, warn: () => false },
+  { id: 'ips', label: 'IPs', icon: Globe, getValue: h => h?.active_users?.unique_ips_5m || 0, warn: () => false },
   { id: 'threads', label: 'Threads', icon: Users, getValue: h => h?.process?.threads || 0, warn: () => false },
   { id: 'error_rate', label: 'Err%', icon: AlertTriangle, getValue: h => `${h?.requests?.error_rate || 0}%`, warn: h => (h?.requests?.error_rate || 0) > 5 },
 ];
 
-const DEFAULT_VISIBLE = ['memory', 'cpu', 'requests', 'errors', 'uptime'];
+const DEFAULT_VISIBLE = ['memory', 'cpu', 'active_users', 'live_ws', 'requests', 'errors', 'fe_load'];
 const STORAGE_KEY = 'admin_statusbar_config';
 
 export default function AdminStatusBar({ onNavigateToMonitor }) {
