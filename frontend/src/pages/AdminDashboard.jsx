@@ -117,6 +117,7 @@ const UIStyleModule = lazy(() => import('@/modules/admin/UIStyleModule'));
 const PrivacyModule = lazy(() => import('@/modules/admin/PrivacyModule'));
 const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
 const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
+const SystemMonitorTab = lazy(() => import('@/modules/admin/SystemMonitorTab'));
 const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModule'));
 const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule'));
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
@@ -224,6 +225,7 @@ const navGroups = [
       { id: 'migration', labelKey: 'nav.migration', icon: ArrowRightLeft, permission: 'admin.site_config', adminOnly: true },
       { id: 'modules', labelKey: 'nav.moduleStatus', icon: LayoutGrid, permission: 'admin.site_config', adminOnly: true },
       { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
+      { id: 'system-monitor', labelKey: 'nav.systemMonitor', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
     ],
   },
 ];
@@ -372,6 +374,8 @@ export default function AdminDashboard() {
         return <IntegrationsModule />;
       case 'devcontrol':
         return <DevControlModule />;
+      case 'system-monitor':
+        return <SystemMonitorTab />;
       // Configuration
       case 'site-config':
         return <SiteConfigModule />;

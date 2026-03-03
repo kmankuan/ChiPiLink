@@ -75,6 +75,7 @@ from modules.admin.archive_routes import router as archive_router, init_archive_
 # Translation Dictionary Module (core feature)
 from modules.translations.routes import router as translation_dict_router
 from modules.admin.migrations import router as migrations_router
+from modules.admin.system_monitor import router as system_monitor_router
 
 # Invision Module (placeholder for laopan.online integration)
 from modules.invision.routes import router as invision_router
@@ -180,6 +181,7 @@ api_router.include_router(seed_demo_router)  # Demo data seeding
 api_router.include_router(data_manager_router)  # Unified data manager
 api_router.include_router(archive_router)  # Archive / soft-delete system
 api_router.include_router(migrations_router)  # Database migrations
+api_router.include_router(system_monitor_router)  # System health monitor
 api_router.include_router(privacy_router)  # Privacy settings
 api_router.include_router(invision_router)
 
@@ -258,6 +260,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Request tracking middleware for system monitor
+@app.middleware("http")
+async def track_requests_middleware(request, call_next):
+    import time as _time
+    start = _time.time()
+    try:
+        response = await call_next(request)
+        duration_ms = (_time.time() - start) * 1000
+        from modules.admin.system_monitor import track_request
+        track_request(duration_ms, is_error=response.status_code >= 500)
+        return response
+    except Exception as e:
+        from modules.admin.system_monitor import track_request
+        track_request((_time.time() - start) * 1000, is_error=True)
+        raise
 
 # ============== LIFECYCLE EVENTS ==============
 
