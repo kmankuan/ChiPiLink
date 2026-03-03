@@ -341,6 +341,7 @@ export default function SchoolTextbooksView({
   const [walletBalance, setWalletBalance] = useState(null);
   const [summaryStudent, setSummaryStudent] = useState(null);
   const [depositOpen, setDepositOpen] = useState(false);
+  const [walletPolling, setWalletPolling] = useState(false);
   
   const texts = {
     en: {
@@ -423,13 +424,26 @@ export default function SchoolTextbooksView({
     }
   }, [isAuthenticated, hasAccess, validatedStudents.length, fetchAllStudents]);
 
-  // Fetch wallet balance
-  useEffect(() => {
+  // Fetch wallet balance — polls every 10s after deposit submission
+  const refreshWallet = useCallback(() => {
     if (!token) return;
     axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
-      .catch(() => setWalletBalance(0));
+      .catch(() => {});
   }, [token]);
+
+  useEffect(() => {
+    refreshWallet();
+  }, [refreshWallet]);
+
+  // Poll wallet balance after deposit (auto-detect admin approval)
+  useEffect(() => {
+    if (!walletPolling) return;
+    const interval = setInterval(refreshWallet, 10000);
+    // Stop polling after 5 minutes
+    const timeout = setTimeout(() => setWalletPolling(false), 300000);
+    return () => { clearInterval(interval); clearTimeout(timeout); };
+  }, [walletPolling, refreshWallet]);
 
   // Fetch order for a specific student (with caching)
   const fetchOrderForStudent = useCallback(async (studentId) => {
@@ -979,10 +993,11 @@ export default function SchoolTextbooksView({
         onOpenChange={setDepositOpen}
         token={token}
         onSuccess={() => {
-          // Refresh wallet balance after deposit
-          axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
-            .catch(() => {});
+          refreshWallet();
+          setWalletPolling(true); // Start polling to detect admin approval
+          toast.info(lang === 'es'
+            ? 'Solicitud enviada. Tu saldo se actualizará automáticamente cuando sea aprobada.'
+            : 'Request sent. Your balance will update automatically when approved.');
         }}
       />
     </div>
