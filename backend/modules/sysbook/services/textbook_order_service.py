@@ -745,40 +745,39 @@ class TextbookOrderService(BaseService):
             if wallet_transaction:
                 await self._notify_admin_post_order_failure(order_id, user_name, student.get("full_name", ""), total_amount, "draft_update", str(draft_err))
 
-        # 9. Send to Monday.com (background — don't block the user)
+        # 9. Send to Monday.com (fire-and-forget — never delays user response)
         import asyncio
-        monday_item_id = None
-        monday_subitems = []
-        try:
-            monday_result = await asyncio.wait_for(
-                self._send_to_monday(
+
+        async def _sync_monday_background():
+            try:
+                monday_result = await self._send_to_monday(
                     order=order,
                     selected_items=order_items,
                     user_name=user_name,
                     user_email=user_email,
                     submission_total=total_amount
-                ),
-                timeout=15.0
-            )
-            monday_item_id = monday_result.get("item_id")
-            monday_subitems = monday_result.get("subitems", [])
-        except asyncio.TimeoutError:
-            logger.warning(f"[create_and_submit_order] Monday.com sync timed out after 15s for order {order_id}")
-        except Exception as e:
-            logger.error(f"[create_and_submit_order] Monday.com sync failed (non-blocking): {e}")
+                )
+                mid = monday_result.get("item_id")
+                msubs = monday_result.get("subitems", [])
+                if mid or msubs:
+                    update = {}
+                    if mid:
+                        update["monday_item_ids"] = [mid]
+                        update["monday_item_id"] = mid
+                    if msubs:
+                        subitem_map = {s["book_id"]: s["monday_subitem_id"] for s in msubs}
+                        updated_items = list(order_items)
+                        for item in updated_items:
+                            if item["book_id"] in subitem_map:
+                                item["monday_subitem_id"] = subitem_map[item["book_id"]]
+                        update["items"] = updated_items
+                    if update:
+                        await self.order_repo.update_order(order_id, update)
+                    logger.info(f"[monday_bg] Order {order_id} synced: item={mid}, subitems={len(msubs)}")
+            except Exception as e:
+                logger.error(f"[monday_bg] Order {order_id} sync failed: {e}")
 
-        # 10. Link monday subitems to items
-        if monday_subitems:
-            subitem_map = {s["book_id"]: s["monday_subitem_id"] for s in monday_subitems}
-            for item in order_items:
-                if item["book_id"] in subitem_map:
-                    item["monday_subitem_id"] = subitem_map[item["book_id"]]
-
-        # Update order with Monday.com info
-        update_data = {"items": order_items}
-        if monday_item_id:
-            update_data["monday_item_ids"] = [monday_item_id]
-        await self.order_repo.update_order(order_id, update_data)
+        asyncio.create_task(_sync_monday_background())
 
         # 11. Send notification (with timeout)
         try:
