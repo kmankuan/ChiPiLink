@@ -4,29 +4,21 @@
  * Uses siteConfig for branding: logo, bg image, colors, text
  */
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { ExternalLink, Loader2, UserPlus, Mail, Lock } from 'lucide-react';
+import { ExternalLink, Loader2, UserPlus } from 'lucide-react';
 
 export default function Login() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { loginWithLaoPan, laopanConfig, login } = useAuth();
+  const { loginWithLaoPan, laopanConfig } = useAuth();
   const { siteConfig } = useSiteConfig();
   const [laopanLoading, setLaopanLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
 
-  // LaoPan is the primary login method — ALWAYS show it.
-  // Only hide if config explicitly says enabled: false (not on API failure).
-  const laopanEnabled = laopanConfig?.enabled !== false;
+  // Public login page ALWAYS shows LaoPan OAuth — no email/password fallback.
+  // Admin login is at /admin/login for email/password access.
   const siteName = siteConfig?.site_name || 'ChiPi Link';
   const logoUrl = siteConfig?.logo_url;
   const bgImage = siteConfig?.login_bg_image || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200';
@@ -96,65 +88,38 @@ export default function Login() {
         </p>
       </div>
 
-      {/* Login Buttons — LaoPan OAuth is ALWAYS the primary method */}
-      {laopanEnabled ? (
-        <div className="space-y-3">
-          <Button
-            type="button"
-            className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-medium gap-2.5"
-            style={{ backgroundColor: laopanConfig?.button_color || '#4F46E5' }}
-            onClick={handleLaoPanLogin}
-            disabled={laopanLoading}
-            data-testid="laopan-login-button"
-          >
-            {laopanLoading ? (
-              <><Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin shrink-0" /> <span className="truncate">{t('auth.laopan.connecting', 'Connecting...')}</span></>
-            ) : (
-              <><ExternalLink className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" /> <span className="truncate">{t('auth.laopan.loginButton', 'Sign in with LaoPan')}</span></>
-            )}
-          </Button>
+      {/* LaoPan OAuth — always shown, no conditions */}
+      <div className="space-y-3">
+        <Button
+          type="button"
+          className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-medium gap-2.5"
+          style={{ backgroundColor: laopanConfig?.button_color || '#4F46E5' }}
+          onClick={handleLaoPanLogin}
+          disabled={laopanLoading}
+          data-testid="laopan-login-button"
+        >
+          {laopanLoading ? (
+            <><Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin shrink-0" /> <span className="truncate">{t('auth.laopan.connecting', 'Connecting...')}</span></>
+          ) : (
+            <><ExternalLink className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" /> <span className="truncate">{t('auth.laopan.loginButton', 'Sign in with LaoPan')}</span></>
+          )}
+        </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-medium gap-2.5"
-            onClick={() => window.open('https://laopan.online/register/', '_blank')}
-            data-testid="laopan-register-button"
-          >
-            <UserPlus className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
-            <span className="truncate">{t('auth.laopan.registerButton', "Don't have an account? Register on LaoPan")}</span>
-          </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-medium gap-2.5"
+          onClick={() => window.open('https://laopan.online/register/', '_blank')}
+          data-testid="laopan-register-button"
+        >
+          <UserPlus className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+          <span className="truncate">{t('auth.laopan.registerButton', "Don't have an account? Register on LaoPan")}</span>
+        </Button>
 
-          <p className="text-center text-xs sm:text-sm text-muted-foreground mt-3 px-2">
-            {subtext}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label className="text-xs">{t('auth.email', 'Email')}</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com"
-                className="pl-10 h-11 rounded-xl" data-testid="login-email" />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">{t('auth.password', 'Password')}</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="********"
-                className="pl-10 h-11 rounded-xl" data-testid="login-password"
-                onKeyDown={e => { if (e.key === 'Enter') handleEmailLogin(); }} />
-            </div>
-          </div>
-          <Button className="w-full h-12 rounded-xl text-sm font-medium" onClick={handleEmailLogin} disabled={loginLoading}
-            data-testid="login-submit">
-            {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            {t('auth.loginButton', 'Sign In')}
-          </Button>
-        </div>
-      )}
+        <p className="text-center text-xs sm:text-sm text-muted-foreground mt-3 px-2">
+          {subtext}
+        </p>
+      </div>
     </div>
   );
 
