@@ -877,18 +877,11 @@ export default function SchoolTextbooksView({
                                   ? 'Recarga tu billetera con una de estas opciones:'
                                   : 'Top up your wallet with one of these options:'}
                               </p>
-                              <div className="flex gap-2">
-                                <Button variant="outline" size="sm" className="flex-1 h-8 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-100"
-                                  onClick={() => navigate('/mi-cuenta?tab=wallet')} data-testid={`goto-wallet-${studentId}`}>
-                                  <Wallet className="h-3 w-3" />
-                                  {lang === 'es' ? 'Ir a Billetera' : 'Go to Wallet'}
-                                </Button>
-                                <Button variant="default" size="sm" className="flex-1 h-8 text-[10px] gap-1 bg-red-600 hover:bg-red-700 text-white"
-                                  onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
-                                  <Banknote className="h-3 w-3" />
-                                  {lang === 'es' ? 'Recargar Ahora' : 'Top Up Now'}
-                                </Button>
-                              </div>
+                              <Button variant="default" size="sm" className="w-full h-8 text-[10px] gap-1 bg-red-600 hover:bg-red-700 text-white"
+                                onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
+                                <Banknote className="h-3 w-3" />
+                                {lang === 'es' ? 'Recargar Ahora' : 'Top Up Now'}
+                              </Button>
                             </div>
                           )}
                           <div className="flex items-center justify-between gap-3 pb-safe">

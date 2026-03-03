@@ -325,15 +325,17 @@ async def get_deposit_methods(user=Depends(get_current_user)):
     config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
     methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
 
-    # Only return enabled methods to users
+    # Return ALL methods — disabled ones shown grayed out so users know they exist
     result = []
     for method_id in ["yappy", "cash", "card", "transfer"]:
         m = methods.get(method_id)
-        if m and m.get("enabled", False):
+        if m:
+            enabled = m.get("enabled", False)
             result.append({
                 "id": m["id"],
                 "label": m.get("label", method_id),
-                "status": m.get("status", "active"),
+                "status": "disabled" if not enabled else m.get("status", "active"),
+                "enabled": enabled,
                 "icon": m.get("icon", ""),
                 "description": m.get("description", ""),
                 "instructions": m.get("instructions", ""),

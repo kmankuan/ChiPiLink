@@ -42,6 +42,8 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
+  const [receiptFile, setReceiptFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -50,6 +52,7 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
       setAmount('');
       setSelectedMethod(null);
       setSubmitted(false);
+      setReceiptFile(null);
     }
   }, [open]);
 
@@ -80,6 +83,22 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
     if (!amount || parseFloat(amount) <= 0 || !selectedMethod || submitting) return;
     setSubmitting(true);
     try {
+      // Upload receipt image first if provided
+      let receipt_url = null;
+      if (receiptFile) {
+        const formData = new FormData();
+        formData.append('file', receiptFile);
+        const uploadRes = await fetch(`${API_URL}/api/upload/payment-receipt`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          receipt_url = uploadData.url || uploadData.file_url;
+        }
+      }
+
       const res = await fetch(`${API_URL}/api/wallet/deposit`, {
         method: 'POST',
         headers: {
@@ -89,7 +108,8 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
         body: JSON.stringify({
           amount: parseFloat(amount),
           currency: 'USD',
-          payment_method: selectedMethod.id === 'transfer' ? 'bank_transfer' : selectedMethod.id
+          payment_method: selectedMethod.id === 'transfer' ? 'bank_transfer' : selectedMethod.id,
+          receipt_url,
         })
       });
       if (res.ok) {
@@ -196,28 +216,27 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
               <div className="grid grid-cols-2 gap-3">
                 {methods.map((method) => {
                   const Icon = ICON_MAP[method.icon] || DollarSign;
-                  const isDisabled = method.status === 'under_construction';
+                  const isDisabled = !method.enabled || method.status === 'under_construction' || method.status === 'disabled';
                   return (
                     <Card
                       key={method.id}
-                      className={`cursor-pointer transition-all hover:shadow-md ${
-                        isDisabled ? 'opacity-60' : ''
+                      className={`transition-all ${
+                        isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'
                       } ${selectedMethod?.id === method.id ? 'ring-2 ring-primary border-primary' : ''}`}
-                      onClick={() => { setSelectedMethod(method); setStep(3); }}
+                      onClick={() => { if (!isDisabled) { setSelectedMethod(method); setStep(3); } }}
                       data-testid={`method-${method.id}`}
                     >
                       <CardContent className="p-4 text-center space-y-2">
-                        <div className="mx-auto w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon className="h-5 w-5 text-primary" />
+                        <div className={`mx-auto w-10 h-10 rounded-full flex items-center justify-center ${isDisabled ? 'bg-muted' : 'bg-primary/10'}`}>
+                          <Icon className={`h-5 w-5 ${isDisabled ? 'text-muted-foreground' : 'text-primary'}`} />
                         </div>
                         <p className="font-medium text-sm">{method.label}</p>
-                        {isDisabled && (
+                        {isDisabled ? (
                           <Badge variant="outline" className="text-[10px]">
                             <Construction className="h-2.5 w-2.5 mr-1" />
-                            {t('wallet.underConstruction', 'Coming Soon')}
+                            {t('wallet.comingSoon', 'Coming Soon')}
                           </Badge>
-                        )}
-                        {!isDisabled && (
+                        ) : (
                           <p className="text-xs text-muted-foreground line-clamp-2">{method.description}</p>
                         )}
                       </CardContent>
@@ -330,6 +349,26 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
                     )}
                   </div>
                 )}
+
+                {/* Receipt Upload */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">{t('wallet.receiptUpload', 'Upload Transfer Receipt')} ({t('common.optional', 'optional')})</Label>
+                  <div className="relative">
+                    {receiptFile ? (
+                      <div className="flex items-center gap-2 p-2 rounded-lg border bg-green-50 dark:bg-green-900/20">
+                        <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+                        <span className="text-xs text-green-700 truncate flex-1">{receiptFile.name}</span>
+                        <button onClick={() => setReceiptFile(null)} className="text-xs text-red-500 hover:text-red-700 shrink-0">✕</button>
+                      </div>
+                    ) : (
+                      <label className="flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 cursor-pointer transition-colors" data-testid="receipt-upload">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{t('wallet.tapToUpload', 'Tap to upload screenshot')}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) setReceiptFile(e.target.files[0]); }} />
+                      </label>
+                    )}
+                  </div>
+                </div>
 
                 <Button onClick={handleSubmitDeposit} className="w-full gap-2" disabled={submitting} data-testid="deposit-transfer-btn">
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
