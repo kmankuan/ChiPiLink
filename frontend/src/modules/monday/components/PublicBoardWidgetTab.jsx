@@ -277,8 +277,9 @@ export default function PublicBoardWidgetTab() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs">{t('monday.maxItems', 'Max Items')}</Label>
-              <Input type="number" min={1} max={50} value={config.max_items || 10} onChange={e => setConfig(p => ({ ...p, max_items: parseInt(e.target.value) || 10 }))} className="mt-1" />
+              <Label className="text-xs">{t('monday.maxItems', 'Max Items (display only)')}</Label>
+              <p className="text-[9px] text-muted-foreground">Ignored in Search-Only mode (all items searchable)</p>
+              <Input type="number" min={1} max={500} value={config.max_items || 10} onChange={e => setConfig(p => ({ ...p, max_items: parseInt(e.target.value) || 10 }))} className="mt-1" />
             </div>
             <div>
               <Label className="text-xs">{t('monday.refreshMinutes', 'Auto-refresh (minutes)')}</Label>

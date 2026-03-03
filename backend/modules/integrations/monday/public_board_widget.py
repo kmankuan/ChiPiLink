@@ -119,6 +119,11 @@ async def get_widget_data():
 
     columns_to_show = config.get("columns_to_show", [])
     max_items = config.get("max_items", 10)
+    search_only = config.get("search_only", False)
+
+    # In search-only mode, send ALL items (search needs full dataset)
+    # Otherwise, respect the max_items limit for display
+    display_items = items if search_only else items[:max_items]
 
     # Build column title mapping — live titles from board override admin config
     column_titles = config.get("column_titles", {})
@@ -142,7 +147,7 @@ async def get_widget_data():
         "subitem_columns": config.get("subitem_columns_to_show", []),
         "search_only": config.get("search_only", False),
         "search_columns": config.get("search_columns", []),
-        "items": items[:max_items],
+        "items": display_items,
     }
 
 
