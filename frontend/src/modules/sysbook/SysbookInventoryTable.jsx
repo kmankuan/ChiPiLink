@@ -21,7 +21,7 @@ import {
   BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
   Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
   Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw,
-  GripVertical
+  GripVertical, Lock, Unlock
 } from 'lucide-react';
 import InventoryImport from '@/modules/unatienda/components/InventoryImport';
 import { BoardHeader } from '@/components/shared/BoardHeader';
@@ -41,6 +41,7 @@ const COLUMNS = [
   { key: 'stock', label: 'Stock', width: 80, sortKey: 'stock', align: 'center', isStock: true },
   { key: 'threshold', label: 'Alert', width: 90, align: 'center', isThreshold: true },
   { key: 'presale', label: 'Pre-sale', width: 80, sortKey: 'presale', align: 'center' },
+  { key: 'presale_lock', label: 'Lock', width: 60, align: 'center' },
   { key: 'purchased', label: 'Purchased', width: 90, sortKey: 'purchased', align: 'center' },
   { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
 ];
@@ -387,6 +388,23 @@ function renderCellContent(col, product, helpers) {
       return <ThresholdCell product={product} globalThreshold={globalThreshold} onSave={updateProductField} />;
     case 'presale':
       return <PresaleCell product={product} onSave={updateProductField} />;
+    case 'presale_lock':
+      return (
+        <div className="flex justify-center">
+          <button
+            onClick={() => updateProductField(bookId, 'presale_locked', !product.presale_locked)}
+            className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+              product.presale_locked
+                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                : 'bg-green-100 text-green-600 hover:bg-green-200'
+            }`}
+            title={product.presale_locked ? 'Locked — click to unlock' : 'Active — click to lock'}
+            data-testid={`presale-lock-${bookId}`}
+          >
+            {product.presale_locked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      );
     case 'purchased':
       return <PurchasedCell product={product} purchasedData={helpers?.purchasedSummary?.[product.book_id]} />;
     case 'status':

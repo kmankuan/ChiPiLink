@@ -383,3 +383,16 @@ async def sysbook_bulk_unarchive(body: dict, admin: dict = Depends(get_admin_use
         {"$set": {"archived": False}, "$unset": {"archived_at": ""}}
     )
     return {"status": "unarchived", "count": r.modified_count}
+
+
+@router.put("/admin/products/{book_id}/presale-lock")
+async def toggle_presale_lock(book_id: str, data: dict, admin: dict = Depends(get_admin_user)):
+    """Toggle presale lock on a product. Locked items are not available for presale ordering."""
+    locked = data.get("locked", False)
+    result = await db.store_products.update_one(
+        {"book_id": book_id, **SYSBOOK_FILTER},
+        {"$set": {"presale_locked": locked}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"status": "ok", "book_id": book_id, "presale_locked": locked}

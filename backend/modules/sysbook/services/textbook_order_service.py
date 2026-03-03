@@ -189,7 +189,14 @@ class TextbookOrderService(BaseService):
         items = []
         for book in books:
             inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
-            status = OrderItemStatus.AVAILABLE.value if (inventory > 0 or is_presale) else OrderItemStatus.OUT_OF_STOCK.value
+            # Check if item is locked by admin (not available for presale)
+            presale_locked = book.get("presale_locked", False)
+            if presale_locked:
+                status = OrderItemStatus.OUT_OF_STOCK.value
+            elif inventory > 0 or is_presale:
+                status = OrderItemStatus.AVAILABLE.value
+            else:
+                status = OrderItemStatus.OUT_OF_STOCK.value
             
             items.append({
                 "book_id": book["book_id"],
@@ -199,6 +206,7 @@ class TextbookOrderService(BaseService):
                 "quantity_ordered": 0,
                 "max_quantity": 1,
                 "status": status,
+                "presale_locked": presale_locked,
                 "ordered_at": None,
                 "notes": None
             })
@@ -253,11 +261,15 @@ class TextbookOrderService(BaseService):
             if book_id in books_dict:
                 book = books_dict[book_id]
                 inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
+                presale_locked = book.get("presale_locked", False)
                 item["price"] = float(book.get("price", 0))
                 item["book_name"] = book["name"]
+                item["presale_locked"] = presale_locked
                 
                 if item["status"] not in [OrderItemStatus.ORDERED.value]:
-                    if inventory <= 0 and not is_presale:
+                    if presale_locked:
+                        item["status"] = OrderItemStatus.OUT_OF_STOCK.value
+                    elif inventory <= 0 and not is_presale:
                         item["status"] = OrderItemStatus.OUT_OF_STOCK.value
                     elif inventory > 0 or is_presale:
                         item["status"] = OrderItemStatus.AVAILABLE.value
@@ -272,7 +284,13 @@ class TextbookOrderService(BaseService):
         for book_id, book in books_dict.items():
             if book_id not in seen_ids:
                 inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
-                status = OrderItemStatus.AVAILABLE.value if (inventory > 0 or is_presale) else OrderItemStatus.OUT_OF_STOCK.value
+                presale_locked = book.get("presale_locked", False)
+                if presale_locked:
+                    status = OrderItemStatus.OUT_OF_STOCK.value
+                elif inventory > 0 or is_presale:
+                    status = OrderItemStatus.AVAILABLE.value
+                else:
+                    status = OrderItemStatus.OUT_OF_STOCK.value
                 updated_items.append({
                     "book_id": book_id,
                     "book_code": book.get("code", ""),
@@ -281,6 +299,7 @@ class TextbookOrderService(BaseService):
                     "quantity_ordered": 0,
                     "max_quantity": 1,
                     "status": status,
+                    "presale_locked": presale_locked,
                     "ordered_at": None,
                     "notes": None
                 })
