@@ -798,6 +798,15 @@ class TextbookOrderService(BaseService):
 
         asyncio.create_task(_sync_monday_background())
 
+        # 10. Sync to Textbooks board (fire-and-forget)
+        async def _sync_textbooks_board():
+            try:
+                from modules.sysbook.services.textbook_board_sync import textbook_board_sync
+                await textbook_board_sync.sync_order_to_textbooks_board(order)
+            except Exception as e:
+                logger.error(f"[textbooks_board] Order {order_id} sync failed: {e}")
+        asyncio.create_task(_sync_textbooks_board())
+
         # 11. Send notification (with timeout)
         try:
             await asyncio.wait_for(

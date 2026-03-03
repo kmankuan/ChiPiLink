@@ -174,3 +174,34 @@ async def reject_suggestion(
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+# ═══ Textbooks Board Sync ═══
+
+async def _run_board_sync_job(job_id: str):
+    """Background task for syncing orders to Textbooks board"""
+    try:
+        _jobs[job_id]["status"] = "running"
+        from modules.sysbook.services.textbook_board_sync import textbook_board_sync
+        result = await textbook_board_sync.sync_all_unsynced()
+        _jobs[job_id].update({"status": "done", "result": result})
+    except Exception as e:
+        _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
+@router.post("/sync-textbooks-board")
+async def sync_to_textbooks_board(admin: dict = Depends(get_admin_user)):
+    """Sync all unsynced orders to the TB2026-Textbooks Monday.com board (background job)"""
+    job_id = f"tb_{uuid.uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "starting", "created_at": datetime.now(timezone.utc).isoformat()}
+    asyncio.create_task(_run_board_sync_job(job_id))
+    return {"job_id": job_id, "status": "starting"}
+
+
+@router.post("/refresh-textbooks-map")
+async def refresh_textbooks_map(admin: dict = Depends(get_admin_user)):
+    """Force refresh the Textbooks board item map cache"""
+    from modules.sysbook.services.textbook_board_sync import textbook_board_sync
+    await textbook_board_sync.invalidate_cache()
+    board_map = await textbook_board_sync._get_board_items_map()
+    return {"status": "ok", "items_mapped": len(board_map)}

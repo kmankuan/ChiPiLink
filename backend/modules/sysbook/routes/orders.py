@@ -467,6 +467,16 @@ async def remove_order_item(
         {"$set": {"items": new_items, "total_amount": new_total, "updated_at": now}}
     )
 
+    # Sync removal to Textbooks board (fire-and-forget)
+    import asyncio
+    async def _sync_remove():
+        try:
+            from modules.sysbook.services.textbook_board_sync import textbook_board_sync
+            await textbook_board_sync.remove_item_from_board(order_id, book_id)
+        except Exception:
+            pass
+    asyncio.create_task(_sync_remove())
+
     # Return updated order
     updated = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
     return {"status": "ok", "removed_book": removed.get("book_name"), "order": updated}
@@ -523,6 +533,17 @@ async def add_order_item(
     )
 
     updated = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+
+    # Sync addition to Textbooks board (fire-and-forget)
+    import asyncio
+    async def _sync_add():
+        try:
+            from modules.sysbook.services.textbook_board_sync import textbook_board_sync
+            await textbook_board_sync.add_item_to_board(order_id, updated, book_id)
+        except Exception:
+            pass
+    asyncio.create_task(_sync_add())
+
     return {"status": "ok", "added_book": product.get("name"), "order": updated}
 
 

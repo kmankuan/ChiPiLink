@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import {
   Download, Eye, Link2, Loader2, RefreshCw, Search, ShoppingCart,
   AlertTriangle, CheckCircle, Clock, Package, Users, ArrowUpDown,
-  ArrowUp, ArrowDown, Unlink, ExternalLink, ArrowRight
+  ArrowUp, ArrowDown, Unlink, ExternalLink, ArrowRight, BookOpen
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
@@ -282,6 +282,29 @@ export default function PreSaleImportTab({ token: propToken }) {
     }
   };
 
+  const [syncingBoard, setSyncingBoard] = useState(false);
+  const handleSyncToTextbooksBoard = async () => {
+    setSyncingBoard(true);
+    try {
+      const res = await fetch(`${API}/api/sysbook/presale-import/sync-textbooks-board`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) { toast.error('Failed to start sync'); setSyncingBoard(false); return; }
+      const { job_id } = await res.json();
+      toast.info('Syncing orders to Textbooks board... This may take a minute.');
+      await pollJob(job_id,
+        (result) => {
+          toast.success(`Textbooks board synced: ${result.items_synced} items synced, ${result.items_skipped} skipped, ${result.orders_synced} orders`, { duration: 8000 });
+          setSyncingBoard(false);
+        },
+        (error) => {
+          toast.error(`Sync failed: ${error}`);
+          setSyncingBoard(false);
+        }
+      );
+    } catch { toast.error('Connection error'); setSyncingBoard(false); }
+  };
+
   // Filtering
   const filteredOrders = useMemo(() => {
     let result = orders;
@@ -381,10 +404,16 @@ export default function PreSaleImportTab({ token: propToken }) {
         actions={
           <div className="flex items-center gap-1.5">
             {orders.length > 0 && (
-              <Button variant="outline" size="sm" onClick={handleSyncToInventory} disabled={syncing} className="gap-1 h-7 text-xs" data-testid="sync-inventory-btn">
-                {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Package className="h-3 w-3" />}
-                Sync to Inventory
-              </Button>
+              <>
+                <Button variant="outline" size="sm" onClick={handleSyncToInventory} disabled={syncing} className="gap-1 h-7 text-xs" data-testid="sync-inventory-btn">
+                  {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Package className="h-3 w-3" />}
+                  Sync Inventory
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleSyncToTextbooksBoard} disabled={syncingBoard} className="gap-1 h-7 text-xs" data-testid="sync-textbooks-btn">
+                  {syncingBoard ? <Loader2 className="h-3 w-3 animate-spin" /> : <BookOpen className="h-3 w-3" />}
+                  Sync Textbooks Board
+                </Button>
+              </>
             )}
             <Button variant="outline" size="sm" onClick={handlePreview} disabled={previewing} className="gap-1 h-7 text-xs" data-testid="preview-import-btn">
               {previewing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
