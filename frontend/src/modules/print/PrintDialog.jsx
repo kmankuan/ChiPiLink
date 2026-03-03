@@ -96,14 +96,15 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     setPrinting(true);
 
     try {
-      // Fetch fresh thermal HTML from backend at print time
       const ids = orderIds.join(',');
       const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(ids)}&token=${encodeURIComponent(token)}`;
-      const res = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const html = await res.text();
 
-      // Open popup and write the HTML using document.write (same pattern as Standard Print)
       const printWindow = window.open('', '_blank', 'width=400,height=600');
       if (!printWindow) {
         toast.error('Pop-up blocked. Please allow pop-ups for this site.');
@@ -114,7 +115,6 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
       printWindow.document.write(html);
       printWindow.document.close();
 
-      // Wait for content to render, then print
       printWindow.onafterprint = () => {
         printWindow.close();
         setPrinting(false);
@@ -125,15 +125,15 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
 
       setTimeout(() => {
         printWindow.print();
-        // Fallback close after 30s if onafterprint doesn't fire
+        // Hard fallback: always reset state after 15s
         setTimeout(() => {
           if (!printWindow.closed) printWindow.close();
           setPrinting(false);
-        }, 30000);
+        }, 15000);
       }, 800);
     } catch (err) {
       console.error('Thermal print error:', err);
-      toast.error('Failed to load print data. Please try again.');
+      toast.error(err.name === 'AbortError' ? 'Print request timed out. Server may be busy — please try again.' : 'Failed to load print data. Please try again.');
       setPrinting(false);
     }
   };
@@ -227,7 +227,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPrinting(false); } onOpenChange(v); }}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

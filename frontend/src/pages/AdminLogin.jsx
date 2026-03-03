@@ -34,8 +34,7 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Retry once on network/transient errors (gateway restarts, etc.)
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const user = await login(formData.email, formData.password);
         if (user.is_admin) {
@@ -45,19 +44,22 @@ export default function AdminLogin() {
           toast.error(t('admin.notAdmin', 'This account does not have admin access'));
           navigate('/');
         }
-        return; // Success, exit
+        return;
       } catch (error) {
         const status = error.response?.status;
         const isAuthError = status === 401 || status === 400;
-        if (isAuthError || attempt === 1) {
-          // Auth error (wrong credentials) or second attempt failed
-          const message = error.response?.data?.detail || t('auth.loginError', 'Login failed. Please verify your credentials or try again.');
-          toast.error(message);
+        if (isAuthError) {
+          toast.error(error.response?.data?.detail || t('auth.loginError', 'Invalid credentials. Please check your email and password.'));
           break;
         }
-        // First attempt failed with a non-auth error — retry after brief pause
-        console.warn(`Login attempt ${attempt + 1} failed (${error.message}), retrying...`);
-        await new Promise(r => setTimeout(r, 1500));
+        // Server error (500, 502, 520, network) — retry
+        if (attempt < 2) {
+          console.warn(`Login attempt ${attempt + 1} failed (${status || error.message}), retrying in ${(attempt + 1)}s...`);
+          await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
+          continue;
+        }
+        // All retries exhausted
+        toast.error(t('auth.serverError', 'Server temporarily unavailable. Please wait a moment and try again.'));
       }
     }
     setLoading(false);
