@@ -17,7 +17,20 @@ CONFIG_COLLECTION = "monday_integration_config"
 
 
 class MondayCoreClient:
-    """Shared Monday.com API client used by all module adapters"""
+    """Shared Monday.com API client used by all module adapters.
+    Uses a persistent connection pool to avoid creating new TCP connections per request."""
+
+    def __init__(self):
+        self._client = None
+
+    def _get_client(self):
+        """Lazy-init persistent httpx client with connection limits"""
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=5, max_keepalive_connections=3),
+                timeout=httpx.Timeout(20.0, connect=10.0),
+            )
+        return self._client
 
     async def get_api_key(self) -> Optional[str]:
         """Get active API key from workspace config or env fallback"""
@@ -40,20 +53,20 @@ class MondayCoreClient:
         if not api_key:
             raise ValueError("Monday.com API key not configured")
 
+        client = self._get_client()
         last_error = None
         for attempt in range(3):
             try:
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(
-                        MONDAY_API_URL,
-                        json={"query": query},
-                        headers={
-                            "Authorization": api_key,
-                            "Content-Type": "application/json"
-                        },
-                        timeout=timeout
-                    )
-                    data = response.json()
+                response = await client.post(
+                    MONDAY_API_URL,
+                    json={"query": query},
+                    headers={
+                        "Authorization": api_key,
+                        "Content-Type": "application/json"
+                    },
+                    timeout=timeout
+                )
+                data = response.json()
 
                 if "errors" in data:
                     error_msg = str(data['errors'])

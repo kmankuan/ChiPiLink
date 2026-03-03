@@ -22,6 +22,15 @@ class TelegramService:
         self.token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
         self._polling = False
         self._poll_task = None
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=3, max_keepalive_connections=2),
+                timeout=httpx.Timeout(30.0, connect=10.0),
+            )
+        return self._client
 
     def _url(self, method: str) -> str:
         return TELEGRAM_API.format(token=self.token, method=method)
@@ -32,43 +41,43 @@ class TelegramService:
     # ---- Bot API Calls ----
 
     async def get_me(self) -> Optional[Dict]:
-        async with httpx.AsyncClient() as client:
-            r = await client.get(self._url("getMe"), timeout=10)
-            data = r.json()
-            return data.get("result") if data.get("ok") else None
+        client = self._get_client()
+        r = await client.get(self._url("getMe"), timeout=10)
+        data = r.json()
+        return data.get("result") if data.get("ok") else None
 
     async def get_updates(self, offset: int = 0, limit: int = 100) -> List[Dict]:
-        async with httpx.AsyncClient() as client:
-            r = await client.get(
-                self._url("getUpdates"),
-                params={"offset": offset, "limit": limit, "timeout": 1},
-                timeout=15
-            )
-            data = r.json()
-            return data.get("result", []) if data.get("ok") else []
+        client = self._get_client()
+        r = await client.get(
+            self._url("getUpdates"),
+            params={"offset": offset, "limit": limit, "timeout": 1},
+            timeout=15
+        )
+        data = r.json()
+        return data.get("result", []) if data.get("ok") else []
 
     async def get_file(self, file_id: str) -> Optional[str]:
         """Get a temporary download URL for a file"""
-        async with httpx.AsyncClient() as client:
-            r = await client.get(
-                self._url("getFile"),
-                params={"file_id": file_id},
-                timeout=10
-            )
-            data = r.json()
-            if data.get("ok"):
-                path = data["result"].get("file_path")
-                return self._file_url(path) if path else None
-            return None
+        client = self._get_client()
+        r = await client.get(
+            self._url("getFile"),
+            params={"file_id": file_id},
+            timeout=10
+        )
+        data = r.json()
+        if data.get("ok"):
+            path = data["result"].get("file_path")
+            return self._file_url(path) if path else None
+        return None
 
     async def get_file_bytes(self, file_id: str) -> Optional[bytes]:
         """Download file content as bytes (for proxying)"""
         url = await self.get_file(file_id)
         if not url:
             return None
-        async with httpx.AsyncClient() as client:
-            r = await client.get(url, timeout=30)
-            return r.content if r.status_code == 200 else None
+        client = self._get_client()
+        r = await client.get(url, timeout=30)
+        return r.content if r.status_code == 200 else None
 
     # ---- Config ----
 
