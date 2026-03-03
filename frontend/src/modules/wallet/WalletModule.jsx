@@ -10,6 +10,7 @@ import WalletOverviewTab from './tabs/WalletOverviewTab';
 import WalletPendingTab from './tabs/WalletPendingTab';
 import WalletTransactionsTab from './tabs/WalletTransactionsTab';
 import BankInfoTab from './tabs/BankInfoTab';
+import DepositMethodsConfig from './tabs/DepositMethodsConfig';
 import WalletSettingsTab from './tabs/WalletSettingsTab';
 import WalletMondayTab from '@/modules/monday/components/WalletMondayTab';
 
@@ -65,7 +66,8 @@ export default function WalletModule() {
           <WalletTransactionsTab token={token} />
         </TabsContent>
 
-        <TabsContent value="bank-info" className="mt-4">
+        <TabsContent value="bank-info" className="mt-4 space-y-4">
+          <DepositMethodsConfig />
           <BankInfoTab token={token} />
         </TabsContent>
 
