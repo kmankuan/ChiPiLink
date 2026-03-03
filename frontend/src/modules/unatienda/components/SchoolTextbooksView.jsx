@@ -496,7 +496,7 @@ export default function SchoolTextbooksView({
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
 
     const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
-    if (walletBalance !== null && walletBalance < total) {
+    if (walletBalance !== null && (walletBalance + 0.01) < total) {
       toast.error(lang === 'es' ? 'Saldo insuficiente en billetera' : 'Insufficient wallet balance');
       return;
     }
@@ -521,7 +521,7 @@ export default function SchoolTextbooksView({
         const freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
         setWalletBalance(freshBalance);
         const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
-        if (freshBalance < total) {
+        if ((freshBalance + 0.01) < total) {
           toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
           return;
         }
@@ -878,7 +878,7 @@ export default function SchoolTextbooksView({
                             <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
                           </div>
                           {/* Insufficient balance — enhanced guidance */}
-                          {selectedList.length > 0 && walletBalance !== null && walletBalance < selectedTotal && (
+                          {selectedList.length > 0 && walletBalance !== null && (walletBalance + 0.01) < selectedTotal && (
                             <div className="mb-2 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 p-2.5 space-y-2" data-testid={`topup-guide-${studentId}`}>
                               <div className="flex items-center gap-1.5 text-red-700 text-[11px] font-semibold">
                                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -907,7 +907,7 @@ export default function SchoolTextbooksView({
                             </div>
                             <Button
                               onClick={() => handleSubmit(student)}
-                              disabled={submitting || selectedList.length === 0 || (walletBalance !== null && walletBalance < selectedTotal)}
+                              disabled={submitting || selectedList.length === 0 || (walletBalance !== null && (walletBalance + 0.01) < selectedTotal)}
                               className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
                               size="sm"
                               data-testid={`submit-order-btn-${studentId}`}
