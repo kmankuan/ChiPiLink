@@ -56,18 +56,29 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
     }
   }, [open]);
 
-  const fetchMethods = async () => {
+  const fetchMethods = async (attempt = 1) => {
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(`${API_URL}/api/wallet/deposit-methods`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         setMethods(data.methods || []);
+      } else if (attempt < 2) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchMethods(attempt + 1);
       }
     } catch (err) {
-      console.error('Error fetching deposit methods:', err);
+      console.error(`Deposit methods fetch error (attempt ${attempt}):`, err?.message);
+      if (attempt < 2) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchMethods(attempt + 1);
+      }
     } finally {
       setLoading(false);
     }
@@ -242,6 +253,13 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
             {loading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : methods.length === 0 ? (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-sm text-muted-foreground">{t('wallet.noMethods', 'Could not load payment methods')}</p>
+                <Button variant="outline" size="sm" onClick={() => fetchMethods()}>
+                  {t('common.retry', 'Retry')}
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
