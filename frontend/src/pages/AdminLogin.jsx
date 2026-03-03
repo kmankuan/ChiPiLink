@@ -34,7 +34,7 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 4; attempt++) {
       try {
         const user = await login(formData.email, formData.password);
         if (user.is_admin) {
@@ -52,14 +52,13 @@ export default function AdminLogin() {
           toast.error(error.response?.data?.detail || t('auth.loginError', 'Invalid credentials. Please check your email and password.'));
           break;
         }
-        // Server error (500, 502, 520, network) — retry
-        if (attempt < 2) {
-          console.warn(`Login attempt ${attempt + 1} failed (${status || error.message}), retrying in ${(attempt + 1)}s...`);
-          await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
+        if (attempt < 3) {
+          const delay = (attempt + 1) * 2000;
+          toast.info(`Server busy, retrying in ${(delay/1000)}s... (${attempt + 1}/4)`);
+          await new Promise(r => setTimeout(r, delay));
           continue;
         }
-        // All retries exhausted
-        toast.error(t('auth.serverError', 'Server temporarily unavailable. Please wait a moment and try again.'));
+        toast.error(t('auth.serverError', 'Server temporarily unavailable. Please wait 30 seconds and try again.'));
       }
     }
     setLoading(false);

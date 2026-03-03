@@ -109,19 +109,41 @@ export function AuthProvider({ children }) {
 
   // LaoPan OAuth login
   const loginWithLaoPan = async (redirectAfter = null) => {
-    try {
-      const params = redirectAfter ? `?redirect=${encodeURIComponent(redirectAfter)}` : '';
-      const response = await api.get(`${AUTH_ENDPOINTS.laopanLogin}${params}`);
-      const { auth_url } = response.data;
-      
-      if (auth_url) {
-        // Redirect to LaoPan OAuth
-        window.location.href = auth_url;
+    const CACHE_KEY = 'laopan_auth_url';
+    const params = redirectAfter ? `?redirect=${encodeURIComponent(redirectAfter)}` : '';
+    
+    // Try to get auth URL from backend (with retry)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await api.get(`${AUTH_ENDPOINTS.laopanLogin}${params}`);
+        const { auth_url } = response.data;
+        if (auth_url) {
+          // Cache the base auth URL for offline use
+          try { localStorage.setItem(CACHE_KEY, auth_url); } catch {}
+          window.location.href = auth_url;
+          return;
+        }
+      } catch (error) {
+        console.warn(`LaoPan login attempt ${attempt + 1} failed:`, error?.message);
+        if (attempt === 0) {
+          await new Promise(r => setTimeout(r, 1500));
+          continue;
+        }
       }
-    } catch (error) {
-      console.error('LaoPan login error:', error);
-      throw error;
     }
+
+    // Fallback: use cached auth URL
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      console.log('Using cached LaoPan auth URL');
+      window.location.href = cached;
+      return;
+    }
+
+    // Last resort: construct URL from known pattern
+    const origin = window.location.origin;
+    const fallbackUrl = `https://laopan.online/oauth/authorize/?client_id=4836442a6d6b6e5d734ea34adcf5482c&redirect_uri=${encodeURIComponent(origin + '/auth/laopan/callback')}&response_type=code`;
+    window.location.href = fallbackUrl;
   };
 
   // Process LaoPan OAuth callback
