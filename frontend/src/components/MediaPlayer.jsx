@@ -304,7 +304,7 @@ export default function MediaPlayer() {
       {albumTitle && <SectionTitle title={albumTitle} />}
       <div
         ref={containerRef}
-        className="relative w-full rounded-2xl overflow-hidden bg-black group"
+        className="relative w-full overflow-hidden bg-black group"
         style={{ aspectRatio: '16/9' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}

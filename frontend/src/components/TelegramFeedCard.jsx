@@ -83,7 +83,7 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
 
   return (
     <div
-      className="flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group transition-shadow hover:shadow-md"
+      className="flex-shrink-0 snap-start overflow-hidden cursor-pointer group transition-shadow hover:shadow-md"
       style={{
         width: cardWidth,
         background: '#fff',
@@ -560,7 +560,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
 
   return (
     <div
-      className="rounded-none sm:rounded-2xl overflow-hidden"
+      className="overflow-hidden"
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
@@ -801,7 +801,7 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
 
   return (
     <div
-      className="rounded-none sm:rounded-2xl overflow-hidden shadow-sm"
+      className="overflow-hidden shadow-sm"
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >

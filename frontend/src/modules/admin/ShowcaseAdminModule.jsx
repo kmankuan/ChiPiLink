@@ -883,19 +883,12 @@ export default function ShowcaseAdminModule() {
                   placeholder="我们的社区" className="h-8 text-xs" data-testid="album-title-zh" />
               </div>
             </div>
-            <div className="flex items-center justify-between pt-1 border-t">
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="shuffle-toggle" checked={mediaConfig?.shuffle || false}
-                  onChange={e => setMediaConfig(prev => ({ ...prev, shuffle: e.target.checked }))}
-                  className="rounded" data-testid="shuffle-toggle" />
-                <label htmlFor="shuffle-toggle" className="text-xs font-medium">Shuffle (random order)</label>
-              </div>
+            <div className="flex justify-end pt-1 border-t">
               <Button size="sm" className="h-7 text-xs px-3" data-testid="save-album-settings"
                 onClick={() => saveMediaConfig({
                   album_title: mediaConfig?.album_title || '',
                   album_title_es: mediaConfig?.album_title_es || '',
                   album_title_zh: mediaConfig?.album_title_zh || '',
-                  shuffle: mediaConfig?.shuffle || false,
                 })}>Save</Button>
             </div>
           </div>
