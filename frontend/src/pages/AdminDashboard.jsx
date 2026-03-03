@@ -118,7 +118,7 @@ const PrivacyModule = lazy(() => import('@/modules/admin/PrivacyModule'));
 const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
 const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
 const SystemMonitorTab = lazy(() => import('@/modules/admin/SystemMonitorTab'));
-import FloatingMonitor from '@/modules/admin/FloatingMonitor';
+import AdminStatusBar from '@/modules/admin/AdminStatusBar';
 const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModule'));
 const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule'));
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto pb-7">
           <div className="p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto min-w-0">
             {/* Page Header - Desktop only */}
             <div className="hidden lg:block mb-6">
@@ -692,7 +692,7 @@ export default function AdminDashboard() {
           </div>
         </main>
       </div>
-      <FloatingMonitor />
+      <AdminStatusBar onNavigateToMonitor={() => navigate('/admin#system-monitor')} />
     </div>
   );
 }
