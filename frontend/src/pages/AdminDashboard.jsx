@@ -118,6 +118,7 @@ const PrivacyModule = lazy(() => import('@/modules/admin/PrivacyModule'));
 const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
 const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
 const SystemMonitorTab = lazy(() => import('@/modules/admin/SystemMonitorTab'));
+import FloatingMonitor from '@/modules/admin/FloatingMonitor';
 const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModule'));
 const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule'));
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
@@ -691,6 +692,7 @@ export default function AdminDashboard() {
           </div>
         </main>
       </div>
+      <FloatingMonitor />
     </div>
   );
 }
