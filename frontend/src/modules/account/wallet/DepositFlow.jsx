@@ -83,44 +83,75 @@ export default function DepositFlow({ open, onOpenChange, token, onSuccess }) {
     if (!amount || parseFloat(amount) <= 0 || !selectedMethod || submitting) return;
     setSubmitting(true);
     try {
-      // Upload receipt image first if provided
+      // Upload receipt image with retry (server can be busy)
       let receipt_url = null;
       if (receiptFile) {
-        const formData = new FormData();
-        formData.append('file', receiptFile);
-        const uploadRes = await fetch(`${API_URL}/api/upload/payment-receipt`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        });
-        if (uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          receipt_url = uploadData.url || uploadData.file_url;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const formData = new FormData();
+            formData.append('file', receiptFile);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            const uploadRes = await fetch(`${API_URL}/api/upload/payment-receipt`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            if (uploadRes.ok) {
+              const uploadData = await uploadRes.json();
+              receipt_url = uploadData.url || uploadData.file_url;
+              break;
+            }
+          } catch (uploadErr) {
+            console.warn(`Receipt upload attempt ${attempt + 1} failed:`, uploadErr?.message);
+            if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+          }
         }
       }
 
-      const res = await fetch(`${API_URL}/api/wallet/deposit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          amount: parseFloat(amount),
-          currency: 'USD',
-          payment_method: selectedMethod.id === 'transfer' ? 'bank_transfer' : selectedMethod.id,
-          receipt_url,
-        })
-      });
-      if (res.ok) {
-        setSubmitted(true);
-        const { toast } = await import('sonner');
-        toast.success(t('wallet.depositPending', 'Your deposit request has been submitted and is pending admin approval.'));
-        onSuccess?.();
-      } else {
-        const err = await res.json().catch(() => ({}));
-        const { toast } = await import('sonner');
-        toast.error(err.detail || t('wallet.depositError', 'Error submitting deposit request'));
+      // Submit deposit request (with or without receipt — don't block on upload failure)
+      let depositOk = false;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(`${API_URL}/api/wallet/deposit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              amount: parseFloat(amount),
+              currency: 'USD',
+              payment_method: selectedMethod.id === 'transfer' ? 'bank_transfer' : selectedMethod.id,
+              receipt_url,
+            }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            depositOk = true;
+            setSubmitted(true);
+            const { toast } = await import('sonner');
+            toast.success(t('wallet.depositPending', 'Your deposit request has been submitted and is pending admin approval.'));
+            onSuccess?.();
+            break;
+          } else {
+            const err = await res.json().catch(() => ({}));
+            if (attempt === 1 || res.status < 500) {
+              const { toast } = await import('sonner');
+              toast.error(err.detail || t('wallet.depositError', 'Error submitting deposit request'));
+              break;
+            }
+          }
+        } catch (err) {
+          if (attempt === 1) {
+            const { toast } = await import('sonner');
+            toast.error(t('wallet.depositError', 'Server temporarily unavailable. Please try again.'));
+          } else {
+            await new Promise(r => setTimeout(r, 2000));
+          }
+        }
       }
     } catch (error) {
       console.error('Error submitting deposit:', error);
