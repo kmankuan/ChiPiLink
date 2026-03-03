@@ -53,7 +53,7 @@ export default function AdminStatusBar({ onNavigateToMonitor }) {
 
   useEffect(() => {
     fetchHealth();
-    const interval = setInterval(fetchHealth, 15000);
+    const interval = setInterval(fetchHealth, 30000);
     return () => clearInterval(interval);
   }, [fetchHealth]);
 

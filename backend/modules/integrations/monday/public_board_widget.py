@@ -107,12 +107,20 @@ async def get_widget_data():
                 needs_refresh = True
 
     if needs_refresh:
-        try:
-            items, live_col_titles = await _fetch_and_cache(config)
-        except Exception as e:
-            logger.error(f"Widget auto-refresh failed: {e}")
-            items = cache.get("items", []) if cache else []
-            live_col_titles = cache.get("live_col_titles", {}) if cache else {}
+        if cache and cache.get("items"):
+            # Serve stale cache immediately, refresh in background
+            items = cache.get("items", [])
+            live_col_titles = cache.get("live_col_titles", {})
+            import asyncio
+            asyncio.create_task(_fetch_and_cache(config))
+        else:
+            # No cache at all — must fetch
+            try:
+                items, live_col_titles = await _fetch_and_cache(config)
+            except Exception as e:
+                logger.error(f"Widget auto-refresh failed: {e}")
+                items = []
+                live_col_titles = {}
     else:
         items = cache.get("items", [])
         live_col_titles = cache.get("live_col_titles", {})

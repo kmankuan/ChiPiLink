@@ -261,7 +261,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request tracking middleware for system monitor
+# Lightweight request tracking middleware
 @app.middleware("http")
 async def track_requests_middleware(request, call_next):
     import time as _time
@@ -271,16 +271,8 @@ async def track_requests_middleware(request, call_next):
         duration_ms = (_time.time() - start) * 1000
         from modules.admin.system_monitor import track_request, track_user_activity
         track_request(duration_ms, is_error=response.status_code >= 500)
-        # Track active user from auth header
-        auth = request.headers.get("authorization", "")
-        if auth.startswith("Bearer "):
-            try:
-                import jwt
-                payload = jwt.decode(auth[7:], options={"verify_signature": False})
-                track_user_activity(user_id=payload.get("sub"), ip=request.client.host if request.client else None)
-            except Exception:
-                pass
-        elif request.client:
+        # Only track IP, don't decode JWT (too expensive for every request)
+        if request.client:
             track_user_activity(ip=request.client.host)
         return response
     except Exception as e:
