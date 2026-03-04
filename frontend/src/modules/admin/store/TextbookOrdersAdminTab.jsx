@@ -1057,7 +1057,15 @@ export default function TextbookOrdersAdminTab() {
         onOpenChange={setSinglePrintOpen}
         orderIds={selectedOrder ? [selectedOrder.order_id] : []}
         token={localStorage.getItem('auth_token')}
-        onPrintComplete={fetchData}
+        onPrintComplete={() => {
+          if (selectedOrder) {
+            setOrders(prev => prev.map(o =>
+              o.order_id === selectedOrder.order_id
+                ? { ...o, printed_at: new Date().toISOString(), print_count: (o.print_count || 0) + 1 }
+                : o
+            ));
+          }
+        }}
       />
 
       {/* Approve Reorder Dialog */}
@@ -1166,7 +1174,14 @@ export default function TextbookOrdersAdminTab() {
         onOpenChange={setPrintDialogOpen}
         orderIds={orderSelection.ids}
         token={localStorage.getItem('auth_token')}
-        onPrintComplete={fetchData}
+        onPrintComplete={() => {
+          const printedIds = new Set(orderSelection.ids);
+          setOrders(prev => prev.map(o =>
+            printedIds.has(o.order_id)
+              ? { ...o, printed_at: new Date().toISOString(), print_count: (o.print_count || 0) + 1 }
+              : o
+          ));
+        }}
       />
 
       {/* CRM Chat */}
