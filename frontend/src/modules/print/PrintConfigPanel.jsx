@@ -310,6 +310,7 @@ export default function PrintConfigPanel() {
                       </div>
                       <ToggleRow label={t('print.showDate', 'Show Date')} checked={format.header?.show_date} onChange={(v) => updateFormat('header', 'show_date', v)} />
                       <ToggleRow label={t('print.showOrderId', 'Show Order ID')} checked={format.header?.show_order_id} onChange={(v) => updateFormat('header', 'show_order_id', v)} />
+                      <ToggleRow label="Show Paid Date" checked={format.header?.show_paid_date} onChange={(v) => updateFormat('header', 'show_paid_date', v)} />
                     </CardContent>
                   </Card>
 
@@ -845,7 +846,7 @@ function TemplatesSection() {
                         <Input value={cfg?.header?.title || ''} onChange={e => updateEditHeader('title', e.target.value)} disabled={!isEditing} className="h-8 text-xs mt-1" />
                       </div>
                       <div className="flex gap-4 flex-wrap">
-                        {[['show_date','Show Date'],['show_order_id','Show Order ID'],['show_logo','Show Logo']].map(([key,label]) => (
+                        {[['show_date','Show Date'],['show_order_id','Show Order ID'],['show_paid_date','Show Paid Date'],['show_logo','Show Logo']].map(([key,label]) => (
                           <label key={key} className="flex items-center gap-1.5 text-[10px] cursor-pointer">
                             <input type="checkbox" checked={cfg?.header?.[key] ?? true} onChange={e => updateEditHeader(key, e.target.checked)} disabled={!isEditing} className="rounded" />{label}
                           </label>
@@ -891,6 +892,49 @@ function TemplatesSection() {
                   <div className="flex items-center gap-3 text-[9px] text-muted-foreground pt-2">
                     {tpl.created_by && <span>by {tpl.created_by}</span>}
                     {tpl.updated_at && <span>updated {new Date(tpl.updated_at).toLocaleDateString()}</span>}
+                  </div>
+
+                  {/* Available Fields Reference */}
+                  <Separator />
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Available Fields Reference</p>
+                    <p className="text-[9px] text-muted-foreground mb-2">These fields are available from each order and can be toggled on/off above.</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-[10px]">
+                      <div className="font-semibold text-muted-foreground mt-1 mb-0.5 col-span-2">Order Fields</div>
+                      {[
+                        ['order_id', 'Order ID', 'ord_2c25f96fd214'],
+                        ['student_name', 'Student Name', 'Sergio Wang'],
+                        ['grade', 'Grade', 'G5'],
+                        ['year', 'Year', '2026'],
+                        ['total_amount', 'Total Amount', '$386.55'],
+                        ['paid_date', 'Paid Date', '2026-02-15'],
+                        ['status', 'Order Status', 'submitted'],
+                        ['parent_name', 'Parent Name', 'Ken Wang'],
+                        ['source', 'Source', 'monday_import'],
+                        ['created_at', 'Created Date', '2026-02-27'],
+                        ['printed_at', 'Last Printed', '2026-03-04'],
+                        ['print_count', 'Print Count', '2'],
+                      ].map(([field, label, example]) => (
+                        <div key={field} className="flex items-center justify-between py-0.5 border-b border-dashed border-muted">
+                          <span><code className="bg-muted px-1 rounded text-[9px]">{field}</code> {label}</span>
+                          <span className="text-muted-foreground text-[9px]">{example}</span>
+                        </div>
+                      ))}
+                      <div className="font-semibold text-muted-foreground mt-2 mb-0.5 col-span-2">Item Fields (per book)</div>
+                      {[
+                        ['book_id', 'Book ID', 'book_4fea5f97'],
+                        ['book_code', 'Code', 'G5-1'],
+                        ['book_name', 'Book Name', 'Science 5 Text'],
+                        ['price', 'Price', '$43.95'],
+                        ['quantity_ordered', 'Quantity', '1'],
+                        ['status', 'Item Status', 'ordered'],
+                      ].map(([field, label, example]) => (
+                        <div key={field} className="flex items-center justify-between py-0.5 border-b border-dashed border-muted">
+                          <span><code className="bg-muted px-1 rounded text-[9px]">{field}</code> {label}</span>
+                          <span className="text-muted-foreground text-[9px]">{example}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
