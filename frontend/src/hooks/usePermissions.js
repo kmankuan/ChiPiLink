@@ -11,12 +11,16 @@ const API_URL = RESOLVED_API_URL;
 // Cache de permisos para evitar llamadas innecesarias
 let permissionsCache = null;
 let cacheTimestamp = null;
-const CACHE_DURATION = 2 * 60 * 1000; // 2 minutos (reducido para mejor UX)
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
+// Request deduplication — prevents thundering herd when 20+ hooks mount simultaneously
+let _inflight = null;
 
 // Función para limpiar el caché (exportada para uso externo)
 export function clearPermissionsCache() {
   permissionsCache = null;
   cacheTimestamp = null;
+  _inflight = null;
 }
 
 export function usePermissions() {
@@ -44,15 +48,27 @@ export function usePermissions() {
 
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/roles/my-permissions`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al cargar permisos');
+      
+      // Deduplicate: if another hook is already fetching, wait for that result
+      if (_inflight) {
+        const data = await _inflight;
+        setPermissions(data.permissions || []);
+        setRole(data.role || null);
+        setError(null);
+        setLoading(false);
+        return;
       }
-
-      const data = await response.json();
+      
+      // This is the first request — others will piggyback on this promise
+      _inflight = fetch(`${API_URL}/api/roles/my-permissions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(r => {
+        if (!r.ok) throw new Error('Error loading permissions');
+        return r.json();
+      });
+      
+      const data = await _inflight;
+      _inflight = null;
       
       // Update cache
       permissionsCache = data;
@@ -62,6 +78,7 @@ export function usePermissions() {
       setRole(data.role || null);
       setError(null);
     } catch (err) {
+      _inflight = null;
       console.error('Error fetching permissions:', err);
       setError(err.message);
       // Default to basic user permissions
