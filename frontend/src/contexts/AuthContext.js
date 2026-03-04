@@ -145,7 +145,7 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Fallback: use cached auth URL
+    // Fallback: use cached auth URL (includes state from previous successful attempt)
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       console.log('Using cached LaoPan auth URL');
@@ -153,10 +153,8 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Last resort: construct URL from known pattern
-    const origin = window.location.origin;
-    const fallbackUrl = `https://laopan.online/oauth/authorize/?client_id=4836442a6d6b6e5d734ea34adcf5482c&redirect_uri=${encodeURIComponent(origin + '/auth/laopan/callback')}&response_type=code`;
-    window.location.href = fallbackUrl;
+    // No cache, no backend — show error
+    throw new Error('Unable to connect to login server. Please try again in a moment.');
   };
 
   // Process LaoPan OAuth callback

@@ -40,6 +40,22 @@ export default function LaoPanCallback() {
 
       // Validate required params
       if (!code || !state) {
+        // If we have code but no state, try sending just the code to backend
+        // The backend may accept code-only auth
+        if (code && !state) {
+          try {
+            const result = await processLaoPanCallback(code, '');
+            if (isPopup) {
+              const token = localStorage.getItem('auth_token');
+              window.opener.postMessage({ type: 'chipi-auth-token', token }, '*');
+              window.close();
+              return;
+            }
+            toast.success(`Welcome, ${result?.nombre || ''}!`);
+            navigate('/');
+            return;
+          } catch {}
+        }
         if (isPopup) {
           window.opener.postMessage({ type: 'chipi-auth-error', error: 'Incomplete authentication' }, '*');
           window.close();
