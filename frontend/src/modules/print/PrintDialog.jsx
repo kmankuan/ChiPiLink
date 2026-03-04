@@ -40,7 +40,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     if (open && orderIds?.length > 0) {
       fetchPrintData();
       setCurrentPage(0);
-      setPrinted(false);
+      // Don't reset printed — will be set from fetched data below
     }
   }, [open, orderIds]);
 
@@ -60,9 +60,15 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         setOrders(data.orders || []);
         setFormatConfig(data.format_config || {});
         setJobId(data.job_id || null);
+        // Show printed badge if ALL orders were already printed
+        const allPrinted = (data.orders || []).every(o => o.printed_at);
+        setPrinted(allPrinted && (data.orders || []).length > 0);
+      } else {
+        setPrinted(false);
       }
     } catch (err) {
       console.error('Error fetching print data:', err);
+      setPrinted(false);
     } finally {
       setLoading(false);
     }
@@ -123,8 +129,8 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         setPrinted(true);
         markJobComplete();
         markOrdersPrinted();
-        // Auto-close dialog after 2 seconds
-        setTimeout(() => onOpenChange(false), 2000);
+        // Auto-close dialog after 1 second
+        setTimeout(() => onOpenChange(false), 1000);
       };
 
       setTimeout(() => {
@@ -252,8 +258,10 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
             )}
           </DialogTitle>
           <DialogDescription>
-            {printed
-              ? t('print.autoClosing', 'Closing automatically...')
+            {printing
+              ? t('print.sending', 'Sending to printer...')
+              : printed
+              ? t('print.alreadyPrinted', 'This order was already printed')
               : t('print.previewDesc', 'Review package lists before printing')
             }
           </DialogDescription>
