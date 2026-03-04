@@ -53,26 +53,39 @@ export function AuthProvider({ children }) {
       return;
     }
     
-    // Try up to 2 times (handles transient 401s during deploys/restarts)
-    for (let attempt = 0; attempt < 2; attempt++) {
+    // Try up to 3 times — only clear token if server explicitly says "invalid token"
+    for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const response = await api.get(AUTH_ENDPOINTS.me);
         setUser(response.data);
         setLoading(false);
         return;
       } catch (error) {
-        if (attempt === 0 && error.response?.status === 401) {
-          // First 401 — wait briefly and retry (backend might be restarting)
-          await new Promise(r => setTimeout(r, 1000));
-          continue;
-        }
-        console.error('Auth check error:', error);
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        const status = error.response?.status;
+        const detail = error.response?.data?.detail || '';
+        
+        // Only clear token if server EXPLICITLY says token is invalid/expired
+        // Not on network errors, 500s, 502s, or timeouts
+        const isTokenError = status === 401 && (
+          detail.includes('expired') || detail.includes('Invalid token') || detail.includes('Not authenticated')
+        );
+        if (isTokenError) {
           setUser(null);
           localStorage.removeItem('auth_token');
           setToken(null);
+          setLoading(false);
+          return;
         }
-        break;
+        
+        // Server error or network issue — retry, DON'T clear token
+        if (attempt < 2) {
+          await new Promise(r => setTimeout(r, (attempt + 1) * 1500));
+          continue;
+        }
+        
+        // All retries failed but NOT a confirmed invalid token — keep token, user stays logged in
+        // They can still navigate the app, and next API call might work
+        console.warn('Auth check failed after 3 attempts, keeping session active');
       }
     }
     setLoading(false);
