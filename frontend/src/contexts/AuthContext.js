@@ -256,8 +256,8 @@ export function AuthProvider({ children }) {
     user,
     loading,
     token,
-    isAuthenticated: !!user,
-    // Use English field name is_admin
+    // Stay authenticated while token exists (even if user is temporarily null during retry)
+    isAuthenticated: !!user || !!localStorage.getItem('auth_token'),
     isAdmin: user?.is_admin || false,
     login,
     register,

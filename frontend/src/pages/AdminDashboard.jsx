@@ -311,12 +311,14 @@ export default function AdminDashboard() {
       .filter(g => g.items.length > 0);
   }, [filteredNavGroups, sidebarSearch]);
 
-  // Redirect non-admins away from admin panel (only after auth is loaded)
+  // Redirect non-admins away from admin panel
+  // ONLY redirect if auth has fully loaded AND user is confirmed non-admin
+  // Don't redirect if user is null (loading/retry state) — token might still be valid
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    if (!authLoading && user && !user.is_admin) {
       navigate('/');
     }
-  }, [authLoading, isAdmin, navigate]);
+  }, [authLoading, user, navigate]);
 
   const handleLogout = async () => {
     await logout();
