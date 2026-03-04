@@ -59,9 +59,9 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
-export default function MondayModule() {
+export default function MondayModule({ initialTab }) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('workspaces');
+  const [activeTab, setActiveTab] = useState(initialTab || 'workspaces');
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('auth_token');
 

@@ -47,8 +47,8 @@ class MondayCoreClient:
             logger.debug(f"Workspace config lookup failed: {e}")
         return MONDAY_API_KEY or None
 
-    async def execute(self, query: str, timeout: float = 20.0) -> dict:
-        """Execute a GraphQL query/mutation against Monday.com API with retry"""
+    async def _execute_raw(self, query: str, timeout: float = 20.0) -> dict:
+        """Raw GraphQL execution — called by the queue worker"""
         api_key = await self.get_api_key()
         if not api_key:
             raise ValueError("Monday.com API key not configured")
@@ -70,12 +70,11 @@ class MondayCoreClient:
 
                 if "errors" in data:
                     error_msg = str(data['errors'])
-                    # Retry on rate limit or complexity budget errors
                     if any(kw in error_msg.lower() for kw in ["rate limit", "complexity", "budget"]):
                         logger.warning(f"Monday.com rate/complexity limit (attempt {attempt+1}): {error_msg}")
                         if attempt < 2:
                             import asyncio
-                            await asyncio.sleep(2 ** attempt)  # 1s, 2s backoff
+                            await asyncio.sleep(2 ** attempt)
                             continue
                     logger.error(f"Monday.com API error: {data['errors']}")
                     raise ValueError(f"Monday.com error: {data['errors']}")
@@ -89,6 +88,15 @@ class MondayCoreClient:
                     await asyncio.sleep(2 ** attempt)
 
         raise ValueError(f"Monday.com API failed after 3 attempts: {last_error}")
+
+    async def execute(self, query: str, timeout: float = 20.0) -> dict:
+        """Queue-aware execute — all calls go through the rate-limited queue"""
+        from modules.integrations.monday.queue import monday_queue, Priority
+        label = query.strip()[:60].replace('\n', ' ')
+        return await monday_queue.enqueue(
+            self._execute_raw, query, timeout,
+            priority=Priority.NORMAL, label=label, timeout=timeout + 15
+        )
 
     async def test_connection(self) -> dict:
         """Test API connectivity and return account info"""

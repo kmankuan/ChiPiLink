@@ -66,6 +66,14 @@ def _get_ws_connections():
         return {"total": 0, "unique_users": 0}
 
 
+def _get_monday_queue_stats():
+    try:
+        from modules.integrations.monday.queue import monday_queue
+        return monday_queue.get_stats()
+    except Exception:
+        return {"queue_depth": 0, "running": 0}
+
+
 @router.get("/health")
 async def system_health(admin: dict = Depends(get_admin_user)):
     """Lightweight health snapshot — no blocking calls"""
@@ -101,6 +109,7 @@ async def system_health(admin: dict = Depends(get_admin_user)):
         "active_users": _get_active_counts(),
         "websockets": _get_ws_connections(),
         "frontend": fe_avg,
+        "monday_queue": _get_monday_queue_stats(),
     }
 
 

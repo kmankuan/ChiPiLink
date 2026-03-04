@@ -25,6 +25,7 @@ const ALL_INDICATORS = [
   { id: 'uptime', label: 'Up', icon: Zap, getValue: h => `${h?.uptime_hours || 0}h`, warn: () => false },
   { id: 'db', label: 'DB', icon: Database, getValue: h => `${h?.database?.size_mb || '?'}MB`, warn: () => false },
   { id: 'ips', label: 'IPs', icon: Globe, getValue: h => h?.active_users?.unique_ips_5m || 0, warn: () => false },
+  { id: 'monday_q', label: 'M.Q', icon: Activity, getValue: h => h?.monday_queue?.queue_depth || 0, warn: h => (h?.monday_queue?.queue_depth || 0) > 10 },
   { id: 'threads', label: 'Threads', icon: Users, getValue: h => h?.process?.threads || 0, warn: () => false },
   { id: 'error_rate', label: 'Err%', icon: AlertTriangle, getValue: h => `${h?.requests?.error_rate || 0}%`, warn: h => (h?.requests?.error_rate || 0) > 5 },
 ];

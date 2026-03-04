@@ -95,7 +95,7 @@ const SysbookAnalyticsTab = lazy(() => import('@/modules/sysbook/SysbookAnalytic
 const SysbookAlertsTab = lazy(() => import('@/modules/sysbook/SysbookAlertsTab'));
 const StudentsSchoolsModule = lazy(() => import('@/modules/school-textbooks/StudentsSchoolsModule'));
 const PreSaleImportTab = lazy(() => import('@/modules/unatienda/tabs/PreSaleImportTab'));
-const MondayTextbookSyncModule = lazy(() => import('@/modules/school-textbooks/MondayTextbookSyncModule'));
+const MondayHubModule = lazy(() => import('@/modules/monday/MondayHubModule'));
 const PrintConfigPanel = lazy(() => import('@/modules/print/PrintConfigPanel'));
 const TextbookFormSettingsModule = lazy(() => import('@/modules/school-textbooks/TextbookFormSettingsModule'));
 const MessagesTab = lazy(() => import('@/modules/unatienda/tabs/MessagesTab'));
@@ -169,7 +169,6 @@ const navGroups = [
       { id: 'sysbook-alerts', labelKey: 'nav.sysbookAlerts', fallbackLabel: 'Stock Alerts', icon: AlertTriangle, permission: 'unatienda.access' },
       { id: 'students-schools', labelKey: 'nav.studentsSchools', fallbackLabel: 'Students & Schools', icon: GraduationCap, permission: 'unatienda.access' },
       { id: 'presale-import', labelKey: 'nav.presaleImport', fallbackLabel: 'Pre-Sale Import', icon: Upload, permission: 'unatienda.access' },
-      { id: 'monday-textbook-sync', labelKey: 'nav.mondayTextbookSync', fallbackLabel: 'Monday.com Sync', icon: RefreshCw, permission: 'unatienda.access' },
       { id: 'textbook-form-settings', labelKey: 'nav.textbookFormSettings', fallbackLabel: 'Form Settings', icon: ClipboardList, permission: 'unatienda.access' },
     ],
   },
@@ -212,11 +211,16 @@ const navGroups = [
     ],
   },
   {
+    group: 'Monday.com',
+    items: [
+      { id: 'monday-hub', labelKey: 'nav.mondayHub', fallbackLabel: 'Monday.com', icon: Plug, permission: 'integrations.access' },
+    ],
+  },
+  {
     group: 'Integrations',
     items: [
       { id: 'telegram', labelKey: 'nav.telegram', icon: Send, permission: 'admin.site_config' },
       { id: 'forms', labelKey: 'nav.forms', icon: FileText, permission: 'admin.site_config' },
-      { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
     ],
   },
   {
@@ -356,7 +360,8 @@ export default function AdminDashboard() {
       case 'presale-import':
         return <PreSaleImportTab token={localStorage.getItem('auth_token')} />;
       case 'monday-textbook-sync':
-        return <MondayTextbookSyncModule />;
+      case 'monday-hub':
+        return <MondayHubModule />;
       case 'textbook-form-settings':
         return <TextbookFormSettingsModule />;
       case 'print-config':
@@ -372,7 +377,7 @@ export default function AdminDashboard() {
       case 'community':
         return <CommunityFeedModule />;
       case 'integrations':
-        return <IntegrationsModule />;
+        return <MondayHubModule />;
       case 'devcontrol':
         return <DevControlModule />;
       case 'system-monitor':
