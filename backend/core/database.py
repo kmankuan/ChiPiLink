@@ -18,7 +18,15 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ.get('MONGO_URL')
 db_name = os.environ.get('DB_NAME', 'chipi_link')
 
-client = AsyncIOMotorClient(mongo_url)
+# MongoDB connection — with explicit pool limits for production stability
+client = AsyncIOMotorClient(
+    mongo_url,
+    maxPoolSize=50,
+    minPoolSize=5,
+    serverSelectionTimeoutMS=5000,
+    connectTimeoutMS=10000,
+    socketTimeoutMS=10000,
+)
 db = client[db_name]
 
 # Import collection constants after db is defined
