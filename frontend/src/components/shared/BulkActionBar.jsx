@@ -20,8 +20,8 @@ export function BulkActionBar({
   if (count === 0) return null;
 
   return (
-    <div className="sticky bottom-4 z-50 mx-auto w-fit" data-testid="bulk-action-bar">
-      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border bg-background shadow-lg">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50" data-testid="bulk-action-bar">
+      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border bg-background/95 backdrop-blur-lg shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
         <span className="text-sm font-medium mr-1" data-testid="bulk-count">
           {count} {t('common.selected')}
         </span>
