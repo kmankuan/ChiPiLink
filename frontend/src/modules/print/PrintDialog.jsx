@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
-  Printer, ChevronLeft, ChevronRight, Loader2, Eye
+  Printer, ChevronLeft, ChevronRight, Loader2, Eye, CheckCircle
 } from 'lucide-react';
 import PackageListPreview from './PackageListPreview';
 import { toast } from 'sonner';
@@ -32,6 +32,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
+  const [printed, setPrinted] = useState(false);
   const [jobId, setJobId] = useState(null);
   const printRef = useRef(null);
 
@@ -39,6 +40,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     if (open && orderIds?.length > 0) {
       fetchPrintData();
       setCurrentPage(0);
+      setPrinted(false);
     }
   }, [open, orderIds]);
 
@@ -118,9 +120,11 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
       printWindow.onafterprint = () => {
         printWindow.close();
         setPrinting(false);
+        setPrinted(true);
         markJobComplete();
         markOrdersPrinted();
-        toast.success(`${orders.length} receipt(s) sent to printer`);
+        // Auto-close dialog after 2 seconds
+        setTimeout(() => onOpenChange(false), 2000);
       };
 
       setTimeout(() => {
@@ -129,6 +133,10 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         setTimeout(() => {
           if (!printWindow.closed) printWindow.close();
           setPrinting(false);
+          setPrinted(true);
+          markJobComplete();
+          markOrdersPrinted();
+          setTimeout(() => onOpenChange(false), 2000);
         }, 15000);
       }, 800);
     } catch (err) {
@@ -213,8 +221,10 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     printWindow.onafterprint = () => {
       printWindow.close();
       setPrinting(false);
+      setPrinted(true);
       markJobComplete();
       markOrdersPrinted();
+      setTimeout(() => onOpenChange(false), 2000);
     };
 
     setTimeout(() => {
@@ -234,9 +244,18 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
             <Printer className="h-5 w-5" />
             {t('print.preview', 'Print Preview')}
             <Badge variant="secondary">{orders.length} {t('print.orders', 'orders')}</Badge>
+            {printed && (
+              <Badge className="bg-green-500 text-white gap-1 animate-in fade-in">
+                <CheckCircle className="h-3 w-3" />
+                {t('print.sent', 'Sent to printer')}
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
-            {t('print.previewDesc', 'Review package lists before printing')}
+            {printed
+              ? t('print.autoClosing', 'Closing automatically...')
+              : t('print.previewDesc', 'Review package lists before printing')
+            }
           </DialogDescription>
         </DialogHeader>
 
