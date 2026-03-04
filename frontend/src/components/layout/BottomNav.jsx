@@ -129,8 +129,13 @@ export default function BottomNav() {
         <NavItem icon={Compass} label={t('common.explore', 'Explore')} to="/comunidad" active={isExplore} />
         <NavItem icon={ShoppingBag} label={t('common.store', 'Store')} to="/unatienda" active={isStore} badge={itemCount} />
 
-        {/* Orders — with combined notification badge */}
-        <NavItem icon={ClipboardList} label={t('cart.myOrders', 'My Orders')} to="/orders" active={path.startsWith('/orders')} badge={allUnread || itemCount} />
+        {/* Orders */}
+        <NavItem icon={ClipboardList} label={t('cart.myOrders', 'Orders')} to="/orders" active={path.startsWith('/orders')} badge={itemCount} />
+
+        {/* Notifications bell — only for authenticated users */}
+        {isAuthenticated && (
+          <NavItem icon={Bell} label={t('common.alerts', 'Alerts')} to="/orders" active={false} badge={allUnread} />
+        )}
 
         {/* Club (if member) */}
         {isAuthenticated && user?.tiene_membresia_activa && (
