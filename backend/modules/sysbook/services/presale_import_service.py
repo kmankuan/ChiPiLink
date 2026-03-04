@@ -143,18 +143,8 @@ class PreSaleImportService:
 
         logger.info(f"[presale] Import complete: {len(imported)} imported, {len(skipped)} skipped, {len(errors)} errors")
 
-        # Auto-sync imported orders to Textbooks board (fire-and-forget)
-        if imported:
-            async def _sync_imported_to_textbooks():
-                try:
-                    from modules.sysbook.services.textbook_board_sync import textbook_board_sync
-                    for imp in imported:
-                        order = await db.store_textbook_orders.find_one({"order_id": imp["order_id"]}, {"_id": 0})
-                        if order:
-                            await textbook_board_sync.sync_order_to_textbooks_board(order)
-                except Exception as e:
-                    logger.error(f"[presale] Textbooks board sync failed: {e}")
-            asyncio.create_task(_sync_imported_to_textbooks())
+        # NOTE: Textbook board sync removed from auto-import (too many API calls overwhelm the server).
+        # Admin can manually sync via the "Sync Textbooks Board" button.
 
         return {
             "imported": len(imported),
