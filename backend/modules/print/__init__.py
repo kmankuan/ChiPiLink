@@ -209,7 +209,18 @@ def _build_thermal_html(orders, fmt):
             total = 0.0
         page_break = 'page-break-after: always;' if idx < len(orders) - 1 else ''
 
-        receipt = f'<div style="padding: 2mm 0; {page_break}">'
+        # For thermal printers: add explicit cut marker between orders
+        cut_marker = ''
+        if idx < len(orders) - 1:
+            cut_marker = (
+                '<div style="page-break-after: always; margin: 4mm 0; text-align: center;">'
+                '<div style="border-top: 2px dashed #000; margin: 3mm 0;"></div>'
+                '<div style="font-size: 7px; color: #666; letter-spacing: 2px;">&#9986; CUT HERE &#9986;</div>'
+                '<div style="border-top: 2px dashed #000; margin: 3mm 0;"></div>'
+                '</div>'
+            )
+
+        receipt = f'<div style="padding: 2mm 0;">'
         # Header
         receipt += '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:2mm; margin-bottom:2mm;">'
         receipt += f'<div style="font-size:14px; font-weight:bold;">{escape(title)}</div>'
@@ -288,7 +299,7 @@ def _build_thermal_html(orders, fmt):
                 receipt += '<div style="border-bottom:1px dotted #888; height:6mm; margin-bottom:1mm;"></div>'
             receipt += '</div>'
         receipt += '</div></div>'
-        receipts_html += receipt
+        receipts_html += receipt + cut_marker
 
     return f'''<!DOCTYPE html>
 <html><head><title>Print</title>
