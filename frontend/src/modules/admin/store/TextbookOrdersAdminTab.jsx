@@ -58,7 +58,9 @@ import {
   Check,
   X,
   Trash2,
-  Plus
+  Plus,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
@@ -622,6 +624,21 @@ export default function TextbookOrdersAdminTab() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
+                {/* Top pagination */}
+                <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/30 text-xs text-muted-foreground">
+                  <span>{orderPagination.totalItems} orders</span>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!orderPagination.canPrev}
+                      onClick={() => orderPagination.setPage(orderPagination.page - 1)}>
+                      <ChevronLeft className="h-3 w-3" />
+                    </Button>
+                    <span className="font-medium px-1">{orderPagination.page + 1} / {orderPagination.totalPages}</span>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!orderPagination.canNext}
+                      onClick={() => orderPagination.setPage(orderPagination.page + 1)}>
+                      <ChevronRight className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
