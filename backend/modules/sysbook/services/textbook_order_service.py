@@ -274,10 +274,10 @@ class TextbookOrderService(BaseService):
                     elif inventory > 0 or is_presale:
                         item["status"] = OrderItemStatus.AVAILABLE.value
             else:
-                # Product no longer in catalog — mark unavailable but keep the item
+                # Product NOT in current grade catalog — only keep if already ordered
                 if item["status"] not in [OrderItemStatus.ORDERED.value]:
-                    item["status"] = OrderItemStatus.OUT_OF_STOCK.value
-            
+                    continue  # Skip non-ordered items from wrong grade
+                    
             updated_items.append(item)
         
         # Second: add any NEW books in catalog that aren't in the existing order

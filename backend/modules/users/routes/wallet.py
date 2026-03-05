@@ -320,8 +320,8 @@ DEFAULT_DEPOSIT_METHODS = {
 
 
 @router.get("/deposit-methods")
-async def get_deposit_methods(user=Depends(get_current_user)):
-    """Get available deposit methods for users"""
+async def get_deposit_methods():
+    """Get available deposit methods — public endpoint (config only, no sensitive data)"""
     config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
     methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
 
