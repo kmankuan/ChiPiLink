@@ -767,12 +767,32 @@ export default function TelegramAdminModule() {
                 data-testid="telegram-channel-title"
               />
               <button
-                onClick={() => handleConfigSave({ channel_title: config?.channel_title || '' })}
-                className="px-3 py-2 rounded-lg text-xs font-medium text-white"
+                onClick={async () => {
+                  await handleConfigSave({ channel_title: config?.channel_title || '' });
+                  alert('Title saved!');
+                }}
+                className="px-4 py-2 rounded-lg text-xs font-medium text-white"
                 style={{ background: '#8B6914' }}
                 data-testid="save-channel-title"
               >Save</button>
             </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: '#2d2217' }}>Show Post Count</p>
+              <p className="text-[10px]" style={{ color: '#b8956a' }}>Display number of posts (e.g. "15 posts") below the title</p>
+            </div>
+            <button
+              onClick={() => {
+                const newVal = !(config?.show_post_count ?? true);
+                setConfig(prev => ({ ...prev, show_post_count: newVal }));
+                handleConfigSave({ show_post_count: newVal });
+              }}
+              className={`w-10 h-5 rounded-full transition-colors relative ${config?.show_post_count !== false ? 'bg-green-500' : 'bg-gray-300'}`}
+              data-testid="telegram-show-post-count-toggle"
+            >
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${config?.show_post_count !== false ? 'left-5' : 'left-0.5'}`} />
+            </button>
           </div>
           <div className="flex items-center justify-between">
             <div>

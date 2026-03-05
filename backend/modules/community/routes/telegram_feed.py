@@ -190,6 +190,7 @@ async def get_public_containers():
             "container_id": "default",
             "channel_id": config.get("channel_id"),
             "title": config.get("channel_title") or "Community Channel",
+            "show_post_count": config.get("show_post_count", True),
         }]
 
     result = []
@@ -450,6 +451,7 @@ class ConfigUpdateRequest(BaseModel):
     channel_title: Optional[str] = None
     auto_sync: Optional[bool] = None
     poll_interval: Optional[int] = None
+    show_post_count: Optional[bool] = None
     visibility: Optional[str] = None
     allowed_roles: Optional[List[str]] = None
 
