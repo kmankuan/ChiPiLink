@@ -38,6 +38,15 @@ class LaoPanOAuthService:
         self.client_id = LAOPAN_CLIENT_ID
         self.client_secret = LAOPAN_CLIENT_SECRET
         self.base_url = LAOPAN_BASE_URL
+        self._http = None
+
+    def _get_http(self):
+        if self._http is None or self._http.is_closed:
+            self._http = httpx.AsyncClient(
+                timeout=httpx.Timeout(15.0, connect=10.0),
+                limits=httpx.Limits(max_connections=3, max_keepalive_connections=2),
+            )
+        return self._http
     
     def get_redirect_uri(self, origin: Optional[str] = None) -> str:
         """
@@ -163,8 +172,8 @@ class LaoPanOAuthService:
         callback_uri = redirect_uri or self.get_redirect_uri()
         
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
+            client = self._get_http()
+            response = await client.post(
                     TOKEN_URL,
                     data={
                         "grant_type": "authorization_code",
@@ -179,11 +188,11 @@ class LaoPanOAuthService:
                     timeout=30.0
                 )
                 
-                if response.status_code != 200:
-                    logger.error(f"Token exchange failed: {response.status_code} - {response.text}")
-                    return None
+            if response.status_code != 200:
+                logger.error(f"Token exchange failed: {response.status_code} - {response.text}")
+                return None
                 
-                return response.json()
+            return response.json()
         except Exception as e:
             logger.error(f"Token exchange error: {e}")
             return None
@@ -194,20 +203,20 @@ class LaoPanOAuthService:
         Returns user data or None on failure
         """
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    USERINFO_URL,
-                    headers={
-                        "Authorization": f"Bearer {access_token}"
-                    },
-                    timeout=30.0
-                )
+            client = self._get_http()
+            response = await client.get(
+                USERINFO_URL,
+                headers={
+                    "Authorization": f"Bearer {access_token}"
+                },
+                timeout=30.0
+            )
                 
-                if response.status_code != 200:
-                    logger.error(f"User info fetch failed: {response.status_code} - {response.text}")
-                    return None
+            if response.status_code != 200:
+                logger.error(f"User info fetch failed: {response.status_code} - {response.text}")
+                return None
                 
-                return response.json()
+            return response.json()
         except Exception as e:
             logger.error(f"User info error: {e}")
             return None

@@ -67,7 +67,20 @@ export default function LaoPanCallback() {
       }
 
       try {
-        const result = await processLaoPanCallback(code, state);
+        // Retry callback processing — OAuth codes can fail on first attempt if backend is slow
+        let result;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            result = await processLaoPanCallback(code, state);
+            break;
+          } catch (err) {
+            if (attempt < 2) {
+              await new Promise(r => setTimeout(r, 1500));
+              continue;
+            }
+            throw err;
+          }
+        }
 
         if (isPopup) {
           // Send token back to the widget iframe via the opener (parent page)
