@@ -488,8 +488,11 @@ function ContainerEditor({ container, onSave, onDelete, onDuplicate, isNew }) {
 /* ────────── Main Admin Module ────────── */
 
 export default function TelegramAdminModule() {
+  const CACHE_KEY = 'chipi_telegram_admin_config';
+  // Load cached config immediately so form shows saved values
+  const cachedConfig = (() => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch { return null; } })();
   const [stats, setStats] = useState(null);
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState(cachedConfig);
   const [botInfo, setBotInfo] = useState(null);
   const [visibility, setVisibility] = useState(null);
   const [containers, setContainers] = useState([]);
@@ -515,6 +518,8 @@ export default function TelegramAdminModule() {
         const d = await configRes.json();
         setConfig(d.config);
         setBotInfo(d.bot);
+        // Cache config for instant load next time
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(d.config)); } catch {}
       }
       if (visRes.ok) setVisibility(await visRes.json());
       if (containersRes.ok) {
@@ -552,6 +557,11 @@ export default function TelegramAdminModule() {
   const handleConfigSave = async (updates) => {
     setSaving(true);
     try {
+      // Optimistically update local state + cache
+      const newConfig = { ...config, ...updates };
+      setConfig(newConfig);
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newConfig)); } catch {}
+      
       await fetch(`${API_URL}/api/community-v2/feed/admin/config`, {
         method: 'PUT', headers: authHeaders(), body: JSON.stringify(updates),
       });
