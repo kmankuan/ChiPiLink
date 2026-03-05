@@ -521,9 +521,9 @@ export default function TextbookOrdersAdminTab() {
     }
   };
 
-  const orderSelection = useTableSelection(sortedOrders, 'order_id');
   const orderPagination = usePagination(sortedOrders, 25);
   const pageOrders = orderPagination.paginated;
+  const orderSelection = useTableSelection(pageOrders, 'order_id');
 
   const handleBulkArchiveOrders = async () => {
     setBulkLoading(true);
