@@ -755,14 +755,24 @@ export default function TelegramAdminModule() {
           </div>
           <div>
             <label className="block text-[11px] font-medium mb-1" style={{ color: '#8B6914' }}>Channel Title</label>
-            <input
-              type="text"
-              value={config?.channel_title || ''}
-              onChange={(e) => setConfig(prev => ({ ...prev, channel_title: e.target.value }))}
-              className="w-full px-3 py-2 rounded-lg text-sm border"
-              style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
-              data-testid="telegram-channel-title"
-            />
+            <p className="text-[9px] mb-1" style={{ color: '#b8956a' }}>This is the title shown on the landing page (e.g. "ChiPi Community")</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={config?.channel_title || ''}
+                onChange={(e) => setConfig(prev => ({ ...prev, channel_title: e.target.value }))}
+                className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                placeholder="e.g. ChiPi Community"
+                data-testid="telegram-channel-title"
+              />
+              <button
+                onClick={() => handleConfigSave({ channel_title: config?.channel_title || '' })}
+                className="px-3 py-2 rounded-lg text-xs font-medium text-white"
+                style={{ background: '#8B6914' }}
+                data-testid="save-channel-title"
+              >Save</button>
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <div>

@@ -884,7 +884,25 @@ export default function TelegramFeedCard() {
   }, []);
 
   if (!loaded) return null;
-  if (containers.length === 0) return null;
+  
+  // If no containers, create a default one using channel config
+  if (containers.length === 0) {
+    // Fetch channel title from telegram config
+    fetch(`${API_URL}/api/community/config`)
+      .then(r => r.ok ? r.json() : {})
+      .then(cfg => {
+        if (cfg.channel_title) {
+          setContainers([{
+            container_id: 'default',
+            title: cfg.channel_title,
+            subtitle: 'Latest updates',
+            layout_mode: 'horizontal',
+          }]);
+        }
+      })
+      .catch(() => {});
+    return null;
+  }
 
   const openGallery = (media, startIndex, caption) => {
     setGalleryModal({ media, startIndex, caption });
