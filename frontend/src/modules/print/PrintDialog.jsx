@@ -102,6 +102,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   /** Print to thermal printer — one job per order (auto-cut between each) */
   const handleThermalPrintOneByOne = async () => {
     setPrinting(true);
+    const printedIds = [];
     try {
       for (let i = 0; i < orderIds.length; i++) {
         const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(orderIds[i])}&token=${encodeURIComponent(token)}`;
@@ -119,15 +120,24 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
           printWindow.onafterprint = () => { printWindow.close(); resolve(); };
           setTimeout(() => {
             printWindow.print();
-            // Fallback: auto-close after 10s
             setTimeout(() => { if (!printWindow.closed) printWindow.close(); resolve(); }, 10000);
           }, 500);
         });
+
+        // Mark THIS order as printed immediately after it's done
+        printedIds.push(orderIds[i]);
+        try {
+          await fetch(`${API_URL}/api/sysbook/orders/admin/mark-printed`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ order_ids: [orderIds[i]] }),
+          });
+        } catch {}
       }
       setPrinted(true);
       markJobComplete();
-      markOrdersPrinted();
-      setTimeout(() => onOpenChange(false), 1000);
+      onPrintComplete?.();
+      // Don't auto-close for multiple orders — admin stays on dialog to verify
     } catch (err) {
       toast.error('Print error: ' + (err.message || 'Unknown'));
     } finally {
@@ -165,8 +175,10 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         setPrinted(true);
         markJobComplete();
         markOrdersPrinted();
-        // Auto-close dialog after 1 second
-        setTimeout(() => onOpenChange(false), 1000);
+        // Auto-close dialog after 2 seconds (single order only)
+        if (orderIds.length === 1) {
+          setTimeout(() => onOpenChange(false), 2000);
+        }
       };
 
       setTimeout(() => {
@@ -178,7 +190,9 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
           setPrinted(true);
           markJobComplete();
           markOrdersPrinted();
-          setTimeout(() => onOpenChange(false), 2000);
+          if (orderIds.length === 1) {
+            setTimeout(() => onOpenChange(false), 2000);
+          }
         }, 15000);
       }, 800);
     } catch (err) {
@@ -266,7 +280,9 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
       setPrinted(true);
       markJobComplete();
       markOrdersPrinted();
-      setTimeout(() => onOpenChange(false), 2000);
+      if (orderIds.length === 1) {
+        setTimeout(() => onOpenChange(false), 2000);
+      }
     };
 
     setTimeout(() => {
