@@ -18,14 +18,17 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ.get('MONGO_URL')
 db_name = os.environ.get('DB_NAME', 'chipi_link')
 
-# MongoDB connection — with explicit pool limits for production stability
+# MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
     mongo_url,
     maxPoolSize=50,
     minPoolSize=5,
-    serverSelectionTimeoutMS=5000,
+    maxIdleTimeMS=45000,
+    serverSelectionTimeoutMS=10000,
     connectTimeoutMS=10000,
-    socketTimeoutMS=10000,
+    socketTimeoutMS=30000,
+    retryWrites=True,
+    retryReads=True,
 )
 db = client[db_name]
 
