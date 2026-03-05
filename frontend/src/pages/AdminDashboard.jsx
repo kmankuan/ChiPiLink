@@ -123,6 +123,7 @@ const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModu
 const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule'));
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
 const TelegramAdminModule = lazy(() => import('@/modules/admin/TelegramAdminModule'));
+const TelegramChannelHub = lazy(() => import('@/modules/community/TelegramChannelHub'));
 const FormsManagerModule = lazy(() => import('@/modules/admin/FormsManagerModule'));
 const TranslationsPanel = lazy(() => import('@/modules/admin/TranslationsModule'));
 const DictionaryManagerModule = lazy(() => import('@/modules/admin/DictionaryManagerModule'));
@@ -176,7 +177,7 @@ const navGroups = [
     group: 'Community',
     items: [
       { id: 'pinpanclub', labelKey: 'nav.pinpanclub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
-      { id: 'community', labelKey: 'nav.community', icon: Rss, permission: 'admin.site_config' },
+      { id: 'telegram-channel', labelKey: 'nav.telegramChannel', fallbackLabel: 'Telegram Channel', icon: Send, permission: 'admin.site_config' },
       { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
     ],
   },
@@ -219,7 +220,6 @@ const navGroups = [
   {
     group: 'Integrations',
     items: [
-      { id: 'telegram', labelKey: 'nav.telegram', icon: Send, permission: 'admin.site_config' },
       { id: 'forms', labelKey: 'nav.forms', icon: FileText, permission: 'admin.site_config' },
     ],
   },
@@ -377,7 +377,9 @@ export default function AdminDashboard() {
       case 'roles':
         return <RolesModule />;
       case 'community':
-        return <CommunityFeedModule />;
+      case 'telegram-channel':
+      case 'telegram':
+        return <TelegramChannelHub />;
       case 'integrations':
         return <MondayHubModule />;
       case 'devcontrol':
@@ -413,8 +415,6 @@ export default function AdminDashboard() {
       case 'widget':
         return <WidgetManagerModule />;
       // Integrations
-      case 'telegram':
-        return <TelegramAdminModule />;
       case 'forms':
         return <FormsManagerModule />;
       // Developer
