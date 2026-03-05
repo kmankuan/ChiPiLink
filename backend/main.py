@@ -261,6 +261,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Pre-import monitor functions at module level (not per-request)
+_track_request = None
+_track_user_activity = None
+
+def _init_monitor():
+    global _track_request, _track_user_activity
+    try:
+        from modules.admin.system_monitor import track_request, track_user_activity
+        _track_request = track_request
+        _track_user_activity = track_user_activity
+    except Exception:
+        pass
+
 # Lightweight request tracking middleware
 @app.middleware("http")
 async def track_requests_middleware(request, call_next):
@@ -268,22 +281,18 @@ async def track_requests_middleware(request, call_next):
     start = _time.time()
     try:
         response = await call_next(request)
-        duration_ms = (_time.time() - start) * 1000
-        try:
-            from modules.admin.system_monitor import track_request, track_user_activity
-            track_request(duration_ms, is_error=response.status_code >= 500)
-            if request.client:
-                track_user_activity(ip=request.client.host)
-        except Exception:
-            pass  # Monitor module failure must never break the app
+        if _track_request:
+            _track_request((_time.time() - start) * 1000, is_error=response.status_code >= 500)
+            if _track_user_activity and request.client:
+                _track_user_activity(ip=request.client.host)
         return response
     except Exception as e:
-        try:
-            from modules.admin.system_monitor import track_request
-            track_request((_time.time() - start) * 1000, is_error=True)
-        except Exception:
-            pass
+        if _track_request:
+            _track_request((_time.time() - start) * 1000, is_error=True)
         raise
+
+# Initialize monitor after app is defined
+_init_monitor()
 
 # ============== LIFECYCLE EVENTS ==============
 
@@ -327,6 +336,13 @@ async def startup_event():
         await asyncio.sleep(2)
         logger.info("Deferred init starting...")
         
+        # Start Monday queue workers FIRST so API calls don't deadlock
+        try:
+            from modules.integrations.monday.queue import monday_queue
+            await monday_queue._ensure_workers()
+        except Exception:
+            pass
+
         try:
             from modules.showcase import seed_showcase_defaults
             await asyncio.wait_for(

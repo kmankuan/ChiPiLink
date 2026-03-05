@@ -62,7 +62,7 @@ import time as _time
 # In-memory user cache — prevents thundering herd of DB lookups
 # {user_id: (user_dict, cached_at_timestamp)}
 _user_cache = {}
-_USER_CACHE_TTL = 30  # seconds
+_USER_CACHE_TTL = 120  # seconds — longer cache reduces DB load significantly
 
 
 def _get_cached_user(user_id: str):
