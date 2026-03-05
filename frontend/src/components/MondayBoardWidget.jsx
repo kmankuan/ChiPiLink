@@ -159,10 +159,23 @@ export default function MondayBoardWidget() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch(`${API}/api/monday/public-board-widget`)
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+    const CACHE_KEY = 'chipi_monday_widget';
+    fetch(`${API}/api/monday/public-board-widget`, { signal: AbortSignal.timeout(10000) })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d) {
+          setData(d);
+          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch {}
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        try {
+          const cached = sessionStorage.getItem(CACHE_KEY);
+          if (cached) setData(JSON.parse(cached));
+        } catch {}
+        setLoading(false);
+      });
   }, []);
 
   const searchColumns = data?.search_columns || [];

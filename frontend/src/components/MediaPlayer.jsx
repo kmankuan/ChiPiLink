@@ -114,16 +114,29 @@ export default function MediaPlayer() {
   const containerRef = useRef(null);
   const [parallaxY, setParallaxY] = useState(0);
 
-  /* Fetch config */
+  /* Fetch config with cache fallback */
   useEffect(() => {
-    fetch(`${API_URL}/api/showcase/media-player`)
+    const CACHE_KEY = 'chipi_media_player';
+    fetch(`${API_URL}/api/showcase/media-player`, { signal: AbortSignal.timeout(8000) })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.items?.length > 0) setConfig({ ...DEFAULT_CONFIG, ...data });
-        else setConfig(DEFAULT_CONFIG);
+        if (data?.items?.length > 0) {
+          setConfig({ ...DEFAULT_CONFIG, ...data });
+          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch {}
+        } else {
+          setConfig(DEFAULT_CONFIG);
+        }
         setLoaded(true);
       })
-      .catch(() => { setConfig(DEFAULT_CONFIG); setLoaded(true); });
+      .catch(() => {
+        // Use cached data on failure
+        try {
+          const cached = sessionStorage.getItem(CACHE_KEY);
+          if (cached) { setConfig({ ...DEFAULT_CONFIG, ...JSON.parse(cached) }); }
+          else { setConfig(DEFAULT_CONFIG); }
+        } catch { setConfig(DEFAULT_CONFIG); }
+        setLoaded(true);
+      });
   }, []);
 
   const items = useMemo(() => {

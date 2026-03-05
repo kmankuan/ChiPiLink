@@ -874,13 +874,23 @@ export default function TelegramFeedCard() {
   const [galleryModal, setGalleryModal] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/community-v2/feed/public/containers`)
+    const CACHE_KEY = 'chipi_telegram_containers';
+    fetch(`${API_URL}/api/community-v2/feed/public/containers`, { signal: AbortSignal.timeout(8000) })
       .then(r => r.ok ? r.json() : { containers: [] })
       .then(data => {
-        setContainers(data.containers || []);
+        const c = data.containers || [];
+        setContainers(c);
+        if (c.length > 0) try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch {}
         setLoaded(true);
       })
-      .catch(() => setLoaded(true));
+      .catch(() => {
+        // Use cached containers on failure
+        try {
+          const cached = sessionStorage.getItem(CACHE_KEY);
+          if (cached) setContainers(JSON.parse(cached));
+        } catch {}
+        setLoaded(true);
+      });
   }, []);
 
   if (!loaded) return null;
