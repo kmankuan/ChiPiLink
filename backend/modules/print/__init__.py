@@ -209,15 +209,20 @@ def _build_thermal_html(orders, fmt):
             total = 0.0
         page_break = 'page-break-after: always;' if idx < len(orders) - 1 else ''
 
-        # For thermal printers: add explicit cut marker between orders
+        # For thermal printers: multiple cut strategies between orders
         cut_marker = ''
         if idx < len(orders) - 1:
             cut_marker = (
-                '<div style="page-break-after: always; margin: 4mm 0; text-align: center;">'
+                # Strategy 1: CSS page break (works with some printer drivers)
+                '<div style="page-break-after: always;"></div>'
+                # Strategy 2: Large spacing + visual cut line (always visible)
+                '<div style="margin: 8mm 0; text-align: center; page-break-before: always;">'
                 '<div style="border-top: 2px dashed #000; margin: 3mm 0;"></div>'
                 '<div style="font-size: 7px; color: #666; letter-spacing: 2px;">&#9986; CUT HERE &#9986;</div>'
                 '<div style="border-top: 2px dashed #000; margin: 3mm 0;"></div>'
                 '</div>'
+                # Strategy 3: ESC/POS raw cut commands injected via JavaScript
+                '<script>if(window.escpos)window.escpos.cut();</script>'
             )
 
         receipt = f'<div style="padding: 2mm 0;">'

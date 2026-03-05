@@ -99,7 +99,43 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     }
   };
 
-  /** Print to thermal printer (LR2000E) — uses the Windows default printer */
+  /** Print to thermal printer — one job per order (auto-cut between each) */
+  const handleThermalPrintOneByOne = async () => {
+    setPrinting(true);
+    try {
+      for (let i = 0; i < orderIds.length; i++) {
+        const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(orderIds[i])}&token=${encodeURIComponent(token)}`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        if (!res.ok) continue;
+        const html = await res.text();
+
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if (!printWindow) continue;
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        // Wait for user to print, then close
+        await new Promise(resolve => {
+          printWindow.onafterprint = () => { printWindow.close(); resolve(); };
+          setTimeout(() => {
+            printWindow.print();
+            // Fallback: auto-close after 10s
+            setTimeout(() => { if (!printWindow.closed) printWindow.close(); resolve(); }, 10000);
+          }, 500);
+        });
+      }
+      setPrinted(true);
+      markJobComplete();
+      markOrdersPrinted();
+      setTimeout(() => onOpenChange(false), 1000);
+    } catch (err) {
+      toast.error('Print error: ' + (err.message || 'Unknown'));
+    } finally {
+      setPrinting(false);
+    }
+  };
+
+  /** Print to thermal printer (all-in-one with cut markers) */
   const handleThermalPrint = async () => {
     setPrinting(true);
 
@@ -332,15 +368,39 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
 
             {/* Print Actions */}
             <div className="flex gap-2">
-              <Button
-                onClick={handleThermalPrint}
-                className="flex-1 gap-2"
-                disabled={printing}
-                data-testid="thermal-print-btn"
-              >
-                {printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
-                Print to LR2000E ({orders.length})
-              </Button>
+              {orders.length > 1 ? (
+                <>
+                  <Button
+                    onClick={handleThermalPrintOneByOne}
+                    className="flex-1 gap-2"
+                    disabled={printing}
+                    data-testid="thermal-print-onebyoe-btn"
+                  >
+                    {printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+                    Print 1 by 1 ({orders.length})
+                  </Button>
+                  <Button
+                    onClick={handleThermalPrint}
+                    className="gap-2"
+                    disabled={printing}
+                    variant="outline"
+                    data-testid="thermal-print-btn"
+                  >
+                    <Printer className="h-4 w-4" />
+                    All at Once
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={handleThermalPrint}
+                  className="flex-1 gap-2"
+                  disabled={printing}
+                  data-testid="thermal-print-btn"
+                >
+                  {printing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+                  Print to LR2000E
+                </Button>
+              )}
               <Button
                 onClick={handleBrowserPrint}
                 className="gap-2"
