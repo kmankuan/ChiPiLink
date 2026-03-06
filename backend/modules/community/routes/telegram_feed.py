@@ -5,6 +5,7 @@ Includes role-based visibility controls and multi-container feed system.
 """
 import logging
 import uuid
+import asyncio
 from datetime import datetime, timezone
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends, Response
@@ -440,9 +441,25 @@ async def admin_sync(admin=Depends(get_admin_user)):
 
 @router.get("/admin/config")
 async def get_config(admin=Depends(get_admin_user)):
-    """Get community/Telegram config"""
+    """Get community/Telegram config — bot status cached to avoid slow API calls"""
     config = await telegram_service.get_config()
-    bot_info = await telegram_service.get_me()
+    
+    # Cache bot info to avoid hitting Telegram API on every admin page load
+    bot_info = None
+    if telegram_service.token:
+        cached_bot = getattr(telegram_service, '_cached_bot', None)
+        cached_at = getattr(telegram_service, '_cached_bot_at', 0)
+        import time
+        if cached_bot and (time.time() - cached_at) < 300:  # 5 min cache
+            bot_info = cached_bot
+        else:
+            try:
+                bot_info = await asyncio.wait_for(telegram_service.get_me(), timeout=5)
+                telegram_service._cached_bot = bot_info
+                telegram_service._cached_bot_at = time.time()
+            except Exception:
+                bot_info = cached_bot  # Use stale cache on failure
+    
     return {"config": config, "bot": bot_info}
 
 
