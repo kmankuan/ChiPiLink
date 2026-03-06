@@ -10,8 +10,8 @@ const STYLES = {
     <div className="flex items-center gap-2 px-1 mb-1">
       <div className="w-[3px] h-4 rounded-sm bg-[#C8102E] shrink-0" />
       <div className="min-w-0">
-        <h3 className="text-xs sm:text-sm font-bold text-foreground tracking-tight truncate">{title}</h3>
-        {subtitle && <p className="text-[9px] text-muted-foreground leading-tight">{subtitle}</p>}
+        <h3 className="text-xs sm:text-sm font-bold tracking-tight truncate drop-shadow-sm" style={{ color: 'inherit' }}>{title}</h3>
+        {subtitle && <p className="text-[9px] leading-tight drop-shadow-sm" style={{ opacity: 0.8 }}>{subtitle}</p>}
       </div>
     </div>
   ),

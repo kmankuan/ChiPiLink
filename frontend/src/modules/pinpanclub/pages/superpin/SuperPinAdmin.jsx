@@ -61,14 +61,21 @@ export default function SuperPinAdmin() {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newLeague)
-      });
+      let response;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(newLeague),
+            signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined,
+          });
+          break;
+        } catch (e) {
+          if (attempt < 2) { await new Promise(r => setTimeout(r, 2000)); continue; }
+          throw e;
+        }
+      }
       
       if (response.ok) {
         setShowCreateModal(false);

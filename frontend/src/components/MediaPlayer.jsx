@@ -314,15 +314,20 @@ export default function MediaPlayer() {
 
   return (
     <div data-testid="media-player-wrapper">
-      {albumTitle && <SectionTitle title={albumTitle} />}
       <div
         ref={containerRef}
         className="relative w-full overflow-hidden bg-black group"
         style={{ aspectRatio: '16/9' }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        onTouchStart={config?.show_controls ? onTouchStart : undefined}
+        onTouchEnd={config?.show_controls ? onTouchEnd : undefined}
         data-testid="media-player"
       >
+        {/* Title overlay inside the player */}
+        {albumTitle && (
+          <div className="absolute top-0 left-0 right-0 z-10 px-2 pt-2 pointer-events-none">
+            <SectionTitle title={albumTitle} />
+          </div>
+        )}
       {/* Slide content */}
       <div key={slideKey} className="absolute inset-0" style={{ animation: `mp-slide-${slideDir.current > 0 ? 'l' : 'r'} .35s ease-out` }}>
         {isVideo ? (
@@ -381,19 +386,24 @@ export default function MediaPlayer() {
       )}
 
       {/* Controls */}
+      {/* Mute button — always available for videos */}
+      {isVideo && (
+        <div className="absolute bottom-3 left-3 z-10">
+          <button onClick={() => { setMuted(!muted); setAutoMuted(false); }} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-mute">
+            {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      )}
+
+      {/* Navigation controls — only when show_controls is enabled */}
       {config?.show_controls && (
         <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ transform: `translateY(${parallaxY * .3}px)` }}>
           <div className="flex items-center gap-2">
             <button onClick={() => setPlaying(!playing)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-play-pause">
               {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             </button>
-            {isVideo && (
-              <button onClick={() => { setMuted(!muted); setAutoMuted(false); }} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-mute">
-                {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              </button>
-            )}
           </div>
-          {slides.length > 1 && !disableSwipe && (
+          {slides.length > 1 && (
             <div className="flex items-center gap-1.5">
               <button onClick={() => goTo(-1)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-prev"><ChevronLeft className="h-4 w-4" /></button>
               <span className="text-white text-[10px] font-bold min-w-[32px] text-center">{current + 1}/{slides.length}</span>
@@ -409,8 +419,8 @@ export default function MediaPlayer() {
           {effectiveDotStyle === 'dots' && (
             <div className="flex gap-1">
               {slides.map((_, i) => (
-                <button key={i} onClick={() => { if (!disableSwipe) { setVideoError(false); setCurrent(i); setSlideKey(k => k + 1); } }}
-                  className={`rounded-full transition-all duration-300 ${i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'} ${disableSwipe ? 'pointer-events-none' : ''}`}
+                <button key={i} onClick={() => { if (config?.show_controls) { setVideoError(false); setCurrent(i); setSlideKey(k => k + 1); } }}
+                  className={`rounded-full transition-all duration-300 ${i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'} ${!config?.show_controls ? 'pointer-events-none' : ''}`}
                   data-testid={`media-dot-${i}`} />
               ))}
             </div>
