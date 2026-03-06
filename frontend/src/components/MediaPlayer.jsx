@@ -334,7 +334,7 @@ export default function MediaPlayer() {
           <>
             <video
               ref={videoRefCallback}
-              key={first.url}
+              key={`${first.url}_${slideKey}`}
               src={first.url}
               autoPlay
               muted={muted}
@@ -345,6 +345,13 @@ export default function MediaPlayer() {
               onCanPlay={handleVideoReady}
               onEnded={handleVideoEnd}
               onError={handleVideoError}
+              onStalled={() => { /* Video stalled — retry play after delay */
+                setTimeout(() => {
+                  const v = videoRef.current;
+                  if (v && v.paused) v.play().catch(() => {});
+                }, 1000);
+              }}
+              crossOrigin="anonymous"
               className="w-full h-full object-cover"
               data-testid="media-video"
             />
