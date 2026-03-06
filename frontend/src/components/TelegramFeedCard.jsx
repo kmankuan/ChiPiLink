@@ -542,9 +542,19 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       url.searchParams.set('offset', offset);
       if (channel_id) url.searchParams.set('channel_id', channel_id);
 
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
+      let data = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const controller = new AbortController();
+          const tid = setTimeout(() => controller.abort(), 8000);
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(tid);
+          if (res.ok) { data = await res.json(); break; }
+        } catch {
+          if (attempt < 1) await new Promise(r => setTimeout(r, 1500));
+        }
+      }
+      if (data) {
         const existingIds = new Set(posts.map(p => p.telegram_msg_id));
         const newPosts = (data.posts || []).filter(p => !existingIds.has(p.telegram_msg_id));
         if (newPosts.length > 0) {
@@ -552,9 +562,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
         }
         setHasMore(newPosts.length > 0 && (offset + newPosts.length) < (data.total || 0));
       }
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
     setLoadingMore(false);
   };
 
@@ -694,9 +702,9 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
               {/* Load older button */}
               {hasMore && (
                 <div
-                  className="flex-shrink-0 snap-start rounded-xl flex items-center justify-center cursor-pointer transition-colors hover:bg-neutral-50"
+                  className="flex-shrink-0 snap-start flex items-center justify-center cursor-pointer transition-colors hover:bg-neutral-50"
                   style={{
-                    width: Math.round(card_width * 0.5),
+                    width: Math.round(card_width * 0.4),
                     height: imageHeight + 60,
                     border: '1px dashed rgba(0,0,0,0.12)',
                   }}
@@ -704,14 +712,9 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
                   data-testid="load-older-btn"
                 >
                   {loadingMore ? (
-                    <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#b8956a' }} />
+                    <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#b8956a' }} />
                   ) : (
-                    <div className="text-center px-2">
-                      <ChevronDown className="h-5 w-5 mx-auto mb-1" style={{ color: '#b8956a' }} />
-                      <span className="text-[10px] font-bold" style={{ color: '#8B6914' }}>
-                        {t('telegramFeed.loadOlder', 'Load older')}
-                      </span>
-                    </div>
+                    <ChevronDown className="h-6 w-6" style={{ color: '#8B6914' }} />
                   )}
                 </div>
               )}
