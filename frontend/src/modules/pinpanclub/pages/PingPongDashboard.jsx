@@ -155,30 +155,33 @@ export default function PingPongDashboard() {
   );
 
   return (
-    <div className={isInsideAdmin ? "" : "min-h-screen"} style={{ background: isInsideAdmin ? 'transparent' : 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
+    <div className={isInsideAdmin ? "" : "min-h-screen overflow-x-hidden"} style={{ background: isInsideAdmin ? 'transparent' : 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header - Only show if NOT inside admin */}
       {!isInsideAdmin && (
         <header className="sticky top-0 z-50 backdrop-blur-md border-b" style={{ background: 'rgba(251,247,240,0.95)', borderColor: 'rgba(139,115,85,0.12)' }}>
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🏓</span>
-                <h1 className="font-bold text-xl">PinpanClub</h1>
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🏓</span>
+                <h1 className="font-bold text-lg" style={{ color: '#2d2217' }}>PinpanClub</h1>
               </div>
               <div className="flex items-center gap-2">
-                {/* Notification Center */}
                 {currentUserId && (
                   <NotificationCenter 
                     userId={currentUserId} 
                     mode="both"
                   />
                 )}
-                {/* PinPan League - Featured */}
+              </div>
+            </div>
+            {/* Scrollable nav buttons */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4" style={{ scrollbarWidth: 'none' }}>
                 <Button 
                   variant="default" 
                   size="sm" 
                   onClick={() => navigate('/pinpanclub/superpin/ranking')}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                  className="text-white rounded-full text-xs shrink-0"
+                  style={{ background: '#B8860B' }}
                 >
                   <Trophy className="h-3.5 w-3.5 mr-1" />
                   League
@@ -285,7 +288,6 @@ export default function PingPongDashboard() {
                     Nuevo Partido
                   </Button>
                 )}
-              </div>
             </div>
           </div>
         </header>
