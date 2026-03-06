@@ -582,7 +582,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between px-3 pt-3 pb-1">
+      <div className="flex items-center justify-between px-2 pt-2 pb-0">
         <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
         <div className="flex items-center gap-2 shrink-0">
           {/* Autoplay toggle - hidden by default, admin-configurable */}
@@ -805,7 +805,7 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
-      <div className="flex items-center justify-between px-3 pt-3 pb-1">
+      <div className="flex items-center justify-between px-2 pt-2 pb-0">
         <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
         <div className="flex items-center gap-2 shrink-0">
           {header_links.length > 0 && header_links.map((link, idx) => {

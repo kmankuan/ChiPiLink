@@ -7,11 +7,11 @@ import { useSiteConfig } from '@/contexts/SiteConfigContext';
 
 const STYLES = {
   bar: ({ title, subtitle }) => (
-    <div className="flex items-center gap-2.5 px-1 mb-2">
-      <div className="w-[3px] h-5 rounded-sm bg-[#C8102E] shrink-0" />
+    <div className="flex items-center gap-2 px-1 mb-1">
+      <div className="w-[3px] h-4 rounded-sm bg-[#C8102E] shrink-0" />
       <div className="min-w-0">
-        <h3 className="text-sm sm:text-base font-bold text-foreground tracking-tight truncate">{title}</h3>
-        {subtitle && <p className="text-[10px] text-muted-foreground">{subtitle}</p>}
+        <h3 className="text-xs sm:text-sm font-bold text-foreground tracking-tight truncate">{title}</h3>
+        {subtitle && <p className="text-[9px] text-muted-foreground leading-tight">{subtitle}</p>}
       </div>
     </div>
   ),
