@@ -101,32 +101,32 @@ export default function RapidPinDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-yellow-500 border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
+        <div className="animate-spin h-8 w-8 border-4 border-[#C8102E] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <div style={{ background: 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }} className="text-white">
+        <div className="max-w-2xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
-                <Zap className="w-10 h-10" />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(200,16,46,0.2)' }}>
+                <Zap className="w-7 h-7" style={{ color: '#C8102E' }} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold">Rapid Pin</h1>
-                <p className="text-white/80">{t('rapidpin.subtitle')}</p>
+                <h1 className="text-xl font-bold">Rapid Pin</h1>
+                <p style={{ color: '#d4c5a9' }} className="text-sm">{t('rapidpin.subtitle')}</p>
               </div>
             </div>
             
             <Dialog open={showNewSeason} onOpenChange={setShowNewSeason}>
               <DialogTrigger asChild>
-                <Button className="bg-white text-orange-600 hover:bg-white/90">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="text-white rounded-full text-xs" style={{ background: '#C8102E' }}>
+                  <Plus className="w-3.5 h-3.5 mr-1" />
                   {t('rapidpin.seasons.create')}
                 </Button>
               </DialogTrigger>
@@ -180,56 +180,27 @@ export default function RapidPinDashboard() {
       </div>
 
       {/* Info Cards */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-yellow-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{t('rapidpin.info.participants')}</p>
-                  <p className="text-2xl font-bold">2 + 1</p>
-                  <p className="text-xs text-muted-foreground">{t('rapidpin.info.playersAndReferee')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
-                  <Award className="w-6 h-6 text-green-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{t('rapidpin.info.scoring')}</p>
-                  <p className="text-lg font-bold">+3 / +1 / +2</p>
-                  <p className="text-xs text-muted-foreground">{t('rapidpin.info.scoringDesc')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{t('rapidpin.info.validation')}</p>
-                  <p className="text-lg font-bold">{t('rapidpin.info.oneConfirmation')}</p>
-                  <p className="text-xs text-muted-foreground">{t('rapidpin.info.validationDesc')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="max-w-2xl mx-auto px-4 py-4">
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="rounded-xl p-3 text-center" style={{ background: 'linear-gradient(145deg, #FBF7F0, #F5EDE0)', border: '1px solid rgba(139,115,85,0.12)' }}>
+            <Users className="h-5 w-5 mx-auto mb-1" style={{ color: '#8b7355' }} />
+            <p className="text-lg font-bold" style={{ color: '#2d2217' }}>2+1</p>
+            <p className="text-[9px]" style={{ color: '#8b7355' }}>Players + Ref</p>
+          </div>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'linear-gradient(145deg, #FBF7F0, #F5EDE0)', border: '1px solid rgba(139,115,85,0.12)' }}>
+            <Award className="h-5 w-5 mx-auto mb-1" style={{ color: '#B8860B' }} />
+            <p className="text-lg font-bold" style={{ color: '#2d2217' }}>+3/+1/+2</p>
+            <p className="text-[9px]" style={{ color: '#8b7355' }}>Win/Loss/Ref</p>
+          </div>
+          <div className="rounded-xl p-3 text-center" style={{ background: 'linear-gradient(145deg, #FBF7F0, #F5EDE0)', border: '1px solid rgba(139,115,85,0.12)' }}>
+            <Clock className="h-5 w-5 mx-auto mb-1" style={{ color: '#C8102E' }} />
+            <p className="text-lg font-bold" style={{ color: '#2d2217' }}>Quick</p>
+            <p className="text-[9px]" style={{ color: '#8b7355' }}>Fast Matches</p>
+          </div>
         </div>
 
         {/* Seasons List */}
-        <h2 className="text-xl font-semibold mb-4">{t('rapidpin.seasons.title')}</h2>
+        <h3 className="text-sm font-bold mb-3" style={{ color: '#2d2217' }}>{t('rapidpin.seasons.title')}</h3>
         
         {seasons.length === 0 ? (
           <Card className="border-dashed">

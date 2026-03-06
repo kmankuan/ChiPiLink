@@ -226,7 +226,7 @@ export default function PingPongDashboard() {
                   <Award className="h-3.5 w-3.5 mr-1" />
                   Hall of Fame
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/superpin/ranking')}>
                   <Users className="h-4 w-4 mr-2" />
                   Players
                 </Button>
@@ -325,7 +325,7 @@ export default function PingPongDashboard() {
             <Award className="h-4 w-4 mr-2" />
             Hall of Fame
           </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/superpin/ranking')}>
             <Users className="h-4 w-4 mr-2" />
             Jugadores
           </Button>

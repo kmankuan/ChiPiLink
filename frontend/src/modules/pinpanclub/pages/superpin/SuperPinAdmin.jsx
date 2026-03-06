@@ -137,7 +137,7 @@ export default function SuperPinAdmin() {
             </h1>
             <p className="text-gray-600 mt-1">{t('superpin.adminDesc')}</p>
           </div>
-          <Button onClick={() => setShowCreateModal(true)} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={() => setShowCreateModal(true)} className="text-white rounded-full" style={{ background: "#B8860B" }}>
             <Plus className="h-4 w-4 mr-2" /> {t('superpin.leagues.new')}
           </Button>
         </div>
@@ -347,7 +347,7 @@ export default function SuperPinAdmin() {
               <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button type="button" onClick={createLeague} className="bg-green-600 hover:bg-green-700">
+              <Button type="button" onClick={createLeague} className="text-white rounded-full" style={{ background: "#B8860B" }}>
                 {t('superpin.leagues.create')}
               </Button>
             </div>

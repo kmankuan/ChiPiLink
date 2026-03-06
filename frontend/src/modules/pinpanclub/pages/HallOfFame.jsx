@@ -185,7 +185,7 @@ export default function HallOfFame() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-500 text-white">
+      <div style={{ background: 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }} className="text-white">
         <div className="container mx-auto px-4 py-8">
           <Button
             variant="ghost"
@@ -201,8 +201,8 @@ export default function HallOfFame() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Trophy className="h-8 w-8" />
-                <h1 className="text-3xl font-bold tracking-tight">Hall of Fame</h1>
+                <Trophy className="h-6 w-6 text-[#B8860B]" />
+                <h1 className="text-xl font-bold tracking-tight text-white">Hall of Fame</h1>
               </div>
               <p className="text-white/80 text-sm max-w-md">
                 All-time player rankings across Arena, League, RapidPin & Referee contributions.
