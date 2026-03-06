@@ -3,9 +3,12 @@ ChiPi Link - Server Bridge
 
 This file serves as a bridge to maintain backward compatibility with supervisor.
 The actual application is in main.py using modular architecture.
-
-The old monolithic server code has been moved to server_backup.py for reference.
 """
+import os
+
+# CRITICAL: Disable watchfiles polling to prevent random restarts from --reload flag
+# Without this, the file watcher can trigger restarts from __pycache__, temp files, or log rotation
+os.environ["WATCHFILES_FORCE_POLLING"] = "false"
 
 # Re-export the app from main.py
 from main import app
