@@ -138,43 +138,27 @@ export default function PingPongDashboard() {
 
   // Quick Stats
   const QuickStats = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Card>
-        <CardContent className="pt-4 text-center">
-          <Play className="h-8 w-8 mx-auto mb-2 text-green-500" />
-          <div className="text-2xl font-bold">{activeMatches.length}</div>
-          <div className="text-sm text-muted-foreground">Live Matches</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="pt-4 text-center">
-          <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-          <div className="text-2xl font-bold">{rankings.length}</div>
-          <div className="text-sm text-muted-foreground">Active Players</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="pt-4 text-center">
-          <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-          <div className="text-2xl font-bold">{upcomingTournaments.length}</div>
-          <div className="text-sm text-muted-foreground">Upcoming Tournaments</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="pt-4 text-center">
-          <Target className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-          <div className="text-2xl font-bold">{recentMatches.length}</div>
-          <div className="text-sm text-muted-foreground">Recent Matches</div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {[
+        { icon: Play, count: activeMatches.length, label: 'Live Matches', color: '#C8102E' },
+        { icon: Users, count: rankings.length, label: 'Active Players', color: '#8b7355' },
+        { icon: Trophy, count: upcomingTournaments.length, label: 'Tournaments', color: '#B8860B' },
+        { icon: Target, count: recentMatches.length, label: 'Recent Matches', color: '#2d2217' },
+      ].map(({ icon: Icon, count, label, color }) => (
+        <div key={label} className="rounded-xl p-3 text-center" style={{ background: 'linear-gradient(145deg, #FBF7F0, #F5EDE0)', border: '1px solid rgba(139,115,85,0.12)' }}>
+          <Icon className="h-6 w-6 mx-auto mb-1.5" style={{ color }} />
+          <div className="text-xl font-bold" style={{ color: '#2d2217' }}>{count}</div>
+          <div className="text-[10px] font-medium" style={{ color: '#8b7355' }}>{label}</div>
+        </div>
+      ))}
     </div>
   );
 
   return (
-    <div className={isInsideAdmin ? "" : "min-h-screen bg-background"}>
+    <div className={isInsideAdmin ? "" : "min-h-screen"} style={{ background: isInsideAdmin ? 'transparent' : 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header - Only show if NOT inside admin */}
       {!isInsideAdmin && (
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
+        <header className="sticky top-0 z-50 backdrop-blur-md border-b" style={{ background: 'rgba(251,247,240,0.95)', borderColor: 'rgba(139,115,85,0.12)' }}>
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -196,16 +180,18 @@ export default function PingPongDashboard() {
                   onClick={() => navigate('/pinpanclub/superpin/ranking')}
                   className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
                 >
-                  <Trophy className="h-4 w-4 mr-2" />
+                  <Trophy className="h-3.5 w-3.5 mr-1" />
                   League
                 </Button>
-                {/* Rapid Pin - New */}
                 <Button 
                   variant="default" 
                   size="sm" 
                   onClick={() => navigate('/pinpanclub/rapidpin')}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white relative"
+                  className="text-white rounded-full text-xs shrink-0 relative"
+                  style={{ background: '#C8102E' }}
                   data-testid="rapidpin-btn"
+                >
+                  <Zap className="h-3.5 w-3.5 mr-1" /> Rapid Pin
                 >
                   ⚡ Rapid Pin
                   {rapidPinPendingCount > 0 && (
@@ -219,21 +205,22 @@ export default function PingPongDashboard() {
                   variant="default" 
                   size="sm" 
                   onClick={() => navigate('/pinpanclub/arena')}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                  className="text-white rounded-full text-xs shrink-0"
+                  style={{ background: '#2d2217' }}
                   data-testid="arena-btn"
                 >
-                  <Swords className="h-4 w-4 mr-1" />
+                  <Swords className="h-3.5 w-3.5 mr-1" />
                   Arena
                 </Button>
-                {/* Hall of Fame */}
                 <Button 
                   variant="default" 
                   size="sm" 
                   onClick={() => navigate('/pinpanclub/hall-of-fame')}
-                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white"
+                  className="text-white rounded-full text-xs shrink-0"
+                  style={{ background: '#8b7355' }}
                   data-testid="hall-of-fame-btn"
                 >
-                  <Award className="h-4 w-4 mr-1" />
+                  <Award className="h-3.5 w-3.5 mr-1" />
                   Hall of Fame
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
@@ -377,25 +364,25 @@ export default function PingPongDashboard() {
 
         {/* PinPan League Banner */}
         <section>
-          <Card className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 border-0 overflow-hidden">
+          <Card className="border-0 overflow-hidden" style={{ background: 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }}>
             <CardContent className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="p-2 sm:p-3 bg-yellow-500/20 rounded-xl shrink-0">
-                    <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />
+                  <div className="p-2 sm:p-3 rounded-xl shrink-0" style={{ background: 'rgba(184,134,11,0.2)' }}>
+                    <Trophy className="h-8 w-8 sm:h-10 sm:w-10" style={{ color: '#B8860B' }} />
                   </div>
                   <div className="min-w-0">
                     <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
                       PinPan League
                     </h2>
-                    <p className="text-green-200 text-sm sm:text-base">Sistema de ranking individual con ligas y temporadas</p>
+                    <p className="text-sm sm:text-base" style={{ color: '#d4c5a9' }}>Sistema de ranking individual con ligas y temporadas</p>
                   </div>
                 </div>
                 <div className="flex gap-2 sm:gap-3 shrink-0">
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="border-white/30 text-white hover:bg-white/10 sm:size-default"
+                    className="border-white/30 text-white hover:bg-white/10 rounded-full sm:size-default"
                     onClick={() => navigate('/pinpanclub/superpin/ranking')}
                   >
                     <Medal className="h-4 w-4 mr-1 sm:mr-2" />
@@ -403,7 +390,8 @@ export default function PingPongDashboard() {
                   </Button>
                   <Button 
                     size="sm"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black sm:size-default"
+                    className="text-black rounded-full sm:size-default"
+                    style={{ background: '#B8860B', color: '#fff' }}
                     onClick={() => navigate('/pinpanclub/superpin/admin')}
                   >
                     <Settings className="h-4 w-4 mr-1 sm:mr-2" />

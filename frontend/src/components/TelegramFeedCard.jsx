@@ -583,7 +583,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
 
       {/* Header */}
       <div className="flex items-center justify-between px-3 pt-3 pb-1">
-        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle} />
+        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
         <div className="flex items-center gap-2 shrink-0">
           {/* Autoplay toggle - hidden by default, admin-configurable */}
           {show_autoplay_btn && posts.length > 1 && (
@@ -806,7 +806,7 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
       <div className="flex items-center justify-between px-3 pt-3 pb-1">
-        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle} />
+        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
         <div className="flex items-center gap-2 shrink-0">
           {header_links.length > 0 && header_links.map((link, idx) => {
             const isExternal = link.url?.startsWith('http');
