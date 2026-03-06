@@ -478,12 +478,24 @@ async def update_config(
     data: ConfigUpdateRequest,
     admin=Depends(get_admin_user)
 ):
-    """Update community/Telegram config"""
+    """Update community/Telegram config — also syncs title/post_count to custom containers"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     if updates:
         config = await telegram_service.get_config()
         config.update(updates)
         await telegram_service.save_config(config)
+        
+        # Also update any existing custom containers with title/show_post_count
+        container_updates = {}
+        if "channel_title" in updates:
+            container_updates["title"] = updates["channel_title"]
+        if "show_post_count" in updates:
+            container_updates["show_post_count"] = updates["show_post_count"]
+        if container_updates:
+            await db.telegram_feed_containers.update_many(
+                {"is_active": True},
+                {"$set": container_updates}
+            )
     return {"success": True}
 
 
