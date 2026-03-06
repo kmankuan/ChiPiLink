@@ -869,28 +869,29 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
 /* ────────── Main Export ────────── */
 
 export default function TelegramFeedCard() {
-  const [containers, setContainers] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  const CACHE_KEY = 'chipi_telegram_containers';
+  // Load from cache FIRST so content shows immediately
+  const initialContainers = (() => {
+    try { const c = sessionStorage.getItem(CACHE_KEY); return c ? JSON.parse(c) : []; } catch { return []; }
+  })();
+  const [containers, setContainers] = useState(initialContainers);
+  const [loaded, setLoaded] = useState(initialContainers.length > 0);
   const [galleryModal, setGalleryModal] = useState(null);
 
   useEffect(() => {
-    const CACHE_KEY = 'chipi_telegram_containers';
-    fetch(`${API_URL}/api/community-v2/feed/public/containers`, { signal: AbortSignal.timeout(8000) })
-      .then(r => r.ok ? r.json() : { containers: [] })
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    fetch(`${API_URL}/api/community-v2/feed/public/containers`, { signal: controller.signal })
+      .then(r => { clearTimeout(timeout); return r.ok ? r.json() : null; })
       .then(data => {
-        const c = data.containers || [];
-        setContainers(c);
-        if (c.length > 0) try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch {}
+        if (data?.containers?.length > 0) {
+          setContainers(data.containers);
+          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data.containers)); } catch {}
+        }
         setLoaded(true);
       })
-      .catch(() => {
-        // Use cached containers on failure
-        try {
-          const cached = sessionStorage.getItem(CACHE_KEY);
-          if (cached) setContainers(JSON.parse(cached));
-        } catch {}
-        setLoaded(true);
-      });
+      .catch(() => { setLoaded(true); });
+    return () => { clearTimeout(timeout); controller.abort(); };
   }, []);
 
   if (!loaded) return null;

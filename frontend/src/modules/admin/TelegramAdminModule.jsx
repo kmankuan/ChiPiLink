@@ -562,6 +562,19 @@ export default function TelegramAdminModule() {
       setConfig(newConfig);
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(newConfig)); } catch {}
       
+      // Also update the landing page sessionStorage cache with new title/settings
+      try {
+        const cached = sessionStorage.getItem('chipi_telegram_containers');
+        if (cached) {
+          const containers = JSON.parse(cached);
+          if (containers.length > 0) {
+            if (updates.channel_title !== undefined) containers[0].title = updates.channel_title;
+            if (updates.show_post_count !== undefined) containers[0].show_post_count = updates.show_post_count;
+            sessionStorage.setItem('chipi_telegram_containers', JSON.stringify(containers));
+          }
+        }
+      } catch {}
+      
       await fetch(`${API_URL}/api/community-v2/feed/admin/config`, {
         method: 'PUT', headers: authHeaders(), body: JSON.stringify(updates),
       });
