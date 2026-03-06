@@ -44,17 +44,17 @@ export default function AnalyticsDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
+      <div className="min-h-screen overflow-x-hidden bg-[#0f1117] flex items-center justify-center">
         <div className="animate-spin h-10 w-10 border-4 border-indigo-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[#0f1117] text-white">
       {/* Header */}
       <div className="border-b border-white/10 bg-[#0f1117]/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Button variant="ghost" size="sm" className="text-white/70 hover:text-white" onClick={() => navigate('/pinpanclub')} data-testid="analytics-back-btn">
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
@@ -65,7 +65,7 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="analytics-kpi-cards">
           <KpiCard icon={Users} label="Total Players" value={stats?.total_players || 0} color="blue" />

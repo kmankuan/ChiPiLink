@@ -294,7 +294,7 @@ export default function PingPongCanvas() {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 flex flex-col">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 flex flex-col">
       {/* Header */}
       {!isFullscreen && (
         <header className="bg-black/50 backdrop-blur-md border-b border-white/10 px-4 py-3">

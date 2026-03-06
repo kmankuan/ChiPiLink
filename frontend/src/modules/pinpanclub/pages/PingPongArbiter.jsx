@@ -47,7 +47,7 @@ export default function PingPongArbiter() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen overflow-x-hidden flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
@@ -55,7 +55,7 @@ export default function PingPongArbiter() {
 
   if (!match) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen overflow-x-hidden flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Partido no encontrado</p>
         <Button onClick={() => navigate('/pinpanclub')}>Volver al Dashboard</Button>
       </div>
@@ -63,10 +63,10 @@ export default function PingPongArbiter() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
+        <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">🏓</span>
@@ -84,7 +84,7 @@ export default function PingPongArbiter() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="max-w-2xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Arbiter Panel */}
           <ArbiterPanel 

@@ -104,7 +104,7 @@ export default function SuperPinMatch() {
   const isPending = match.status === 'pending';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       {/* Header */}
       <div className="flex items-center justify-end mb-6">
         <Badge className={{

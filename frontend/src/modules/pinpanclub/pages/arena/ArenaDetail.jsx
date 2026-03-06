@@ -110,10 +110,10 @@ export default function ArenaDetail() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
+        <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub/arena')} data-testid="detail-back-btn">
               <ArrowLeft className="h-5 w-5" />
@@ -144,7 +144,7 @@ export default function ArenaDetail() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Admin Actions */}
         {canManage && (
           <Card data-testid="admin-actions-card">

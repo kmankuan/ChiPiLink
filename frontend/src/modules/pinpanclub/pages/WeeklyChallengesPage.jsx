@@ -17,10 +17,10 @@ export default function WeeklyChallengesPage() {
   const currentUserId = user?.user_id || null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
+        <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button 
@@ -38,7 +38,7 @@ export default function WeeklyChallengesPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8">
         <WeeklyChallenges playerId={currentUserId} />
       </main>
     </div>

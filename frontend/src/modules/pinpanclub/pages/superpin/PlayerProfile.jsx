@@ -119,7 +119,7 @@ export default function PlayerProfile() {
   const { player_info, overall_stats, league_rankings, match_history, badges, recent_form, badge_count } = stats;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-gray-900 p-6">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-900 via-green-900 to-gray-900 p-6">
       {/* Header */}
       <div className="max-w-6xl mx-auto">
         {/* Profile Header */}

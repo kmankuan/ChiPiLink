@@ -208,10 +208,10 @@ export default function RefereeSettings() {
   const hasChanges = Object.keys(pendingChanges).length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white">
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 py-8">
           <Button
             variant="ghost"
             size="sm"
@@ -232,7 +232,7 @@ export default function RefereeSettings() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Settings Panel */}
         {isAdmin && (
           <Card>

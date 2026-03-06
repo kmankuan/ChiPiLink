@@ -121,10 +121,10 @@ export default function ArenaPublic() {
   const isInProgress = tournament.status === 'in_progress';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 text-white" data-testid="public-tournament-header">
-        <div className="container mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -168,7 +168,7 @@ export default function ArenaPublic() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Champion Banner */}
         {isCompleted && tournament.champion_id && (
           <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20" data-testid="public-champion-banner">

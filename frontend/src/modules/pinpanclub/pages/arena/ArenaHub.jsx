@@ -121,17 +121,17 @@ export default function ArenaHub() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden overflow-x-hidden" style={{ background: "linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
+      <header className="sticky top-0 z-50 backdrop-blur-md border-b">
+        <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')} data-testid="arena-back-btn">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: '#2d2217' }}>
                   <Swords className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -144,7 +144,7 @@ export default function ArenaHub() {
               <Button
                 size="sm"
                 onClick={() => navigate('/pinpanclub/arena/create')}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                className="text-white rounded-full" style={{ background: "#2d2217" }}
                 data-testid="create-tournament-btn"
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -155,7 +155,7 @@ export default function ArenaHub() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Filters */}
         <div className="flex gap-2">
           <div className="relative flex-1">

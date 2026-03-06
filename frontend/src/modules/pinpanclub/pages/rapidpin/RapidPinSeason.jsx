@@ -225,7 +225,7 @@ export default function RapidPinSeason() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen overflow-x-hidden bg-background flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-4 border-yellow-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -233,7 +233,7 @@ export default function RapidPinSeason() {
 
   if (!season) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen overflow-x-hidden bg-background flex items-center justify-center">
         <Card className="p-8 text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
           <p>{t('rapidpin.seasons.notFound')}</p>
@@ -246,10 +246,10 @@ export default function RapidPinSeason() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Header */}
       <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4">
             <Button 
               variant="ghost" 
@@ -507,7 +507,7 @@ export default function RapidPinSeason() {
       </div>
 
       {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4 text-center">

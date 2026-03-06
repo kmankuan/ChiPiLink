@@ -183,10 +183,10 @@ export default function HallOfFame() {
   const isRefTab = activeTab === 'referee';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       {/* Hero Header */}
       <div style={{ background: 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }} className="text-white">
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 py-8">
           <Button
             variant="ghost"
             size="sm"
@@ -226,7 +226,7 @@ export default function HallOfFame() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full justify-start mb-6 overflow-x-auto" data-testid="hof-tabs">
             <TabsTrigger value="combined" className="gap-1.5">

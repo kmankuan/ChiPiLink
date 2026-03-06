@@ -129,7 +129,7 @@ export default function PingPongSpectator() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen overflow-x-hidden flex items-center justify-center bg-black">
         <Loader2 className="h-12 w-12 animate-spin text-white" />
       </div>
     );
@@ -137,7 +137,7 @@ export default function PingPongSpectator() {
 
   if (!match) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+      <div className="min-h-screen overflow-x-hidden flex flex-col items-center justify-center gap-4 bg-background">
         <p className="text-muted-foreground">Match not found</p>
         <Button onClick={() => navigate('/pinpanclub')}>Back to Dashboard</Button>
       </div>
@@ -146,7 +146,7 @@ export default function PingPongSpectator() {
 
   if (isFullscreen) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
+      <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
         <div className="w-full max-w-6xl">
           <ScoreBoard match={match} size="tv" showStats={true} className="bg-gray-800/50 backdrop-blur border-gray-700" />
           <div className="text-center mt-4 text-gray-500 text-sm">
@@ -158,9 +158,9 @@ export default function PingPongSpectator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-background via-background to-muted/20">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
+        <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')} data-testid="live-back-btn">
@@ -193,7 +193,7 @@ export default function PingPongSpectator() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <ScoreBoard match={match} size="large" showStats={true} />
           <div className="text-center mt-4 text-sm text-muted-foreground">

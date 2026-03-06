@@ -133,7 +133,7 @@ export default function SuperPinAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen overflow-x-hidden px-4 py-4" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

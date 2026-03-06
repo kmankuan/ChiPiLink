@@ -124,7 +124,7 @@ export default function SuperPinTournament() {
   const hasStarted = brackets.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">

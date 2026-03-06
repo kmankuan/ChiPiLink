@@ -98,41 +98,40 @@ export default function SuperPinRanking() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-green-900 p-4 md:p-6">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Trophy className="h-8 w-8 text-yellow-400" />
-              PinPan League
-            </h1>
-          </div>
-          <div className="flex gap-2">
+      <div style={{ background: 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }} className="px-4 py-4 mb-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5" style={{ color: '#B8860B' }} />
+              <h1 className="text-lg font-bold text-white">PinPan League</h1>
+            </div>
             <Button
-              variant="outline"
-              className="border-yellow-400/50 text-yellow-400 hover:bg-yellow-400/10"
-              onClick={() => navigate('/pinpanclub/superpin/compare')}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              {t('superpin.comparison.title')}
-            </Button>
-            <Button
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
+              variant="ghost"
+              size="sm"
+              className="text-white/70 hover:text-white hover:bg-white/10 rounded-full h-8 text-xs"
               onClick={fetchRanking}
               disabled={refreshing}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              Actualizar
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-white/30 text-white hover:bg-white/10 rounded-full text-xs"
+            onClick={() => navigate('/pinpanclub/superpin/compare')}
+          >
+            <Users className="h-3.5 w-3.5 mr-1" />
+            {t('superpin.comparison.title')}
+          </Button>
         </div>
       </div>
 
       {/* League Selector */}
       {leagues.length > 1 && (
-        <div className="max-w-4xl mx-auto mb-6">
+        <div className="max-w-2xl mx-auto px-4 mb-6">
           <div className="flex gap-2 overflow-x-auto pb-2">
             {leagues.map((league) => (
               <Button
@@ -153,7 +152,7 @@ export default function SuperPinRanking() {
 
       {/* League Info */}
       {ranking && (
-        <div className="max-w-4xl mx-auto mb-6">
+        <div className="max-w-2xl mx-auto px-4 mb-6">
           <Card className="bg-white/10 border-white/20">
             <CardContent className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -184,7 +183,7 @@ export default function SuperPinRanking() {
       )}
 
       {/* Ranking Table */}
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-2xl mx-auto px-4">
         <Card className="bg-white/10 border-white/20 overflow-hidden">
           <CardHeader className="bg-white/5">
             <CardTitle className="text-white flex items-center gap-2">
@@ -284,7 +283,7 @@ export default function SuperPinRanking() {
 
       {/* Last Updated */}
       {ranking?.last_updated && (
-        <div className="max-w-4xl mx-auto mt-4 text-center">
+        <div className="max-w-2xl mx-auto px-4 mt-4 text-center">
           <p className="text-white/40 text-sm">
             Última actualización: {new Date(ranking.last_updated).toLocaleString()}
           </p>

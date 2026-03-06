@@ -97,9 +97,9 @@ export default function ArenaCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub/arena')} data-testid="create-back-btn">
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -112,7 +112,7 @@ export default function ArenaCreate() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-4 max-w-2xl space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 max-w-2xl space-y-4">
         {/* Basic Info */}
         <Card>
           <CardHeader className="pb-3">

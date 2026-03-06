@@ -232,10 +232,10 @@ export default function SponsorsAdmin() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -264,7 +264,7 @@ export default function SponsorsAdmin() {
       </header>
 
       {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 mt-4">
+      <div className="max-w-2xl mx-auto px-4 mt-4">
         <div className="flex gap-2 border-b">
           <button
             onClick={() => setActiveTab('lista')}
@@ -292,7 +292,7 @@ export default function SponsorsAdmin() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6">
         {activeTab === 'lista' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Sponsors List */}
