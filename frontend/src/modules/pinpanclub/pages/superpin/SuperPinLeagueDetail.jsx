@@ -35,7 +35,7 @@ export default function SuperPinLeagueDetail() {
   const [newMatch, setNewMatch] = useState({ player_a_id: '', player_b_id: '' });
   const [loadingMonday, setLoadingMonday] = useState(false);
   const [tournaments, setTournaments] = useState([]);
-  const [newTournament, setNewTournament] = useState({ nombre: '', start_date: '' });
+  const [newTournament, setNewTournament] = useState({ name: '', start_date: '' });
 
   useEffect(() => {
     fetchData();
@@ -192,7 +192,7 @@ export default function SuperPinLeagueDetail() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Trophy className="h-8 w-8 text-yellow-500" />
-              {league.nombre}
+              {league.name || league.nombre}
             </h1>
             <p className="text-gray-600 mt-1">
               {t('superpin.tournaments.season')} {league.temporada} • {league.scoring_config?.system === 'elo' ? t('superpin.leagues.scoringElo') : t('superpin.leagues.scoringSimple')}
@@ -621,7 +621,7 @@ export default function SuperPinLeagueDetail() {
                 </label>
                 <input
                   type="text"
-                  value={newTournament.nombre}
+                  value={newTournament.name}
                   onChange={(e) => setNewTournament({ ...newTournament, nombre: e.target.value })}
                   placeholder={`${league?.nombre || 'League'} Playoff`}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700"
@@ -658,7 +658,7 @@ export default function SuperPinLeagueDetail() {
                 variant="outline" 
                 onClick={() => {
                   setShowCreateTournamentModal(false);
-                  setNewTournament({ nombre: '', start_date: '' });
+                  setNewTournament({ name: '', start_date: '' });
                 }}
                 data-testid="cancel-playoff-btn"
               >
@@ -668,7 +668,7 @@ export default function SuperPinLeagueDetail() {
                 type="button"
                 data-testid="create-playoff-btn"
                 onClick={async () => {
-                  if (!newTournament.nombre) {
+                  if (!newTournament.name) {
                     alert('Please enter a tournament name');
                     return;
                   }
@@ -682,7 +682,7 @@ export default function SuperPinLeagueDetail() {
                         'Authorization': `Bearer ${token}`
                       },
                       body: JSON.stringify({
-                        name: newTournament.nombre,
+                        name: newTournament.name,
                         description: `Playoff tournament for ${league?.nombre || 'league'}`,
                         format: 'single_elimination',
                         max_players: Math.min(ranking?.entries?.length || 8, 16),
@@ -696,7 +696,7 @@ export default function SuperPinLeagueDetail() {
                     if (response.ok) {
                       const data = await response.json();
                       setShowCreateTournamentModal(false);
-                      setNewTournament({ nombre: '', start_date: '' });
+                      setNewTournament({ name: '', start_date: '' });
                       navigate(`/pinpanclub/arena/${data.tournament_id}`);
                     }
                   } catch (error) {

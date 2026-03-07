@@ -24,9 +24,9 @@ export default function SuperPinAdmin() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newLeague, setNewLeague] = useState({
-    nombre: '',
-    temporada: new Date().getFullYear().toString(),
-    descripcion: '',
+    name: '',
+    season: new Date().getFullYear().toString(),
+    description: '',
     scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
     checkin_config: { methods: ['manual'], require_all: false }
   });
@@ -48,7 +48,7 @@ export default function SuperPinAdmin() {
   };
 
   const createLeague = async () => {
-    if (!newLeague.nombre || newLeague.nombre.trim() === '') {
+    if (!newLeague.name || newLeague.name.trim() === '') {
       alert(t('superpin.leagues.name') + ' es requerido');
       return;
     }
@@ -62,9 +62,9 @@ export default function SuperPinAdmin() {
 
       // Map frontend field names to backend expected names
       const payload = {
-        name: newLeague.nombre.trim(),
-        season: newLeague.temporada || new Date().getFullYear().toString(),
-        description: newLeague.descripcion || null,
+        name: newLeague.name.trim(),
+        season: newLeague.season || new Date().getFullYear().toString(),
+        description: newLeague.description || null,
         scoring_config: newLeague.scoring_config,
         checkin_config: newLeague.checkin_config,
       };
@@ -233,7 +233,7 @@ export default function SuperPinAdmin() {
                       <Trophy className="h-6 w-6 text-yellow-500" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{league.nombre}</h3>
+                      <h3 className="font-semibold text-gray-900">{league.name}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-sm text-gray-500">{t('superpin.tournaments.season')} {league.temporada}</span>
                         <span className="text-gray-300">•</span>
@@ -283,7 +283,7 @@ export default function SuperPinAdmin() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.name')}</label>
                 <input
                   type="text"
-                  value={newLeague.nombre}
+                  value={newLeague.name}
                   onChange={(e) => setNewLeague({ ...newLeague, nombre: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   placeholder="Liga Primavera 2025"
@@ -293,7 +293,7 @@ export default function SuperPinAdmin() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.tournaments.season')}</label>
                 <input
                   type="text"
-                  value={newLeague.temporada}
+                  value={newLeague.season}
                   onChange={(e) => setNewLeague({ ...newLeague, temporada: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   placeholder="2025"
