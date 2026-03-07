@@ -48,7 +48,6 @@ export default function SuperPinAdmin() {
   };
 
   const createLeague = async () => {
-    // Validación
     if (!newLeague.nombre || newLeague.nombre.trim() === '') {
       alert(t('superpin.leagues.name') + ' es requerido');
       return;
@@ -61,14 +60,22 @@ export default function SuperPinAdmin() {
         return;
       }
 
+      // Map frontend field names to backend expected names
+      const payload = {
+        name: newLeague.nombre.trim(),
+        season: newLeague.temporada || new Date().getFullYear().toString(),
+        description: newLeague.descripcion || null,
+        scoring_config: newLeague.scoring_config,
+        checkin_config: newLeague.checkin_config,
+      };
+
       let response;
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(newLeague),
-            signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined,
+            body: JSON.stringify(payload),
           });
           break;
         } catch (e) {
