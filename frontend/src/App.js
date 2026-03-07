@@ -47,6 +47,7 @@ import AgentPanel from '@/pages/AgentPanel';
 
 // PinpanClub Module
 import PingPongDashboard from '@/modules/pinpanclub/pages/PingPongDashboard';
+import CompetitionsHub from '@/modules/pinpanclub/pages/CompetitionsHub';
 import PingPongMatch from '@/modules/pinpanclub/pages/PingPongMatch';
 import PingPongArbiter from '@/modules/pinpanclub/pages/PingPongArbiter';
 import PingPongSpectator from '@/modules/pinpanclub/pages/PingPongSpectator';
@@ -200,6 +201,7 @@ function AppRouter() {
       
       {/* Rapid Pin Routes */}
       <Route path="/rapidpin" element={<><Header /><RapidPinPublicPage /></>} />
+      <Route path="/pinpanclub/competitions" element={<><Header /><CompetitionsHub /></>} />
       <Route path="/pinpanclub/rapidpin" element={<><Header /><RapidPinDashboard /></>} />
       <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<><Header /><RapidPinSeason /></>} />
       

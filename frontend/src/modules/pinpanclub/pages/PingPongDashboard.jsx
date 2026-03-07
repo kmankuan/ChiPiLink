@@ -33,7 +33,8 @@ import {
   Scale,
   Award,
   BarChart3,
-  Swords
+  Swords,
+  Star
 } from 'lucide-react';
 import NotificationCenter from '../components/NotificationCenter';
 import WeeklyChallenges from '../components/WeeklyChallenges';
@@ -176,63 +177,17 @@ export default function PingPongDashboard() {
             </div>
             {/* Scrollable nav buttons */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4" style={{ scrollbarWidth: 'none' }}>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={() => navigate('/pinpanclub/superpin/ranking')}
-                  className="text-white rounded-full text-xs shrink-0"
-                  style={{ background: '#B8860B' }}
-                >
-                  <Trophy className="h-3.5 w-3.5 mr-1" />
-                  League
+                <Button variant="default" size="sm" onClick={() => navigate('/pinpanclub/competitions')}
+                  className="text-white rounded-full text-xs shrink-0" style={{ background: '#B8860B' }}>
+                  <Trophy className="h-3.5 w-3.5 mr-1" /> Competitions
                 </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={() => navigate('/pinpanclub/rapidpin')}
-                  className="text-white rounded-full text-xs shrink-0 relative"
-                  style={{ background: '#C8102E' }}
-                  data-testid="rapidpin-btn"
-                >
-                  <Zap className="h-3.5 w-3.5 mr-1" /> Rapid Pin
-                >
-                  ⚡ Rapid Pin
-                  {rapidPinPendingCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-                      {rapidPinPendingCount}
-                    </span>
-                  )}
+                <Button variant="default" size="sm" onClick={() => navigate('/pinpanclub/superpin/ranking')}
+                  className="text-white rounded-full text-xs shrink-0" style={{ background: '#2d2217' }}>
+                  <Star className="h-3.5 w-3.5 mr-1" /> Ranking
                 </Button>
-                {/* PinPan Arena */}
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={() => navigate('/pinpanclub/arena')}
-                  className="text-white rounded-full text-xs shrink-0"
-                  style={{ background: '#2d2217' }}
-                  data-testid="arena-btn"
-                >
-                  <Swords className="h-3.5 w-3.5 mr-1" />
-                  Arena
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={() => navigate('/pinpanclub/hall-of-fame')}
-                  className="text-white rounded-full text-xs shrink-0"
-                  style={{ background: '#8b7355' }}
-                  data-testid="hall-of-fame-btn"
-                >
-                  <Award className="h-3.5 w-3.5 mr-1" />
-                  Hall of Fame
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/superpin/ranking')}>
-                  <Users className="h-4 w-4 mr-2" />
-                  Players
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/arena')}>
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Tournaments
+                <Button variant="default" size="sm" onClick={() => navigate('/pinpanclub/hall-of-fame')}
+                  className="text-white rounded-full text-xs shrink-0" style={{ background: '#8b7355' }}>
+                  <Award className="h-3.5 w-3.5 mr-1" /> Hall of Fame
                 </Button>
                 {/* Configuration Menu - Only for admins/moderators */}
                 {canManage && (
