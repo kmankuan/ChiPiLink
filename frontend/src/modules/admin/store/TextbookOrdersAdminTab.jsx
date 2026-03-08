@@ -369,6 +369,7 @@ export default function TextbookOrdersAdminTab() {
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [printOrderIds, setPrintOrderIds] = useState([]);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [chatStudent, setChatStudent] = useState(null);
   const [singlePrintOpen, setSinglePrintOpen] = useState(false);
@@ -1153,7 +1154,7 @@ export default function TextbookOrdersAdminTab() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setPrintDialogOpen(true)}
+          onClick={() => { setPrintOrderIds([...orderSelection.ids]); orderSelection.clear(); setPrintDialogOpen(true); }}
           className="gap-1.5 bg-background"
           data-testid="bulk-print-btn"
         >
@@ -1188,11 +1189,11 @@ export default function TextbookOrdersAdminTab() {
       {/* Print Dialog */}
       <PrintDialog
         open={printDialogOpen}
-        onOpenChange={setPrintDialogOpen}
-        orderIds={orderSelection.ids}
+        onOpenChange={(v) => { setPrintDialogOpen(v); if (!v) setPrintOrderIds([]); }}
+        orderIds={printOrderIds}
         token={localStorage.getItem('auth_token')}
         onPrintComplete={() => {
-          const printedIds = new Set(orderSelection.ids);
+          const printedIds = new Set(printOrderIds);
           setOrders(prev => prev.map(o =>
             printedIds.has(o.order_id)
               ? { ...o, printed_at: new Date().toISOString(), print_count: (o.print_count || 0) + 1 }
