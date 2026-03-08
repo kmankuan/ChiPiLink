@@ -1,6 +1,7 @@
 """
-Job Processor — MongoDB-based job queue.
-Polls hub_jobs collection, processes jobs via registered handlers.
+Job Processor — MongoDB Change Streams based (real-time, no polling).
+Watches hub_jobs collection for new jobs, processes instantly.
+Falls back to polling if Change Streams not available.
 """
 import asyncio
 import logging
@@ -11,9 +12,8 @@ logger = logging.getLogger("hub.jobs")
 
 
 class JobProcessor:
-    def __init__(self, db, poll_interval=5, max_concurrent=3):
+    def __init__(self, db, max_concurrent=3):
         self.db = db
-        self.poll_interval = poll_interval
         self.max_concurrent = max_concurrent
         self._running = False
         self._handlers = {}
@@ -29,29 +29,84 @@ class JobProcessor:
         self._running = False
 
     async def start(self):
-        """Main polling loop"""
+        """Start watching for jobs — Change Streams first, polling fallback"""
         self._running = True
-        logger.info(f"Job processor started (poll={self.poll_interval}s, max_concurrent={self.max_concurrent})")
+        
+        # Process any existing pending jobs first
+        await self._drain_pending()
+        
+        # Try Change Streams (real-time, zero latency)
+        try:
+            await self._watch_stream()
+        except Exception as e:
+            logger.warning(f"Change Streams not available ({e}), falling back to polling")
+            await self._poll_loop()
+
+    async def _watch_stream(self):
+        """Watch hub_jobs collection with Change Streams — instant job pickup"""
+        logger.info("Job processor started (Change Streams mode — real-time)")
+        
+        pipeline = [{"$match": {
+            "operationType": {"$in": ["insert", "update"]},
+            "$or": [
+                {"fullDocument.status": "pending"},
+                {"updateDescription.updatedFields.status": "pending"},
+            ]
+        }}]
+        
+        async with self.db.hub_jobs.watch(pipeline, full_document="updateLookup") as stream:
+            async for change in stream:
+                if not self._running:
+                    break
+                doc = change.get("fullDocument")
+                if doc and doc.get("status") == "pending":
+                    doc.pop("_id", None)
+                    # Claim the job
+                    result = await self.db.hub_jobs.update_one(
+                        {"job_id": doc["job_id"], "status": "pending"},
+                        {"$set": {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()}}
+                    )
+                    if result.modified_count > 0:
+                        asyncio.create_task(self._process(doc))
+
+    async def _poll_loop(self, interval=5):
+        """Fallback polling for environments without Change Streams"""
+        logger.info(f"Job processor started (polling mode — {interval}s interval)")
         
         while self._running:
             try:
-                # Pick up pending jobs (oldest first, respect priority)
                 job = await self.db.hub_jobs.find_one_and_update(
                     {"status": "pending"},
                     {"$set": {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()}},
                     sort=[("priority", 1), ("created_at", 1)],
                     return_document=True,
                 )
-                
                 if job:
                     job.pop("_id", None)
                     asyncio.create_task(self._process(job))
                 else:
-                    await asyncio.sleep(self.poll_interval)
-                    
+                    await asyncio.sleep(interval)
             except Exception as e:
                 logger.error(f"Poll error: {e}")
-                await asyncio.sleep(self.poll_interval)
+                await asyncio.sleep(interval)
+
+    async def _drain_pending(self):
+        """Process any jobs left pending from before startup"""
+        count = 0
+        while True:
+            job = await self.db.hub_jobs.find_one_and_update(
+                {"status": "pending"},
+                {"$set": {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()}},
+                sort=[("priority", 1), ("created_at", 1)],
+                return_document=True,
+            )
+            if not job:
+                break
+            job.pop("_id", None)
+            asyncio.create_task(self._process(job))
+            count += 1
+        if count:
+            logger.info(f"Drained {count} pending jobs from before startup")
 
     async def _process(self, job):
         """Process a single job"""
@@ -91,7 +146,6 @@ class JobProcessor:
         max_retries = (job or {}).get("max_retries", 3)
         
         if retries < max_retries:
-            # Re-queue with backoff
             await self.db.hub_jobs.update_one(
                 {"job_id": job_id},
                 {"$set": {
@@ -101,7 +155,7 @@ class JobProcessor:
                     "retry_at": datetime.now(timezone.utc).isoformat(),
                 }}
             )
-            logger.warning(f"Job {job_id} failed, retrying ({retries+1}/{max_retries}): {error}")
+            logger.warning(f"Job {job_id} retry ({retries+1}/{max_retries}): {error}")
         else:
             await self.db.hub_jobs.update_one(
                 {"job_id": job_id},
@@ -119,3 +173,4 @@ class JobProcessor:
             "handlers": list(self._handlers.keys()),
             "uptime_hours": round((time.time() - self.stats["started_at"]) / 3600, 1),
         }
+
