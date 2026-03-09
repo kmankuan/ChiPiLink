@@ -31,7 +31,7 @@ class Settings(BaseModel):
     """Application settings"""
     # Database
     mongo_url: str = os.environ.get('MONGO_URL', '')
-    db_name: str = "chipilink_prod"  # Hardcoded — deployment system overrides DB_NAME env var
+    db_name: str = os.environ.get('DB_NAME', 'chipilink_prod')
     
     # JWT
     jwt_secret: str = JWT_SECRET

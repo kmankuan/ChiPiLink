@@ -6,8 +6,8 @@ import os
 import asyncio
 import bcrypt
 import uuid
+import logging
 from datetime import datetime, timezone
-from urllib.parse import urlparse
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -15,31 +15,16 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent
 load_dotenv(ROOT_DIR / '.env')
 
+_db_logger = logging.getLogger("core.database")
+
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL')
 
-# CRITICAL: Extract DB name from MONGO_URL path if present (e.g. mongodb+srv://...mongodb.net/chipilink_prod)
-# This prevents the deployment system's DB_NAME override from using the wrong database.
-# Priority: URL path > hardcoded fallback. Ignore DB_NAME env var entirely.
-_HARDCODED_DB = "chipilink_prod"
-
-def _extract_db_from_url(url: str) -> str:
-    """Extract database name from MongoDB connection string path."""
-    try:
-        parsed = urlparse(url)
-        path_db = parsed.path.lstrip("/").split("?")[0]
-        if path_db:
-            return path_db
-    except Exception:
-        pass
-    return ""
-
-_url_db = _extract_db_from_url(mongo_url) if mongo_url else ""
-db_name = _url_db or _HARDCODED_DB
-
-import logging
-_db_logger = logging.getLogger("core.database")
-_db_logger.info(f"DB resolution: url_db={_url_db!r}, hardcoded={_HARDCODED_DB!r}, final={db_name!r}")
+# DB_NAME: Use the environment variable set by the deployment system.
+# The deployment system creates the Atlas DB and authorizes the user for it.
+# Local dev: falls back to 'chipilink_prod' from .env
+db_name = os.environ.get('DB_NAME', 'chipilink_prod')
+_db_logger.info(f"DB resolution: DB_NAME env={os.environ.get('DB_NAME', '(not set)')!r}, final={db_name!r}")
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
