@@ -94,23 +94,7 @@ frontend/node_modules/.cache/default-development/14.pack
 frontend/node_modules/.cache/default-development/15.pack
 frontend/node_modules/.cache/default-development/4.pack
 
-# Environment files - KEEP .env files for deployment
-# Note: .env files MUST be tracked for Emergent deployment
-# The deployment system will auto-update them with production values
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Environment files - MUST be tracked for Emergent deployment
+# The deployment system auto-updates them with production values at runtime
+# DO NOT add *.env here — it breaks deployment
 frontend/node_modules/.cache/default-development/3.pack_
