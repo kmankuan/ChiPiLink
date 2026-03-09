@@ -1,26 +1,30 @@
 [
   {
-    "content": "Create job handlers in Hub for: telegram_poll, monday_api_call, gmail_scan",
+    "content": "Add /api/monday/execute endpoint to Hub for synchronous Monday API calls",
     "status": "completed"
   },
   {
-    "content": "Update Hub main.py to register handlers and start pollers properly",
+    "content": "Rewrite core_client.execute() to proxy through Hub instead of calling Monday directly",
     "status": "completed"
   },
   {
-    "content": "Update main app to write jobs to hub_jobs instead of running background tasks",
+    "content": "Replace fire-and-forget calls in listed files with submit_hub_job",
     "status": "completed"
   },
   {
-    "content": "Remove polling loops from main app startup (Telegram, Monday queue, Gmail)",
+    "content": "Remove monday_queue imports from main app",
     "status": "completed"
   },
   {
-    "content": "Remove polling shutdown from main app",
+    "content": "Update system_monitor to read queue stats from Hub",
     "status": "completed"
   },
   {
-    "content": "Test both services work together with job-based architecture — ALL PASS",
+    "content": "Verify backend starts clean with zero direct Monday imports",
     "status": "completed"
+  },
+  {
+    "content": "End-to-end testing",
+    "status": "in_progress"
   }
 ]

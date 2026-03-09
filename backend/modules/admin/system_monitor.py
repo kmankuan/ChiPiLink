@@ -68,10 +68,14 @@ def _get_ws_connections():
 
 def _get_monday_queue_stats():
     try:
-        from modules.integrations.monday.queue import monday_queue
-        return monday_queue.get_stats()
+        import httpx
+        # Get stats from Integration Hub
+        r = httpx.get("http://127.0.0.1:8002/api/monday/stats", timeout=3)
+        if r.status_code == 200:
+            return {**r.json(), "source": "integration_hub"}
+        return {"source": "integration_hub", "error": f"HTTP {r.status_code}"}
     except Exception:
-        return {"queue_depth": 0, "running": 0}
+        return {"source": "integration_hub", "status": "unreachable"}
 
 
 @router.get("/health")

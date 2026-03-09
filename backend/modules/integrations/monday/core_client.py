@@ -1,6 +1,7 @@
 """
-Monday.com Core API Client
-Single shared client for all modules. Handles auth, rate limiting, error handling.
+Monday.com Core API Client — Hub-Proxied
+All API calls route through the Integration Hub (port 8002).
+Zero direct Monday.com connections from the main app.
 """
 from typing import Dict, Optional
 import httpx
@@ -8,95 +9,59 @@ import logging
 import json
 
 from core.database import db
-from core.config import MONDAY_API_KEY
 
 logger = logging.getLogger(__name__)
 
-MONDAY_API_URL = "https://api.monday.com/v2"
+HUB_URL = "http://127.0.0.1:8002"
 CONFIG_COLLECTION = "monday_integration_config"
 
 
 class MondayCoreClient:
-    """Shared Monday.com API client used by all module adapters.
-    Uses a persistent connection pool to avoid creating new TCP connections per request."""
+    """Monday.com API client that proxies all calls through the Integration Hub.
+    Same interface as the original — all callers work unchanged."""
 
     def __init__(self):
         self._client = None
 
     def _get_client(self):
-        """Lazy-init persistent httpx client with connection limits"""
+        """Persistent httpx client for Hub communication"""
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
-                limits=httpx.Limits(max_connections=5, max_keepalive_connections=3),
-                timeout=httpx.Timeout(20.0, connect=10.0),
+                base_url=HUB_URL,
+                limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+                timeout=httpx.Timeout(45.0, connect=5.0),
             )
         return self._client
 
-    async def get_api_key(self) -> Optional[str]:
-        """Get active API key from workspace config or env fallback"""
-        try:
-            ws_config = await db[CONFIG_COLLECTION].find_one(
-                {"config_key": "global.workspaces"}, {"_id": 0}
-            )
-            if ws_config:
-                active_id = ws_config.get("active_workspace_id")
-                for ws in ws_config.get("workspaces", []):
-                    if ws.get("workspace_id") == active_id and ws.get("api_key"):
-                        return ws["api_key"]
-        except Exception as e:
-            logger.debug(f"Workspace config lookup failed: {e}")
-        return MONDAY_API_KEY or None
-
-    async def _execute_raw(self, query: str, timeout: float = 20.0) -> dict:
-        """Raw GraphQL execution — called by the queue worker"""
-        api_key = await self.get_api_key()
-        if not api_key:
-            raise ValueError("Monday.com API key not configured")
-
-        client = self._get_client()
-        last_error = None
-        for attempt in range(3):
-            try:
-                response = await client.post(
-                    MONDAY_API_URL,
-                    json={"query": query},
-                    headers={
-                        "Authorization": api_key,
-                        "Content-Type": "application/json"
-                    },
-                    timeout=timeout
-                )
-                data = response.json()
-
-                if "errors" in data:
-                    error_msg = str(data['errors'])
-                    if any(kw in error_msg.lower() for kw in ["rate limit", "complexity", "budget"]):
-                        logger.warning(f"Monday.com rate/complexity limit (attempt {attempt+1}): {error_msg}")
-                        if attempt < 2:
-                            import asyncio
-                            await asyncio.sleep(2 ** attempt)
-                            continue
-                    logger.error(f"Monday.com API error: {data['errors']}")
-                    raise ValueError(f"Monday.com error: {data['errors']}")
-
-                return data.get("data", {})
-            except (httpx.TimeoutException, httpx.ConnectError) as e:
-                last_error = e
-                logger.warning(f"Monday.com request failed (attempt {attempt+1}): {e}")
-                if attempt < 2:
-                    import asyncio
-                    await asyncio.sleep(2 ** attempt)
-
-        raise ValueError(f"Monday.com API failed after 3 attempts: {last_error}")
-
     async def execute(self, query: str, timeout: float = 20.0) -> dict:
-        """Queue-aware execute — all calls go through the rate-limited queue"""
-        from modules.integrations.monday.queue import monday_queue, Priority
+        """Execute a Monday.com GraphQL query via the Integration Hub proxy."""
+        client = self._get_client()
         label = query.strip()[:60].replace('\n', ' ')
-        return await monday_queue.enqueue(
-            self._execute_raw, query, timeout,
-            priority=Priority.NORMAL, label=label, timeout=timeout + 15
-        )
+        try:
+            r = await client.post(
+                "/api/monday/execute",
+                json={"query": query, "variables": {}},
+                timeout=timeout + 10,
+            )
+            if r.status_code == 503:
+                raise ValueError("Monday.com API key not configured (Hub returned 503)")
+            if r.status_code == 429:
+                raise ValueError("Monday.com rate limit reached")
+            if r.status_code >= 500:
+                raise ValueError(f"Hub error: HTTP {r.status_code}")
+
+            data = r.json()
+
+            if "errors" in data and not data.get("data"):
+                raise ValueError(f"Monday.com error: {data['errors']}")
+
+            return data.get("data", data)
+
+        except httpx.TimeoutException:
+            raise ValueError(f"Monday.com API timeout for: {label}")
+        except httpx.ConnectError:
+            logger.error("Integration Hub not reachable at port 8002")
+            raise ValueError("Integration Hub not reachable — is it running?")
 
     async def test_connection(self) -> dict:
         """Test API connectivity and return account info"""
@@ -175,7 +140,7 @@ class MondayCoreClient:
         return data.get("create_subitem", {}).get("id")
 
     async def create_update(self, item_id: str, body: str) -> Optional[str]:
-        """Add an Update (comment) to an item. Returns update_id."""
+        """Add an Update (comment) to an item."""
         escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
         query = f'mutation {{ create_update (item_id: {item_id}, body: "{escaped}") {{ id }} }}'
         data = await self.execute(query)
@@ -192,7 +157,7 @@ class MondayCoreClient:
         return items[0].get("updates", []) if items else []
 
     async def get_item_updates_with_replies(self, item_id: str) -> list:
-        """Fetch Updates with their replies for an item (topic + thread structure)"""
+        """Fetch Updates with their replies"""
         data = await self.execute(
             f'''query {{ items(ids: [{item_id}]) {{
                 updates {{ id body text_body creator {{ name }} created_at
@@ -205,7 +170,7 @@ class MondayCoreClient:
         return items[0].get("updates", []) if items else []
 
     async def create_reply(self, item_id: str, update_id: str, body: str) -> Optional[str]:
-        """Reply to an existing Update. Returns reply update_id."""
+        """Reply to an existing Update."""
         escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
         query = f'mutation {{ create_update (item_id: {item_id}, parent_id: {update_id}, body: "{escaped}") {{ id }} }}'
         data = await self.execute(query)
@@ -239,8 +204,7 @@ class MondayCoreClient:
         self, board_id: str, item_id: str, column_values: dict,
         create_labels_if_missing: bool = False
     ) -> bool:
-        """Update multiple column values on an item.
-        Set create_labels_if_missing=True when updating dropdown/status columns by label text."""
+        """Update multiple column values on an item."""
         col_json = json.dumps(json.dumps(column_values))
         labels_flag = ", create_labels_if_missing: true" if create_labels_if_missing else ""
         query = f'''mutation {{
@@ -255,7 +219,7 @@ class MondayCoreClient:
     async def register_webhook(
         self, board_id: str, url: str, event: str = "change_subitem_column_value"
     ) -> Optional[str]:
-        """Register a webhook with Monday.com. Returns webhook_id."""
+        """Register a webhook with Monday.com."""
         data = await self.execute(
             f'''mutation {{
                 create_webhook (
@@ -274,11 +238,10 @@ class MondayCoreClient:
             return False
 
     async def get_board_items(self, board_id: str, limit: int = 200, include_subitems: bool = False) -> list:
-        """Fetch ALL items from a board with cursor-based pagination.
-        Set include_subitems=True to fetch subitems inline (avoids N+1 calls)."""
+        """Fetch ALL items from a board with cursor-based pagination."""
         all_items = []
         cursor = None
-        page_limit = min(limit, 500)  # Monday.com max per page is 500
+        page_limit = min(limit, 500)
 
         subitems_fragment = """
             subitems { id name column_values { id text value type } }
@@ -339,6 +302,5 @@ class MondayCoreClient:
             return False
 
 
-
-# Singleton
+# Singleton — same interface, now proxied through Hub
 monday_client = MondayCoreClient()

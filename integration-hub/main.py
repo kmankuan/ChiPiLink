@@ -122,8 +122,10 @@ from routes.dashboard import router as dashboard_router
 from routes.integrations import router as integrations_router
 from routes.jobs import router as jobs_router
 from routes.debug import router as debug_router
+from routes.monday_proxy import router as monday_proxy_router
 
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(integrations_router, prefix="/api")
 app.include_router(jobs_router, prefix="/api")
 app.include_router(debug_router, prefix="/api")
+app.include_router(monday_proxy_router, prefix="/api")
