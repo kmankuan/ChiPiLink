@@ -31,8 +31,24 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
 
 # Database — shares the same MongoDB as the main app
+# CRITICAL: Extract DB name from MONGO_URL path if present, hardcode fallback to chipilink_prod.
+# This prevents the deployment system's DB_NAME override from using the wrong database.
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "chipi_link")
+_HARDCODED_DB = "chipilink_prod"
+
+def _extract_db_from_url(url: str) -> str:
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        path_db = parsed.path.lstrip("/").split("?")[0]
+        if path_db:
+            return path_db
+    except Exception:
+        pass
+    return ""
+
+_url_db = _extract_db_from_url(MONGO_URL)
+DB_NAME = _url_db or _HARDCODED_DB
 
 client = AsyncIOMotorClient(
     MONGO_URL,

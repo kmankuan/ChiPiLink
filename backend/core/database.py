@@ -7,6 +7,7 @@ import asyncio
 import bcrypt
 import uuid
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -16,7 +17,25 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL')
-db_name = os.environ.get('DB_NAME', 'chipi_link')
+
+# CRITICAL: Extract DB name from MONGO_URL path if present (e.g. mongodb+srv://...mongodb.net/chipilink_prod)
+# This prevents the deployment system's DB_NAME override from using the wrong database.
+# Priority: URL path > hardcoded fallback. Ignore DB_NAME env var entirely.
+_HARDCODED_DB = "chipilink_prod"
+
+def _extract_db_from_url(url: str) -> str:
+    """Extract database name from MongoDB connection string path."""
+    try:
+        parsed = urlparse(url)
+        path_db = parsed.path.lstrip("/").split("?")[0]
+        if path_db:
+            return path_db
+    except Exception:
+        pass
+    return ""
+
+_url_db = _extract_db_from_url(mongo_url) if mongo_url else ""
+db_name = _url_db or _HARDCODED_DB
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(

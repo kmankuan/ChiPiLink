@@ -302,7 +302,7 @@ async def startup_event():
     import asyncio
     import traceback
     logger.info("ChiPi Link API starting up...")
-    logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
+    logger.info(f"Database: {db.name}")
     
     # Phase 1: Database indexes (with timeout for Atlas)
     try:
