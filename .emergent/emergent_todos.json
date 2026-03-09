@@ -1,66 +1,30 @@
 [
   {
-    "content": "Phase 1: Environment setup - install deps, configure .env, start services",
+    "content": "Create .env for integration-hub sharing MONGO_URL from main app",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Verify backend starts without errors",
+    "content": "Install integration-hub Python dependencies",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Verify frontend builds and starts without errors",
+    "content": "Add supervisor config for integration-hub on port 8002",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Verify health endpoints respond",
+    "content": "Verify integration-hub starts and /health responds",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Verify admin login and auth flow",
+    "content": "Verify both apps run simultaneously without conflict",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Fix 'nombre' KeyError in users module init",
+    "content": "Test integration-hub API endpoints",
     "status": "completed"
   },
   {
-    "content": "Phase 1: End to end stability testing - ALL CORE FLOWS PASS",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2: P0 - Verify WATCHFILES fix + production stability",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: P1 - Badge customization admin UI (backend + frontend)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: P1 - Google Photos video playback fix (removed crossOrigin, added URL transform)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: P1 - PinPanClub mobile verification (fixed overflow on remaining pages)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: End to end testing of P1 features",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: Fix badge reset endpoint",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4: P2 - Telegram config verified (configurable title/subtitle)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4: P2 - Media player controls verified (mute-only for videos)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4: P2 - Landing page uses CinematicLanding layout (admin configured)",
-    "status": "completed"
+    "content": "End to end testing of both services",
+    "status": "in_progress"
   }
 ]

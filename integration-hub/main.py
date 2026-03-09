@@ -5,17 +5,22 @@ Operations engine for the ChiPi Link community platform.
 import os
 import asyncio
 import logging
+from pathlib import Path
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
+# Load .env
+load_dotenv(Path(__file__).parent / ".env")
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
 
-# Database
+# Database — shares the same MongoDB as the main app
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
+DB_NAME = os.environ.get("DB_NAME", "chipi_link")
 
 client = AsyncIOMotorClient(
     MONGO_URL,
