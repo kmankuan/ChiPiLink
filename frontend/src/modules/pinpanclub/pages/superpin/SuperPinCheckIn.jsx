@@ -182,7 +182,7 @@ export default function SuperPinCheckIn({ leagueId, leagueConfig, onCheckInCompl
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden max-w-2xl mx-auto px-4">
       {/* Check-in Card */}
       <Card>
         <CardHeader>

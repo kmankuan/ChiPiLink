@@ -24,24 +24,28 @@
     "status": "completed"
   },
   {
-    "content": "Phase 1: End to end stability testing",
+    "content": "Phase 1: End to end stability testing - ALL CORE FLOWS PASS",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: P0 - Verify WATCHFILES fix + production stability",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: P1 - Badge customization admin UI (backend + frontend)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: P1 - Google Photos video playback fix (removed crossOrigin, added URL transform)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: P1 - PinPanClub mobile verification (fixed overflow on remaining pages)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: End to end testing of P1 features",
     "status": "in_progress"
-  },
-  {
-    "content": "Phase 2: P0 - Deploy & verify production stability",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: P1 - Badge customization admin UI",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: P1 - Google Photos video playback fix",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: P1 - PinPanClub mobile verification",
-    "status": "pending"
   },
   {
     "content": "Phase 4: P2 - Verify Telegram config, landing titles, media player",

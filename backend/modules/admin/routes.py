@@ -548,3 +548,63 @@ async def update_ui_style(data: dict, admin: dict = Depends(get_admin_user)):
     """Update UI style configuration"""
     await ui_style_service.update_style(data.get("style", {}), admin.get("user_id"))
     return {"success": True, "message": "UI style updated"}
+
+
+# ============== BADGE CUSTOMIZATION ROUTES ==============
+
+DEFAULT_BADGE_CONFIG = {
+    "order_statuses": {
+        "draft": {"color": "#6b7280", "bg": "#f3f4f6", "icon": "FileEdit", "label": "Draft"},
+        "submitted": {"color": "#2563eb", "bg": "#dbeafe", "icon": "Send", "label": "Submitted"},
+        "awaiting_link": {"color": "#ea580c", "bg": "#ffedd5", "icon": "Link", "label": "Awaiting Link"},
+        "processing": {"color": "#d97706", "bg": "#fef3c7", "icon": "Loader", "label": "Processing"},
+        "ready": {"color": "#16a34a", "bg": "#dcfce7", "icon": "CheckCircle", "label": "Ready"},
+        "delivered": {"color": "#059669", "bg": "#d1fae5", "icon": "Package", "label": "Delivered"},
+        "cancelled": {"color": "#dc2626", "bg": "#fee2e2", "icon": "XCircle", "label": "Cancelled"},
+    },
+    "item_statuses": {
+        "available": {"color": "#16a34a", "bg": "#dcfce7", "icon": "Check", "label": "Available"},
+        "ordered": {"color": "#2563eb", "bg": "#dbeafe", "icon": "ShoppingCart", "label": "Ordered"},
+        "processing": {"color": "#d97706", "bg": "#fef3c7", "icon": "Loader", "label": "Processing"},
+        "ready_for_pickup": {"color": "#059669", "bg": "#d1fae5", "icon": "MapPin", "label": "Ready for Pickup"},
+        "delivered": {"color": "#047857", "bg": "#a7f3d0", "icon": "PackageCheck", "label": "Delivered"},
+        "issue": {"color": "#dc2626", "bg": "#fee2e2", "icon": "AlertTriangle", "label": "Issue"},
+        "out_of_stock": {"color": "#9ca3af", "bg": "#f3f4f6", "icon": "PackageX", "label": "Out of Stock"},
+        "reorder_requested": {"color": "#7c3aed", "bg": "#ede9fe", "icon": "RefreshCw", "label": "Reorder Requested"},
+        "reorder_approved": {"color": "#6d28d9", "bg": "#ddd6fe", "icon": "CheckCircle2", "label": "Reorder Approved"},
+    }
+}
+
+
+@router.get("/badge-config")
+async def get_badge_config(admin: dict = Depends(get_admin_user)):
+    """Get badge customization configuration"""
+    config = await db.app_config.find_one({"config_key": "badge_customization"}, {"_id": 0})
+    if not config:
+        return DEFAULT_BADGE_CONFIG
+    return config.get("value", DEFAULT_BADGE_CONFIG)
+
+
+@router.get("/badge-config/public")
+async def get_badge_config_public():
+    """Get badge config without auth (for public views that show order status)"""
+    config = await db.app_config.find_one({"config_key": "badge_customization"}, {"_id": 0})
+    if not config:
+        return DEFAULT_BADGE_CONFIG
+    return config.get("value", DEFAULT_BADGE_CONFIG)
+
+
+@router.put("/badge-config")
+async def update_badge_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update badge customization configuration"""
+    await db.app_config.update_one(
+        {"config_key": "badge_customization"},
+        {"$set": {
+            "config_key": "badge_customization",
+            "value": data,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": admin.get("user_id")
+        }},
+        upsert=True
+    )
+    return {"success": True, "message": "Badge configuration updated"}

@@ -72,6 +72,8 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import SpeechNotifications from '@/modules/dashboard/SpeechNotifications';
 
+const BadgeCustomizationModule = lazy(() => import('@/modules/admin/BadgeCustomizationModule'));
+
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
 const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule'));
@@ -198,6 +200,7 @@ const navGroups = [
       { id: 'privacy', labelKey: 'nav.privacy', icon: EyeOff, permission: 'admin.site_config' },
       { id: 'auth-config', labelKey: 'nav.authentication', icon: Shield, permission: 'admin.site_config' },
       { id: 'ui-style', labelKey: 'nav.uiStyle', icon: Paintbrush, permission: 'admin.site_config' },
+      { id: 'badge-config', labelKey: 'nav.badgeConfig', fallbackLabel: 'Badge Config', icon: Palette, permission: 'admin.site_config' },
       { id: 'translations', labelKey: 'nav.translations', icon: Languages, permission: 'admin.site_config' },
     ],
   },
@@ -395,6 +398,8 @@ export default function AdminDashboard() {
         return <AuthMethodsConfig />;
       case 'ui-style':
         return <UIStyleModule />;
+      case 'badge-config':
+        return <BadgeCustomizationModule />;
       case 'translations':
         return (
           <div className="space-y-8">

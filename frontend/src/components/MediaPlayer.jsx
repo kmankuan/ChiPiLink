@@ -28,6 +28,22 @@ const DEFAULT_CONFIG = {
   items: [],
 };
 
+/**
+ * Transform Google Photos URLs for better mobile video playback:
+ * - Add =dv suffix for direct video download (bypasses Google's streaming wrapper)
+ * - Remove width/height params that force image-mode thumbnails
+ */
+function transformVideoUrl(url) {
+  if (!url) return url;
+  // Google Photos / Google User Content URLs
+  if (url.includes('googleusercontent.com') || url.includes('ggpht.com') || url.includes('photos.google.com')) {
+    // Strip existing size/crop params and add =dv for direct video
+    const baseUrl = url.split('=')[0];
+    return `${baseUrl}=dv`;
+  }
+  return url;
+}
+
 function shuffleArray(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -335,7 +351,8 @@ export default function MediaPlayer() {
             <video
               ref={videoRefCallback}
               key={`${first.url}_${slideKey}`}
-              src={first.url}
+              src={transformVideoUrl(first.url)}
+              poster={first.url?.includes('googleusercontent.com') ? `${first.url.split('=')[0]}=w800` : undefined}
               autoPlay
               muted={muted}
               playsInline
@@ -351,7 +368,6 @@ export default function MediaPlayer() {
                   if (v && v.paused) v.play().catch(() => {});
                 }, 1000);
               }}
-              crossOrigin="anonymous"
               className="w-full h-full object-cover"
               data-testid="media-video"
             />
