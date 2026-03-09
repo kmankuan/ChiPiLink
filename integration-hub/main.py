@@ -1,6 +1,13 @@
 """
 ChiPi Link Integration Hub — Main Application
 Operations engine for the ChiPi Link community platform.
+
+Handles all background integrations:
+- Telegram channel polling
+- Monday.com API queue processing
+- Gmail wallet receipt polling
+- Push notifications (OneSignal)
+- Job queue with retry logic
 """
 import os
 import asyncio
@@ -18,7 +25,7 @@ own_env = Path(__file__).parent / ".env"
 if backend_env.exists():
     load_dotenv(backend_env)
 if own_env.exists():
-    load_dotenv(own_env, override=False)  # don't override backend values
+    load_dotenv(own_env, override=False)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
@@ -43,32 +50,50 @@ db = client[DB_NAME]
 from jobs.processor import JobProcessor
 job_processor = JobProcessor(db)
 
+# Integration workers
+from integrations.monday_worker import MondayWorker
+from integrations.gmail_worker import GmailWorker
+
+monday_worker = MondayWorker(db)
+gmail_worker = GmailWorker(db)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown"""
     logger.info(f"Integration Hub starting — DB: {DB_NAME}")
-    
-    # Start job processor
+
+    # Register job handlers so the processor knows how to handle each type
+    job_processor.register("monday_api_call", monday_worker.handle_job)
+    job_processor.register("monday_webhook_sync", monday_worker.handle_webhook_sync)
+    job_processor.register("gmail_scan", gmail_worker.handle_job)
+    logger.info(f"Registered {len(job_processor._handlers)} job handlers: {list(job_processor._handlers.keys())}")
+
+    # Start job processor (watches hub_jobs collection)
     asyncio.create_task(job_processor.start())
-    
-    # Start pollers
+
+    # Start Telegram poller (direct polling, not job-based — it's a continuous loop)
     from integrations.telegram_poller import TelegramPoller
     telegram = TelegramPoller(db)
     asyncio.create_task(telegram.start())
-    
-    logger.info("Integration Hub ready")
+
+    # Start Gmail poller (continuous background loop)
+    asyncio.create_task(gmail_worker.start())
+
+    logger.info("Integration Hub ready — all workers and pollers started")
     yield
-    
+
     # Shutdown
     job_processor.stop()
+    gmail_worker.stop()
+    telegram.stop()
     client.close()
     logger.info("Integration Hub stopped")
 
 
 app = FastAPI(
     title="ChiPi Link Integration Hub",
-    description="Operations engine for the ChiPi Link community platform",
+    description="Operations engine — Telegram, Monday.com, Gmail, Push Notifications",
     lifespan=lifespan,
 )
 
@@ -84,7 +109,12 @@ app.add_middleware(
 # Health
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "integration-hub"}
+    return {
+        "status": "ok",
+        "service": "integration-hub",
+        "db": DB_NAME,
+        "handlers": list(job_processor._handlers.keys()),
+    }
 
 
 # Routes

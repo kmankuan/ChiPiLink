@@ -1,30 +1,26 @@
 [
   {
-    "content": "Create .env for integration-hub sharing MONGO_URL from main app",
+    "content": "Create job handlers in Hub for: telegram_poll, monday_api_call, gmail_scan",
     "status": "completed"
   },
   {
-    "content": "Install integration-hub Python dependencies",
+    "content": "Update Hub main.py to register handlers and start pollers properly",
     "status": "completed"
   },
   {
-    "content": "Add supervisor config for integration-hub on port 8002",
+    "content": "Update main app to write jobs to hub_jobs instead of running background tasks",
     "status": "completed"
   },
   {
-    "content": "Verify integration-hub starts and /health responds",
+    "content": "Remove polling loops from main app startup (Telegram, Monday queue, Gmail)",
     "status": "completed"
   },
   {
-    "content": "Verify both apps run simultaneously without conflict",
+    "content": "Remove polling shutdown from main app",
     "status": "completed"
   },
   {
-    "content": "Test integration-hub API endpoints",
-    "status": "completed"
-  },
-  {
-    "content": "End to end testing of both services — 100% PASS",
-    "status": "completed"
+    "content": "Test both services work together with job-based architecture",
+    "status": "in_progress"
   }
 ]

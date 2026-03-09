@@ -336,12 +336,10 @@ async def startup_event():
         await asyncio.sleep(2)
         logger.info("Deferred init starting...")
         
-        # Start Monday queue workers FIRST so API calls don't deadlock
-        try:
-            from modules.integrations.monday.queue import monday_queue
-            await monday_queue._ensure_workers()
-        except Exception:
-            pass
+        # Monday queue workers — MOVED TO INTEGRATION HUB for background tasks.
+        # The in-process queue remains available for sync API calls that need immediate results.
+        # Background/fire-and-forget Monday operations now write to hub_jobs collection.
+        logger.info("Monday background workers delegated to Integration Hub")
 
         try:
             from modules.showcase import seed_showcase_defaults
@@ -404,22 +402,10 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Textbook orders webhook registration skipped: {e}")
 
-        # Background pollers — start after another short delay to avoid event loop contention
-        await asyncio.sleep(1)
-
-        try:
-            from modules.community.services.telegram_service import telegram_service
-            if telegram_service.token:
-                await telegram_service.start_polling()
-                logger.info("Telegram community feed polling started")
-        except Exception as e:
-            logger.warning(f"Telegram init failed (non-blocking): {e}")
-
-        try:
-            from modules.wallet_topups.gmail_poller import gmail_poller
-            await gmail_poller.start()
-        except Exception as e:
-            logger.warning(f"Gmail poller init failed (non-blocking): {e}")
+        # Background pollers — MOVED TO INTEGRATION HUB
+        # Telegram polling, Gmail polling now run in the Hub process (port 8002).
+        # Main app only writes jobs to hub_jobs for Monday.com API calls.
+        logger.info("Background pollers delegated to Integration Hub")
 
         try:
             from modules.showcase.scheduler import banner_sync_scheduler
@@ -472,11 +458,6 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("ChiPi Link API shutting down...")
-    try:
-        from modules.wallet_topups.gmail_poller import gmail_poller
-        await gmail_poller.stop()
-    except Exception as e:
-        logger.warning(f"Gmail poller shutdown issue: {e}")
     try:
         from modules.showcase.scheduler import banner_sync_scheduler
         banner_sync_scheduler.stop()
