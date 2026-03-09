@@ -437,6 +437,23 @@ async def startup_event():
 
         logger.info("All modules loaded successfully")
 
+        # Bootstrap Integration Hub (creates supervisor config if needed)
+        try:
+            import subprocess
+            bootstrap_script = "/app/integration-hub/bootstrap.sh"
+            if os.path.exists(bootstrap_script):
+                result = subprocess.run(
+                    ["bash", bootstrap_script],
+                    capture_output=True, text=True, timeout=15
+                )
+                for line in result.stdout.strip().split("\n"):
+                    if line.strip():
+                        logger.info(line.strip())
+                if result.returncode != 0 and result.stderr:
+                    logger.warning(f"Hub bootstrap stderr: {result.stderr.strip()}")
+        except Exception as e:
+            logger.warning(f"Integration Hub bootstrap skipped: {e}")
+
     # Self-check: verify the server can actually respond to HTTP requests
     async def _self_check():
         await asyncio.sleep(5)
