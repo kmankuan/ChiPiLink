@@ -1,0 +1,90 @@
+{
+  "summary": "Iteration 71: Draggable columns and dynamic column definitions in inventory table - All features verified working. Dynamic columns render correctly per catalog type (All/PCA/Public/Archived). Drag-and-drop column reordering works with localStorage persistence per catalog type. Name column is sticky (non-draggable). Column resize, sorting, and bulk actions all working.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Dynamic columns for 'All' tab: Name, Code/SKU, Grade, Category, Publisher/Brand, Price, Stock, Status",
+    "Dynamic columns for 'PCA Textbooks' tab: Book Name, Code, Grade, Subject, Publisher, Price, Stock, Status",
+    "Dynamic columns for 'Public Store' tab: Product Name, SKU, Category, Type, Brand, Price, Stock, Status",
+    "Dynamic columns for 'Archived' tab: Same as All view",
+    "Column headers (except sticky name) show grip icon and are draggable",
+    "Drag-and-drop column reordering works (verified Grade moved after Subject/Publisher)",
+    "Column order persisted to localStorage per catalog type (chipi_inv_col_order key)",
+    "Name column is NOT draggable (draggable='false') and has sticky CSS class",
+    "8 columns are draggable (all except name/checkbox/actions)",
+    "Column resize handles present (9 resize handles with cursor-col-resize)",
+    "Sorting works when clicking column headers (Price sort verified)",
+    "Bulk select shows action bar with Set Active, Set Inactive, Archive buttons",
+    "All 4 catalog type buttons present: All, PCA Textbooks, Public Store, Archived",
+    "Table renders without JavaScript errors"
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "COLUMN_DEFS object at line 23-54 correctly defines columns per catalog type (pca, public, all, archived)",
+    "ResizableHeader component correctly handles draggable attribute based on isSticky prop",
+    "GripVertical icon properly rendered for non-sticky columns",
+    "loadColumnOrder/saveColumnOrder functions correctly persist to localStorage with chipi_inv_col_order key",
+    "activeColumns memo correctly reorders columns based on saved order from columnOrders state"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (frontend only test)",
+    "frontend": "100% (14/14 features verified)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "testadmin@chipi.com",
+      "password": "TestPass123!",
+      "login_endpoint": "POST /api/auth-v2/login"
+    }
+  },
+
+  "seed_data_creation": "None - used existing 14 PCA products and 1 public product",
+
+  "mocked_apis": {
+    "has_mocked_apis": false
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Iteration 71 tested draggable columns feature. Navigation: Admin (/admin#unatienda) > Inventory tab (default). Catalog type filter: data-testid='catalog-all/pca/public/archived'. Column order is stored in localStorage key 'chipi_inv_col_order' with structure like {\"pca\":[\"name\",\"code\",...],...}. Name column is sticky (non-draggable). 15 total products in inventory (14 PCA + 1 public). Auth token must be stored in localStorage with key 'auth_token' (not 'token').",
+
+  "verified_features": {
+    "dynamic_columns": {
+      "all": ["Name", "Code / SKU", "Grade", "Category", "Publisher / Brand", "Price", "Stock", "Status"],
+      "pca": ["Book Name", "Code", "Grade", "Subject", "Publisher", "Price", "Stock", "Status"],
+      "public": ["Product Name", "SKU", "Category", "Type", "Brand", "Price", "Stock", "Status"],
+      "archived": "Same as all"
+    },
+    "draggable_columns": {
+      "sticky_column": "Name (draggable='false')",
+      "draggable_count": 8,
+      "localStorage_key": "chipi_inv_col_order",
+      "storage_format": "{\"catalog_type\": [\"column_keys\"]}"
+    },
+    "resize_handles": 9,
+    "sorting": "Works via data-testid='sort-{column}' click",
+    "bulk_actions": {
+      "trigger": "Checkbox selection",
+      "actions": ["Set Active", "Set Inactive", "Archive"]
+    }
+  }
+}

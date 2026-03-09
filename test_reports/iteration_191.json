@@ -1,0 +1,80 @@
+{
+  "summary": "Sysbook route migration testing complete. All API routes successfully migrated from /api/store/* to /api/sysbook/*. Old routes correctly return 404. Frontend UI loads correctly with updated API endpoints.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: Admin login with teck@koh.one / Acdb##0897 works (POST /api/auth-v2/login)",
+    "Backend: GET /api/sysbook/browse/access returns has_access and students list",
+    "Backend: GET /api/sysbook/access/my-students returns student list",
+    "Backend: GET /api/sysbook/orders/my-orders returns orders",
+    "Backend: GET /api/sysbook/presale-import/orders returns presale data",
+    "Backend: GET /api/sysbook/school-year/config returns school year config",
+    "Backend: GET /api/sysbook/bulk-import/history returns import history",
+    "Backend: GET /api/sysbook/browse/products works with auth",
+    "Backend: GET /api/sysbook/inventory/products returns sysbook inventory",
+    "Backend: OLD /api/store/sysbook-catalog/access returns 404 (route removed)",
+    "Backend: OLD /api/store/textbook-access/my-students returns 404 (route removed)",
+    "Backend: OLD /api/store/textbook-orders/my-orders returns 404 (route removed)",
+    "Backend: OLD /api/store/presale-import/orders returns 404 (route removed)",
+    "Backend: OLD /api/store/school-year/config returns 404 (route removed)",
+    "Backend: OLD /api/store/bulk-import/history returns 404 (route removed)",
+    "Backend: GET /api/sysbook/access/config returns public form config (no auth needed)",
+    "Backend: GET /api/sysbook/access/admin/all-students returns all students (admin)",
+    "Backend: GET /api/sysbook/access/admin/requests returns pending requests (admin)",
+    "Backend: GET /api/sysbook/orders/admin/all returns all orders (admin)",
+    "Backend: GET /api/sysbook/orders/admin/stats returns order statistics (admin)",
+    "Frontend: Unatienda page loads with products and category navigation",
+    "Frontend: 'School Textbooks' button present with lock icon (private catalog)",
+    "Frontend: Admin login page loads and accepts credentials",
+    "Frontend: Admin dashboard loads with SYSBOOK sidebar section",
+    "Frontend: SYSBOOK sidebar shows Inventory, Students & Schools, Pre-Sale Import links"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_sysbook_route_migration.py",
+    "/app/test_reports/pytest/pytest_results_sysbook_route_migration.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Route migration verified: All sysbook routes moved from store/ module to sysbook/ module",
+    "New router prefix /api/sysbook/* correctly configured in sysbook/routes/__init__.py",
+    "Store module (__init__.py) no longer includes sysbook routes (clean separation)",
+    "Frontend API URLs updated in Unatienda.jsx (line 144): /api/sysbook/browse/access",
+    "Frontend API URLs updated in BooksByStudent.jsx: /api/sysbook/browse/*",
+    "Frontend API URLs updated in PrivateBookDetail.jsx: /api/sysbook/browse/*"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_sysbook_route_migration.py"
+  ],
+  "success_rate": {
+    "backend": "100% (20/20 tests passed)",
+    "frontend": "100% (UI pages load correctly)"
+  },
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "Acdb##0897",
+      "endpoint": "POST /api/auth-v2/login"
+    }
+  },
+  "seed_data_creation": "No new seed data created",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Route migration from /api/store/* to /api/sysbook/* verified complete. Key endpoints: browse/access, access/my-students, orders/my-orders, presale-import/orders, school-year/config, bulk-import/history. All old /api/store/sysbook-catalog/*, /api/store/textbook-access/*, /api/store/textbook-orders/* routes return 404. Frontend pages (Unatienda.jsx, BooksByStudent.jsx, PrivateBookDetail.jsx) use new /api/sysbook/* URLs. Admin panel shows SYSBOOK section with correct navigation links.",
+  "notes": {
+    "route_changes": {
+      "browse_access": "/api/store/sysbook-catalog/access → /api/sysbook/browse/access",
+      "my_students": "/api/store/textbook-access/my-students → /api/sysbook/access/my-students",
+      "my_orders": "/api/store/textbook-orders/my-orders → /api/sysbook/orders/my-orders",
+      "presale_orders": "/api/store/presale-import/orders → /api/sysbook/presale-import/orders",
+      "school_year_config": "/api/store/school-year/config → /api/sysbook/school-year/config",
+      "bulk_import_history": "/api/store/bulk-import/history → /api/sysbook/bulk-import/history"
+    }
+  }
+}

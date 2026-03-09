@@ -1,0 +1,124 @@
+"""
+Collection Name Constants
+=========================
+Centralized collection names for all modules.
+This file is the single source of truth for MongoDB collection names.
+
+Phase 2: Microservices-Ready naming convention
+- Format: {module}_{entity}
+- Example: auth_users, store_products, pinpanclub_players
+"""
+
+# =============================================================================
+# AUTH MODULE COLLECTIONS
+# =============================================================================
+class AuthCollections:
+    USERS = "auth_users"                    # Previously: clientes
+    SESSIONS = "auth_sessions"              # Previously: user_sessions
+
+
+# =============================================================================
+# STORE MODULE COLLECTIONS
+# =============================================================================
+class StoreCollections:
+    PRODUCTS = "store_products"
+    ORDERS = "store_orders"
+    CATEGORIES = "store_categories"
+    STUDENTS = "store_synced_students"
+
+
+# =============================================================================
+# PINPANCLUB MODULE COLLECTIONS
+# =============================================================================
+class PinpanClubCollections:
+    PLAYERS = "pinpanclub_players"          # Previously: pingpong_players
+    MATCHES = "pinpanclub_matches"          # Previously: pingpong_matches
+    SPONSORS = "pinpanclub_sponsors"        # Previously: pingpong_sponsors
+    CONFIG = "pinpanclub_config"            # Previously: pingpong_config
+    LAYOUTS = "pinpanclub_layouts"          # Previously: pingpong_layouts
+    
+    # SuperPin feature collections
+    SUPERPIN_LEAGUES = "pinpanclub_superpin_leagues"
+    SUPERPIN_CHECKINS = "pinpanclub_superpin_checkins"
+    SUPERPIN_MATCHES = "pinpanclub_superpin_matches"
+    SUPERPIN_RANKINGS = "pinpanclub_superpin_rankings"
+    SUPERPIN_TOURNAMENTS = "pinpanclub_superpin_tournaments"
+    SUPERPIN_BADGES = "pinpanclub_superpin_badges"
+    
+    # RapidPin feature collections
+    RAPIDPIN_SEASONS = "pinpanclub_rapidpin_seasons"
+    RAPIDPIN_MATCHES = "pinpanclub_rapidpin_matches"
+    RAPIDPIN_RANKINGS = "pinpanclub_rapidpin_rankings"
+
+    # PinPan Arena (unified tournaments)
+    ARENA_TOURNAMENTS = "pinpanclub_arena_tournaments"
+    ARENA_MATCHES = "pinpanclub_arena_matches"
+
+    # Settings & Referee System
+    SETTINGS = "pinpanclub_settings"
+    REFEREE_PROFILES = "pinpanclub_referee_profiles"
+    REFEREE_RATINGS = "pinpanclub_referee_ratings"
+    ARENA_LEADERBOARD = "pinpanclub_arena_leaderboard"
+    HALL_OF_FAME = "pinpanclub_hall_of_fame"
+
+
+# =============================================================================
+# COMMUNITY MODULE COLLECTIONS
+# =============================================================================
+class CommunityCollections:
+    POSTS = "community_posts"               # Already correct
+    EVENTS = "community_events"             # Already correct
+    COMMENTS = "community_comments"         # Already correct
+    ALBUMS = "community_albums"             # Previously: gallery_albums
+
+
+# =============================================================================
+# CORE/SHARED COLLECTIONS
+# =============================================================================
+class CoreCollections:
+    APP_CONFIG = "core_app_config"          # Previously: app_config
+    SITE_CONFIG = "core_site_config"        # Previously: site_config
+    NOTIFICATIONS = "core_notifications"    # Previously: notifications
+    TRANSLATIONS = "core_translations"      # Previously: translations
+    PAGES = "core_pages"                    # Previously: paginas
+
+
+# =============================================================================
+# LEGACY MAPPING (for backward compatibility during transition)
+# =============================================================================
+LEGACY_TO_NEW = {
+    # Auth
+    "clientes": AuthCollections.USERS,
+    "user_sessions": AuthCollections.SESSIONS,
+    
+    # Store
+    "store_products": StoreCollections.PRODUCTS,
+    "store_orders": StoreCollections.ORDERS,
+    "store_categories": StoreCollections.CATEGORIES,
+    "store_synced_students": StoreCollections.STUDENTS,
+    
+    # PinpanClub
+    "pingpong_players": PinpanClubCollections.PLAYERS,
+    "pingpong_matches": PinpanClubCollections.MATCHES,
+    "pingpong_sponsors": PinpanClubCollections.SPONSORS,
+    "pingpong_config": PinpanClubCollections.CONFIG,
+    "pingpong_layouts": PinpanClubCollections.LAYOUTS,
+    
+    # Community
+    "gallery_albums": CommunityCollections.ALBUMS,
+    
+    # Core
+    "app_config": CoreCollections.APP_CONFIG,
+    "site_config": CoreCollections.SITE_CONFIG,
+    "notifications": CoreCollections.NOTIFICATIONS,
+    "translations": CoreCollections.TRANSLATIONS,
+    "paginas": CoreCollections.PAGES,
+}
+
+
+def get_collection_name(legacy_name: str) -> str:
+    """
+    Get the new collection name from a legacy name.
+    Use this during transition period.
+    """
+    return LEGACY_TO_NEW.get(legacy_name, legacy_name)

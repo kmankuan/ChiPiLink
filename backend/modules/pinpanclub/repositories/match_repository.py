@@ -1,0 +1,155 @@
+"""
+PinpanClub - Match Repository
+Acceso a datos de partidos
+"""
+from typing import List, Optional, Dict
+from core.base import BaseRepository
+from core.database import db
+from core.constants import PinpanClubCollections
+import uuid
+
+
+class MatchRepository(BaseRepository):
+    """
+    Repository para partidos de PinpanClub.
+    Maneja todas las operations de base de datos para partidos.
+    """
+    
+    COLLECTION_NAME = PinpanClubCollections.MATCHES
+    ID_FIELD = "match_id"
+    
+    def __init__(self):
+        super().__init__(db, self.COLLECTION_NAME)
+    
+    async def create(self, match_data: Dict) -> Dict:
+        """Create new match"""
+        match_data["match_id"] = str(uuid.uuid4())
+        match_data["status"] = "pendiente"
+        match_data["points_player_a"] = 0
+        match_data["points_player_b"] = 0
+        match_data["sets_jugador_a"] = 0
+        match_data["sets_jugador_b"] = 0
+        match_data["current_set"] = 1
+        match_data["historial_sets"] = []
+        
+        return await self.insert_one(match_data)
+    
+    async def get_by_id(self, match_id: str) -> Optional[Dict]:
+        """Get match by ID"""
+        return await self.find_by_id(self.ID_FIELD, match_id)
+    
+    async def get_active_matches(self) -> List[Dict]:
+        """Get partidos activos (en curso o pausados)"""
+        return await self.find_many(
+            query={"status": {"$in": ["en_curso", "pausado"]}},
+            sort=[("created_at", -1)]
+        )
+    
+    async def get_by_state(self, estado: str, limit: int = 50) -> List[Dict]:
+        """Get partidos by status"""
+        return await self.find_many(
+            query={"status": estado},
+            limit=limit,
+            sort=[("created_at", -1)]
+        )
+    
+    async def get_by_player(self, jugador_id: str, limit: int = 50) -> List[Dict]:
+        """Get partidos de un jugador"""
+        return await self.find_many(
+            query={
+                "$or": [
+                    {"player_a_id": jugador_id},
+                    {"player_b_id": jugador_id}
+                ]
+            },
+            limit=limit,
+            sort=[("created_at", -1)]
+        )
+    
+    async def get_by_tournament(self, torneo_id: str) -> List[Dict]:
+        """Get partidos de un torneo"""
+        return await self.find_many(
+            query={"torneo_id": torneo_id},
+            sort=[("ronda", 1), ("created_at", 1)]
+        )
+    
+    async def update_match(self, match_id: str, data: Dict) -> bool:
+        """Update datos de partido"""
+        return await self.update_by_id(self.ID_FIELD, match_id, data)
+    
+    async def update_score(
+        self,
+        match_id: str,
+        puntos_a: int,
+        puntos_b: int,
+        sets_a: int,
+        sets_b: int,
+        current_set: int,
+        historial: List[Dict]
+    ) -> bool:
+        """Update score dthe match"""
+        return await self.update_match(match_id, {
+            "points_player_a": puntos_a,
+            "points_player_b": puntos_b,
+            "sets_jugador_a": sets_a,
+            "sets_jugador_b": sets_b,
+            "current_set": current_set,
+            "historial_sets": historial
+        })
+    
+    async def start_match(self, match_id: str, fecha_inicio: str) -> bool:
+        """Start match"""
+        return await self.update_match(match_id, {
+            "status": "en_curso",
+            "start_date": fecha_inicio
+        })
+    
+    async def finish_match(
+        self,
+        match_id: str,
+        winner_id: str,
+        end_date: str
+    ) -> bool:
+        """Finalizar partido"""
+        return await self.update_match(match_id, {
+            "status": "finalizado",
+            "winner_id": winner_id,
+            "end_date": end_date
+        })
+    
+    async def cancel_match(self, match_id: str) -> bool:
+        """Cancelar partido"""
+        return await self.update_match(match_id, {"status": "cancelado"})
+    
+    async def get_not_synced_to_monday(self) -> List[Dict]:
+        """Get matches not synced with Monday.com"""
+        return await self.find_many(
+            query={
+                "status": {"$in": ["pendiente", "en_curso", "pausado"]},
+                "$or": [
+                    {"monday_item_id": {"$exists": False}},
+                    {"monday_item_id": None}
+                ]
+            }
+        )
+    
+    async def get_finished_with_monday_id(self) -> List[Dict]:
+        """Get partidos finalizados that hasn monday_item_id"""
+        return await self.find_many(
+            query={
+                "status": "finalizado",
+                "monday_item_id": {"$exists": True, "$ne": None}
+            }
+        )
+    
+    async def set_monday_item_id(self, match_id: str, monday_item_id: str) -> bool:
+        """Establecer ID de Monday.com"""
+        return await self.update_match(match_id, {"monday_item_id": monday_item_id})
+    
+    async def count_by_state(self) -> Dict[str, int]:
+        """Contar partidos by status"""
+        pipeline = [
+            {"$group": {"_id": "$estado", "count": {"$sum": 1}}}
+        ]
+        results = await self.aggregate(pipeline)
+        return {r["_id"]: r["count"] for r in results}

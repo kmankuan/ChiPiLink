@@ -1,0 +1,156 @@
+# ============================================================
+# Docker Compose - Microservices Configuration
+# ============================================================
+# Este archivo está preparado para cuando se decida extraer
+# los módulos a servicios independientes.
+# 
+# Actualmente la aplicación corre como monolito modular.
+# Esta configuración es para referencia futura.
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ============== API GATEWAY ==============
+  # Punto de entrada único para todas las APIs
+  gateway:
+    image: kong:3.5
+    container_name: chipilink-gateway
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    ports:
+      - "8000:8000"   # Proxy
+      - "8001:8001"   # Admin API
+    volumes:
+      - ./gateway/kong.yml:/kong/kong.yml:ro
+    networks:
+      - chipilink-network
+    depends_on:
+      - auth-service
+      - store-service
+      - pinpanclub-service
+      - community-service
+
+  # ============== AUTH SERVICE ==============
+  auth-service:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    container_name: chipilink-auth
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - SERVICE_NAME=auth
+      - SERVICE_PORT=8010
+    ports:
+      - "8010:8010"
+    networks:
+      - chipilink-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============== STORE SERVICE ==============
+  store-service:
+    build:
+      context: ./services/store
+      dockerfile: Dockerfile
+    container_name: chipilink-store
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - DB_NAME=${DB_NAME}
+      - SERVICE_NAME=store
+      - SERVICE_PORT=8011
+    ports:
+      - "8011:8011"
+    networks:
+      - chipilink-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============== PINPANCLUB SERVICE ==============
+  pinpanclub-service:
+    build:
+      context: ./services/pinpanclub
+      dockerfile: Dockerfile
+    container_name: chipilink-pinpanclub
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - DB_NAME=${DB_NAME}
+      - SERVICE_NAME=pinpanclub
+      - SERVICE_PORT=8012
+    ports:
+      - "8012:8012"
+    networks:
+      - chipilink-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============== COMMUNITY SERVICE ==============
+  community-service:
+    build:
+      context: ./services/community
+      dockerfile: Dockerfile
+    container_name: chipilink-community
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - DB_NAME=${DB_NAME}
+      - SERVICE_NAME=community
+      - SERVICE_PORT=8013
+    ports:
+      - "8013:8013"
+    networks:
+      - chipilink-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============== MESSAGE BROKER ==============
+  # Para Event Bus distribuido (opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: chipilink-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - chipilink-network
+
+  # ============== FRONTEND ==============
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chipilink-frontend
+    environment:
+      - REACT_APP_BACKEND_URL=http://gateway:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - chipilink-network
+    depends_on:
+      - gateway
+
+networks:
+  chipilink-network:
+    driver: bridge
+
+volumes:
+  redis-data:

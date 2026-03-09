@@ -1,0 +1,92 @@
+{
+  "summary": "Iteration 89: Telegram Feed Visibility Controls fully tested. All backend APIs (15 tests) pass: GET /feed/access returns has_access=true and is_admin=true for admin, GET /admin/visibility returns settings with available_roles and Spanish names (nombre), PUT /admin/visibility saves all three modes (all_users, admin_only, specific_roles) and rejects invalid modes with 400, admin always has feed access regardless of visibility setting. Frontend UI verified: Visibility panel renders for admin in Comunidad section, three visibility modes selectable, Specific Roles shows role checkboxes with colored dots and Spanish names (Super Administrador, Administrador, Moderador, Usuario), Save button shows success toast 'Visibility settings saved', feed displays 3 posts below visibility panel. Monday.com Config tab in Payment Alerts still accessible.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Backend: GET /api/community-v2/feed/access requires authentication (401)",
+    "Backend: GET /api/community-v2/feed/access returns has_access=true and is_admin=true for admin user",
+    "Backend: GET /api/community-v2/feed/admin/visibility requires admin auth (401/403)",
+    "Backend: GET /api/community-v2/feed/admin/visibility returns visibility, allowed_roles, available_roles",
+    "Backend: GET /api/community-v2/feed/admin/visibility available_roles includes super_admin, admin, moderator, user",
+    "Backend: GET /api/community-v2/feed/admin/visibility roles have Spanish names from 'nombre' field",
+    "Backend: PUT /api/community-v2/feed/admin/visibility requires admin auth (401/403)",
+    "Backend: PUT /api/community-v2/feed/admin/visibility saves visibility=all_users",
+    "Backend: PUT /api/community-v2/feed/admin/visibility saves visibility=admin_only",
+    "Backend: PUT /api/community-v2/feed/admin/visibility saves visibility=specific_roles with allowed_roles array",
+    "Backend: PUT /api/community-v2/feed/admin/visibility rejects invalid visibility mode with 400",
+    "Backend: PUT /api/community-v2/feed/admin/visibility changes persist to database",
+    "Backend: GET /api/community-v2/feed/posts returns posts when visibility=all_users",
+    "Backend: GET /api/community-v2/feed/posts - admin always has access regardless of visibility setting",
+    "Backend: GET /api/community-v2/feed/admin/stats includes visibility and allowed_roles fields",
+    "Frontend: Panel Admin -> Comunidad navigation works",
+    "Frontend: Visibility panel renders with data-testid='visibility-panel' for admin users",
+    "Frontend: Visibility panel expands on click showing visibility mode selector",
+    "Frontend: All Users mode option is visible and selectable",
+    "Frontend: Admins Only mode option is visible and selectable",
+    "Frontend: Specific Roles mode option is visible and selectable",
+    "Frontend: Selecting Specific Roles shows Allowed Roles section with role checkboxes",
+    "Frontend: Role checkboxes display Spanish names (Super Administrador, Administrador, Moderador, Usuario)",
+    "Frontend: Role checkboxes show colored dots matching role.color",
+    "Frontend: Save button (data-testid='save-visibility-btn') visible and clickable",
+    "Frontend: Save button triggers success toast 'Visibility settings saved'",
+    "Frontend: Feed displays 3 posts from Telegram channel below visibility panel",
+    "Frontend: Monday.com Config tab in Payment Alerts still accessible"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_feed_visibility_controls.py",
+    "/app/test_reports/pytest/pytest_results_feed_visibility.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [],
+
+  "updated_files": [
+    "/app/backend/tests/test_feed_visibility_controls.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (15/15 tests passed)",
+    "frontend": "100% (all UI features verified)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "admin"
+    }
+  },
+
+  "seed_data_creation": "None - used existing roles (super_admin, admin, moderator, user) and 3 community posts from Telegram sync",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+
+  "context_for_next_testing_agent": "Iteration 89 fully tested Telegram Feed Visibility Controls. Navigation: Panel Admin -> Comunidad (sidebar). The visibility panel appears at top of feed for admin users. Roles collection uses Spanish field names (nombre, descripcion) which are mapped to 'name' and 'description' in the API response. Current visibility is set to 'all_users'. Available roles: super_admin (Super Administrador, #dc2626), admin (Administrador, #ea580c), moderator (Moderador, #0891b2), user (Usuario, #6366f1). Feed has 3 test posts. All Payment Alerts tabs including Monday.com Config verified working.",
+
+  "data_testid_verified": [
+    "visibility-panel",
+    "visibility-toggle",
+    "visibility-mode-all_users",
+    "visibility-mode-admin_only",
+    "visibility-mode-specific_roles",
+    "role-super_admin",
+    "role-admin",
+    "role-moderator",
+    "role-user",
+    "save-visibility-btn",
+    "post-card-{telegram_msg_id}",
+    "refresh-feed-btn"
+  ]
+}

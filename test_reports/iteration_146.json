@@ -1,0 +1,71 @@
+{
+  "summary": "Tested presale mode fix and duplicate EmptyStudentCard removal. Both fixes verified working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "1. PRESALE FIX - Backend: _refresh_order_items correctly shows items as 'available' for presale students (std_e32ae7fae07a with presale_mode=True)",
+    "2. PRESALE FIX - Backend: Non-presale students (std_test_001) correctly see 0-inventory items as 'out_of_stock'",
+    "3. PRESALE FIX - Verified presale_mode flag is read from student document in _refresh_order_items (line 236-239)",
+    "4. PRESALE FIX - Verified status logic: inventory<=0 AND NOT presale = out_of_stock, inventory>0 OR presale = available (line 260-263)",
+    "5. DUPLICATE CARD REMOVAL - Code review confirms EmptyStudentCard only appears at line 526 (no-students view), NOT in main validated grid",
+    "6. DUPLICATE CARD REMOVAL - Lines 780-782 no longer contain EmptyStudentCard component",
+    "7. Admin login endpoint works correctly",
+    "8. Diagnostic endpoint returns correct student info with presale_mode flag"
+  ],
+  "test_evidence": {
+    "presale_student_test": {
+      "student_id": "std_e32ae7fae07a",
+      "student_name": "TEST_Test Other Relation",
+      "presale_mode": true,
+      "items_before_refresh": {"available": 3, "out_of_stock": 1},
+      "items_after_refresh": {"available": 4, "out_of_stock": 0},
+      "conclusion": "PASS - All items show 'available' for presale student"
+    },
+    "non_presale_student_test": {
+      "student_id": "std_test_001",
+      "student_name": "Test Student Alpha",
+      "presale_mode": false,
+      "items_after_refresh": {"available": 1, "out_of_stock": 3},
+      "conclusion": "PASS - Non-presale student correctly sees out_of_stock items"
+    }
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_presale_fix.py",
+    "/app/backend/tests/test_presale_direct.py",
+    "/app/test_reports/pytest/pytest_results_presale_fix.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "get_or_create_order() correctly checks is_presale at line 186-192",
+    "_refresh_order_items() correctly reads presale_mode from student document (line 234-240) and applies to status logic (line 260-263)",
+    "EmptyStudentCard removed from main validated students grid - only exists in no-students view"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_presale_fix.py",
+    "/app/backend/tests/test_presale_direct.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100% (code review)"
+  },
+  "test_credentials": {
+    "email": "admin@chipi.co",
+    "password": "admin",
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+  "seed_data_used": {
+    "presale_student": "std_e32ae7fae07a (presale_mode=True, grade=3)",
+    "non_presale_student": "std_test_001 (presale_mode=False, grade=3)",
+    "grade_3_books": "4 books, 3 with inventory=0, 1 with inventory>0"
+  },
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Presale mode fix verified working: presale students see all items as 'available' regardless of inventory. Non-presale students correctly see 0-inventory items as 'out_of_stock'. EmptyStudentCard duplicate removed from SchoolTextbooksView.jsx - only appears in no-students view (line 526). Test files: test_presale_fix.py, test_presale_direct.py"
+}

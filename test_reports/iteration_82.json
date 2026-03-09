@@ -1,0 +1,102 @@
+{
+  "summary": "Iteration 82: Translation Coverage Card & Sidebar i18n Testing. Backend Coverage API works correctly (8/8 tests pass). Translation Coverage Card UI renders with correct data-testid attributes, progress bars, missing keys dialog, and category breakdown. CRITICAL BUG: Admin sidebar navigation does NOT translate when switching languages - labels remain in Spanish (the user's saved language preference) regardless of UI language selection.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AdminDashboard Sidebar",
+        "issue": "Sidebar navigation labels do NOT translate when switching languages. Labels remain in Spanish (user's saved preference) regardless of language selection in UI. The sidebar shows 'Panel, Unatienda, Pedidos, Billetera, Reportes...' instead of translating to 'Dashboard, Unatienda, Orders, Wallet, Reports...' (EN) or '仪表盘, 商店, 订单, 钱包, 报告...' (ZH)",
+        "selector": "aside button span.text-sm",
+        "priority": "HIGH",
+        "root_cause": "The LanguageSelector syncs language from backend on login (useEffect in LanguageSelector.jsx lines 30-54) which overrides localStorage changes. The navItems translation happens at render time (line 89) but the component doesn't re-render when language changes via the selector because the backend sync is resetting the language."
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Language switching in Admin Panel",
+        "issue": "Language selector click doesn't properly update sidebar labels. The localStorage changes but sidebar doesn't re-render with new translations. May be related to backend language sync overriding user selection.",
+        "affected_selectors": ["[data-testid='language-selector']", "[data-testid='lang-en']", "[data-testid='lang-zh']", "aside button span"]
+      }
+    ],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "GET /api/translations/admin/coverage returns 200 OK",
+    "Coverage API returns correct structure: reference_lang, total_reference_keys, languages, categories",
+    "All 3 languages (EN, ES, ZH) present in coverage response with coverage_pct, missing_count, missing_keys",
+    "EN coverage is 100% (reference language)",
+    "ES coverage is 100%",
+    "ZH coverage is 90.1% with 195 missing keys",
+    "Categories breakdown returns correct groupings",
+    "TranslationCoverageCard renders with data-testid='translation-coverage-card'",
+    "Progress bars render for EN/ES/ZH (data-testid='progress-bar-{lang}')",
+    "Missing badge for ZH (data-testid='missing-badge-zh') is clickable",
+    "Missing keys dialog opens showing achievement.*, acudidos.*, etc missing keys",
+    "Category breakdown toggle (data-testid='toggle-category-breakdown') expands to show table",
+    "User dropdown shows translated 'Ir al Inicio' and 'Cerrar Sesión' in Spanish mode"
+  ],
+  
+  "test_report_links": [
+    "/app/backend/tests/test_translation_coverage.py",
+    "/app/test_reports/pytest/pytest_results_translation_coverage.xml"
+  ],
+  
+  "action_items": [
+    "FIX CRITICAL: Admin sidebar labels don't update when language is changed. The navItems are computed at render time but the component isn't re-rendering when i18n.language changes.",
+    "INVESTIGATE: LanguageSelector backend sync (useEffect in LanguageSelector.jsx) may be overriding user's language selection and preventing sidebar from updating",
+    "POTENTIAL FIX: The navItems should be recomputed when t() function changes. Consider using useMemo with [t] dependency or ensuring the component re-renders on language change"
+  ],
+  
+  "critical_code_review_comments": [
+    "AdminDashboard.jsx line 89: navItems computed with t() but may not re-render on language change",
+    "LanguageSelector.jsx lines 30-54: Backend sync useEffect may be causing language reversion",
+    "Need to verify i18n language change properly triggers re-render in AdminDashboard"
+  ],
+  
+  "updated_files": [
+    "/app/backend/tests/test_translation_coverage.py"
+  ],
+  
+  "success_rate": {
+    "backend": "100% (8/8 tests passed)",
+    "frontend": "80% (Translation Coverage Card works, but sidebar i18n is broken)"
+  },
+  
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "Acdb##0897",
+      "admin_login_url": "/admin/login"
+    }
+  },
+  
+  "seed_data_creation": "No new seed data created",
+  
+  "mocked_apis": {
+    "has_mocked_apis": false
+  },
+  
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "Backend Translation Coverage API is fully working. The TranslationCoverageCard component renders correctly with all expected data-testid attributes. CRITICAL BUG: Admin sidebar navigation labels do NOT translate when user switches language via the LanguageSelector. The labels remain fixed to the user's profile language (Spanish) even when localStorage i18nextLng is changed to 'en' or 'zh'. The LanguageSelector's backend sync useEffect appears to be resetting the language after user changes it. The main agent needs to fix the sidebar re-rendering to use dynamic translations.",
+  
+  "rca_of_issue": {
+    "bug": "Admin sidebar labels don't translate when switching languages",
+    "reproduction_steps": [
+      "1. Login to admin panel at /admin/login with teck@koh.one / Acdb##0897",
+      "2. Observe sidebar shows Spanish labels (Panel, Unatienda, Pedidos, etc)",
+      "3. Click language selector in header",
+      "4. Select English (EN) or Chinese (ZH)",
+      "5. Observe sidebar labels remain in Spanish instead of translating"
+    ],
+    "root_cause_analysis": "The navItems array is computed at component render time (line 89 of AdminDashboard.jsx) using t(item.labelKey). However, when the language changes via LanguageSelector, the AdminDashboard component may not be properly re-rendering to recompute navItems with the new translation function. Additionally, the LanguageSelector's useEffect (lines 30-54) syncs language from the backend, which may be overriding the user's selection and reverting to Spanish.",
+    "potential_fix": "1. Ensure AdminDashboard component re-renders when i18n.language changes. 2. Consider using useMemo for navItems with [t] or [i18n.language] as dependency. 3. Review LanguageSelector backend sync logic to ensure it doesn't override user's explicit language selection."
+  }
+}

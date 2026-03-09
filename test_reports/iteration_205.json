@@ -1,0 +1,53 @@
+{
+  "summary": "Add/Remove Item to Order Feature - ALL TESTS PASSED. Backend: 14/14 API tests pass. Frontend: Full e2e flow verified including search, add item, remove item with toast notifications.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "POST /api/sysbook/orders/admin/{order_id}/items - adds item from inventory to order",
+    "DELETE /api/sysbook/orders/admin/{order_id}/items/{book_id} - removes item from order",
+    "GET /api/sysbook/inventory/products?search=X&grade=Y - search inventory with filters",
+    "Add item without book_id returns 400",
+    "Add item with invalid book_id returns 404",
+    "Add item to invalid order returns 404",
+    "Remove non-existent item returns 404",
+    "Remove from invalid order returns 404",
+    "UI: Open order details via eye icon",
+    "UI: Add Item button visible in order details dialog",
+    "UI: Search dialog opens with grade-filtered results",
+    "UI: + button adds item and shows success toast",
+    "UI: Remove item (trash) buttons visible for each item",
+    "UI: Confirm/cancel UI shown on remove click",
+    "UI: Remove confirms and shows toast with 'Presale qty updated'"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_order_add_remove_items.py",
+    "/app/test_reports/pytest/pytest_results_order_add_remove_items.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_order_add_remove_items.py"
+  ],
+  "success_rate": {
+    "backend": "100% (14/14 tests)",
+    "frontend": "100% (all flows verified)"
+  },
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "Acdb##0897",
+      "endpoint": "POST /api/auth-v2/login"
+    }
+  },
+  "seed_data_creation": "No new seed data. Used existing order ord_2c25f96fd214 (Sergio Wang, G5) for testing.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Add/Remove Item to Order feature fully working. POST /api/sysbook/orders/admin/{order_id}/items adds items and increments reserved_quantity. DELETE /api/sysbook/orders/admin/{order_id}/items/{book_id} removes items and decrements reserved_quantity. Frontend AddItemToOrder component (line 97) searches inventory filtered by order grade and excludes existing items. RemoveItemButton (line 201) shows confirm/cancel UI before deletion. Toast notifications confirm both operations. Search requires 2+ characters per frontend validation."
+}
