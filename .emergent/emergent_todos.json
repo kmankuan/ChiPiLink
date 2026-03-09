@@ -45,10 +45,22 @@
   },
   {
     "content": "Phase 3: End to end testing of P1 features",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
-    "content": "Phase 4: P2 - Verify Telegram config, landing titles, media player",
-    "status": "pending"
+    "content": "Phase 3: Fix badge reset endpoint",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4: P2 - Telegram config verified (configurable title/subtitle)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4: P2 - Media player controls verified (mute-only for videos)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4: P2 - Landing page uses CinematicLanding layout (admin configured)",
+    "status": "completed"
   }
 ]

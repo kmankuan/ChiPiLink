@@ -596,7 +596,12 @@ async def get_badge_config_public():
 
 @router.put("/badge-config")
 async def update_badge_config(data: dict, admin: dict = Depends(get_admin_user)):
-    """Update badge customization configuration"""
+    """Update badge customization configuration. Empty data resets to defaults."""
+    # If empty data, delete config to reset to defaults
+    if not data or (not data.get("order_statuses") and not data.get("item_statuses")):
+        await db.app_config.delete_one({"config_key": "badge_customization"})
+        return {"success": True, "message": "Badge configuration reset to defaults"}
+    
     await db.app_config.update_one(
         {"config_key": "badge_customization"},
         {"$set": {
