@@ -12,8 +12,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
-# Load .env
-load_dotenv(Path(__file__).parent / ".env")
+# Load env: prefer backend .env (shared production secrets), fallback to own .env
+backend_env = Path(__file__).parent.parent / "backend" / ".env"
+own_env = Path(__file__).parent / ".env"
+if backend_env.exists():
+    load_dotenv(backend_env)
+if own_env.exists():
+    load_dotenv(own_env, override=False)  # don't override backend values
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
