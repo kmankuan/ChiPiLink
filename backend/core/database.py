@@ -37,6 +37,10 @@ def _extract_db_from_url(url: str) -> str:
 _url_db = _extract_db_from_url(mongo_url) if mongo_url else ""
 db_name = _url_db or _HARDCODED_DB
 
+import logging
+_db_logger = logging.getLogger("core.database")
+_db_logger.info(f"DB resolution: url_db={_url_db!r}, hardcoded={_HARDCODED_DB!r}, final={db_name!r}")
+
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
     mongo_url,
