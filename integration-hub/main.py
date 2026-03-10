@@ -31,9 +31,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
 
 # Database — shares the same MongoDB as the main app
-# DB_NAME comes from environment (deployment system sets it for Atlas auth)
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
+# CHIPI_MONGO_URL/CHIPI_DB_NAME are custom keys the deployment system won't override
+MONGO_URL = os.environ.get("CHIPI_MONGO_URL") or os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("CHIPI_DB_NAME") or os.environ.get("DB_NAME", "chipilink_prod")
 
 client = AsyncIOMotorClient(
     MONGO_URL,

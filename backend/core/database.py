@@ -18,13 +18,14 @@ load_dotenv(ROOT_DIR / '.env')
 _db_logger = logging.getLogger("core.database")
 
 # MongoDB connection
-mongo_url = os.environ.get('MONGO_URL')
+# CHIPI_MONGO_URL is a custom key that the deployment system does NOT override.
+# Falls back to MONGO_URL (system key) then localhost for local dev.
+mongo_url = os.environ.get('CHIPI_MONGO_URL') or os.environ.get('MONGO_URL') or 'mongodb://localhost:27017'
 
-# DB_NAME: Use the environment variable set by the deployment system.
-# The deployment system creates the Atlas DB and authorizes the user for it.
-# Local dev: falls back to 'chipilink_prod' from .env
-db_name = os.environ.get('DB_NAME', 'chipilink_prod')
-_db_logger.info(f"DB resolution: DB_NAME env={os.environ.get('DB_NAME', '(not set)')!r}, final={db_name!r}")
+# DB_NAME: CHIPI_DB_NAME (custom) takes priority over DB_NAME (system, gets overridden)
+db_name = os.environ.get('CHIPI_DB_NAME') or os.environ.get('DB_NAME', 'chipilink_prod')
+
+_db_logger.info(f"DB resolution: CHIPI_MONGO_URL={'set' if os.environ.get('CHIPI_MONGO_URL') else 'not set'}, MONGO_URL={'set' if os.environ.get('MONGO_URL') else 'not set'}, db={db_name!r}")
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
