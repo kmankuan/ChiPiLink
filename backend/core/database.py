@@ -19,7 +19,7 @@ _db_logger = logging.getLogger("core.database")
 
 # Production MongoDB — hardcoded because deployment system overrides MONGO_URL/DB_NAME env vars
 _PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
-_PROD_DB_NAME = "chipilink_prod"
+_PROD_DB_NAME = "backend-cleanup-10-chipilink_prod"
 
 # Detect local dev: if the .env MONGO_URL is localhost, use it. Otherwise use hardcoded production Atlas.
 _env_mongo = os.environ.get('MONGO_URL', '')
