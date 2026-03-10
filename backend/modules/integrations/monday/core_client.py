@@ -44,7 +44,8 @@ class MondayCoreClient:
         return self._direct_client
 
     async def _get_api_key(self) -> str:
-        """Get Monday API key from DB workspace config or environment"""
+        """Get Monday API key — hardcoded production key with DB/env fallback"""
+        _PROD_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM5NDE5MjgyMywiYWFpIjoxMSwidWlkIjoyNDU0MTE1OSwiaWFkIjoiMjAyNC0wOC0wN1QxNDo0Nzo1My4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6OTg2OTY0MSwicmduIjoidXNlMSJ9.JInd3-Xn_dEmoVxCb7RKvlrr9Ndl5EhanLRF9QljYQ0"
         try:
             ws_config = await db[CONFIG_COLLECTION].find_one(
                 {"config_key": "global.workspaces"}, {"_id": 0}
@@ -56,7 +57,7 @@ class MondayCoreClient:
                         return ws["api_key"]
         except Exception:
             pass
-        return os.environ.get("MONDAY_API_KEY", "")
+        return os.environ.get("MONDAY_API_KEY", "") or _PROD_KEY
 
     async def _execute_via_hub(self, query: str, timeout: float) -> dict:
         """Try executing via Integration Hub"""
