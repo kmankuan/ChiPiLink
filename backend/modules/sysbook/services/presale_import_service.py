@@ -961,6 +961,19 @@ class PreSaleImportService:
                 entry["order_status"] = existing_order.get("status", "")
                 entry["order_items_count"] = existing_count
                 entry["print_count"] = existing_order.get("print_count", 0)
+                entry["admin_note"] = existing_order.get("admin_note", "")
+                # Include existing order items for inline editing/review
+                entry["order_items"] = [
+                    {
+                        "book_code": it.get("book_code", ""),
+                        "book_name": it.get("book_name", ""),
+                        "price": it.get("price", 0),
+                        "quantity_ordered": it.get("quantity_ordered", 1),
+                        "status": it.get("status", "ordered"),
+                        "monday_subitem_id": it.get("monday_subitem_id", ""),
+                    }
+                    for it in existing_order.get("items", [])
+                ]
 
                 if new_subitem_ids:
                     # Has new items not in the order
