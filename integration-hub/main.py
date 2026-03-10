@@ -34,9 +34,10 @@ logger = logging.getLogger("hub")
 _PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
 _PROD_DB_NAME = "chipilink_prod"
 
-if os.environ.get("CHIPI_USE_LOCAL") == "true":
-    MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-    DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
+_env_mongo = os.environ.get("MONGO_URL", "")
+if "localhost" in _env_mongo or "127.0.0.1" in _env_mongo:
+    MONGO_URL = _env_mongo
+    DB_NAME = os.environ.get("DB_NAME", _PROD_DB_NAME)
 else:
     MONGO_URL = _PROD_MONGO_URL
     DB_NAME = _PROD_DB_NAME
