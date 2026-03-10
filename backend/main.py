@@ -489,10 +489,13 @@ async def health_check():
         db_name = db.name
     except Exception:
         db_name = "connecting"
+    from core.database import mongo_url as _murl
+    _murl_safe = _murl[:30] + "...@" + _murl.split("@")[-1][:40] if "@" in _murl else _murl[:60]
     return {
         "status": "healthy",
-        "version": "2.3.0",
+        "version": "2.3.1-diag",
         "db": db_name,
+        "mongo_target": _murl_safe,
     }
 
 @app.get("/api/health/admin-check")
