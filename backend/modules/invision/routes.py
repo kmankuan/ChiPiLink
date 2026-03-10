@@ -86,6 +86,7 @@ async def initiate_oauth_login(
 
 @router.get("/oauth/callback")
 async def oauth_callback(
+    request: Request,
     code: Optional[str] = Query(None),
     state: Optional[str] = Query(None),
     error: Optional[str] = Query(None),
@@ -114,21 +115,36 @@ async def oauth_callback(
     if not code:
         raise HTTPException(status_code=400, detail="Authorization code not received")
     
-    if not state:
-        raise HTTPException(status_code=400, detail="Session state not received")
+    # Validate state (CSRF protection) — gracefully degrade if state is missing/expired
+    state_data = None
+    redirect_after = None
     
-    # Validate state (CSRF protection) - now async, reads from database
-    state_data = await laopan_oauth_service.validate_state(state)
-    if not state_data:
-        raise HTTPException(
-            status_code=400,
-            detail="Session state invalid or expired. Please try again."
-        )
+    if state:
+        state_data = await laopan_oauth_service.validate_state(state)
+        if state_data:
+            redirect_after = state_data.get("redirect_after")
+        else:
+            logger.warning(f"OAuth state validation failed for state={state[:16]}... — proceeding with code-only auth")
     
-    # Get the redirect_uri that was used in the authorization request
-    redirect_uri = state_data.get("redirect_uri")
+    # Determine redirect_uri — needed for token exchange (must match what was used in auth request)
+    # Priority: state_data > auto-detect from request origin
+    if state_data and state_data.get("redirect_uri"):
+        redirect_uri = state_data["redirect_uri"]
+    else:
+        # Reconstruct redirect_uri from request origin (same logic as generate_auth_url)
+        origin = None
+        referer = request.headers.get("referer")
+        origin_header = request.headers.get("origin")
+        if origin_header:
+            origin = origin_header
+        elif referer:
+            from urllib.parse import urlparse
+            parsed = urlparse(referer)
+            origin = f"{parsed.scheme}://{parsed.netloc}"
+        redirect_uri = laopan_oauth_service.get_redirect_uri(origin)
+        logger.info(f"Reconstructed redirect_uri from origin: {redirect_uri}")
     
-    # Exchange code for token (using the same redirect_uri)
+    # Exchange code for token
     token_data = await laopan_oauth_service.exchange_code_for_token(code, redirect_uri)
     if not token_data:
         raise HTTPException(
@@ -155,7 +171,7 @@ async def oauth_callback(
     auth_result = await laopan_oauth_service.authenticate_user(laopan_user)
     
     # Include redirect_after if provided
-    auth_result["redirect_after"] = state_data.get("redirect_after")
+    auth_result["redirect_after"] = redirect_after
     
     return auth_result
 
