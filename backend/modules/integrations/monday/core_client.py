@@ -1,67 +1,128 @@
 """
-Monday.com Core API Client — Hub-Proxied
-All API calls route through the Integration Hub (port 8002).
-Zero direct Monday.com connections from the main app.
+Monday.com Core API Client — Hub-Proxied with Direct Fallback
+Tries Integration Hub (port 8002) first. If unreachable, calls Monday.com API directly.
 """
 from typing import Dict, Optional
 import httpx
 import logging
 import json
+import os
+import asyncio
 
 from core.database import db
 
 logger = logging.getLogger(__name__)
 
 HUB_URL = "http://127.0.0.1:8002"
+MONDAY_API_URL = "https://api.monday.com/v2"
 CONFIG_COLLECTION = "monday_integration_config"
 
 
 class MondayCoreClient:
-    """Monday.com API client that proxies all calls through the Integration Hub.
-    Same interface as the original — all callers work unchanged."""
+    """Monday.com API client. Routes through Hub when available, falls back to direct API."""
 
     def __init__(self):
-        self._client = None
+        self._hub_client = None
+        self._direct_client = None
+        self._hub_available = None  # None = unknown, True/False = cached
 
-    def _get_client(self):
-        """Persistent httpx client for Hub communication"""
-        if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(
+    def _get_hub_client(self):
+        if self._hub_client is None or self._hub_client.is_closed:
+            self._hub_client = httpx.AsyncClient(
                 base_url=HUB_URL,
                 limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
-                timeout=httpx.Timeout(45.0, connect=5.0),
+                timeout=httpx.Timeout(45.0, connect=3.0),
             )
-        return self._client
+        return self._hub_client
+
+    def _get_direct_client(self):
+        if self._direct_client is None or self._direct_client.is_closed:
+            self._direct_client = httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=5, max_keepalive_connections=3),
+                timeout=httpx.Timeout(30.0, connect=10.0),
+            )
+        return self._direct_client
+
+    async def _get_api_key(self) -> str:
+        """Get Monday API key from DB workspace config or environment"""
+        try:
+            ws_config = await db[CONFIG_COLLECTION].find_one(
+                {"config_key": "global.workspaces"}, {"_id": 0}
+            )
+            if ws_config:
+                active_id = ws_config.get("active_workspace_id")
+                for ws in ws_config.get("workspaces", []):
+                    if ws.get("workspace_id") == active_id and ws.get("api_key"):
+                        return ws["api_key"]
+        except Exception:
+            pass
+        return os.environ.get("MONDAY_API_KEY", "")
+
+    async def _execute_via_hub(self, query: str, timeout: float) -> dict:
+        """Try executing via Integration Hub"""
+        client = self._get_hub_client()
+        r = await client.post(
+            "/api/monday/execute",
+            json={"query": query, "variables": {}},
+            timeout=timeout + 10,
+        )
+        if r.status_code == 503:
+            raise ValueError("Monday.com API key not configured")
+        if r.status_code >= 500:
+            raise ValueError(f"Hub error: HTTP {r.status_code}")
+        data = r.json()
+        if "errors" in data and not data.get("data"):
+            raise ValueError(f"Monday.com error: {data['errors']}")
+        return data.get("data", data)
+
+    async def _execute_direct(self, query: str, timeout: float) -> dict:
+        """Execute directly against Monday.com API"""
+        api_key = await self._get_api_key()
+        if not api_key:
+            raise ValueError("Monday.com API key not configured")
+        client = self._get_direct_client()
+        for attempt in range(3):
+            try:
+                r = await client.post(
+                    MONDAY_API_URL,
+                    json={"query": query},
+                    headers={"Authorization": api_key, "Content-Type": "application/json"},
+                    timeout=timeout,
+                )
+                data = r.json()
+                if "errors" in data:
+                    err = str(data["errors"])
+                    if any(kw in err.lower() for kw in ["rate limit", "complexity", "budget"]):
+                        if attempt < 2:
+                            await asyncio.sleep(2 ** attempt)
+                            continue
+                    raise ValueError(f"Monday.com error: {data['errors']}")
+                return data.get("data", {})
+            except (httpx.TimeoutException, httpx.ConnectError) as e:
+                if attempt < 2:
+                    await asyncio.sleep(2 ** attempt)
+                    continue
+                raise ValueError(f"Monday.com API failed: {e}")
+        raise ValueError("Monday.com API failed after 3 attempts")
 
     async def execute(self, query: str, timeout: float = 20.0) -> dict:
-        """Execute a Monday.com GraphQL query via the Integration Hub proxy."""
-        client = self._get_client()
-        label = query.strip()[:60].replace('\n', ' ')
+        """Execute query — Hub first, direct fallback if Hub unreachable."""
+        # Try Hub first
         try:
-            r = await client.post(
-                "/api/monday/execute",
-                json={"query": query, "variables": {}},
-                timeout=timeout + 10,
-            )
-            if r.status_code == 503:
-                raise ValueError("Monday.com API key not configured (Hub returned 503)")
-            if r.status_code == 429:
-                raise ValueError("Monday.com rate limit reached")
-            if r.status_code >= 500:
-                raise ValueError(f"Hub error: HTTP {r.status_code}")
+            result = await self._execute_via_hub(query, timeout)
+            if self._hub_available is not True:
+                self._hub_available = True
+                logger.info("Monday API routing through Integration Hub")
+            return result
+        except (httpx.ConnectError, httpx.ConnectTimeout, OSError) as e:
+            if self._hub_available is not False:
+                self._hub_available = False
+                logger.warning(f"Integration Hub unreachable, falling back to direct API: {e}")
+        except ValueError:
+            raise  # Re-raise Monday API errors (not connection errors)
 
-            data = r.json()
-
-            if "errors" in data and not data.get("data"):
-                raise ValueError(f"Monday.com error: {data['errors']}")
-
-            return data.get("data", data)
-
-        except httpx.TimeoutException:
-            raise ValueError(f"Monday.com API timeout for: {label}")
-        except httpx.ConnectError:
-            logger.error("Integration Hub not reachable at port 8002")
-            raise ValueError("Integration Hub not reachable — is it running?")
+        # Fallback to direct
+        return await self._execute_direct(query, timeout)
 
     async def test_connection(self) -> dict:
         """Test API connectivity and return account info"""

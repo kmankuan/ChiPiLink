@@ -79,7 +79,7 @@ function InlineOrderEditor({ entry, onUpdate }) {
   };
 
   return (
-    <div className="bg-white border rounded-lg p-3 space-y-3">
+    <div className="bg-card border rounded-lg p-3 space-y-3">
       {/* Order info row */}
       <div className="flex items-center gap-4 flex-wrap text-sm">
         <span className="font-mono text-xs text-muted-foreground">{entry.order_id}</span>

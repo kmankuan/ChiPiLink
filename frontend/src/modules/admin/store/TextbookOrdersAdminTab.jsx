@@ -190,7 +190,7 @@ function EditableNote({ orderId, note, onUpdate }) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Add a note..."
-            className="w-full h-20 text-xs border rounded p-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full h-20 text-xs border rounded p-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary bg-background text-foreground"
             autoFocus
             data-testid={`note-input-${orderId}`}
           />
