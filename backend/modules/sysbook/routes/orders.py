@@ -307,6 +307,59 @@ async def mark_orders_printed(
     return {"status": "ok", "updated": result.modified_count}
 
 
+@router.put("/admin/{order_id}/print-count")
+async def update_print_count(
+    order_id: str,
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Manually update print_count for an order (e.g. mark as already printed)"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    print_count = data.get("print_count", 0)
+    if not isinstance(print_count, int) or print_count < 0:
+        raise HTTPException(status_code=400, detail="print_count must be a non-negative integer")
+
+    now = datetime.now(timezone.utc).isoformat()
+    update_fields = {"print_count": print_count, "updated_at": now}
+    # If setting count > 0 and no printed_at, set it
+    if print_count > 0:
+        update_fields["printed_at"] = now
+    elif print_count == 0:
+        update_fields["printed_at"] = None
+
+    result = await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": update_fields}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {"status": "ok", "print_count": print_count}
+
+
+@router.put("/admin/{order_id}/note")
+async def update_order_note(
+    order_id: str,
+    data: dict,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update admin note on an order"""
+    from core.database import db
+    from datetime import datetime, timezone
+
+    note = data.get("note", "")
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"admin_note": note, "updated_at": now}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {"status": "ok", "note": note}
+
+
+
 @router.put("/admin/{order_id}/paid-date")
 async def update_paid_date(
     order_id: str,

@@ -60,7 +60,9 @@ import {
   Trash2,
   Plus,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquareText,
+  Pencil
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
@@ -70,6 +72,7 @@ import { TablePagination } from '@/components/shared/TablePagination';
 import { BoardHeader } from '@/components/shared/BoardHeader';
 import { useTranslation } from 'react-i18next';
 import CrmChat from '@/components/chat/CrmChat';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import PrintDialog from '@/modules/print/PrintDialog';
 import ArchiveTab from '@/components/shared/ArchiveTab';
 import RESOLVED_API_URL from '@/config/apiUrl';
@@ -95,6 +98,135 @@ const STATUS_COLORS = {
   delivered: 'bg-emerald-600 text-white',
   cancelled: 'bg-red-600 text-white',
 };
+
+
+// Inline editable print count
+function EditablePrintCount({ orderId, printCount, printedAt, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(printCount || 0);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < 0) return;
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/print-count`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ print_count: num }),
+      });
+      if (res.ok) {
+        toast.success('Print count updated');
+        onUpdate?.();
+      }
+    } catch {} finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <Input
+          type="number" min="0" value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+          className="h-6 w-12 text-center text-[11px] px-1"
+          autoFocus
+          data-testid={`print-count-input-${orderId}`}
+        />
+        <button onClick={save} disabled={saving} className="text-green-600 hover:text-green-800"><Check className="h-3 w-3" /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X className="h-3 w-3" /></button>
+      </div>
+    );
+  }
+
+  const count = printCount || 0;
+  const hasBeenPrinted = count > 0 || printedAt;
+  return (
+    <button
+      onClick={() => { setValue(count); setEditing(true); }}
+      title={`${hasBeenPrinted ? `Printed ${count}x` : 'Not printed'} — click to edit`}
+      className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full text-[11px] font-bold cursor-pointer hover:ring-2 hover:ring-offset-1 transition-all ${
+        hasBeenPrinted ? 'bg-green-100 text-green-700 hover:ring-green-300' : 'bg-gray-100 text-gray-400 hover:ring-gray-300'
+      }`}
+      data-testid={`print-count-${orderId}`}
+    >
+      {count}
+    </button>
+  );
+}
+
+// Inline editable admin note
+function EditableNote({ orderId, note, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(note || '');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/note`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: value.trim() }),
+      });
+      if (res.ok) {
+        toast.success('Note saved');
+        onUpdate?.();
+      }
+    } catch {} finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <Popover open={true} onOpenChange={(open) => { if (!open) setEditing(false); }}>
+        <PopoverTrigger asChild>
+          <span />
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-2" align="start">
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Add a note..."
+            className="w-full h-20 text-xs border rounded p-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+            autoFocus
+            data-testid={`note-input-${orderId}`}
+          />
+          <div className="flex justify-end gap-1 mt-1">
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)} className="h-6 text-xs px-2">Cancel</Button>
+            <Button size="sm" onClick={save} disabled={saving} className="h-6 text-xs px-2">Save</Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  if (note) {
+    return (
+      <button
+        onClick={() => { setValue(note); setEditing(true); }}
+        title={note}
+        className="max-w-[120px] truncate text-[11px] text-left text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer hover:bg-amber-100 transition-colors"
+        data-testid={`note-display-${orderId}`}
+      >
+        {note}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => { setValue(''); setEditing(true); }}
+      title="Add note"
+      className="text-gray-300 hover:text-gray-500 cursor-pointer transition-colors"
+      data-testid={`note-add-${orderId}`}
+    >
+      <MessageSquareText className="h-3.5 w-3.5" />
+    </button>
+  );
+}
 
 function AddItemToOrder({ order, onAdded }) {
   const [open, setOpen] = useState(false);
@@ -658,7 +790,8 @@ export default function TextbookOrdersAdminTab() {
                         Paid {sortField === 'paid_date' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                       </TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="w-[60px] text-center">Activity</TableHead>
+                      <TableHead className="w-[60px] text-center">Print</TableHead>
+                      <TableHead className="w-[100px]">Note</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -709,24 +842,25 @@ export default function TextbookOrdersAdminTab() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-center gap-1" data-testid={`order-activity-${order.order_id}`}>
-                            {order.printed_at ? (
-                              <span
-                                title={`Printed ${order.print_count || 1}x — ${new Date(order.printed_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
-                                className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-green-100 text-green-700 text-[11px] font-bold"
-                              >
-                                {order.print_count || 1}
-                              </span>
-                            ) : (
-                              <span title="Not printed yet" className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-gray-100 text-gray-400 text-[11px] font-medium">
-                                0
-                              </span>
-                            )}
+                            <EditablePrintCount
+                              orderId={order.order_id}
+                              printCount={order.print_count}
+                              printedAt={order.printed_at}
+                              onUpdate={fetchData}
+                            />
                             {order.link_status === 'linked' ? (
                               <span title="Linked to user">
                                 <Link2 className="h-3.5 w-3.5 text-blue-500" />
                               </span>
                             ) : null}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <EditableNote
+                            orderId={order.order_id}
+                            note={order.admin_note}
+                            onUpdate={fetchData}
+                          />
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5">
