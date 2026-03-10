@@ -17,15 +17,19 @@ load_dotenv(ROOT_DIR / '.env')
 
 _db_logger = logging.getLogger("core.database")
 
-# MongoDB connection
-# CHIPI_MONGO_URL is a custom key that the deployment system does NOT override.
-# Falls back to MONGO_URL (system key) then localhost for local dev.
-mongo_url = os.environ.get('CHIPI_MONGO_URL') or os.environ.get('MONGO_URL') or 'mongodb://localhost:27017'
+# Production MongoDB — hardcoded because deployment system overrides MONGO_URL/DB_NAME env vars
+_PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
+_PROD_DB_NAME = "chipilink_prod"
 
-# DB_NAME: CHIPI_DB_NAME (custom) takes priority over DB_NAME (system, gets overridden)
-db_name = os.environ.get('CHIPI_DB_NAME') or os.environ.get('DB_NAME', 'chipilink_prod')
+# Use production Atlas. Falls back to localhost only if CHIPI_USE_LOCAL=true (for dev).
+if os.environ.get("CHIPI_USE_LOCAL") == "true":
+    mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+    db_name = os.environ.get('DB_NAME', 'chipilink_prod')
+else:
+    mongo_url = _PROD_MONGO_URL
+    db_name = _PROD_DB_NAME
 
-_db_logger.info(f"DB resolution: CHIPI_MONGO_URL={'set' if os.environ.get('CHIPI_MONGO_URL') else 'not set'}, MONGO_URL={'set' if os.environ.get('MONGO_URL') else 'not set'}, db={db_name!r}")
+_db_logger.info(f"DB: {db_name}")
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(

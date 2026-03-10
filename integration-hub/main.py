@@ -30,10 +30,16 @@ if own_env.exists():
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hub")
 
-# Database — shares the same MongoDB as the main app
-# CHIPI_MONGO_URL/CHIPI_DB_NAME are custom keys the deployment system won't override
-MONGO_URL = os.environ.get("CHIPI_MONGO_URL") or os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("CHIPI_DB_NAME") or os.environ.get("DB_NAME", "chipilink_prod")
+# Database — hardcoded production Atlas (deployment system overrides env vars)
+_PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
+_PROD_DB_NAME = "chipilink_prod"
+
+if os.environ.get("CHIPI_USE_LOCAL") == "true":
+    MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+    DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
+else:
+    MONGO_URL = _PROD_MONGO_URL
+    DB_NAME = _PROD_DB_NAME
 
 client = AsyncIOMotorClient(
     MONGO_URL,
