@@ -879,5 +879,261 @@ class PreSaleImportService:
         return matching / total
 
 
+    # ═══════════════════════════════════════════════════════════
+    # RECONCILIATION — Compare Monday board vs imported orders
+    # ═══════════════════════════════════════════════════════════
+
+    async def reconcile(self, board_id: str) -> Dict:
+        """
+        Scan ALL Monday items and compare against imported orders.
+        Returns categorized results:
+        - synced: all subitems match
+        - has_new_items: Monday has subitems not in the order
+        - missing_import: Monday item marked Done but no order exists
+        - not_imported: Monday item not yet marked Ready (informational)
+        """
+        await self._load_subitem_config()
+
+        # Fetch ALL items from Monday board (not just "Ready" ones)
+        all_items = await monday_client.get_board_items(board_id, limit=500, include_subitems=True)
+        logger.info(f"[reconcile] Fetched {len(all_items)} total items from board {board_id}")
+
+        # Get all imported orders with their monday_item_ids
+        imported_orders = await db.store_textbook_orders.find(
+            {"source": "monday_import"},
+            {"_id": 0, "order_id": 1, "monday_item_id": 1, "monday_item_ids": 1,
+             "student_name": 1, "grade": 1, "items": 1, "status": 1, "print_count": 1}
+        ).to_list(2000)
+
+        # Build lookup: monday_item_id → order
+        order_by_monday_id = {}
+        for order in imported_orders:
+            mid = str(order.get("monday_item_id", ""))
+            if mid:
+                order_by_monday_id[mid] = order
+            for mid2 in order.get("monday_item_ids", []):
+                order_by_monday_id[str(mid2)] = order
+
+        results = {
+            "synced": [],
+            "has_new_items": [],
+            "missing_import": [],
+            "not_imported": [],
+            "total_monday_items": len(all_items),
+            "total_imported_orders": len(imported_orders),
+        }
+
+        for item in all_items:
+            monday_item_id = str(item.get("id", ""))
+            item_name = item.get("name", "")
+            cols = {c["id"]: c for c in item.get("column_values", [])}
+            student_name = cols.get(ESTUDIANTE_COL, {}).get("text", "").strip() or item_name
+            grade_text = cols.get(GRADO_COL, {}).get("text", "").strip()
+            grade = self._normalize_grade(grade_text)
+            trigger_text = cols.get(SYNC_TRIGGER_COL, {}).get("text", "").strip()
+
+            monday_subitems = item.get("subitems") or []
+            monday_subitem_ids = set(str(si.get("id", "")) for si in monday_subitems)
+            monday_subitem_names = {str(si.get("id", "")): si.get("name", "") for si in monday_subitems}
+
+            existing_order = order_by_monday_id.get(monday_item_id)
+
+            entry = {
+                "monday_item_id": monday_item_id,
+                "student_name": student_name,
+                "grade": grade,
+                "monday_subitems_count": len(monday_subitems),
+                "sync_column": trigger_text,
+            }
+
+            if existing_order:
+                # Order exists — compare subitems
+                order_subitem_ids = set(
+                    str(it.get("monday_subitem_id", ""))
+                    for it in existing_order.get("items", [])
+                    if it.get("monday_subitem_id")
+                )
+                existing_count = len(order_subitem_ids)
+                new_subitem_ids = monday_subitem_ids - order_subitem_ids
+                removed_subitem_ids = order_subitem_ids - monday_subitem_ids
+
+                entry["order_id"] = existing_order["order_id"]
+                entry["order_status"] = existing_order.get("status", "")
+                entry["order_items_count"] = existing_count
+                entry["print_count"] = existing_order.get("print_count", 0)
+
+                if new_subitem_ids:
+                    # Has new items not in the order
+                    new_items_detail = []
+                    for si in monday_subitems:
+                        si_id = str(si.get("id", ""))
+                        if si_id in new_subitem_ids:
+                            si_name = si.get("name", "")
+                            book_code, book_name = self._parse_subitem_name(si_name)
+                            # Parse price
+                            price = 0.0
+                            for col in si.get("column_values", []):
+                                if col.get("id") == self._subitem_price_col:
+                                    try:
+                                        price = float((col.get("text") or "0").replace(",", "").replace("$", ""))
+                                    except ValueError:
+                                        pass
+                            new_items_detail.append({
+                                "monday_subitem_id": si_id,
+                                "name": si_name,
+                                "book_code": book_code,
+                                "book_name": book_name,
+                                "price": price,
+                                "quantity": 1,
+                            })
+                    entry["new_items"] = new_items_detail
+                    entry["new_items_count"] = len(new_items_detail)
+                    results["has_new_items"].append(entry)
+                else:
+                    entry["new_items_count"] = 0
+                    results["synced"].append(entry)
+            else:
+                # No order exists for this Monday item
+                if trigger_text in ["Done", "done", "Hecho"]:
+                    # Was marked Done but never imported
+                    entry["reason"] = "marked_done_but_not_imported"
+                    results["missing_import"].append(entry)
+                elif trigger_text in SYNC_TRIGGER_LABELS:
+                    entry["reason"] = "ready_not_yet_imported"
+                    results["not_imported"].append(entry)
+                else:
+                    entry["reason"] = f"sync_column={trigger_text or 'empty'}"
+                    results["not_imported"].append(entry)
+
+        logger.info(
+            f"[reconcile] Results: {len(results['synced'])} synced, "
+            f"{len(results['has_new_items'])} with new items, "
+            f"{len(results['missing_import'])} missing, "
+            f"{len(results['not_imported'])} not imported"
+        )
+        return results
+
+    async def merge_new_items(self, order_id: str, monday_item_id: str,
+                               new_items: List[Dict], admin_user_id: str) -> Dict:
+        """Merge new subitems into an existing order"""
+        order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+        if not order:
+            raise ValueError(f"Order {order_id} not found")
+
+        existing_items = order.get("items", [])
+        existing_subitem_ids = set(
+            str(it.get("monday_subitem_id", "")) for it in existing_items if it.get("monday_subitem_id")
+        )
+
+        added = []
+        skipped = []
+        total_added_amount = 0.0
+
+        for ni in new_items:
+            si_id = str(ni.get("monday_subitem_id", ""))
+            if si_id in existing_subitem_ids:
+                skipped.append({"subitem_id": si_id, "reason": "already_exists"})
+                continue
+
+            book_code = ni.get("book_code", "")
+            book_name = ni.get("book_name", ni.get("name", ""))
+            price = float(ni.get("price", 0))
+            quantity = int(ni.get("quantity", 1))
+            grade = order.get("grade", "")
+
+            # Try to match to inventory
+            match = await self._match_book(book_code, book_name, grade)
+            if match:
+                book_id = match.get("product_id", "") or match.get("book_id", "")
+                book_code = match.get("code", book_code)
+                book_name = match.get("name", book_name)
+                price = price or match.get("price", 0)
+                matched = True
+            else:
+                book_id = f"unmatched_{uuid.uuid4().hex[:8]}"
+                matched = False
+
+            new_item = {
+                "book_id": book_id,
+                "book_code": book_code,
+                "book_name": book_name,
+                "price": price,
+                "quantity_ordered": quantity,
+                "max_quantity": quantity,
+                "status": "ordered",
+                "ordered_at": datetime.now(timezone.utc).isoformat(),
+                "monday_subitem_id": si_id,
+                "matched": matched,
+                "merged_at": datetime.now(timezone.utc).isoformat(),
+                "merged_by": admin_user_id,
+            }
+            existing_items.append(new_item)
+            total_added_amount += price * quantity
+            added.append({"subitem_id": si_id, "book_name": book_name, "price": price})
+
+        # Update order
+        now = datetime.now(timezone.utc).isoformat()
+        new_total = float(order.get("total_amount", 0)) + total_added_amount
+        await db.store_textbook_orders.update_one(
+            {"order_id": order_id},
+            {"$set": {
+                "items": existing_items,
+                "total_amount": new_total,
+                "updated_at": now,
+                "last_merge_at": now,
+                "last_merge_by": admin_user_id,
+            }}
+        )
+
+        logger.info(f"[reconcile] Merged {len(added)} new items into order {order_id}")
+        return {
+            "success": True,
+            "order_id": order_id,
+            "added": len(added),
+            "skipped": len(skipped),
+            "new_total": new_total,
+            "details": {"added": added, "skipped": skipped},
+        }
+
+    async def import_specific_items(self, board_id: str, monday_item_ids: List[str],
+                                     admin_user_id: str) -> Dict:
+        """Import specific Monday items by ID (for missing imports)"""
+        await self._load_subitem_config()
+        all_items = await monday_client.get_board_items(board_id, limit=500, include_subitems=True)
+
+        target_items = [it for it in all_items if str(it.get("id", "")) in monday_item_ids]
+        if not target_items:
+            return {"imported": 0, "errors": [{"error": "No matching items found on Monday board"}]}
+
+        imported = []
+        errors = []
+        for item in target_items:
+            mid = str(item.get("id", ""))
+            try:
+                existing = await db.store_textbook_orders.find_one(
+                    {"monday_item_ids": mid}, {"_id": 0, "order_id": 1}
+                )
+                if existing:
+                    errors.append({"monday_id": mid, "error": "already_imported", "order_id": existing["order_id"]})
+                    continue
+
+                parsed = await self._parse_monday_item_safe(item, board_id)
+                if not parsed:
+                    errors.append({"monday_id": mid, "error": "parse_failed"})
+                    continue
+
+                order = await self._create_presale_order(parsed, mid, admin_user_id)
+                imported.append({
+                    "order_id": order["order_id"],
+                    "monday_id": mid,
+                    "student_name": parsed["student_name"],
+                    "items_count": len(parsed["items"]),
+                })
+            except Exception as e:
+                errors.append({"monday_id": mid, "error": str(e)})
+
+        return {"imported": len(imported), "errors": errors, "details": imported}
+
+
 # Singleton
 presale_import_service = PreSaleImportService()

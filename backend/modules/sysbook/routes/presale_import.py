@@ -205,3 +205,93 @@ async def refresh_textbooks_map(admin: dict = Depends(get_admin_user)):
     await textbook_board_sync.invalidate_cache()
     board_map = await textbook_board_sync._get_board_items_map()
     return {"status": "ok", "items_mapped": len(board_map)}
+
+
+
+# ═══ RECONCILIATION — Detect new subitems, missing imports, discrepancies ═══
+
+async def _run_reconcile_job(job_id: str, board_id: str):
+    """Background task for reconciliation scan"""
+    try:
+        _jobs[job_id]["status"] = "running"
+        result = await presale_import_service.reconcile(board_id)
+        _jobs[job_id].update({"status": "done", "result": result})
+    except Exception as e:
+        import traceback
+        _jobs[job_id].update({"status": "error", "error": str(e), "traceback": traceback.format_exc()})
+
+
+@router.get("/reconcile")
+async def reconcile_presale(admin: dict = Depends(get_admin_user)):
+    """
+    Scan ALL Monday items (regardless of sync column) and compare against imported orders.
+    Returns status for each item: synced, has_new_items, missing_import, not_imported.
+    Background job — returns job_id.
+    """
+    board_config = await monday_config_service.get_config()
+    board_id = board_config.get("board_id")
+    if not board_id:
+        raise HTTPException(400, "Textbook Orders Monday.com board not configured")
+    job_id = f"rc_{uuid.uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "starting", "created_at": datetime.now(timezone.utc).isoformat()}
+    asyncio.create_task(_run_reconcile_job(job_id, board_id))
+    return {"job_id": job_id, "status": "starting"}
+
+
+@router.post("/merge/{order_id}")
+async def merge_new_items(
+    order_id: str,
+    data: dict = Body(...),
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Merge new subitems from Monday.com into an existing order.
+    Body: {monday_item_id: str, new_items: [{book_name, book_code, price, quantity, monday_subitem_id}]}
+    """
+    monday_item_id = data.get("monday_item_id")
+    new_items = data.get("new_items", [])
+    if not new_items:
+        raise HTTPException(400, "No new items to merge")
+
+    admin_user_id = admin.get("user_id", "admin")
+    try:
+        result = await presale_import_service.merge_new_items(order_id, monday_item_id, new_items, admin_user_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(500, f"Merge failed: {str(e)}")
+
+
+@router.post("/import-missing")
+async def import_missing_orders(
+    data: dict = Body(...),
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Import orders that exist on Monday (marked Done) but were never imported into the app.
+    Body: {monday_item_ids: [str]} — list of Monday item IDs to import
+    """
+    board_config = await monday_config_service.get_config()
+    board_id = board_config.get("board_id")
+    if not board_id:
+        raise HTTPException(400, "Board not configured")
+
+    monday_item_ids = data.get("monday_item_ids", [])
+    if not monday_item_ids:
+        raise HTTPException(400, "No item IDs provided")
+
+    admin_user_id = admin.get("user_id", "admin")
+    job_id = f"im_{uuid.uuid4().hex[:8]}"
+    _jobs[job_id] = {"status": "starting", "created_at": datetime.now(timezone.utc).isoformat()}
+
+    async def _run():
+        try:
+            _jobs[job_id]["status"] = "running"
+            result = await presale_import_service.import_specific_items(board_id, monday_item_ids, admin_user_id)
+            _jobs[job_id].update({"status": "done", "result": result})
+        except Exception as e:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+    asyncio.create_task(_run())
+    return {"job_id": job_id, "status": "starting"}

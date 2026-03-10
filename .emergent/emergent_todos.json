@@ -1,30 +1,22 @@
 [
   {
-    "content": "Add /api/monday/execute endpoint to Hub for synchronous Monday API calls",
+    "content": "Backend: Add presale reconciliation endpoint - scans ALL Monday items vs DB orders",
     "status": "completed"
   },
   {
-    "content": "Rewrite core_client.execute() to proxy through Hub instead of calling Monday directly",
+    "content": "Backend: Add merge endpoint - adds only NEW subitems to existing orders",
     "status": "completed"
   },
   {
-    "content": "Replace fire-and-forget calls in listed files with submit_hub_job",
+    "content": "Backend: Add import-missing endpoint - imports orders marked Done but never imported",
     "status": "completed"
   },
   {
-    "content": "Remove monday_queue imports from main app",
+    "content": "Frontend: Add Reconciliation tab in Pre-Sale Import with status table and actions",
     "status": "completed"
   },
   {
-    "content": "Update system_monitor to read queue stats from Hub",
-    "status": "completed"
-  },
-  {
-    "content": "Verify backend starts clean with zero direct Monday imports",
-    "status": "completed"
-  },
-  {
-    "content": "End-to-end testing — 100% ALL PASS",
+    "content": "Test reconciliation flow end-to-end",
     "status": "completed"
   }
 ]

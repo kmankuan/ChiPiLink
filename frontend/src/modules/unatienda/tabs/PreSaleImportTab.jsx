@@ -13,6 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ReconciliationTab from './ReconciliationTab';
 import { toast } from 'sonner';
 import {
   Download, Eye, Link2, Loader2, RefreshCw, Search, ShoppingCart,
@@ -374,6 +376,12 @@ export default function PreSaleImportTab({ token: propToken }) {
   }
 
   return (
+    <Tabs defaultValue="orders" className="space-y-3">
+      <TabsList>
+        <TabsTrigger value="orders" data-testid="presale-orders-tab">Orders & Linking</TabsTrigger>
+        <TabsTrigger value="reconcile" data-testid="presale-reconcile-tab">Reconciliation</TabsTrigger>
+      </TabsList>
+      <TabsContent value="orders">
     <div className="space-y-3" data-testid="presale-import-tab">
       <BoardHeader
         title="Pre-Sale Import"
@@ -722,5 +730,10 @@ export default function PreSaleImportTab({ token: propToken }) {
         </DialogContent>
       </Dialog>
     </div>
+      </TabsContent>
+      <TabsContent value="reconcile">
+        <ReconciliationTab />
+      </TabsContent>
+    </Tabs>
   );
 }
