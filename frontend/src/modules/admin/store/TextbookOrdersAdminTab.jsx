@@ -710,12 +710,15 @@ export default function TextbookOrdersAdminTab() {
                         <TableCell>
                           <div className="flex items-center justify-center gap-1" data-testid={`order-activity-${order.order_id}`}>
                             {order.printed_at ? (
-                              <span title={`Printed ${order.print_count || 1}x — ${new Date(order.printed_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}>
-                                <PrinterCheck className="h-4 w-4 text-green-600" />
+                              <span
+                                title={`Printed ${order.print_count || 1}x — ${new Date(order.printed_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
+                                className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-green-100 text-green-700 text-[11px] font-bold"
+                              >
+                                {order.print_count || 1}
                               </span>
                             ) : (
-                              <span title="Not printed yet">
-                                <Printer className="h-4 w-4 text-gray-300" />
+                              <span title="Not printed yet" className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-gray-100 text-gray-400 text-[11px] font-medium">
+                                0
                               </span>
                             )}
                             {order.link_status === 'linked' ? (
