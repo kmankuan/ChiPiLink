@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 ESTUDIANTE_COL = "text_mm026sg3"
 GRADO_COL = "color_mm02xhw1"
 SYNC_TRIGGER_COL = "color_mm0mnmrs"
+DATE_PAID_COL = "date_mm10yfj1"  # Exact column ID for Date Paid
 
 # Status labels on the sync trigger column that mean "ready to import"
 SYNC_TRIGGER_LABELS = ["Ready", "ready", "Listo", "listo"]
@@ -185,23 +186,31 @@ class PreSaleImportService:
         # Parse grade from label text
         grade = self._normalize_grade(grade_text)
 
-        # Auto-detect Date Paid column
+        # Detect Date Paid column — exact ID first, then keyword fallback
         paid_date = None
         for col_data in item.get("column_values", []):
-            col_id = col_data.get("id", "").lower()
-            col_type = col_data.get("type", "").lower()
-            col_title = col_data.get("title", "").lower() if col_data.get("title") else ""
+            col_id = col_data.get("id", "")
             col_text = (col_data.get("text") or "").strip()
-
-            # Match by column type (date) + keyword in id or title
-            is_date_col = col_type == "date" or col_id.startswith("date")
-            has_paid_keyword = any(kw in col_id or kw in col_title for kw in DATE_PAID_KEYWORDS)
-            if is_date_col and has_paid_keyword and col_text:
+            # Exact match on known column ID
+            if col_id == DATE_PAID_COL and col_text:
                 paid_date = col_text
                 break
-            # Also check for any date column with "paid"/"pago" in its text-based id
-            if not paid_date and has_paid_keyword and col_text:
-                paid_date = col_text
+        
+        # Fallback: auto-detect by keywords if exact match didn't find it
+        if not paid_date:
+            for col_data in item.get("column_values", []):
+                col_id = col_data.get("id", "").lower()
+                col_type = col_data.get("type", "").lower()
+                col_title = col_data.get("title", "").lower() if col_data.get("title") else ""
+                col_text = (col_data.get("text") or "").strip()
+
+                is_date_col = col_type == "date" or col_id.startswith("date")
+                has_paid_keyword = any(kw in col_id or kw in col_title for kw in DATE_PAID_KEYWORDS)
+                if is_date_col and has_paid_keyword and col_text:
+                    paid_date = col_text
+                    break
+                if not paid_date and has_paid_keyword and col_text:
+                    paid_date = col_text
 
         # Use subitems from inline data (included in get_board_items), fallback to separate API call
         subitems = item.get("subitems") or []
