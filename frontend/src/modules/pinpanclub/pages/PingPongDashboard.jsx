@@ -400,45 +400,45 @@ export default function PingPongDashboard() {
                       return (
                         <div 
                           key={match.match_id}
-                          className={`flex items-center justify-between p-3 rounded-lg ${
+                          className={`p-3 rounded-lg ${
                             match.status === 'validated' 
                               ? 'bg-green-500/10 border border-green-500/20' 
                               : 'bg-yellow-500/10 border border-yellow-500/20'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-medium text-white ${isPlayerAWinner ? 'text-green-400' : ''}`}>
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                              <span className={`font-medium text-white text-sm truncate ${isPlayerAWinner ? 'text-green-400' : ''}`}>
                                 {match.player_a_info?.nickname || match.player_a_info?.nombre || '?'}
                               </span>
-                              <span className="text-orange-300">vs</span>
-                              <span className={`font-medium text-white ${!isPlayerAWinner ? 'text-green-400' : ''}`}>
+                              <span className="text-orange-300 text-xs">vs</span>
+                              <span className={`font-medium text-white text-sm truncate ${!isPlayerAWinner ? 'text-green-400' : ''}`}>
                                 {match.player_b_info?.nickname || match.player_b_info?.nombre || '?'}
                               </span>
+                              <Badge variant="outline" className="text-orange-200 border-orange-500/30 text-[10px] shrink-0">
+                                <Scale className="w-3 h-3 mr-0.5" />
+                                {match.referee_info?.nickname || match.referee_info?.nombre || '?'}
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className="text-orange-200 border-orange-500/30 text-xs">
-                              <Scale className="w-3 h-3 mr-1" />
-                              {match.referee_info?.nickname || match.referee_info?.nombre || '?'}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-white">
-                              {isPlayerAWinner 
-                                ? `${match.score_winner}-${match.score_loser}`
-                                : `${match.score_loser}-${match.score_winner}`
-                              }
-                            </span>
-                            {match.status === 'validated' ? (
-                              <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                                <Check className="w-3 h-3 mr-1" />
-                                Validado
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                                <Clock className="w-3 h-3 mr-1" />
-                                Pendiente
-                              </Badge>
-                            )}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="font-mono text-white text-sm">
+                                {isPlayerAWinner 
+                                  ? `${match.score_winner}-${match.score_loser}`
+                                  : `${match.score_loser}-${match.score_winner}`
+                                }
+                              </span>
+                              {match.status === 'validated' ? (
+                                <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-[10px]">
+                                  <Check className="w-3 h-3 mr-0.5" />
+                                  OK
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-[10px]">
+                                  <Clock className="w-3 h-3 mr-0.5" />
+                                  Pend.
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );

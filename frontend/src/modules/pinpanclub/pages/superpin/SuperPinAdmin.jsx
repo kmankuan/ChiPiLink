@@ -284,7 +284,7 @@ export default function SuperPinAdmin() {
                 <input
                   type="text"
                   value={newLeague.name}
-                  onChange={(e) => setNewLeague({ ...newLeague, nombre: e.target.value })}
+                  onChange={(e) => setNewLeague({ ...newLeague, name: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   placeholder="Liga Primavera 2025"
                 />
@@ -294,7 +294,7 @@ export default function SuperPinAdmin() {
                 <input
                   type="text"
                   value={newLeague.season}
-                  onChange={(e) => setNewLeague({ ...newLeague, temporada: e.target.value })}
+                  onChange={(e) => setNewLeague({ ...newLeague, season: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   placeholder="2025"
                 />
@@ -303,7 +303,7 @@ export default function SuperPinAdmin() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.description')}</label>
                 <textarea
                   value={newLeague.description}
-                  onChange={(e) => setNewLeague({ ...newLeague, descripcion: e.target.value })}
+                  onChange={(e) => setNewLeague({ ...newLeague, description: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   rows={2}
                 />

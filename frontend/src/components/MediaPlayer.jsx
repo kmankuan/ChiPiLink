@@ -330,20 +330,20 @@ export default function MediaPlayer() {
 
   return (
     <div data-testid="media-player-wrapper">
+      {/* Title ABOVE the frame — styled to look like part of the frame */}
+      {albumTitle && (
+        <div className="bg-black rounded-t-xl px-4 pt-3 pb-2">
+          <SectionTitle title={albumTitle} />
+        </div>
+      )}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden bg-black group"
+        className={`relative w-full overflow-hidden bg-black group ${albumTitle ? 'rounded-b-xl' : 'rounded-xl'}`}
         style={{ aspectRatio: '16/9' }}
         onTouchStart={config?.show_controls ? onTouchStart : undefined}
         onTouchEnd={config?.show_controls ? onTouchEnd : undefined}
         data-testid="media-player"
       >
-        {/* Title overlay inside the player */}
-        {albumTitle && (
-          <div className="absolute top-0 left-0 right-0 z-10 px-2 pt-2 pointer-events-none">
-            <SectionTitle title={albumTitle} />
-          </div>
-        )}
       {/* Slide content */}
       <div key={slideKey} className="absolute inset-0" style={{ animation: `mp-slide-${slideDir.current > 0 ? 'l' : 'r'} .35s ease-out` }}>
         {isVideo ? (
