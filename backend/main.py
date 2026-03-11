@@ -234,6 +234,10 @@ api_router.include_router(help_guide_public_router)
 from modules.wallet_topups import wallet_topups_router
 api_router.include_router(wallet_topups_router)
 
+# Payment Verification Module
+from modules.wallet_topups.payment_verification_routes import router as payment_verify_router
+api_router.include_router(payment_verify_router)
+
 # Ticker Module (Activity feed + Sponsor banners)
 from modules.ticker.routes import router as ticker_router, admin_router as ticker_admin_router
 api_router.include_router(ticker_router)
