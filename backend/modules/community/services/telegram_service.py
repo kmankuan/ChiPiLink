@@ -19,7 +19,7 @@ TELEGRAM_FILE = "https://api.telegram.org/file/bot{token}/{path}"
 
 class TelegramService:
     def __init__(self):
-        self.token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+        self.token = os.environ.get("TELEGRAM_BOT_TOKEN", "") or "8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM"
         self._polling = False
         self._poll_task = None
         self._client = None

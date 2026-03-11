@@ -76,7 +76,7 @@ async def test_all_connections():
         results["monday"] = {"status": "not_configured"}
     
     # Telegram
-    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "") or "8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM"
     if tg_token:
         try:
             async with httpx.AsyncClient(timeout=10) as c:
