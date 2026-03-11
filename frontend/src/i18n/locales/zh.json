@@ -2352,5 +2352,26 @@
     "itemsInCart": "件商品在购物车中",
     "noProducts": "购物车中没有商品",
     "exploreStoreShort": "浏览商店"
+  },
+  "paymentCheck": {
+    "title": "查询付款",
+    "subtitle": "输入您的转账参考号以查看付款状态",
+    "placeholder": "参考号、收据...",
+    "search": "查询",
+    "notFound": "未找到参考号",
+    "notFoundHint": "请检查参考号并重试。如果您刚完成转账，请等待几分钟后再查询。",
+    "tryAgain": "重试",
+    "whereToFind": "在哪里找到我的参考号？",
+    "hint1": "银行转账收据上",
+    "hint2": "转账确认邮件中",
+    "hint3": "银行APP，近期交易记录",
+    "statusPending": "等待验证",
+    "statusReceived": "付款已确认",
+    "statusProcessing": "验证中",
+    "statusNotFound": "未找到 — 请联系客服",
+    "statusReview": "审核中",
+    "credited": "已充值到钱包",
+    "date": "日期",
+    "backToHome": "ChiPi Link"
   }
 }

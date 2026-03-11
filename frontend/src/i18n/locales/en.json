@@ -2355,5 +2355,26 @@
     "itemsInCart": "item(s) in your cart",
     "noProducts": "No products in your cart",
     "exploreStoreShort": "Explore Unatienda"
+  },
+  "paymentCheck": {
+    "title": "Verify Payment",
+    "subtitle": "Enter your transfer reference number to check the status",
+    "placeholder": "Reference number, receipt...",
+    "search": "Search",
+    "notFound": "Reference not found",
+    "notFoundHint": "Check the reference number and try again. If you made the transfer recently, wait a few minutes and try again.",
+    "tryAgain": "Try again",
+    "whereToFind": "Where do I find my reference?",
+    "hint1": "On your bank transfer receipt",
+    "hint2": "In the transfer confirmation email",
+    "hint3": "In your bank app, recent transactions section",
+    "statusPending": "Pending verification",
+    "statusReceived": "Payment verified",
+    "statusProcessing": "Verification in progress",
+    "statusNotFound": "Not found — contact support",
+    "statusReview": "Under review",
+    "credited": "Credited to wallet",
+    "date": "Date",
+    "backToHome": "ChiPi Link"
   }
 }

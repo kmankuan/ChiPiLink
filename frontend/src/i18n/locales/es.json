@@ -2359,5 +2359,26 @@
     "itemsInCart": "producto(s) en tu carrito",
     "noProducts": "No hay productos en tu carrito",
     "exploreStoreShort": "Explorar Unatienda"
+  },
+  "paymentCheck": {
+    "title": "Verificar Pago",
+    "subtitle": "Ingrese el número de referencia de su transferencia para verificar el estado",
+    "placeholder": "Número de referencia, comprobante...",
+    "search": "Buscar",
+    "notFound": "Referencia no encontrada",
+    "notFoundHint": "Verifique el número de referencia e intente nuevamente. Si realizó la transferencia recientemente, espere unos minutos y vuelva a consultar.",
+    "tryAgain": "Intentar de nuevo",
+    "whereToFind": "¿Dónde encuentro mi referencia?",
+    "hint1": "En el comprobante de transferencia de su banco",
+    "hint2": "En el correo de confirmación de la transferencia",
+    "hint3": "En la app de su banco, sección de movimientos recientes",
+    "statusPending": "Pendiente de verificación",
+    "statusReceived": "Pago verificado",
+    "statusProcessing": "En proceso de verificación",
+    "statusNotFound": "No encontrado — contacte soporte",
+    "statusReview": "En revisión",
+    "credited": "Acreditado en billetera",
+    "date": "Fecha",
+    "backToHome": "ChiPi Link"
   }
 }

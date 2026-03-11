@@ -30,21 +30,21 @@ async def public_check_payment(ref: str = Query(..., min_length=3)):
     if not record:
         return {"found": False}
 
-    # Map internal status to user-friendly display
+    # Map internal status to color + i18n key (frontend handles translation)
     status = record.get("verification_status", "pending")
     status_map = {
-        "pending": {"label": "Pendiente de verificación", "color": "yellow"},
-        "received": {"label": "Pago verificado", "color": "green"},
-        "not_found_1/3": {"label": "En proceso de verificación", "color": "yellow"},
-        "not_found_2/3": {"label": "En proceso de verificación", "color": "yellow"},
-        "not_found_3/3": {"label": "No encontrado — contacte soporte", "color": "red"},
-        "check_later": {"label": "En proceso de verificación", "color": "yellow"},
+        "pending": {"status_key": "statusPending", "color": "yellow"},
+        "received": {"status_key": "statusReceived", "color": "green"},
+        "not_found_1/3": {"status_key": "statusProcessing", "color": "yellow"},
+        "not_found_2/3": {"status_key": "statusProcessing", "color": "yellow"},
+        "not_found_3/3": {"status_key": "statusNotFound", "color": "red"},
+        "check_later": {"status_key": "statusProcessing", "color": "yellow"},
     }
-    display = status_map.get(status, {"label": "En revisión", "color": "yellow"})
+    display = status_map.get(status, {"status_key": "statusReview", "color": "yellow"})
 
     return {
         "found": True,
-        "status": display["label"],
+        "status_key": display["status_key"],
         "color": display["color"],
         "amount": record.get("verified_amount") or record.get("amount"),
         "date": record.get("created_at", "")[:10],
