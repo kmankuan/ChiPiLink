@@ -16,8 +16,8 @@ from core.constants import AuthCollections
 
 logger = logging.getLogger(__name__)
 
-# OAuth Configuration from environment
-LAOPAN_CLIENT_ID = os.environ.get("LAOPAN_OAUTH_CLIENT_ID", "")
+# OAuth Configuration — hardcoded because deployment system overrides env vars
+LAOPAN_CLIENT_ID = os.environ.get("LAOPAN_OAUTH_CLIENT_ID", "") or os.environ.get("LAOPAN_CLIENT_ID", "") or "4836442a6d6b6e5d734ea34adcf5482c"
 LAOPAN_CLIENT_SECRET = os.environ.get("LAOPAN_OAUTH_CLIENT_SECRET", "")
 LAOPAN_BASE_URL = os.environ.get("LAOPAN_OAUTH_BASE_URL", "https://laopan.online")
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "")
