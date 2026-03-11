@@ -33,6 +33,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
   const [printed, setPrinted] = useState(false);
+  const [confirmPrint, setConfirmPrint] = useState(false); // Ask user to confirm print
   const [jobId, setJobId] = useState(null);
   const printRef = useRef(null);
 
@@ -40,6 +41,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     if (open && orderIds?.length > 0) {
       fetchPrintData();
       setCurrentPage(0);
+      setConfirmPrint(false);
       // Don't reset printed — will be set from fetched data below
     }
   }, [open, orderIds]);
@@ -99,10 +101,33 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
     }
   };
 
+  /** Called when user confirms they actually printed */
+  const handleConfirmPrinted = () => {
+    setPrinted(true);
+    setConfirmPrint(false);
+    markJobComplete();
+    markOrdersPrinted();
+    if (orderIds.length === 1) {
+      setTimeout(() => onOpenChange(false), 1500);
+    }
+  };
+
+  /** Called when user says they did NOT print (cancelled) */
+  const handleDenyPrinted = () => {
+    setConfirmPrint(false);
+    // Don't mark as printed — counter stays the same
+    toast.info('Print not registered — counter unchanged');
+  };
+
+  /** Show confirmation after print dialog closes */
+  const askPrintConfirmation = () => {
+    setPrinting(false);
+    setConfirmPrint(true);
+  };
+
   /** Print to thermal printer — one job per order (auto-cut between each) */
   const handleThermalPrintOneByOne = async () => {
     setPrinting(true);
-    const printedIds = [];
     try {
       for (let i = 0; i < orderIds.length; i++) {
         const url = `${API_URL}/api/print/thermal-page?order_ids=${encodeURIComponent(orderIds[i])}&token=${encodeURIComponent(token)}`;
@@ -115,7 +140,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         printWindow.document.write(html);
         printWindow.document.close();
 
-        // Wait for user to print, then close
+        // Wait for print dialog to close
         await new Promise(resolve => {
           printWindow.onafterprint = () => { printWindow.close(); resolve(); };
           setTimeout(() => {
@@ -123,24 +148,11 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
             setTimeout(() => { if (!printWindow.closed) printWindow.close(); resolve(); }, 10000);
           }, 500);
         });
-
-        // Mark THIS order as printed immediately after it's done
-        printedIds.push(orderIds[i]);
-        try {
-          await fetch(`${API_URL}/api/sysbook/orders/admin/mark-printed`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ order_ids: [orderIds[i]] }),
-          });
-        } catch {}
       }
-      setPrinted(true);
-      markJobComplete();
-      onPrintComplete?.();
-      // Don't auto-close for multiple orders — admin stays on dialog to verify
+      // Ask user to confirm they actually printed
+      askPrintConfirmation();
     } catch (err) {
       toast.error('Print error: ' + (err.message || 'Unknown'));
-    } finally {
       setPrinting(false);
     }
   };
@@ -169,31 +181,19 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
       printWindow.document.write(html);
       printWindow.document.close();
 
+      // When print dialog closes (OK or Cancel), ask user to confirm
       printWindow.onafterprint = () => {
         printWindow.close();
-        setPrinting(false);
-        setPrinted(true);
-        markJobComplete();
-        markOrdersPrinted();
-        // Auto-close dialog after 2 seconds (single order only)
-        if (orderIds.length === 1) {
-          setTimeout(() => onOpenChange(false), 2000);
-        }
+        askPrintConfirmation();
       };
 
       setTimeout(() => {
         printWindow.print();
-        // Hard fallback: always reset state after 15s
+        // Hard fallback: if window still open after 30s, close and ask
         setTimeout(() => {
           if (!printWindow.closed) printWindow.close();
-          setPrinting(false);
-          setPrinted(true);
-          markJobComplete();
-          markOrdersPrinted();
-          if (orderIds.length === 1) {
-            setTimeout(() => onOpenChange(false), 2000);
-          }
-        }, 15000);
+          if (!confirmPrint && !printed) askPrintConfirmation();
+        }, 30000);
       }, 800);
     } catch (err) {
       console.error('Thermal print error:', err);
@@ -274,23 +274,18 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
 </html>`);
 
     printWindow.document.close();
+    // When print dialog closes, ask user to confirm
     printWindow.onafterprint = () => {
       printWindow.close();
-      setPrinting(false);
-      setPrinted(true);
-      markJobComplete();
-      markOrdersPrinted();
-      if (orderIds.length === 1) {
-        setTimeout(() => onOpenChange(false), 2000);
-      }
+      askPrintConfirmation();
     };
 
     setTimeout(() => {
       printWindow.print();
       setTimeout(() => {
         if (!printWindow.closed) printWindow.close();
-        setPrinting(false);
-      }, 10000);
+        if (!confirmPrint && !printed) askPrintConfirmation();
+      }, 15000);
     }, 500);
   };
 
@@ -322,6 +317,24 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : confirmPrint ? (
+          /* Print confirmation — did the user actually print? */
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <Printer className="h-12 w-12 text-amber-500" />
+            <div className="text-center space-y-1">
+              <p className="font-semibold text-lg">{t('print.confirmTitle', 'Did you print successfully?')}</p>
+              <p className="text-sm text-muted-foreground">{t('print.confirmDesc', 'Only confirm if the print job was sent to the printer')}</p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={handleDenyPrinted} className="min-w-[120px]" data-testid="print-deny-btn">
+                {t('print.notPrinted', 'No, I cancelled')}
+              </Button>
+              <Button onClick={handleConfirmPrinted} className="min-w-[120px] bg-green-600 hover:bg-green-700" data-testid="print-confirm-btn">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {t('print.yesPrinted', 'Yes, printed')}
+              </Button>
+            </div>
           </div>
         ) : orders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
