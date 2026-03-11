@@ -300,14 +300,8 @@ async def update_settings(data: dict, admin: dict = Depends(get_admin_user)):
     else:
         await db[SETTINGS_COL].update_one({"id": "default"}, {"$set": update_fields})
 
-    # Restart or stop Gmail poller based on new settings
-    from .gmail_poller import gmail_poller
-    if "polling_mode" in update_fields:
-        if update_fields["polling_mode"] == "realtime":
-            await gmail_poller.stop()
-            await gmail_poller.start()
-        else:
-            await gmail_poller.stop()
+    # Gmail polling now runs in the Integration Hub — settings are read from DB by the Hub
+    # No local poller to restart; Hub picks up config changes automatically
 
     result = await db[SETTINGS_COL].find_one({"id": "default"}, {"_id": 0})
     return result
@@ -315,15 +309,24 @@ async def update_settings(data: dict, admin: dict = Depends(get_admin_user)):
 
 @router.get("/polling/status")
 async def get_polling_status(admin: dict = Depends(get_admin_user)):
-    """Check the Gmail background polling status."""
-    from .gmail_poller import gmail_poller
+    """Check the Gmail background polling status (Hub-managed)."""
     settings = await db[SETTINGS_COL].find_one({"id": "default"}, {"_id": 0})
+    # Check Hub status
+    hub_running = False
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=3) as c:
+            r = await c.get("http://127.0.0.1:8002/health")
+            hub_running = r.status_code == 200
+    except Exception:
+        pass
     return {
-        "poller_running": gmail_poller.is_running,
+        "poller_running": hub_running,
         "polling_mode": settings.get("polling_mode", "manual") if settings else "manual",
         "polling_interval_minutes": settings.get("polling_interval_minutes", 1) if settings else 1,
         "last_auto_scan": settings.get("last_auto_scan") if settings else None,
         "last_scan_created": settings.get("last_scan_created", 0) if settings else 0,
+        "hub_managed": True,
     }
 
 

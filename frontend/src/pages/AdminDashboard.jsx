@@ -73,6 +73,7 @@ import { useTranslation } from 'react-i18next';
 import SpeechNotifications from '@/modules/dashboard/SpeechNotifications';
 
 const BadgeCustomizationModule = lazy(() => import('@/modules/admin/BadgeCustomizationModule'));
+const HubDashboardModule = lazy(() => import('@/modules/admin/HubDashboardModule'));
 
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
@@ -223,6 +224,7 @@ const navGroups = [
   {
     group: 'Integrations',
     items: [
+      { id: 'hub-dashboard', labelKey: 'nav.hubDashboard', fallbackLabel: 'Integration Hub', icon: Radio, permission: 'admin.site_config', adminOnly: true },
       { id: 'forms', labelKey: 'nav.forms', icon: FileText, permission: 'admin.site_config' },
     ],
   },
@@ -420,6 +422,8 @@ export default function AdminDashboard() {
       case 'widget':
         return <WidgetManagerModule />;
       // Integrations
+      case 'hub-dashboard':
+        return <HubDashboardModule />;
       case 'forms':
         return <FormsManagerModule />;
       // Developer

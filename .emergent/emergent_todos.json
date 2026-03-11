@@ -1,22 +1,22 @@
 [
   {
-    "content": "Backend: Add presale reconciliation endpoint - scans ALL Monday items vs DB orders",
+    "content": "Clean redundant code: remove queue.py usage, clean gmail_poller.py from main app",
     "status": "completed"
   },
   {
-    "content": "Backend: Add merge endpoint - adds only NEW subitems to existing orders",
+    "content": "Build Hub Dashboard in main app admin panel (/admin#hub-dashboard)",
     "status": "completed"
   },
   {
-    "content": "Backend: Add import-missing endpoint - imports orders marked Done but never imported",
+    "content": "Add Hub proxy route in main app backend to forward requests to Hub APIs",
     "status": "completed"
   },
   {
-    "content": "Frontend: Add Reconciliation tab in Pre-Sale Import with status table and actions",
+    "content": "Fix Paid Date sync with exact column ID date_mm10yfj1",
     "status": "completed"
   },
   {
-    "content": "Test reconciliation flow end-to-end",
+    "content": "Test everything works after cleanup",
     "status": "completed"
   }
 ]

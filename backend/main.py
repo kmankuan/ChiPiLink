@@ -244,6 +244,10 @@ from modules.showcase import router as showcase_router, admin_router as showcase
 api_router.include_router(showcase_router)
 api_router.include_router(showcase_admin_router)
 
+# Integration Hub Proxy (admin access to Hub APIs via port 8001)
+from modules.hub_proxy import router as hub_proxy_router
+api_router.include_router(hub_proxy_router)
+
 # Include main router in app
 app.include_router(api_router)
 
