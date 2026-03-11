@@ -105,6 +105,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   const handleConfirmPrinted = () => {
     setPrinted(true);
     setConfirmPrint(false);
+    setCountdown(0);
     markJobComplete();
     markOrdersPrinted();
     if (orderIds.length === 1) {
@@ -115,15 +116,33 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   /** Called when user says they did NOT print (cancelled) */
   const handleDenyPrinted = () => {
     setConfirmPrint(false);
-    // Don't mark as printed — counter stays the same
+    setCountdown(0);
     toast.info('Print not registered — counter unchanged');
   };
 
-  /** Show confirmation after print dialog closes */
+  /** Show confirmation after print dialog closes — auto-confirms in 4s */
+  const [countdown, setCountdown] = useState(0);
+  const countdownRef = useRef(null);
+
   const askPrintConfirmation = () => {
     setPrinting(false);
     setConfirmPrint(true);
+    setCountdown(4);
   };
+
+  // Countdown timer — auto-confirms when it reaches 0
+  useEffect(() => {
+    if (!confirmPrint || countdown <= 0) return;
+    countdownRef.current = setTimeout(() => {
+      if (countdown === 1) {
+        // Time's up — auto-confirm
+        handleConfirmPrinted();
+      } else {
+        setCountdown(countdown - 1);
+      }
+    }, 1000);
+    return () => clearTimeout(countdownRef.current);
+  }, [confirmPrint, countdown]);
 
   /** Print to thermal printer — one job per order (auto-cut between each) */
   const handleThermalPrintOneByOne = async () => {
@@ -319,20 +338,39 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
         ) : confirmPrint ? (
-          /* Print confirmation — did the user actually print? */
+          /* Print confirmation — auto-confirms in 4s, user can cancel */
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <Printer className="h-12 w-12 text-amber-500" />
+            <div className="relative">
+              <Printer className="h-12 w-12 text-green-500" />
+              {countdown > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {countdown}
+                </span>
+              )}
+            </div>
             <div className="text-center space-y-1">
-              <p className="font-semibold text-lg">{t('print.confirmTitle', 'Did you print successfully?')}</p>
-              <p className="text-sm text-muted-foreground">{t('print.confirmDesc', 'Only confirm if the print job was sent to the printer')}</p>
+              <p className="font-semibold text-lg">{t('print.confirmTitle', 'Print sent')}</p>
+              <p className="text-sm text-muted-foreground">
+                {countdown > 0
+                  ? t('print.autoConfirm', `Registering in ${countdown}s... Click cancel if you didn't print`)
+                  : t('print.confirmDesc', 'Print registered')
+                }
+              </p>
+            </div>
+            {/* Progress bar */}
+            <div className="w-48 h-1.5 rounded-full bg-gray-200 overflow-hidden">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear"
+                style={{ width: `${((4 - countdown) / 4) * 100}%` }}
+              />
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={handleDenyPrinted} className="min-w-[120px]" data-testid="print-deny-btn">
-                {t('print.notPrinted', 'No, I cancelled')}
+              <Button variant="outline" onClick={handleDenyPrinted} className="min-w-[140px] border-red-200 text-red-600 hover:bg-red-50" data-testid="print-deny-btn">
+                {t('print.notPrinted', "No, I didn't print")}
               </Button>
               <Button onClick={handleConfirmPrinted} className="min-w-[120px] bg-green-600 hover:bg-green-700" data-testid="print-confirm-btn">
                 <CheckCircle className="h-4 w-4 mr-2" />
-                {t('print.yesPrinted', 'Yes, printed')}
+                {t('print.yesPrinted', 'Confirm now')}
               </Button>
             </div>
           </div>
