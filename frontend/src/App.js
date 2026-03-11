@@ -44,6 +44,7 @@ import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
 import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
+import PaymentStatus from '@/pages/PaymentStatus';
 
 // PinpanClub Module
 import PingPongDashboard from '@/modules/pinpanclub/pages/PingPongDashboard';
@@ -153,6 +154,7 @@ function AppRouter() {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path="/payment-status" element={<PaymentStatus />} />
       <Route path="/" element={<><Header /><SuperAppLanding /></>} />
       <Route path="/login" element={<><Header /><Login /></>} />
       <Route path="/admin/login" element={<AdminLogin />} />

@@ -10,6 +10,50 @@ from .payment_verification import payment_verification_service
 router = APIRouter(prefix="/payment-verify", tags=["Payment Verification"])
 
 
+# ═══ PUBLIC ENDPOINT — No login required ═══
+
+@router.get("/public/check")
+async def public_check_payment(ref: str = Query(..., min_length=3)):
+    """
+    Public payment status lookup. No auth required.
+    Only returns: status, amount, date — NO personal info exposed.
+    """
+    from core.database import db
+
+    # Search by reference (exact or partial match)
+    record = await db.payment_verifications.find_one(
+        {"bank_reference": {"$regex": ref.strip(), "$options": "i"}},
+        {"_id": 0, "verification_status": 1, "amount": 1, "verified_amount": 1,
+         "bank_account": 1, "created_at": 1, "wallet_credited": 1}
+    )
+
+    if not record:
+        return {"found": False}
+
+    # Map internal status to user-friendly display
+    status = record.get("verification_status", "pending")
+    status_map = {
+        "pending": {"label": "Pendiente de verificación", "color": "yellow"},
+        "received": {"label": "Pago verificado", "color": "green"},
+        "not_found_1/3": {"label": "En proceso de verificación", "color": "yellow"},
+        "not_found_2/3": {"label": "En proceso de verificación", "color": "yellow"},
+        "not_found_3/3": {"label": "No encontrado — contacte soporte", "color": "red"},
+        "check_later": {"label": "En proceso de verificación", "color": "yellow"},
+    }
+    display = status_map.get(status, {"label": "En revisión", "color": "yellow"})
+
+    return {
+        "found": True,
+        "status": display["label"],
+        "color": display["color"],
+        "amount": record.get("verified_amount") or record.get("amount"),
+        "date": record.get("created_at", "")[:10],
+        "credited": record.get("wallet_credited", False),
+    }
+
+
+
+
 @router.get("/search")
 async def search_payments(
     q: str = "",
