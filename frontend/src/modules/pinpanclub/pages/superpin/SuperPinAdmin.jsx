@@ -87,9 +87,9 @@ export default function SuperPinAdmin() {
       if (response.ok) {
         setShowCreateModal(false);
         setNewLeague({
-          nombre: '',
-          temporada: new Date().getFullYear().toString(),
-          descripcion: '',
+          name: '',
+          season: new Date().getFullYear().toString(),
+          description: '',
           scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
           checkin_config: { methods: ['manual'] }
         });

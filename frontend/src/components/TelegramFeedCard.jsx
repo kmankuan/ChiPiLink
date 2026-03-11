@@ -87,7 +87,7 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
       style={{
         width: cardWidth,
         background: '#fff',
-        border: '1px solid rgba(0,0,0,0.07)',
+        border: '1px solid rgba(0,0,0,0.04)',
       }}
       onClick={() => onOpenDetail(post)}
       data-testid={`h-post-${post.telegram_msg_id}`}
@@ -569,7 +569,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
   return (
     <div
       className="overflow-hidden"
-      style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
+      style={{ background: bg_color }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
       {/* Autoplay progress bar */}
@@ -805,7 +805,7 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
   return (
     <div
       className="overflow-hidden shadow-sm"
-      style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
+      style={{ background: bg_color }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
       <div className="flex items-center justify-between px-2 pt-2 pb-0">

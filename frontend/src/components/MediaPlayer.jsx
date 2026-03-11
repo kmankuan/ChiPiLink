@@ -330,15 +330,15 @@ export default function MediaPlayer() {
 
   return (
     <div data-testid="media-player-wrapper">
-      {/* Title ABOVE the frame — styled to look like part of the frame */}
+      {/* Title ABOVE the frame — seamless with the player, no borders */}
       {albumTitle && (
-        <div className="bg-black rounded-t-xl px-4 pt-3 pb-2">
+        <div className="bg-black px-4 pt-3 pb-2">
           <SectionTitle title={albumTitle} />
         </div>
       )}
       <div
         ref={containerRef}
-        className={`relative w-full overflow-hidden bg-black group ${albumTitle ? 'rounded-b-xl' : 'rounded-xl'}`}
+        className="relative w-full overflow-hidden bg-black group"
         style={{ aspectRatio: '16/9' }}
         onTouchStart={config?.show_controls ? onTouchStart : undefined}
         onTouchEnd={config?.show_controls ? onTouchEnd : undefined}
