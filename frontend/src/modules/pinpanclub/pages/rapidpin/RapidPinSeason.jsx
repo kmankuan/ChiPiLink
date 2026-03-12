@@ -708,47 +708,46 @@ export default function RapidPinSeason() {
                     {matches.map((match) => (
                       <div 
                         key={match.match_id}
-                        className={`p-4 rounded-lg border ${
+                        className={`p-3 rounded-lg border ${
                           match.status === 'validated' 
                             ? 'bg-green-500/5 border-green-500/20' 
                             : 'bg-yellow-500/5 border-yellow-500/20'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div>
-                              <span className={`font-medium ${match.winner_id === match.player_a_id ? 'text-green-500' : ''}`}>
-                                {getPlayerName(match.player_a_info)}
-                              </span>
-                              <span className="text-muted-foreground mx-2">vs</span>
-                              <span className={`font-medium ${match.winner_id === match.player_b_id ? 'text-green-500' : ''}`}>
-                                {getPlayerName(match.player_b_info)}
-                              </span>
-                            </div>
-                            <span className="text-lg font-mono">
-                              {match.winner_id === match.player_a_id 
-                                ? `${match.score_winner}-${match.score_loser}`
-                                : `${match.score_loser}-${match.score_winner}`
-                              }
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                            <span className={`font-medium text-sm truncate ${match.winner_id === match.player_a_id ? 'text-green-600' : ''}`}>
+                              {getPlayerName(match.player_a_info)}
+                            </span>
+                            <span className="text-muted-foreground text-xs">vs</span>
+                            <span className={`font-medium text-sm truncate ${match.winner_id === match.player_b_id ? 'text-green-600' : ''}`}>
+                              {getPlayerName(match.player_b_info)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="text-xs">
-                              <Scale className="w-3 h-3 mr-1" />
+                          <span className="text-base font-mono font-bold shrink-0">
+                            {match.winner_id === match.player_a_id 
+                              ? `${match.score_winner}-${match.score_loser}`
+                              : `${match.score_loser}-${match.score_winner}`
+                            }
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-gray-100">
+                          <span className="text-[10px] text-muted-foreground">
+                            {formatDate(match.match_date)} {formatTime(match.match_date)}
+                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge variant="outline" className="text-[10px] shrink-0">
+                              <Scale className="w-3 h-3 mr-0.5" />
                               {getPlayerName(match.referee_info)}
                             </Badge>
-                            <Badge variant={match.status === 'validated' ? 'default' : 'secondary'}>
+                            <Badge variant={match.status === 'validated' ? 'default' : 'secondary'} className="text-[10px] shrink-0">
                               {match.status === 'validated' ? (
-                                <Check className="w-3 h-3 mr-1" />
+                                <><Check className="w-3 h-3 mr-0.5" />OK</>
                               ) : (
-                                <Clock className="w-3 h-3 mr-1" />
+                                <><Clock className="w-3 h-3 mr-0.5" />Pend.</>
                               )}
-                              {t(`rapidpin.matches.status.${match.status}`)}
                             </Badge>
                           </div>
-                        </div>
-                        <div className="mt-2 text-xs text-muted-foreground">
-                          {formatDate(match.match_date)} {formatTime(match.match_date)}
                         </div>
                       </div>
                     ))}

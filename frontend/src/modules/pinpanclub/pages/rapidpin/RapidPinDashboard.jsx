@@ -276,15 +276,13 @@ export default function RapidPinDashboard() {
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
-                    {(season.total_matches || 0) === 0 && (
-                      <button
-                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        onClick={(e) => { e.stopPropagation(); deleteSeason(season.season_id, season.name); }}
-                        data-testid={`delete-season-${season.season_id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
+                    <button
+                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      onClick={(e) => { e.stopPropagation(); deleteSeason(season.season_id, season.name); }}
+                      data-testid={`delete-season-${season.season_id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                     <div className="flex items-center text-yellow-500 ml-auto">
                       <span className="text-sm">{t('rapidpin.viewSeason')}</span>
                       <ChevronRight className="w-4 h-4 ml-1" />
