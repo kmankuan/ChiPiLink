@@ -148,25 +148,25 @@ export default function SuperPinAdmin() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden px-4 py-4" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
+    <div className="min-h-screen overflow-x-hidden max-w-2xl mx-auto px-4 py-4" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Trophy className="h-8 w-8 text-yellow-500" />
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Trophy className="h-6 w-6 text-yellow-500 shrink-0" />
               {t('superpin.admin')}
             </h1>
-            <p className="text-gray-600 mt-1">{t('superpin.adminDesc')}</p>
+            <p className="text-gray-600 text-sm mt-1">{t('superpin.adminDesc')}</p>
           </div>
-          <Button onClick={() => setShowCreateModal(true)} className="text-white rounded-full" style={{ background: "#B8860B" }}>
-            <Plus className="h-4 w-4 mr-2" /> {t('superpin.leagues.new')}
+          <Button onClick={() => setShowCreateModal(true)} className="text-white rounded-full shrink-0 text-sm" style={{ background: "#B8860B" }}>
+            <Plus className="h-4 w-4 mr-1" /> {t('superpin.leagues.new')}
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <Card>
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-3 bg-green-100 rounded-lg">
@@ -230,47 +230,42 @@ export default function SuperPinAdmin() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {leagues.map((league) => (
                 <div
-                  key={league.liga_id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  key={league.league_id || league.liga_id}
+                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-lg shadow-sm">
-                      <Trophy className="h-6 w-6 text-yellow-500" />
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-white rounded-lg shadow-sm shrink-0">
+                      <Trophy className="h-5 w-5 text-yellow-500" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{league.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-500">{t('superpin.tournaments.season')} {league.temporada}</span>
-                        <span className="text-gray-300">•</span>
-                        <span className="text-sm text-gray-500">{getScoringLabel(league.scoring_config?.system)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right mr-4">
-                      <p className="text-sm text-gray-500">{league.total_players || 0} {t('superpin.players.title').toLowerCase()}</p>
-                      <p className="text-sm text-gray-500">{league.total_matches || 0} {t('superpin.matches.title').toLowerCase()}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-gray-900 truncate">{league.name}</h3>
+                      <p className="text-xs text-gray-500">{t('superpin.tournaments.season')} {league.season || league.temporada}</p>
                     </div>
                     {getStatusBadge(league.status)}
-                    {league.status === 'draft' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => activateLeague(league.liga_id)}
-                      >
-                        <Play className="h-4 w-4 mr-1" /> {t('superpin.leagues.activate')}
+                  </div>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span>{league.total_players || 0} {t('superpin.players.title').toLowerCase()}</span>
+                      <span>•</span>
+                      <span>{league.total_matches || 0} {t('superpin.matches.title').toLowerCase()}</span>
+                      <span>•</span>
+                      <span>{getScoringLabel(league.scoring_config?.system)}</span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {league.status === 'draft' && (
+                        <Button size="sm" variant="outline" className="h-7 text-xs"
+                          onClick={() => activateLeague(league.league_id || league.liga_id)}>
+                          <Play className="h-3 w-3 mr-1" /> {t('superpin.leagues.activate')}
+                        </Button>
+                      )}
+                      <Button size="sm" variant="ghost" className="h-7"
+                        onClick={() => navigate(`/pinpanclub/superpin/league/${league.league_id || league.liga_id}`)}>
+                        <ChevronRight className="h-4 w-4" />
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigate(`/pinpanclub/superpin/league/${league.liga_id}`)}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                    </div>
                   </div>
                 </div>
               ))}
