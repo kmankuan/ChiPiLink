@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
+import { toast } from 'sonner';
 import { Badge } from '../../../../components/ui/badge';
 import PINPANCLUB_API from '../../config/api';
 import RESOLVED_API_URL from '@/config/apiUrl';
@@ -49,14 +50,14 @@ export default function SuperPinAdmin() {
 
   const createLeague = async () => {
     if (!newLeague.name || newLeague.name.trim() === '') {
-      alert(t('superpin.leagues.name') + ' es requerido');
+      toast.error(t('superpin.leagues.name') + ' es requerido');
       return;
     }
 
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) {
-        alert('Sesión expirada. Por favor inicie sesión nuevamente.');
+        toast.error('Sesión expirada. Por favor inicie sesión como administrador.');
         return;
       }
 
@@ -85,6 +86,7 @@ export default function SuperPinAdmin() {
       }
       
       if (response.ok) {
+        toast.success('Liga creada exitosamente');
         setShowCreateModal(false);
         setNewLeague({
           name: '',
@@ -96,11 +98,17 @@ export default function SuperPinAdmin() {
         fetchLeagues();
       } else {
         const error = await response.json();
-        alert('Error: ' + (error.detail || 'No se pudo crear la liga'));
+        if (response.status === 403) {
+          toast.error('Acceso denegado — se requiere cuenta de administrador');
+        } else if (response.status === 401) {
+          toast.error('Sesión expirada — inicie sesión nuevamente');
+        } else {
+          toast.error('Error: ' + (error.detail || 'No se pudo crear la liga'));
+        }
       }
     } catch (error) {
       console.error('Error creating league:', error);
-      alert('Error de conexión. Intente nuevamente.');
+      toast.error('Error de conexión. Intente nuevamente.');
     }
   };
 
