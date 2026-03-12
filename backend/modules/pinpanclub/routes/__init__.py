@@ -10,7 +10,6 @@ from .monday import router as monday_router
 from .sponsors import router as sponsors_router
 from .canvas import router as canvas_router
 from .websocket import ws_router
-from .superpin import router as superpin_router
 from .rapidpin import router as rapidpin_router
 from .social import router as social_router
 from .challenges import router as challenges_router
@@ -33,7 +32,6 @@ router.include_router(monday_router)
 router.include_router(sponsors_router)
 router.include_router(canvas_router)
 router.include_router(ws_router)
-router.include_router(superpin_router)
 router.include_router(rapidpin_router)
 router.include_router(social_router)
 router.include_router(challenges_router)

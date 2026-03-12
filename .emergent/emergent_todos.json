@@ -1,22 +1,26 @@
 [
   {
-    "content": "Clean redundant code: remove queue.py usage, clean gmail_poller.py from main app",
+    "content": "Remove SuperPin routes from App.js",
     "status": "completed"
   },
   {
-    "content": "Build Hub Dashboard in main app admin panel (/admin#hub-dashboard)",
+    "content": "Remove SuperPin imports from App.js",
     "status": "completed"
   },
   {
-    "content": "Add Hub proxy route in main app backend to forward requests to Hub APIs",
+    "content": "Clean CompetitionsHub — remove league section, keep Arena + RapidPin",
     "status": "completed"
   },
   {
-    "content": "Fix Paid Date sync with exact column ID date_mm10yfj1",
+    "content": "Clean PingPongDashboard — remove league banner and references",
     "status": "completed"
   },
   {
-    "content": "Test everything works after cleanup",
+    "content": "Remove superpin route from backend router",
+    "status": "completed"
+  },
+  {
+    "content": "Test everything compiles and works",
     "status": "completed"
   }
 ]

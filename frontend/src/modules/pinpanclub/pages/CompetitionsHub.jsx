@@ -1,6 +1,6 @@
 /**
  * CompetitionsHub — Unified competition center.
- * Merges League (SuperPin), Rapid Pin, and Arena into one view.
+ * Rapid Pin + Arena Tournaments only. SuperPin League module removed.
  */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Trophy, Zap, Swords, Award, Users, Plus, ArrowRight, Clock, Star, Shield
+  Trophy, Zap, Swords, Award, Users, Plus, ArrowRight, Clock, Star
 } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -44,8 +44,7 @@ function CompCard({ icon: Icon, title, desc, count, color, onClick }) {
 export default function CompetitionsHub() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
-  const [leagues, setLeagues] = useState([]);
+  const { user } = useAuth();
   const [seasons, setSeasons] = useState([]);
   const [tournaments, setTournaments] = useState([]);
   const [tab, setTab] = useState('all');
@@ -54,21 +53,18 @@ export default function CompetitionsHub() {
 
   useEffect(() => {
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    // Fetch all competition types
     Promise.all([
-      fetch(`${API}/api/pinpanclub/superpin/leagues`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
       fetch(`${API}/api/pinpanclub/rapidpin/seasons`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
       fetch(`${API}/api/pinpanclub/arena/tournaments`, { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([l, s, a]) => {
-      setLeagues(Array.isArray(l) ? l : l?.leagues || []);
+    ]).then(([s, a]) => {
       setSeasons(Array.isArray(s) ? s : s?.seasons || []);
       setTournaments(Array.isArray(a) ? a : a?.tournaments || []);
     });
   }, [token]);
 
-  const activeLeagues = leagues.filter(l => l.status === 'active');
   const activeSeasons = seasons.filter(s => s.status === 'active');
   const activeTournaments = tournaments.filter(t => t.status === 'active' || t.status === 'registration');
+  const allActive = [...activeSeasons, ...activeTournaments];
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
@@ -80,16 +76,10 @@ export default function CompetitionsHub() {
               <Trophy className="h-5 w-5" style={{ color: '#B8860B' }} />
               <h1 className="text-lg font-bold text-white">Competitions</h1>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="text-white/70 hover:text-white rounded-full text-xs h-7"
-                onClick={() => navigate('/pinpanclub/superpin/ranking')}>
-                <Star className="h-3.5 w-3.5 mr-1" /> Ranking
-              </Button>
-              <Button variant="ghost" size="sm" className="text-white/70 hover:text-white rounded-full text-xs h-7"
-                onClick={() => navigate('/pinpanclub/hall-of-fame')}>
-                <Award className="h-3.5 w-3.5 mr-1" /> Hall of Fame
-              </Button>
-            </div>
+            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white rounded-full text-xs h-7"
+              onClick={() => navigate('/pinpanclub/hall-of-fame')}>
+              <Award className="h-3.5 w-3.5 mr-1" /> Hall of Fame
+            </Button>
           </div>
         </div>
       </div>
@@ -98,10 +88,6 @@ export default function CompetitionsHub() {
         {/* Quick Create — admin only */}
         {isAdmin && (
           <div className="flex gap-2">
-            <Button size="sm" className="flex-1 rounded-full text-xs text-white" style={{ background: '#B8860B' }}
-              onClick={() => navigate('/pinpanclub/superpin/admin')}>
-              <Plus className="h-3 w-3 mr-1" /> New League
-            </Button>
             <Button size="sm" className="flex-1 rounded-full text-xs text-white" style={{ background: '#C8102E' }}
               onClick={() => navigate('/pinpanclub/rapidpin')}>
               <Plus className="h-3 w-3 mr-1" /> New Season
@@ -117,11 +103,8 @@ export default function CompetitionsHub() {
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="w-full h-auto gap-1 p-1" style={{ background: 'rgba(139,115,85,0.08)' }}>
             <TabsTrigger value="all" className="flex-1 text-xs rounded-full">All</TabsTrigger>
-            <TabsTrigger value="leagues" className="flex-1 text-xs rounded-full gap-1">
-              <Shield className="h-3 w-3" /> Leagues
-            </TabsTrigger>
             <TabsTrigger value="seasons" className="flex-1 text-xs rounded-full gap-1">
-              <Zap className="h-3 w-3" /> Seasons
+              <Zap className="h-3 w-3" /> Rapid Pin
             </TabsTrigger>
             <TabsTrigger value="tournaments" className="flex-1 text-xs rounded-full gap-1">
               <Swords className="h-3 w-3" /> Tournaments
@@ -129,35 +112,24 @@ export default function CompetitionsHub() {
           </TabsList>
 
           <TabsContent value="all" className="space-y-3 mt-3">
-            {activeLeagues.length === 0 && activeSeasons.length === 0 && activeTournaments.length === 0 && (
+            {allActive.length === 0 && (
               <p className="text-center text-sm py-8" style={{ color: '#8b7355' }}>No active competitions. {isAdmin ? 'Create one above!' : ''}</p>
             )}
-            {activeLeagues.map(l => (
-              <CompCard key={l.liga_id} icon={Shield} title={l.name} desc={`${l.players?.length || 0} players · League`}
-                count={0} color="#B8860B" onClick={() => navigate(`/pinpanclub/superpin/ranking`)} />
-            ))}
             {activeSeasons.map(s => (
-              <CompCard key={s.season_id} icon={Zap} title={s.name} desc={`${s.matches_count || 0} matches · Rapid Pin Season`}
+              <CompCard key={s.season_id} icon={Zap} title={s.name} desc={`${s.matches_count || 0} matches · Rapid Pin`}
                 count={0} color="#C8102E" onClick={() => navigate(`/pinpanclub/rapidpin/season/${s.season_id}`)} />
             ))}
             {activeTournaments.map(t => (
               <CompCard key={t.tournament_id} icon={Swords} title={t.name} desc={`${t.participants?.length || 0} participants · Tournament`}
                 count={0} color="#2d2217" onClick={() => navigate(`/pinpanclub/arena/${t.tournament_id}`)} />
             ))}
-            {/* Also show inactive ones */}
-            {[...leagues.filter(l => l.status !== 'active'), ...seasons.filter(s => s.status !== 'active'), ...tournaments.filter(t => t.status !== 'active' && t.status !== 'registration')].map((item, i) => (
+            {/* Inactive */}
+            {[...seasons.filter(s => s.status !== 'active'), ...tournaments.filter(t => t.status !== 'active' && t.status !== 'registration')].map((item, i) => (
               <CompCard key={i} icon={Clock} title={item.name} desc={item.status || 'Ended'}
-                count={0} color="#8b7355" onClick={() => {}} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="leagues" className="space-y-3 mt-3">
-            {leagues.length === 0 ? (
-              <p className="text-center text-sm py-8" style={{ color: '#8b7355' }}>No leagues yet</p>
-            ) : leagues.map(l => (
-              <CompCard key={l.liga_id} icon={Shield} title={l.name}
-                desc={`${l.players?.length || 0} players · ${l.status}`}
-                count={0} color="#B8860B" onClick={() => navigate(`/pinpanclub/superpin/ranking`)} />
+                count={0} color="#8b7355" onClick={() => {
+                  if (item.season_id) navigate(`/pinpanclub/rapidpin/season/${item.season_id}`);
+                  else if (item.tournament_id) navigate(`/pinpanclub/arena/${item.tournament_id}`);
+                }} />
             ))}
           </TabsContent>
 

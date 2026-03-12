@@ -58,9 +58,6 @@ import SponsorsAdmin from '@/modules/pinpanclub/pages/SponsorsAdmin';
 import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
 import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
 
-// Super Pin Module
-import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking, SuperPinTournament, PlayerProfile, PlayerComparison } from '@/modules/pinpanclub/pages/superpin';
-
 // Rapid Pin Module
 import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
 
@@ -190,16 +187,6 @@ function AppRouter() {
       
       {/* PinpanClub Mobile Arbiter */}
       <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<><Header /><PingPongMobileArbiter /></>} />
-      
-      {/* PinPan League Routes (formerly Super Pin) */}
-      <Route path="/pinpanclub/superpin/admin" element={<><Header /><SuperPinAdmin /></>} />
-      <Route path="/pinpanclub/superpin/league/:leagueId" element={<><Header /><SuperPinLeagueDetail /></>} />
-      <Route path="/pinpanclub/superpin/match/:matchId" element={<><Header /><SuperPinMatch /></>} />
-      <Route path="/pinpanclub/superpin/ranking" element={<><Header /><SuperPinRanking /></>} />
-      <Route path="/pinpanclub/superpin/ranking/:leagueId" element={<><Header /><SuperPinRanking /></>} />
-      <Route path="/pinpanclub/superpin/tournament/:tournamentId" element={<><Header /><SuperPinTournament /></>} />
-      <Route path="/pinpanclub/superpin/player/:playerId" element={<><Header /><PlayerProfile /></>} />
-      <Route path="/pinpanclub/superpin/compare" element={<><Header /><PlayerComparison /></>} />
       
       {/* Rapid Pin Routes */}
       <Route path="/rapidpin" element={<><Header /><RapidPinPublicPage /></>} />
