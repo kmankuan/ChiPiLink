@@ -478,7 +478,7 @@ class SuperPinService(BaseService):
     
     # ============== RANKING ==============
     
-    async def get_ranking(self, league_id: str) -> RankingTable:
+    async def get_ranking(self, league_id: str):
         """Get ranking table"""
         league = await self.get_league(league_id)
         if not league:
@@ -486,16 +486,24 @@ class SuperPinService(BaseService):
         
         entries = await self.ranking_repo.get_league_ranking(league_id)
         
-        return RankingTable(
-            league_id=league_id,
-            league_name=league.name,
-            season=league.season,
-            total_players=len(entries),
-            total_matches=league.total_matches,
-            scoring_system=league.scoring_config.system,
-            entries=[RankingEntry(**e) for e in entries],
-            last_updated=datetime.now(timezone.utc).isoformat()
-        )
+        safe_entries = []
+        for e in entries:
+            try:
+                safe_entries.append(RankingEntry(**e).model_dump())
+            except Exception:
+                e.pop("_id", None)
+                safe_entries.append(e)
+        
+        return {
+            "league_id": league_id,
+            "league_name": league.get("name", "") if isinstance(league, dict) else getattr(league, "name", ""),
+            "season": league.get("season", "") if isinstance(league, dict) else getattr(league, "season", ""),
+            "total_players": len(safe_entries),
+            "total_matches": league.get("total_matches", 0) if isinstance(league, dict) else getattr(league, "total_matches", 0),
+            "scoring_system": (league.get("scoring_config", {}) if isinstance(league, dict) else getattr(league, "scoring_config", {})).get("system", "simple") if isinstance(league.get("scoring_config") if isinstance(league, dict) else getattr(league, "scoring_config", None), dict) else "simple",
+            "entries": safe_entries,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
     
     async def get_player_stats(
         self,
