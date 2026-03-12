@@ -132,11 +132,13 @@ export default function SuperPinAdmin() {
       paused: 'bg-yellow-100 text-yellow-800',
       finished: 'bg-blue-100 text-blue-800'
     };
-    return <Badge className={styles[status]}>{t(`superpin.leagues.status.${status}`)}</Badge>;
+    const labels = { draft: 'Borrador', active: 'Activa', paused: 'Pausada', finished: 'Terminada' };
+    const label = t(`superpin.leagues.status.${status}`, labels[status] || status || 'Draft');
+    return <Badge className={`text-xs shrink-0 ${styles[status] || 'bg-gray-100 text-gray-800'}`}>{label}</Badge>;
   };
 
   const getScoringLabel = (system) => {
-    return system === 'elo' ? t('superpin.leagues.scoringElo') : t('superpin.leagues.scoringSimple');
+    return system === 'elo' ? 'ELO' : 'Simple';
   };
 
   if (loading) {
