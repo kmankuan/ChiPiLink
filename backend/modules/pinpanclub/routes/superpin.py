@@ -21,15 +21,31 @@ router = APIRouter(prefix="/superpin", tags=["Super Pin Ranking"])
 
 # ============== LEAGUES ==============
 
-@router.get("/leagues", response_model=List[SuperPinLeague])
+@router.get("/leagues")
 async def get_leagues(active_only: bool = False):
     """Get all leagues or only active ones"""
-    if active_only:
-        return await superpin_service.get_active_leagues()
-    return await superpin_service.get_all_leagues()
+    try:
+        if active_only:
+            results = await superpin_service.get_active_leagues()
+        else:
+            results = await superpin_service.get_all_leagues()
+        # Serialize safely — convert any datetime objects to strings
+        safe_results = []
+        for league in results:
+            if hasattr(league, 'model_dump'):
+                safe_results.append(league.model_dump())
+            elif isinstance(league, dict):
+                safe_results.append(league)
+            else:
+                safe_results.append(league)
+        return safe_results
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Error fetching leagues: {e}", exc_info=True)
+        raise
 
 
-@router.get("/leagues/{league_id}", response_model=SuperPinLeague)
+@router.get("/leagues/{league_id}")
 async def get_league(league_id: str):
     """Get league by ID"""
     league = await superpin_service.get_league(league_id)
