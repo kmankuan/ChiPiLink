@@ -302,26 +302,26 @@ export default function PingPongDashboard() {
         {rapidPinData.season && (
           <section>
             <Card className="bg-gradient-to-r from-orange-900 via-red-900 to-orange-900 border-0 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-yellow-500/20 rounded-xl">
-                      <Zap className="h-8 w-8 text-yellow-400" />
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 bg-yellow-500/20 rounded-xl shrink-0">
+                      <Zap className="h-6 w-6 text-yellow-400" />
                     </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        ⚡ Rapid Pin - {rapidPinData.season.nombre}
+                    <div className="min-w-0">
+                      <h2 className="text-base font-bold text-white truncate">
+                        Rapid Pin — {rapidPinData.season.nombre || rapidPinData.season.name}
                       </h2>
-                      <p className="text-orange-200 text-sm">Actividad reciente de partidos espontáneos</p>
+                      <p className="text-orange-200 text-xs">Actividad reciente</p>
                     </div>
                   </div>
                   <Button 
-                    variant="outline" 
-                    className="border-white/30 text-white hover:bg-white/10"
+                    variant="outline" size="sm"
+                    className="border-white/30 text-white hover:bg-white/10 shrink-0 text-xs"
                     onClick={() => navigate(`/pinpanclub/rapidpin/season/${rapidPinData.season.season_id}`)}
                   >
-                    <Trophy className="h-4 w-4 mr-2" />
-                    Ver Ranking
+                    <Trophy className="h-3 w-3 mr-1" />
+                    Ranking
                   </Button>
                 </div>
 
@@ -383,24 +383,24 @@ export default function PingPongDashboard() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                  <div className="flex items-center gap-6 text-sm text-orange-200">
+                <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
+                  <div className="flex items-center gap-4 text-xs text-orange-200 flex-wrap">
                     <span className="flex items-center gap-1">
-                      <Trophy className="w-4 h-4" />
+                      <Trophy className="w-3.5 h-3.5" />
                       {rapidPinData.season.total_matches || 0} partidos
                     </span>
                     <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
+                      <Users className="w-3.5 h-3.5" />
                       {rapidPinData.season.total_players || 0} players
                     </span>
                     <span className="flex items-center gap-1">
-                      <Scale className="w-4 h-4" />
+                      <Scale className="w-3.5 h-3.5" />
                       {rapidPinData.season.total_referees || 0} árbitros
                     </span>
                   </div>
                   <Button 
                     size="sm"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
                     onClick={() => navigate('/pinpanclub/rapidpin')}
                   >
                     <Plus className="h-4 w-4 mr-1" />
