@@ -85,15 +85,30 @@ class SuperPinService(BaseService):
         result = await self.league_repo.get_by_id(league_id)
         return SuperPinLeague(**result) if result else None
     
-    async def get_active_leagues(self) -> List[SuperPinLeague]:
+    async def get_active_leagues(self) -> list:
         """Get active leagues"""
         results = await self.league_repo.get_active_leagues()
-        return [SuperPinLeague(**r) for r in results]
+        safe = []
+        for r in results:
+            try:
+                safe.append(SuperPinLeague(**r).model_dump())
+            except Exception:
+                # If model validation fails, return raw dict (safe fallback)
+                r.pop("_id", None)
+                safe.append(r)
+        return safe
     
-    async def get_all_leagues(self) -> List[SuperPinLeague]:
+    async def get_all_leagues(self) -> list:
         """Get all leagues"""
         results = await self.league_repo.get_all_leagues()
-        return [SuperPinLeague(**r) for r in results]
+        safe = []
+        for r in results:
+            try:
+                safe.append(SuperPinLeague(**r).model_dump())
+            except Exception:
+                r.pop("_id", None)
+                safe.append(r)
+        return safe
     
     async def update_league(
         self,

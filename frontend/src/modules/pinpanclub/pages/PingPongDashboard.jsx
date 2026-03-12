@@ -345,6 +345,7 @@ export default function PingPongDashboard() {
                     <Medal className="h-4 w-4 mr-1 sm:mr-2" />
                     <span className="hidden xs:inline">Ver </span>Ranking
                   </Button>
+                  {canManage && (
                   <Button 
                     size="sm"
                     className="text-black rounded-full sm:size-default"
@@ -355,6 +356,7 @@ export default function PingPongDashboard() {
                     <span className="hidden sm:inline">Administrar</span>
                     <span className="sm:hidden">Admin</span>
                   </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
