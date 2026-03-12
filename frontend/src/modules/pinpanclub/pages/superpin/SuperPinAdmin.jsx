@@ -253,49 +253,55 @@ export default function SuperPinAdmin() {
             </div>
           ) : (
             <div className="space-y-3">
-              {leagues.map((league) => (
+              {leagues.map((league) => {
+                const lid = league.league_id || league.liga_id || '';
+                const canDelete = (league.total_matches || 0) === 0;
+                return (
                 <div
-                  key={league.league_id || league.liga_id}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  key={lid || Math.random()}
+                  className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3">
                     <div className="p-2 bg-white rounded-lg shadow-sm shrink-0">
                       <Trophy className="h-5 w-5 text-yellow-500" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-gray-900 truncate">{league.name}</h3>
-                      <p className="text-xs text-gray-500">{t('superpin.tournaments.season')} {league.season || league.temporada}</p>
-                    </div>
-                    {getStatusBadge(league.status)}
-                  </div>
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span>{league.total_players || 0} {t('superpin.players.title').toLowerCase()}</span>
-                      <span>•</span>
-                      <span>{league.total_matches || 0} {t('superpin.matches.title').toLowerCase()}</span>
-                      <span>•</span>
-                      <span>{getScoringLabel(league.scoring_config?.system)}</span>
+                      <h3 className="font-semibold text-gray-900 truncate text-sm">{league.name || '(sin nombre)'}</h3>
+                      <p className="text-[11px] text-gray-500">{league.season || league.temporada || '—'} · {getScoringLabel(league.scoring_config?.system)}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
+                      {getStatusBadge(league.status)}
+                      {canDelete && (
+                        <button
+                          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          onClick={(e) => { e.stopPropagation(); deleteLeague(lid, league.name); }}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                      <span>{league.total_players || 0} jugadores</span>
+                      <span>·</span>
+                      <span>{league.total_matches || 0} partidos</span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       {league.status === 'draft' && (
-                        <Button size="sm" variant="outline" className="h-7 text-xs"
-                          onClick={() => activateLeague(league.league_id || league.liga_id)}>
-                          <Play className="h-3 w-3 mr-1" /> {t('superpin.leagues.activate')}
+                        <Button size="sm" variant="outline" className="h-6 text-[11px] px-2"
+                          onClick={() => activateLeague(lid)}>
+                          <Play className="h-3 w-3 mr-1" /> Activar
                         </Button>
                       )}
-                      {league.status === 'draft' && (league.total_matches || 0) === 0 && (
-                        <Button size="sm" variant="ghost" className="h-7 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          onClick={(e) => { e.stopPropagation(); deleteLeague(league.league_id || league.liga_id, league.name); }}>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      )}
-                      <Button size="sm" variant="ghost" className="h-7"
-                        onClick={() => navigate(`/pinpanclub/superpin/league/${league.league_id || league.liga_id}`)}>
+                      <Button size="sm" variant="ghost" className="h-6 px-1"
+                        onClick={() => navigate(`/pinpanclub/superpin/league/${lid}`)}>
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 </div>
+                );
+              })}
               ))}
             </div>
           )}

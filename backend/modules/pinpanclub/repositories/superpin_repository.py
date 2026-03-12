@@ -32,8 +32,12 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.insert_one(league_data)
     
     async def get_by_id(self, league_id: str) -> Optional[Dict]:
-        """Get league by ID"""
-        return await self.find_one({self.ID_FIELD: league_id})
+        """Get league by ID — handles both league_id and legacy liga_id"""
+        result = await self.find_one({self.ID_FIELD: league_id})
+        if not result:
+            # Try legacy Spanish field name
+            result = await self.find_one({"liga_id": league_id})
+        return result
     
     async def get_active_leagues(self) -> List[Dict]:
         """Get active leagues"""

@@ -58,17 +58,23 @@ async def get_league(league_id: str):
 @router.delete("/leagues/{league_id}")
 async def delete_league(league_id: str, admin: dict = Depends(get_admin_user)):
     """Delete a league (admin only). Only draft leagues with 0 matches can be deleted."""
-    league = await superpin_service.get_league(league_id)
+    from core.database import db
+    from core.constants import PinpanClubCollections
+    
+    # Try both league_id and liga_id (handles legacy Spanish field names)
+    league = await db[PinpanClubCollections.SUPERPIN_LEAGUES].find_one(
+        {"$or": [{"league_id": league_id}, {"liga_id": league_id}]}, {"_id": 0}
+    )
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
     if (league.get("total_matches") or 0) > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete league with matches. Set to finished instead.")
+        raise HTTPException(status_code=400, detail="Cannot delete league with matches")
     
-    from core.database import db
-    from core.constants import PinpanClubCollections
-    result = await db[PinpanClubCollections.SUPERPIN_LEAGUES].delete_one({"league_id": league_id})
+    result = await db[PinpanClubCollections.SUPERPIN_LEAGUES].delete_one(
+        {"$or": [{"league_id": league_id}, {"liga_id": league_id}]}
+    )
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="League not found")
+        raise HTTPException(status_code=404, detail="Delete failed")
     return {"success": True, "deleted": league_id}
 
 
