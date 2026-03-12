@@ -229,11 +229,15 @@ async def get_league_matches(
 
 # ============== RANKING ==============
 
-@router.get("/leagues/{league_id}/ranking", response_model=RankingTable)
+@router.get("/leagues/{league_id}/ranking")
 async def get_ranking(league_id: str):
     """Get ranking table for a league"""
     try:
         return await superpin_service.get_ranking(league_id)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Ranking error for {league_id}: {e}")
+        return {"league_id": league_id, "rankings": [], "last_updated": None}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

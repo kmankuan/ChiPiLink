@@ -45,29 +45,40 @@ export default function SuperPinLeagueDetail() {
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       
-      const [leagueRes, rankingRes, matchesRes, playersRes, usersRes] = await Promise.all([
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}`),
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/ranking`),
-        fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/matches?limit=20`),
-        fetch(`${API_URL}/api/pinpanclub/players`),
-        fetch(`${API_URL}/api/auth-v2/users`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).catch(() => ({ ok: false }))
-      ]);
-
+      // Fetch league first — this is required
+      const leagueRes = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}`);
+      if (!leagueRes.ok) {
+        setLoading(false);
+        return;
+      }
       const leagueData = await leagueRes.json();
-      const rankingData = await rankingRes.json();
-      const matchesData = await matchesRes.json();
-      const playersData = await playersRes.json();
-      const usersData = usersRes.ok ? await usersRes.json() : [];
-
       setLeague(leagueData);
-      setRanking(rankingData);
-      setMatches(matchesData);
-      setAvailablePlayers(playersData);
-      setRegisteredUsers(usersData);
+
+      // Fetch the rest individually — failures don't block the page
+      try {
+        const rankingRes = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/ranking`);
+        if (rankingRes.ok) setRanking(await rankingRes.json());
+      } catch {}
+
+      try {
+        const matchesRes = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/matches?limit=20`);
+        if (matchesRes.ok) setMatches(await matchesRes.json());
+      } catch {}
+
+      try {
+        const playersRes = await fetch(`${API_URL}/api/pinpanclub/players`);
+        if (playersRes.ok) setAvailablePlayers(await playersRes.json());
+      } catch {}
+
+      try {
+        const usersRes = await fetch(`${API_URL}/api/auth-v2/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (usersRes.ok) setRegisteredUsers(await usersRes.json());
+      } catch {}
+
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching league:', error);
     } finally {
       setLoading(false);
     }
