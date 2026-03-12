@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Zap, Plus, Calendar, Users, Award, Clock, 
-  ChevronRight, Trophy, Settings, ArrowLeft 
+  ChevronRight, Trophy, Settings, ArrowLeft, Trash2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -58,9 +58,10 @@ export default function RapidPinDashboard() {
     }
 
     try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       const response = await fetch(`${API_BASE}/rapidpin/seasons`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newSeason)
       });
 
@@ -84,6 +85,27 @@ export default function RapidPinDashboard() {
       toast.error(t('common.error'));
     }
   };
+
+  const deleteSeason = async (seasonId, seasonName) => {
+    if (!confirm(`Delete "${seasonName}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/rapidpin/seasons/${seasonId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setSeasons(prev => prev.filter(s => s.season_id !== seasonId));
+        toast.success('Season deleted');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Cannot delete season');
+      }
+    } catch {
+      toast.error('Error deleting season');
+    }
+  };
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -253,9 +275,20 @@ export default function RapidPinDashboard() {
                       </span>
                     </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-end text-yellow-500">
-                    <span className="text-sm">{t('rapidpin.viewSeason')}</span>
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                  <div className="mt-3 flex items-center justify-between">
+                    {(season.total_matches || 0) === 0 && (
+                      <button
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        onClick={(e) => { e.stopPropagation(); deleteSeason(season.season_id, season.name); }}
+                        data-testid={`delete-season-${season.season_id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                    <div className="flex items-center text-yellow-500 ml-auto">
+                      <span className="text-sm">{t('rapidpin.viewSeason')}</span>
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

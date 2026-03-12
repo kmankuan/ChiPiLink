@@ -58,6 +58,23 @@ async def update_season(
     return season
 
 
+@router.delete("/seasons/{season_id}")
+async def delete_season(season_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a season (admin only). Only seasons with 0 matches can be deleted."""
+    from core.database import db
+    from core.constants import PinpanClubCollections
+    
+    season = await db[PinpanClubCollections.RAPIDPIN_SEASONS].find_one({"season_id": season_id}, {"_id": 0})
+    if not season:
+        raise HTTPException(status_code=404, detail="Season not found")
+    if (season.get("total_matches") or 0) > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete season with matches")
+    
+    await db[PinpanClubCollections.RAPIDPIN_SEASONS].delete_one({"season_id": season_id})
+    return {"success": True, "deleted": season_id}
+
+
+
 @router.post("/seasons/{season_id}/close", response_model=RapidPinSeasonFinalResults)
 async def close_season(
     season_id: str,
