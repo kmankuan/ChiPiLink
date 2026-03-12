@@ -255,7 +255,7 @@ export default function SuperPinAdmin() {
             <div className="space-y-3">
               {leagues.map((league) => {
                 const lid = league.league_id || league.liga_id || '';
-                const canDelete = (league.total_matches || 0) === 0;
+                const canDelete = league.status === 'draft' && (league.total_matches || 0) === 0;
                 return (
                 <div
                   key={lid || Math.random()}
@@ -302,7 +302,6 @@ export default function SuperPinAdmin() {
                 </div>
                 );
               })}
-              ))}
             </div>
           )}
         </CardContent>
