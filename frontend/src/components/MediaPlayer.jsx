@@ -330,10 +330,10 @@ export default function MediaPlayer() {
 
   return (
     <div data-testid="media-player-wrapper">
-      {/* Title ABOVE the frame — seamless with the player, no borders */}
+      {/* Title — seamless with the black player frame */}
       {albumTitle && (
         <div className="bg-black px-4 pt-3 pb-2">
-          <SectionTitle title={albumTitle} />
+          <h3 className="text-white/90 text-xs sm:text-sm font-bold tracking-tight">{albumTitle}</h3>
         </div>
       )}
       <div

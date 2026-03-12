@@ -590,8 +590,11 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between px-2 pt-2 pb-0">
-        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
+      <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
+        <div>
+          <h3 className="text-sm font-bold text-[#2d2217]">{title}</h3>
+          {show_post_count && total_posts > 0 && <p className="text-[9px] text-[#8b7355]">{total_posts} posts</p>}
+        </div>
         <div className="flex items-center gap-2 shrink-0">
           {/* Autoplay toggle - hidden by default, admin-configurable */}
           {show_autoplay_btn && posts.length > 1 && (
@@ -808,8 +811,11 @@ function VerticalFeedContainer({ container, onOpenGallery }) {
       style={{ background: bg_color }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
-      <div className="flex items-center justify-between px-2 pt-2 pb-0">
-        <SectionTitle title={title} subtitle={show_post_count && total_posts > 0 ? `${total_posts} posts` : null} />
+      <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
+        <div>
+          <h3 className="text-sm font-bold text-[#2d2217]">{title}</h3>
+          {show_post_count && total_posts > 0 && <p className="text-[9px] text-[#8b7355]">{total_posts} posts</p>}
+        </div>
         <div className="flex items-center gap-2 shrink-0">
           {header_links.length > 0 && header_links.map((link, idx) => {
             const isExternal = link.url?.startsWith('http');
