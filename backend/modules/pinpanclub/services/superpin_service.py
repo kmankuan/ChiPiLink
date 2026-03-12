@@ -80,10 +80,16 @@ class SuperPinService(BaseService):
             {"name": "Fourth Place", "position": 4, "icon": "🏅"},
         ]
     
-    async def get_league(self, league_id: str) -> Optional[SuperPinLeague]:
+    async def get_league(self, league_id: str):
         """Get league by ID"""
         result = await self.league_repo.get_by_id(league_id)
-        return SuperPinLeague(**result) if result else None
+        if not result:
+            return None
+        try:
+            return SuperPinLeague(**result).model_dump()
+        except Exception:
+            result.pop("_id", None)
+            return result
     
     async def get_active_leagues(self) -> list:
         """Get active leagues"""

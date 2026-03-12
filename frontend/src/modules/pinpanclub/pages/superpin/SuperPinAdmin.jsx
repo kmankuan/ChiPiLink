@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Trophy, Users, Calendar, Settings, Plus, Play, Pause,
-  ChevronRight, Medal, Target, Award, TrendingUp, ArrowLeft
+  ChevronRight, Medal, Target, Award, TrendingUp, ArrowLeft, Trash2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
@@ -122,6 +122,26 @@ export default function SuperPinAdmin() {
       fetchLeagues();
     } catch (error) {
       console.error('Error activating league:', error);
+    }
+  };
+
+  const deleteLeague = async (leagueId, leagueName) => {
+    if (!confirm(`Delete "${leagueName || 'this league'}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('League deleted');
+        fetchLeagues();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Cannot delete league');
+      }
+    } catch (error) {
+      toast.error('Error deleting league');
     }
   };
 
@@ -261,6 +281,12 @@ export default function SuperPinAdmin() {
                         <Button size="sm" variant="outline" className="h-7 text-xs"
                           onClick={() => activateLeague(league.league_id || league.liga_id)}>
                           <Play className="h-3 w-3 mr-1" /> {t('superpin.leagues.activate')}
+                        </Button>
+                      )}
+                      {league.status === 'draft' && (league.total_matches || 0) === 0 && (
+                        <Button size="sm" variant="ghost" className="h-7 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={(e) => { e.stopPropagation(); deleteLeague(league.league_id || league.liga_id, league.name); }}>
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       )}
                       <Button size="sm" variant="ghost" className="h-7"
