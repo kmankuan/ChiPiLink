@@ -252,6 +252,11 @@ api_router.include_router(showcase_admin_router)
 from modules.hub_proxy import router as hub_proxy_router
 api_router.include_router(hub_proxy_router)
 
+# Sport Module (Table Tennis — replaces PinPanClub)
+from modules.sport import router as sport_router
+api_router.include_router(sport_router)
+
+
 # Include main router in app
 app.include_router(api_router)
 

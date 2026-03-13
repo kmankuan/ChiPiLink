@@ -1,26 +1,34 @@
 [
   {
-    "content": "Remove SuperPin routes from App.js",
+    "content": "Step 1: Backend foundation — models, settings, player CRUD, match CRUD",
     "status": "completed"
   },
   {
-    "content": "Remove SuperPin imports from App.js",
+    "content": "Step 2: Backend live scoring — WebSocket, momentum engine, emotions",
     "status": "completed"
   },
   {
-    "content": "Clean CompetitionsHub — remove league section, keep Arena + RapidPin",
+    "content": "Step 3: Backend leagues — standings, rating calculations",
     "status": "completed"
   },
   {
-    "content": "Clean PingPongDashboard — remove league banner and references",
-    "status": "completed"
+    "content": "Step 4: Frontend — Dashboard, Record Match, Rankings, League",
+    "status": "in_progress"
   },
   {
-    "content": "Remove superpin route from backend router",
-    "status": "completed"
+    "content": "Step 5: Frontend live scoring — Referee panel, Spectator, Overlay",
+    "status": "pending"
   },
   {
-    "content": "Test everything compiles and works",
-    "status": "completed"
+    "content": "Step 6: Frontend momentum graph + GIF emotions",
+    "status": "pending"
+  },
+  {
+    "content": "Step 7: Remove old PinPanClub + register new Sport module",
+    "status": "pending"
+  },
+  {
+    "content": "Step 8: Testing + polish",
+    "status": "pending"
   }
 ]
