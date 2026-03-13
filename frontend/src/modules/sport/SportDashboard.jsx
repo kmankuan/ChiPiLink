@@ -60,14 +60,18 @@ export default function SportDashboard() {
 
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button className="h-14 rounded-xl text-white font-bold text-sm" style={{ background: '#C8102E' }}
+        <div className="grid grid-cols-3 gap-2">
+          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#C8102E' }}
             onClick={() => navigate('/sport/match/new')}>
-            <Plus className="h-5 w-5 mr-2" /> {t('sport.recordMatch')}
+            <Plus className="h-4 w-4" /> {t('sport.recordMatch')}
           </Button>
-          <Button className="h-14 rounded-xl text-white font-bold text-sm" style={{ background: '#2d2217' }}
+          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#2d2217' }}
             onClick={() => navigate('/sport/live/new')}>
-            <Radio className="h-5 w-5 mr-2" /> {t('sport.live.startLive')}
+            <Zap className="h-4 w-4" /> Referee
+          </Button>
+          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#7c3aed' }}
+            onClick={() => navigate('/sport/live/new?stream=1')}>
+            <Radio className="h-4 w-4" /> Stream
           </Button>
         </div>
 

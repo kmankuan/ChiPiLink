@@ -21,6 +21,8 @@ export default function StartLive() {
   const token = localStorage.getItem('auth_token');
   const [players, setPlayers] = useState([]);
   const [leagues, setLeagues] = useState([]);
+  const isStream = new URLSearchParams(window.location.search).get('stream') === '1';
+  const [showStream, setShowStream] = useState(isStream);
   const [form, setForm] = useState({
     player_a_name: '', player_b_name: '', referee_name: '',
     sets_to_win: 2, points_to_win: 11, league_id: '', stream_url: '',
@@ -56,11 +58,11 @@ export default function StartLive() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
-      <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' }} className="px-4 py-3">
+      <div style={{ background: showStream ? 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)' : 'linear-gradient(135deg, #2d2217 0%, #4a3728 100%)' }} className="px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <Button variant="ghost" size="sm" className="text-white" onClick={() => navigate('/sport')}><ArrowLeft className="h-4 w-4" /></Button>
-          <Radio className="h-5 w-5 text-red-500" />
-          <h1 className="text-base font-bold text-white">{t('sport.live.startLive')}</h1>
+          {showStream ? <Radio className="h-5 w-5 text-red-400" /> : <Play className="h-5 w-5 text-yellow-400" />}
+          <h1 className="text-base font-bold text-white">{showStream ? 'Live Stream Match' : 'Referee Match'}</h1>
         </div>
       </div>
 
@@ -116,14 +118,21 @@ export default function StartLive() {
               </div>
             )}
 
-            <div>
-              <Label className="text-xs">Stream URL (optional — Telegram/YouTube live link)</Label>
-              <Input value={form.stream_url} onChange={e => set('stream_url', e.target.value)} placeholder="https://t.me/..." className="h-10" />
-            </div>
+            {/* Stream URL — only shown when streaming mode */}
+            {showStream ? (
+              <div>
+                <Label className="text-xs">Stream URL (Telegram/YouTube live link)</Label>
+                <Input value={form.stream_url} onChange={e => set('stream_url', e.target.value)} placeholder="https://t.me/..." className="h-10" />
+              </div>
+            ) : (
+              <button className="text-xs text-muted-foreground hover:underline" onClick={() => setShowStream(true)}>
+                + Add live stream URL (optional)
+              </button>
+            )}
 
-            <Button className="w-full h-14 text-lg font-bold text-white" style={{ background: 'linear-gradient(135deg, #C8102E, #8B0000)' }}
+            <Button className="w-full h-14 text-lg font-bold text-white" style={{ background: showStream ? 'linear-gradient(135deg, #7c3aed, #5b21b6)' : 'linear-gradient(135deg, #2d2217, #4a3728)' }}
               onClick={handleStart} disabled={submitting}>
-              <Play className="h-6 w-6 mr-2" /> {submitting ? '...' : 'START LIVE MATCH'}
+              <Play className="h-6 w-6 mr-2" /> {submitting ? '...' : showStream ? 'START LIVE STREAM' : 'START REFEREE'}
             </Button>
           </CardContent>
         </Card>
