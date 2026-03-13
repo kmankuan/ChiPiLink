@@ -178,52 +178,17 @@ function AppRouter() {
       <Route path="/eventos" element={<><Header /><SuperAppLanding /></>} />
       <Route path="/galeria" element={<><Header /><SuperAppLanding /></>} />
       
-      {/* PinpanClub Routes */}
-      <Route path="/pinpanclub" element={<><Header /><PingPongDashboard /></>} />
-      <Route path="/pinpanclub/match/new" element={<><Header /><PingPongMatch /></>} />
-      <Route path="/pinpanclub/match/:matchId" element={<><Header /><PingPongMatch /></>} />
-      <Route path="/pinpanclub/arbiter/:matchId" element={<><Header /><PingPongArbiter /></>} />
-      <Route path="/pinpanclub/spectator/:matchId" element={<><Header /><PingPongSpectator /></>} />
-      <Route path="/pinpanclub/live/:matchId" element={<><Header /><PingPongSpectator /></>} />
-      <Route path="/pinpanclub/sponsors" element={<><Header /><SponsorsAdmin /></>} />
-      <Route path="/pinpanclub/monday" element={<><Header /><PingPongMondayIntegration /></>} />
-      
-      {/* PinpanClub TV Display - Public URL for TVs - NO Header for TV mode */}
+      {/* PinpanClub Routes — DEPRECATED, redirecting to Sport module */}
+      {/* Keep TV and Canvas routes as they still work independently */}
       <Route path="/tv/pinpanclub" element={<PingPongTV />} />
       <Route path="/tv" element={<PingPongTV />} />
-      
-      {/* PinpanClub Canvas - Customizable Widget Layout - NO Header for canvas */}
       <Route path="/canvas" element={<PingPongCanvas />} />
       <Route path="/tv/canvas" element={<PingPongCanvas />} />
       
-      {/* PinpanClub Mobile Arbiter */}
-      <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<><Header /><PingPongMobileArbiter /></>} />
-      
-      {/* Rapid Pin Routes */}
-      <Route path="/rapidpin" element={<><Header /><RapidPinPublicPage /></>} />
-      <Route path="/pinpanclub/competitions" element={<><Header /><CompetitionsHub /></>} />
-      <Route path="/pinpanclub/rapidpin" element={<><Header /><RapidPinDashboard /></>} />
-      <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<><Header /><RapidPinSeason /></>} />
-      
-      {/* PinPan Arena Routes */}
-      <Route path="/pinpanclub/arena" element={<><Header /><ArenaHub /></>} />
-      <Route path="/pinpanclub/arena/create" element={<><Header /><ArenaCreate /></>} />
-      <Route path="/pinpanclub/arena/:tournamentId" element={<><Header /><ArenaDetail /></>} />
+      {/* All pinpanclub routes redirect to sport */}
+      <Route path="/pinpanclub/*" element={<Navigate to="/sport" replace />} />
+      <Route path="/rapidpin" element={<Navigate to="/sport" replace />} />
       <Route path="/arena/:tournamentId" element={<ArenaPublic />} />
-      
-      {/* Hall of Fame & Referee Routes */}
-      <Route path="/pinpanclub/hall-of-fame" element={<><Header /><HallOfFame /></>} />
-      <Route path="/pinpanclub/referee-settings" element={<><Header /><RefereeSettings /></>} />
-      
-      {/* Weekly Challenges Route */}
-      <Route path="/pinpanclub/challenges" element={<><Header /><WeeklyChallengesPage /></>} />
-      
-      {/* Analytics Dashboard Route */}
-      <Route path="/pinpanclub/analytics" element={<><Header /><AnalyticsDashboard /></>} />
-      
-      {/* Seasons Page Routes */}
-      <Route path="/pinpanclub/seasons" element={<><Header /><SeasonsPage /></>} />
-      <Route path="/pinpanclub/seasons/:seasonId" element={<><Header /><SeasonsPage /></>} />
       
       {/* Account Module Routes (User's personal portal) */}
       <Route 
@@ -288,9 +253,6 @@ function AppRouter() {
       
       {/* Legacy redirects */}
       <Route path="/pingpong/*" element={<Navigate to="/sport" replace />} />
-      <Route path="/pinpanclub" element={<Navigate to="/sport" replace />} />
-      <Route path="/pinpanclub/*" element={<Navigate to="/sport" replace />} />
-      <Route path="/tv/pingpong" element={<Navigate to="/sport" replace />} />
 
       {/* Sport Module (Table Tennis) */}
       <Route path="/sport" element={<><Header /><SportDashboard /></>} />

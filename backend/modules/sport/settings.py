@@ -99,12 +99,12 @@ DEFAULTS = {
     "reactions": {
         "enabled": True,
         "available": [
-            {"emoji": "\ud83d\udc4f", "label": "Great!", "id": "clap"},
-            {"emoji": "\ud83d\udd25", "label": "Fire!", "id": "fire"},
-            {"emoji": "\ud83d\ude31", "label": "Wow!", "id": "wow"},
-            {"emoji": "\ud83d\udc09", "label": "Dragon!", "id": "dragon"},
-            {"emoji": "\ud83c\udfee", "label": "Respect", "id": "lantern"},
-            {"emoji": "\ud83d\udcaa", "label": "Strong!", "id": "strong"},
+            {"emoji": "clap", "label": "Great!", "id": "clap"},
+            {"emoji": "fire", "label": "Fire!", "id": "fire"},
+            {"emoji": "wow", "label": "Wow!", "id": "wow"},
+            {"emoji": "dragon", "label": "Dragon!", "id": "dragon"},
+            {"emoji": "lantern", "label": "Respect", "id": "lantern"},
+            {"emoji": "strong", "label": "Strong!", "id": "strong"},
         ],
     },
 }

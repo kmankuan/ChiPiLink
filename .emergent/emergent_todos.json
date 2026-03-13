@@ -25,10 +25,10 @@
   },
   {
     "content": "Step 7: Remove old PinPanClub + add Sport to navigation",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
-    "content": "Step 8: Testing + polish",
-    "status": "pending"
+    "content": "Step 8: Testing + bug fixes",
+    "status": "completed"
   }
 ]
