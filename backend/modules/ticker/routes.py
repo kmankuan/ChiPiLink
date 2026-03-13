@@ -12,11 +12,10 @@ import os
 router = APIRouter(prefix="/ticker", tags=["Ticker"])
 admin_router = APIRouter(prefix="/admin/ticker", tags=["Ticker Admin"])
 
-# DB helper
+# DB helper — use the shared async motor client
 def get_db():
-    from pymongo import MongoClient
-    client = MongoClient(os.environ.get("MONGO_URL"))
-    return client[os.environ.get("DB_NAME", "chipilink_prod")]
+    from core.database import db
+    return db
 
 def get_admin_user():
     """Dependency placeholder — replaced when mounted"""
@@ -51,11 +50,11 @@ DEFAULT_CONFIG = {
 }
 
 
-def _get_config(db):
+async def _get_config(db):
     """Get ticker config, seeding defaults if missing."""
-    doc = db.app_config.find_one({"config_key": "ticker_config"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "ticker_config"}, {"_id": 0})
     if not doc:
-        db.app_config.insert_one({"config_key": "ticker_config", "value": DEFAULT_CONFIG})
+        await db.app_config.insert_one({"config_key": "ticker_config", "value": DEFAULT_CONFIG})
         return DEFAULT_CONFIG
     return doc.get("value", DEFAULT_CONFIG)
 
@@ -69,7 +68,7 @@ def _merge_defaults(config):
 
 
 # ─── Activity Aggregator ───
-def _fetch_activities(db, config):
+async def _fetch_activities(db, config):
     """Pull real activities from enabled sources."""
     activities = []
     sources = config.get("activity_sources", {})
@@ -79,10 +78,10 @@ def _fetch_activities(db, config):
     # PinPanClub Matches
     if sources.get("matches", {}).get("enabled"):
         try:
-            matches = list(db.pinpanclub_matches.find(
+            matches = await db.pinpanclub_matches.find(
                 {"created_at": {"$gte": since.isoformat()}},
                 {"_id": 0, "player1_name": 1, "player2_name": 1, "status": 1, "created_at": 1, "winner_name": 1}
-            ).sort("created_at", -1).limit(5))
+            ).sort("created_at", -1).limit(5).to_list(5)
             for m in matches:
                 p1 = m.get("player1_name", "Player 1")
                 p2 = m.get("player2_name", "Player 2")
@@ -103,10 +102,10 @@ def _fetch_activities(db, config):
     # New Users
     if sources.get("new_users", {}).get("enabled"):
         try:
-            users = list(db.users.find(
+            users = await db.users.find(
                 {},
                 {"_id": 0, "nombre": 1, "email": 1, "created_at": 1}
-            ).sort("created_at", -1).limit(5))
+            ).sort("created_at", -1).limit(5).to_list(5)
             for u in users:
                 name = u.get("nombre", u.get("email", "Someone").split("@")[0])
                 activities.append({
@@ -121,10 +120,10 @@ def _fetch_activities(db, config):
     # Store Orders
     if sources.get("orders", {}).get("enabled"):
         try:
-            orders = list(db.store_textbook_orders.find(
+            orders = await db.store_textbook_orders.find(
                 {},
                 {"_id": 0, "student_name": 1, "items": 1, "created_at": 1, "status": 1}
-            ).sort("created_at", -1).limit(5))
+            ).sort("created_at", -1).limit(5).to_list(5)
             for o in orders:
                 name = o.get("student_name", "Someone")
                 item_count = len(o.get("items", []))
@@ -140,10 +139,10 @@ def _fetch_activities(db, config):
     # Community Posts
     if sources.get("community", {}).get("enabled"):
         try:
-            posts = list(db.community_posts.find(
+            posts = await db.community_posts.find(
                 {},
                 {"_id": 0, "title": 1, "author_name": 1, "created_at": 1}
-            ).sort("created_at", -1).limit(5))
+            ).sort("created_at", -1).limit(5).to_list(5)
             for p in posts:
                 author = p.get("author_name", "Someone")
                 title = p.get("title", "a new post")
@@ -161,10 +160,10 @@ def _fetch_activities(db, config):
     # Wallet Transactions
     if sources.get("transactions", {}).get("enabled"):
         try:
-            txns = list(db.wallet_transactions.find(
+            txns = await db.wallet_transactions.find(
                 {"type": {"$in": ["topup", "transfer"]}},
                 {"_id": 0, "type": 1, "amount": 1, "created_at": 1}
-            ).sort("created_at", -1).limit(5))
+            ).sort("created_at", -1).limit(5).to_list(5)
             for tx in txns:
                 amt = tx.get("amount", 0)
                 activities.append({
@@ -259,7 +258,7 @@ async def update_ticker_config(body: dict):
     updated = {**current, **body}
     updated["updated_at"] = datetime.now(timezone.utc).isoformat()
 
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "ticker_config"},
         {"$set": {"value": updated}},
         upsert=True
@@ -289,7 +288,7 @@ async def add_sponsor(body: dict):
     sponsors = config.get("sponsors", [])
     sponsors.append(sponsor)
 
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "ticker_config"},
         {"$set": {"value.sponsors": sponsors}},
         upsert=True
@@ -314,7 +313,7 @@ async def update_sponsor(sponsor_id: str, body: dict):
     if not found:
         raise HTTPException(status_code=404, detail="Sponsor not found")
 
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "ticker_config"},
         {"$set": {"value.sponsors": sponsors}}
     )
@@ -328,7 +327,7 @@ async def delete_sponsor(sponsor_id: str):
     config = _get_config(db)
     sponsors = [s for s in config.get("sponsors", []) if s.get("id") != sponsor_id]
 
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "ticker_config"},
         {"$set": {"value.sponsors": sponsors}}
     )
@@ -354,7 +353,7 @@ DEFAULT_LANDING_IMAGES = {
 async def get_landing_images():
     """Public: get customized landing page images."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
     images = doc.get("value", DEFAULT_LANDING_IMAGES) if doc else DEFAULT_LANDING_IMAGES
     return {**DEFAULT_LANDING_IMAGES, **images}
 
@@ -363,7 +362,7 @@ async def get_landing_images():
 async def get_landing_images_admin():
     """Admin: get landing images config with defaults."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
     custom = doc.get("value", {}) if doc else {}
     return {"defaults": DEFAULT_LANDING_IMAGES, "custom": custom, "resolved": {**DEFAULT_LANDING_IMAGES, **custom}}
 
@@ -372,10 +371,10 @@ async def get_landing_images_admin():
 async def update_landing_images(body: dict):
     """Admin: update landing page images (partial update)."""
     db = get_db()
-    current_doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    current_doc = await db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
     current = current_doc.get("value", {}) if current_doc else {}
     updated = {**current, **body}
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "landing_images"},
         {"$set": {"config_key": "landing_images", "value": updated, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
@@ -410,7 +409,7 @@ DEFAULT_LAYOUT_ICONS = {
 async def get_layout_icons():
     """Public: get icon config for all layouts."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
     custom = doc.get("value", {}) if doc else {}
     merged = {**DEFAULT_LAYOUT_ICONS}
     for layout_id, icons in custom.items():
@@ -423,7 +422,7 @@ async def get_layout_icons():
 async def get_layout_icons_admin():
     """Admin: get all layout icon configs with defaults."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
     custom = doc.get("value", {}) if doc else {}
     merged = {**DEFAULT_LAYOUT_ICONS}
     for layout_id, icons in custom.items():
@@ -437,10 +436,10 @@ async def update_layout_icons(layout_id: str, body: dict):
     """Admin: update icon config for a specific layout."""
     db = get_db()
     icons = body.get("icons", [])
-    current_doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    current_doc = await db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
     current = current_doc.get("value", {}) if current_doc else {}
     current[layout_id] = icons
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "layout_icons"},
         {"$set": {"config_key": "layout_icons", "value": current, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
@@ -470,7 +469,7 @@ DEFAULT_ICON_STATUSES = [
 async def get_icon_statuses_public():
     """Public: get available icon statuses."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
     statuses = doc.get("value", DEFAULT_ICON_STATUSES) if doc else DEFAULT_ICON_STATUSES
     return {"statuses": statuses}
 
@@ -479,7 +478,7 @@ async def get_icon_statuses_public():
 async def get_icon_statuses_admin():
     """Admin: get icon statuses config."""
     db = get_db()
-    doc = db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
     statuses = doc.get("value", DEFAULT_ICON_STATUSES) if doc else DEFAULT_ICON_STATUSES
     return {"statuses": statuses, "defaults": DEFAULT_ICON_STATUSES}
 
@@ -489,7 +488,7 @@ async def update_icon_statuses(body: dict):
     """Admin: update custom icon statuses."""
     db = get_db()
     statuses = body.get("statuses", [])
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "icon_statuses"},
         {"$set": {"config_key": "icon_statuses", "value": statuses, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
