@@ -514,6 +514,13 @@ export default function TextbookOrdersAdminTab() {
     fetchData();
   }, [filterStatus, filterGrade]);
 
+  // Debounced search — refetch when search term changes (after 400ms)
+  useEffect(() => {
+    if (!searchTerm) { fetchData(); return; }
+    const timer = setTimeout(() => fetchData(), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Auto-refresh on real-time order events
   useRealtimeEvent('order_submitted', useCallback(() => fetchData(), []));
   useRealtimeEvent('order_status_changed', useCallback(() => fetchData(), []));
@@ -527,6 +534,7 @@ export default function TextbookOrdersAdminTab() {
       const params = new URLSearchParams();
       if (filterStatus !== 'all') params.append('status', filterStatus);
       if (filterGrade !== 'all') params.append('grade', filterGrade);
+      if (searchTerm && searchTerm.length >= 2) params.append('search', searchTerm);
 
       const [ordersRes, statsRes, reordersRes] = await Promise.all([
         fetch(`${API}/api/sysbook/orders/admin/all?${params}`, {

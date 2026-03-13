@@ -1046,10 +1046,11 @@ class TextbookOrderService(BaseService):
         self,
         status: Optional[str] = None,
         grade: Optional[str] = None,
-        year: Optional[int] = None
+        year: Optional[int] = None,
+        search: Optional[str] = None
     ) -> List[Dict]:
         """Get all orders (admin view)"""
-        orders = await self.order_repo.get_all(status, grade, year)
+        orders = await self.order_repo.get_all(status, grade, year, search=search)
         
         # Enrich with user info
         for order in orders:

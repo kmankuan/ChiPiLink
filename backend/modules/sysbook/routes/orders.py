@@ -221,17 +221,20 @@ async def debug_my_info(
 # ============== ADMIN ENDPOINTS ==============
 
 @router.get("/admin/all")
+@router.get("/admin/all")
 async def get_all_orders(
     status: Optional[str] = None,
     grade: Optional[str] = None,
     year: Optional[int] = None,
+    search: Optional[str] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Get all orders (admin view)"""
+    """Get all orders (admin view) with optional search"""
     orders = await textbook_order_service.get_all_orders(
         status=status,
         grade=grade,
-        year=year
+        year=year,
+        search=search
     )
     return {"orders": orders}
 

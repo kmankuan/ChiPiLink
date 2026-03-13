@@ -50,9 +50,10 @@ class TextbookOrderRepository(BaseRepository):
         status: Optional[str] = None,
         grade: Optional[str] = None,
         year: Optional[int] = None,
-        limit: int = 500
+        limit: int = 500,
+        search: Optional[str] = None
     ) -> List[Dict]:
-        """Get all orders with optional filters (excludes drafts and archived from admin view)"""
+        """Get all orders with optional filters and search"""
         query = {"status": {"$ne": "draft"}, "$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
         if status:
             query["status"] = status
@@ -60,6 +61,14 @@ class TextbookOrderRepository(BaseRepository):
             query["grade"] = grade
         if year:
             query["year"] = year
+        if search and len(search) >= 2:
+            import re
+            search_regex = {"$regex": re.escape(search), "$options": "i"}
+            query["$or"] = [
+                {"student_name": search_regex},
+                {"order_id": search_regex},
+                {"grade": search_regex},
+            ]
         return await self.find_many(query=query, sort=[("created_at", -1)], limit=limit)
     
     async def update_order(self, order_id: str, data: Dict) -> bool:

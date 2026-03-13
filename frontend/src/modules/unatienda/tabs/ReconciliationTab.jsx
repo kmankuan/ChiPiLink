@@ -356,7 +356,7 @@ export default function ReconciliationTab() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <ScrollArea className="max-h-[600px]">
+            <div className="space-y-3">
               {results.has_new_items.map((entry) => {
                 const isExpanded = expandedItems.has(entry.monday_item_id);
                 return (
@@ -407,7 +407,7 @@ export default function ReconciliationTab() {
                   </div>
                 );
               })}
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       )}
