@@ -102,6 +102,91 @@ async def register_match(data: RapidPinMatchCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.post("/matches/with-names")
+async def register_match_with_names(data: dict):
+    """
+    Register a match using player names. Auto-creates players if they don't exist.
+    Body: {season_id, player_a_name, player_b_name, referee_name, winner_name, score_winner, score_loser}
+    """
+    from core.database import db
+    from core.constants import PinpanClubCollections
+    import uuid
+    from datetime import datetime, timezone
+    
+    season_id = data.get("season_id")
+    pa_name = (data.get("player_a_name") or "").strip()
+    pb_name = (data.get("player_b_name") or "").strip()
+    ref_name = (data.get("referee_name") or "").strip()
+    winner_name = (data.get("winner_name") or "").strip()
+    
+    if not all([season_id, pa_name, pb_name, ref_name, winner_name]):
+        raise HTTPException(400, "All fields required: season_id, player_a_name, player_b_name, referee_name, winner_name")
+    
+    if len(set([pa_name.lower(), pb_name.lower(), ref_name.lower()])) < 3:
+        raise HTTPException(400, "All 3 participants must be different people")
+    
+    if winner_name.lower() not in [pa_name.lower(), pb_name.lower()]:
+        raise HTTPException(400, "Winner must be one of the two players")
+    
+    async def get_or_create_player(name: str) -> dict:
+        """Find existing player by nickname or create new one"""
+        existing = await db[PinpanClubCollections.PLAYERS].find_one(
+            {"nickname": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0}
+        )
+        if existing:
+            return existing
+        
+        # Create new player
+        player_id = f"player_{uuid.uuid4().hex[:8]}"
+        now = datetime.now(timezone.utc).isoformat()
+        new_player = {
+            "player_id": player_id,
+            "nickname": name,
+            "nombre": name,
+            "name": name,
+            "active": True,
+            "elo": 1000,
+            "created_at": now,
+            "auto_created": True,
+        }
+        await db[PinpanClubCollections.PLAYERS].insert_one(new_player)
+        new_player.pop("_id", None)
+        return new_player
+    
+    pa = await get_or_create_player(pa_name)
+    pb = await get_or_create_player(pb_name)
+    ref = await get_or_create_player(ref_name)
+    
+    winner = pa if winner_name.lower() == pa_name.lower() else pb
+    
+    match_data = RapidPinMatchCreate(
+        season_id=season_id,
+        player_a_id=pa["player_id"],
+        player_b_id=pb["player_id"],
+        referee_id=ref["player_id"],
+        winner_id=winner["player_id"],
+        score_winner=int(data.get("score_winner", 11)),
+        score_loser=int(data.get("score_loser", 0)),
+        registered_by_id=pa["player_id"],
+    )
+    
+    try:
+        result = await rapidpin_service.register_match(match_data)
+        # Return with player names for UI
+        if hasattr(result, 'model_dump'):
+            result = result.model_dump()
+        elif not isinstance(result, dict):
+            result = dict(result)
+        result["player_a_name"] = pa["nickname"]
+        result["player_b_name"] = pb["nickname"]
+        result["referee_name"] = ref["nickname"]
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+
+
 @router.post("/matches/{match_id}/confirm", response_model=RapidPinMatch)
 async def confirm_match(
     match_id: str,

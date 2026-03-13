@@ -38,12 +38,12 @@ export default function RapidPinSeason() {
   const [currentUserId, setCurrentUserId] = useState(null);
   
   const [newMatch, setNewMatch] = useState({
-    player_a_id: '',
-    player_b_id: '',
-    referee_id: '',
-    winner_id: '',
-    winner_score: 11,
-    loser_score: 0
+    player_a_name: '',
+    player_b_name: '',
+    referee_name: '',
+    winner_name: '',
+    score_winner: 11,
+    score_loser: 0
   });
 
   useEffect(() => {
@@ -111,31 +111,31 @@ export default function RapidPinSeason() {
   };
 
   const registerMatch = async () => {
-    // Validations
-    if (!newMatch.player_a_id || !newMatch.player_b_id || !newMatch.referee_id || !newMatch.winner_id) {
+    if (!newMatch.player_a_name || !newMatch.player_b_name || !newMatch.referee_name || !newMatch.winner_name) {
       toast.error(t('rapidpin.matches.fieldsRequired'));
       return;
     }
 
-    const participants = new Set([newMatch.player_a_id, newMatch.player_b_id, newMatch.referee_id]);
-    if (participants.size !== 3) {
+    const names = [newMatch.player_a_name.toLowerCase(), newMatch.player_b_name.toLowerCase(), newMatch.referee_name.toLowerCase()];
+    if (new Set(names).size < 3) {
       toast.error(t('rapidpin.matches.differentParticipants'));
       return;
     }
 
-    if (newMatch.winner_id !== newMatch.player_a_id && newMatch.winner_id !== newMatch.player_b_id) {
+    if (newMatch.winner_name.toLowerCase() !== newMatch.player_a_name.toLowerCase() &&
+        newMatch.winner_name.toLowerCase() !== newMatch.player_b_name.toLowerCase()) {
       toast.error(t('rapidpin.matches.winnerMustBePlayer'));
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE}/rapidpin/matches`, {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/rapidpin/matches/with-names`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           season_id: seasonId,
           ...newMatch,
-          registered_by_id: currentUserId || newMatch.player_a_id
         })
       });
 
@@ -143,12 +143,12 @@ export default function RapidPinSeason() {
         toast.success(t('rapidpin.matches.registered'));
         setShowNewMatch(false);
         setNewMatch({
-          player_a_id: '',
-          player_b_id: '',
-          referee_id: '',
-          winner_id: '',
-          winner_score: 11,
-          loser_score: 0
+          player_a_name: '',
+          player_b_name: '',
+          referee_name: '',
+          winner_name: '',
+          score_winner: 11,
+          score_loser: 0
         });
         fetchData();
       } else {
@@ -296,91 +296,73 @@ export default function RapidPinSeason() {
                     <DialogDescription>{t('rapidpin.matches.registerDesc')}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label>{t('rapidpin.matches.playerA')}</Label>
-                        <Select
-                          value={newMatch.player_a_id}
-                          onValueChange={(v) => setNewMatch({ ...newMatch, player_a_id: v })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('rapidpin.matches.selectPlayer')} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {players.map((p) => (
-                              <SelectItem key={p.player_id} value={p.player_id}>
-                                {p.nickname || p.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          value={newMatch.player_a_name}
+                          onChange={(e) => setNewMatch({ ...newMatch, player_a_name: e.target.value })}
+                          placeholder="Name..."
+                          list="player-suggestions"
+                          data-testid="match-player-a"
+                        />
                       </div>
                       <div>
                         <Label>{t('rapidpin.matches.playerB')}</Label>
-                        <Select
-                          value={newMatch.player_b_id}
-                          onValueChange={(v) => setNewMatch({ ...newMatch, player_b_id: v })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('rapidpin.matches.selectPlayer')} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {players.map((p) => (
-                              <SelectItem key={p.player_id} value={p.player_id}>
-                                {p.nickname || p.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          value={newMatch.player_b_name}
+                          onChange={(e) => setNewMatch({ ...newMatch, player_b_name: e.target.value })}
+                          placeholder="Name..."
+                          list="player-suggestions"
+                          data-testid="match-player-b"
+                        />
                       </div>
                     </div>
                     
                     <div>
                       <Label>{t('rapidpin.matches.referee')}</Label>
-                      <Select
-                        value={newMatch.referee_id}
-                        onValueChange={(v) => setNewMatch({ ...newMatch, referee_id: v })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('rapidpin.matches.selectReferee')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {players.map((p) => (
-                            <SelectItem key={p.player_id} value={p.player_id}>
-                              {p.nickname || p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        value={newMatch.referee_name}
+                        onChange={(e) => setNewMatch({ ...newMatch, referee_name: e.target.value })}
+                        placeholder="Referee name..."
+                        list="player-suggestions"
+                        data-testid="match-referee"
+                      />
                     </div>
 
                     <div>
                       <Label>{t('rapidpin.matches.winner')}</Label>
-                      <Select
-                        value={newMatch.winner_id}
-                        onValueChange={(v) => setNewMatch({ ...newMatch, ganador_id: v })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('rapidpin.matches.selectWinner')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {newMatch.player_a_id && (
-                            <SelectItem value={newMatch.player_a_id}>
-                              {players.find(p => p.player_id === newMatch.player_a_id)?.nickname || 
-                               players.find(p => p.player_id === newMatch.player_a_id)?.nombre || 
-                               t('rapidpin.matches.playerA')}
-                            </SelectItem>
-                          )}
-                          {newMatch.player_b_id && (
-                            <SelectItem value={newMatch.player_b_id}>
-                              {players.find(p => p.player_id === newMatch.player_b_id)?.nickname || 
-                               players.find(p => p.player_id === newMatch.player_b_id)?.nombre || 
-                               t('rapidpin.matches.playerB')}
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <div className="grid grid-cols-2 gap-2">
+                        {newMatch.player_a_name && (
+                          <Button
+                            type="button" variant={newMatch.winner_name === newMatch.player_a_name ? "default" : "outline"}
+                            className={`h-10 text-sm ${newMatch.winner_name === newMatch.player_a_name ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                            onClick={() => setNewMatch({ ...newMatch, winner_name: newMatch.player_a_name })}
+                          >
+                            {newMatch.player_a_name}
+                          </Button>
+                        )}
+                        {newMatch.player_b_name && (
+                          <Button
+                            type="button" variant={newMatch.winner_name === newMatch.player_b_name ? "default" : "outline"}
+                            className={`h-10 text-sm ${newMatch.winner_name === newMatch.player_b_name ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                            onClick={() => setNewMatch({ ...newMatch, winner_name: newMatch.player_b_name })}
+                          >
+                            {newMatch.player_b_name}
+                          </Button>
+                        )}
+                      </div>
+                      {!newMatch.player_a_name && !newMatch.player_b_name && (
+                        <p className="text-xs text-muted-foreground mt-1">Enter player names first</p>
+                      )}
                     </div>
+
+                    {/* HTML datalist for autocomplete suggestions from existing players */}
+                    <datalist id="player-suggestions">
+                      {players.map(p => (
+                        <option key={p.player_id} value={p.nickname || p.name || p.nombre} />
+                      ))}
+                    </datalist>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
