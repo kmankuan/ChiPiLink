@@ -58,6 +58,17 @@ import SponsorsAdmin from '@/modules/pinpanclub/pages/SponsorsAdmin';
 import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
 import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
 
+// Sport Module (new — replaces PinPanClub league system)
+import SportDashboard from '@/modules/sport/SportDashboard';
+import RecordMatch from '@/modules/sport/RecordMatch';
+import SportRankings from '@/modules/sport/Rankings';
+import SportLeagueDetail from '@/modules/sport/LeagueDetail';
+import StartLive from '@/modules/sport/StartLive';
+import LiveRefPanel from '@/modules/sport/LiveRefPanel';
+import LiveSpectator from '@/modules/sport/LiveSpectator';
+import LiveOverlay from '@/modules/sport/LiveOverlay';
+
+
 // Rapid Pin Module
 import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
 
@@ -278,6 +289,17 @@ function AppRouter() {
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
       <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
+
+      {/* Sport Module (Table Tennis) */}
+      <Route path="/sport" element={<><Header /><SportDashboard /></>} />
+      <Route path="/sport/match/new" element={<><Header /><RecordMatch /></>} />
+      <Route path="/sport/rankings" element={<><Header /><SportRankings /></>} />
+      <Route path="/sport/league/:leagueId" element={<><Header /><SportLeagueDetail /></>} />
+      <Route path="/sport/live/new" element={<><Header /><StartLive /></>} />
+      <Route path="/sport/live/:sessionId" element={<LiveRefPanel />} />
+      <Route path="/sport/live/:sessionId/spectator" element={<LiveSpectator />} />
+      <Route path="/sport/overlay/:sessionId" element={<LiveOverlay />} />
+
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}
       <Route path="/catalogo" element={<Navigate to="/admin" replace />} />
