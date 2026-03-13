@@ -331,7 +331,15 @@ export default function SchoolTextbooksView({
   const [expandedStudentId, setExpandedStudentId] = useState(null);
   const [studentOrders, setStudentOrders] = useState({}); // { studentId: orderData }
   const [studentLoading, setStudentLoading] = useState({}); // { studentId: boolean }
-  const [selectedBooks, setSelectedBooks] = useState({}); // { studentId: { bookId: bool } }
+  const SELECTED_BOOKS_KEY = 'chipi_selected_textbooks';
+  const [selectedBooks, setSelectedBooks] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem(SELECTED_BOOKS_KEY) || '{}'); } catch { return {}; }
+  });
+  
+  // Persist selections to sessionStorage so they survive tab switches
+  useEffect(() => {
+    try { sessionStorage.setItem(SELECTED_BOOKS_KEY, JSON.stringify(selectedBooks)); } catch {}
+  }, [selectedBooks]);
   const [executeSubmit, submitting] = useGuardedAction();
   const [reorderItem, setReorderItem] = useState(null);
   const [reorderReason, setReorderReason] = useState('');
@@ -423,6 +431,29 @@ export default function SchoolTextbooksView({
       fetchAllStudents();
     }
   }, [isAuthenticated, hasAccess, validatedStudents.length, fetchAllStudents]);
+
+  // Poll for student link approval — when pending, check every 3s until approved
+  const [linkPolling, setLinkPolling] = useState(false);
+  useEffect(() => {
+    if (!linkPolling || !isAuthenticated || !token) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/sysbook/access`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.students?.length > 0 && data.has_access) {
+            // Approval detected — reload the page to show textbooks
+            setLinkPolling(false);
+            window.location.reload();
+          }
+        }
+      } catch {}
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [linkPolling, isAuthenticated, token]);
+
 
   // Fetch wallet balance — polls every 10s after deposit submission
   const refreshWallet = useCallback(() => {
@@ -668,6 +699,7 @@ export default function SchoolTextbooksView({
           onSuccess={() => {
             setShowLinkForm(false);
             fetchAllStudents();
+            setLinkPolling(true); // Start polling for auto-approval
           }}
           onCancel={() => setShowLinkForm(false)}
         />
@@ -720,9 +752,9 @@ export default function SchoolTextbooksView({
                   <BookOpen className="h-4 w-4" />
                   {t.textbooksList}
                   {orderData && items.length > 0 && (
-                    <span className="text-xs font-normal opacity-70">
-                      ({orderedItems.length}/{items.length} {t.purchased.toLowerCase()})
-                    </span>
+                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5 ml-1">
+                      {items.length} items · {orderedItems.length} {t.purchased.toLowerCase()}
+                    </Badge>
                   )}
                 </span>
                 <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
@@ -789,7 +821,7 @@ export default function SchoolTextbooksView({
                       
                       {/* Item list */}
                       <div className="divide-y" data-testid={`textbook-list-${studentId}`}>
-                        {items.map((item) => {
+                        {items.map((item, itemIndex) => {
                           const isOrdered = item.status === 'ordered';
                           const isPending = item.status === 'reorder_requested';
                           const isAvailable = item.status === 'available' || item.status === 'reorder_approved';
@@ -812,6 +844,8 @@ export default function SchoolTextbooksView({
                                 }
                               }}
                             >
+                              {/* Row number */}
+                              <span className="shrink-0 w-5 text-[10px] text-muted-foreground text-right">{itemIndex + 1}</span>
                               {/* Selection / Status indicator */}
                               <div className="shrink-0 w-5 flex justify-center">
                                 {isOrdered ? (

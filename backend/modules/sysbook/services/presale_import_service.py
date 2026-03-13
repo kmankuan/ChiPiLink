@@ -598,11 +598,15 @@ class PreSaleImportService:
             for item in order.get("items", []):
                 code = item.get("book_code", "")
                 name = item.get("book_name", "")
-                key = f"{code}||{name}||{grade}"
+                # KEY BY CODE ONLY when code exists — prevents duplicates from name variations
+                key = f"{code}||{grade}" if code else f"||{name}||{grade}"
                 book_agg[key]["total_qty"] += item.get("quantity_ordered", 1)
                 book_agg[key]["order_refs"].append(order["order_id"])
-                book_agg[key]["book_code"] = code
-                book_agg[key]["book_name"] = name
+                # Keep the first code/name seen (don't overwrite with variations)
+                if not book_agg[key]["book_code"]:
+                    book_agg[key]["book_code"] = code
+                if not book_agg[key]["book_name"]:
+                    book_agg[key]["book_name"] = name
                 book_agg[key]["grade"] = grade
                 if item.get("price", 0) > book_agg[key]["price"]:
                     book_agg[key]["price"] = item["price"]
