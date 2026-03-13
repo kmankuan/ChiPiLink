@@ -147,7 +147,7 @@ export default function BottomNav() {
                 <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2"><User className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/orders" className="flex items-center gap-2"><ClipboardList className="h-4 w-4" />{t('nav.orders', 'Orders')}</Link></DropdownMenuItem>
                 {user?.tiene_membresia_activa && (
-                  <DropdownMenuItem asChild><Link to="/pinpanclub" className="flex items-center gap-2"><Trophy className="h-4 w-4" />PinPanClub</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/sport" className="flex items-center gap-2"><Trophy className="h-4 w-4" />Sport</Link></DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={toggleTheme} className="flex items-center gap-2">

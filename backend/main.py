@@ -121,8 +121,9 @@ from modules.roles import router as roles_router, roles_service
 from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
 
 # Ping Pong Club - Refactored as Microservices-Ready Module
-from modules.pinpanclub import init_module as init_pinpanclub
-from modules.pinpanclub.routes import router as pinpanclub_router
+# PinPanClub Module — DEPRECATED, replaced by Sport module
+# from modules.pinpanclub import init_module as init_pinpanclub
+# from modules.pinpanclub.routes import router as pinpanclub_router
 
 # Membership - Already modularized
 from routes.membership import router as membership_router, init_routes as init_membership_routes
@@ -148,7 +149,7 @@ init_print_routes(db, get_admin_user, get_current_user, ws_manager)
 init_archive_routes(db, get_admin_user)
 
 # Initialize PinpanClub module (event handlers)
-init_pinpanclub()
+# init_pinpanclub()  # DEPRECATED — replaced by Sport module
 
 # Initialize Store module (event handlers)
 init_store()
@@ -198,7 +199,7 @@ api_router.include_router(task_supervisor_router)
 api_router.include_router(platform_store_router)
 
 # PinpanClub - Microservices-ready module (includes players, matches, sponsors, canvas, websocket)
-api_router.include_router(pinpanclub_router)
+# api_router.include_router(pinpanclub_router)  # DEPRECATED — replaced by Sport module
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 

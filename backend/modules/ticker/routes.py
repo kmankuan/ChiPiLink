@@ -392,9 +392,9 @@ async def upload_landing_image(image_key: str = "pinpanclub"):
 
 DEFAULT_LAYOUT_ICONS = {
     "mosaic_community": [
-        {"key": "pinpan", "label": "PinPan", "to": "/pinpanclub", "type": "lucide", "icon": "Gamepad2", "image_url": "", "accent": "#d97706", "accent_bg": "#FFF7ED"},
+        {"key": "pinpan", "label": "PinPan", "to": "/sport", "type": "lucide", "icon": "Gamepad2", "image_url": "", "accent": "#d97706", "accent_bg": "#FFF7ED"},
         {"key": "tienda", "label": "Tienda", "to": "/unatienda", "type": "lucide", "icon": "Store", "image_url": "", "accent": "#059669", "accent_bg": "#ECFDF5"},
-        {"key": "ranking", "label": "Ranking", "to": "/pinpanclub/superpin/ranking", "type": "lucide", "icon": "Trophy", "image_url": "", "accent": "#C8102E", "accent_bg": "#FFF1F2"},
+        {"key": "ranking", "label": "Ranking", "to": "/sport/rankings", "type": "lucide", "icon": "Trophy", "image_url": "", "accent": "#C8102E", "accent_bg": "#FFF1F2"},
         {"key": "aprender", "label": "Aprender", "to": "/comunidad", "type": "lucide", "icon": "GraduationCap", "image_url": "", "accent": "#7c3aed", "accent_bg": "#F5F3FF"},
         {"key": "cultura", "label": "Cultura", "to": "/galeria", "type": "lucide", "icon": "Globe", "image_url": "", "accent": "#0284c7", "accent_bg": "#F0F9FF"},
         {"key": "fe", "label": "Fe", "to": "/comunidad", "type": "lucide", "icon": "Heart", "image_url": "", "accent": "#ec4899", "accent_bg": "#FDF2F8"},

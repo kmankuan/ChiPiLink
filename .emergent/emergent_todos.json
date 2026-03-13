@@ -13,19 +13,19 @@
   },
   {
     "content": "Step 4: Frontend — Dashboard, Record Match, Rankings, League",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Step 5: Frontend live scoring — Referee panel, Spectator, Overlay",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Step 6: Frontend momentum graph + GIF emotions",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Step 7: Remove old PinPanClub + register new Sport module",
-    "status": "pending"
+    "content": "Step 7: Remove old PinPanClub + add Sport to navigation",
+    "status": "in_progress"
   },
   {
     "content": "Step 8: Testing + polish",

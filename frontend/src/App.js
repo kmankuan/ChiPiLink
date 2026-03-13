@@ -286,9 +286,11 @@ function AppRouter() {
         element={<Navigate to="/unatienda?tab=private" replace />}
       />
       
-      {/* Legacy redirects for backward compatibility */}
-      <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
-      <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
+      {/* Legacy redirects */}
+      <Route path="/pingpong/*" element={<Navigate to="/sport" replace />} />
+      <Route path="/pinpanclub" element={<Navigate to="/sport" replace />} />
+      <Route path="/pinpanclub/*" element={<Navigate to="/sport" replace />} />
+      <Route path="/tv/pingpong" element={<Navigate to="/sport" replace />} />
 
       {/* Sport Module (Table Tennis) */}
       <Route path="/sport" element={<><Header /><SportDashboard /></>} />

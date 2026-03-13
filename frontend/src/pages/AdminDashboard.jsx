@@ -81,6 +81,7 @@ const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule')
 const TextbookOrdersAdminTab = lazy(() => import('@/modules/admin/store/TextbookOrdersAdminTab'));
 const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
+const SportDashboardEmbed = lazy(() => import('@/modules/sport/SportDashboard'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
 const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
 const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
@@ -179,7 +180,7 @@ const navGroups = [
   {
     group: 'Community',
     items: [
-      { id: 'pinpanclub', labelKey: 'nav.pinpanclub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
+      { id: 'sport', labelKey: 'nav.sport', fallbackLabel: 'Sport', icon: Trophy, permission: 'pinpanclub.admin_panel' },
       { id: 'telegram-channel', labelKey: 'nav.telegramChannel', fallbackLabel: 'Telegram Channel', icon: Send, permission: 'admin.site_config' },
       { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
     ],
@@ -377,6 +378,8 @@ export default function AdminDashboard() {
         return <UsersManagementModule />;
       case 'memberships':
         return <AdminMemberships />;
+      case 'sport':
+        return <SportDashboardEmbed />;
       case 'pinpanclub':
         return <PinpanClubModule />;
       case 'roles':
