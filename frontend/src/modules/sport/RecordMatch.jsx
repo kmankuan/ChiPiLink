@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ArrowLeft, Check, Trophy } from 'lucide-react';
+import PlayerPicker from './components/PlayerPicker';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -20,13 +21,8 @@ export default function RecordMatch() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const token = localStorage.getItem('auth_token');
-  const [players, setPlayers] = useState([]);
   const [form, setForm] = useState({ player_a_name: '', player_b_name: '', referee_name: '', winner_name: '', score_winner: 11, score_loser: 0 });
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    fetch(`${API}/api/sport/players`).then(r => r.ok ? r.json() : []).then(setPlayers).catch(() => {});
-  }, []);
 
   const handleSubmit = async () => {
     if (!form.player_a_name || !form.player_b_name || !form.referee_name) { toast.error(t('sport.allDifferent')); return; }
@@ -63,25 +59,15 @@ export default function RecordMatch() {
       <div className="max-w-lg mx-auto px-4 py-4">
         <Card>
           <CardContent className="p-4 space-y-4">
-            <datalist id="sport-players">
-              {players.map(p => <option key={p.player_id} value={p.nickname} />)}
-            </datalist>
-
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">{t('sport.playerA')}</Label>
-                <Input value={form.player_a_name} onChange={e => set('player_a_name', e.target.value)} placeholder="Name..." list="sport-players" className="h-10" data-testid="match-pa" />
-              </div>
-              <div>
-                <Label className="text-xs">{t('sport.playerB')}</Label>
-                <Input value={form.player_b_name} onChange={e => set('player_b_name', e.target.value)} placeholder="Name..." list="sport-players" className="h-10" data-testid="match-pb" />
-              </div>
+              <PlayerPicker label={t('sport.playerA')} value={form.player_a_name}
+                onChange={v => set('player_a_name', v)} testId="match-pa" />
+              <PlayerPicker label={t('sport.playerB')} value={form.player_b_name}
+                onChange={v => set('player_b_name', v)} testId="match-pb" />
             </div>
 
-            <div>
-              <Label className="text-xs">{t('sport.referee')}</Label>
-              <Input value={form.referee_name} onChange={e => set('referee_name', e.target.value)} placeholder="Referee..." list="sport-players" className="h-10" data-testid="match-ref" />
-            </div>
+            <PlayerPicker label={t('sport.referee')} value={form.referee_name} filterRole="referee"
+              onChange={v => set('referee_name', v)} testId="match-ref" placeholder="Referee..." />
 
             <div>
               <Label className="text-xs">{t('sport.winner')}</Label>

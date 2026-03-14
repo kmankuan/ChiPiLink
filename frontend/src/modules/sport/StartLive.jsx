@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ArrowLeft, Radio, Play } from 'lucide-react';
+import PlayerPicker from './components/PlayerPicker';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -19,7 +20,6 @@ export default function StartLive() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const token = localStorage.getItem('auth_token');
-  const [players, setPlayers] = useState([]);
   const [leagues, setLeagues] = useState([]);
   const isStream = new URLSearchParams(window.location.search).get('stream') === '1';
   const [showStream, setShowStream] = useState(isStream);
@@ -31,10 +31,7 @@ export default function StartLive() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${API}/api/sport/players`).then(r => r.ok ? r.json() : []),
-      fetch(`${API}/api/sport/leagues`).then(r => r.ok ? r.json() : []),
-    ]).then(([p, l]) => { setPlayers(p); setLeagues(l); }).catch(() => {});
+    fetch(`${API}/api/sport/leagues`).then(r => r.ok ? r.json() : []).then(setLeagues).catch(() => {});
   }, []);
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
@@ -75,16 +72,14 @@ export default function StartLive() {
             </datalist>
 
             <div className="grid grid-cols-2 gap-3">
-              <div><Label className="text-xs">{t('sport.playerA')}</Label><Input value={form.player_a_name} onChange={e => set('player_a_name', e.target.value)} placeholder="Name..." list="live-players" className="h-10" /></div>
-              <div><Label className="text-xs">{t('sport.playerB')}</Label><Input value={form.player_b_name} onChange={e => set('player_b_name', e.target.value)} placeholder="Name..." list="live-players" className="h-10" /></div>
+              <PlayerPicker label={t('sport.playerA')} value={form.player_a_name} photoValue={form.player_a_photo}
+                onChange={v => set('player_a_name', v)} onPhotoChange={v => set('player_a_photo', v)} testId="live-pa" />
+              <PlayerPicker label={t('sport.playerB')} value={form.player_b_name} photoValue={form.player_b_photo}
+                onChange={v => set('player_b_name', v)} onPhotoChange={v => set('player_b_photo', v)} testId="live-pb" />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div><Label className="text-[10px] text-muted-foreground">Photo URL (optional)</Label><Input value={form.player_a_photo} onChange={e => set('player_a_photo', e.target.value)} placeholder="https://..." className="h-8 text-xs" /></div>
-              <div><Label className="text-[10px] text-muted-foreground">Photo URL (optional)</Label><Input value={form.player_b_photo} onChange={e => set('player_b_photo', e.target.value)} placeholder="https://..." className="h-8 text-xs" /></div>
-            </div>
-
-            <div><Label className="text-xs">{t('sport.referee')}</Label><Input value={form.referee_name} onChange={e => set('referee_name', e.target.value)} placeholder="Referee..." list="live-players" className="h-10" /></div>
+            <PlayerPicker label={t('sport.referee')} value={form.referee_name} filterRole="referee"
+              onChange={v => set('referee_name', v)} testId="live-ref" placeholder="Referee..." />
 
             <div className="grid grid-cols-2 gap-3">
               <div>

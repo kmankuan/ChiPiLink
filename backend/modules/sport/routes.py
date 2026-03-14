@@ -54,6 +54,13 @@ async def deactivate_player(player_id: str, admin: dict = Depends(get_admin_user
         return {"success": True}
     raise HTTPException(404, "Player not found")
 
+@router.put("/players/{player_id}/photo")
+async def update_photo(player_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Update player photo URL."""
+    url = data.get("photo_url", "")
+    await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": {"avatar_url": url}})
+    return {"success": True}
+
 
 # ═══ MATCHES ═══
 

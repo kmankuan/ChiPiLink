@@ -195,7 +195,8 @@ export default function SportTV() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
-      <EmotionOverlay emotion={emotion} settings={{}} side={emotion?.side} />
+      <EmotionOverlay emotion={emotion} settings={{}} side={emotion?.side}
+        playerPhoto={emotion?.side === 'left' ? leftPlayer?.photo_url : rightPlayer?.photo_url} />
 
       {/* Header */}
       <div className="flex items-center justify-between px-8 py-3">

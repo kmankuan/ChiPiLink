@@ -179,7 +179,8 @@ export default function LiveRefPanel() {
   return (
     <div className="min-h-screen flex flex-col select-none" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)' }}>
       {/* Emotion overlay — positioned on the scoring player's side */}
-      <EmotionOverlay emotion={emotion} settings={s} side={emotion?.side === leftSide ? 'left' : 'right'} />
+      <EmotionOverlay emotion={emotion} settings={s} side={emotion?.side === leftSide ? 'left' : 'right'}
+        playerPhoto={emotion?.side === leftSide ? left?.photo_url : right?.photo_url} />
 
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2">
