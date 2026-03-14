@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Radio, Trophy } from 'lucide-react';
 import MomentumGraph from './components/MomentumGraph';
+import PointFlow from './components/PointFlow';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -190,21 +191,29 @@ export default function SportTV() {
         </div>
       </div>
 
-      {/* Momentum Graph */}
-      <div className="px-8 py-4">
-        <MomentumGraph points={state.points || []} height={80} />
+      {/* Point Flow + Set History */}
+      <div className="px-8 py-3 space-y-2">
+        {/* Set-by-set scores */}
+        <div className="flex items-center justify-center gap-3">
+          {state.sets?.map((set, i) => (
+            <div key={i} className={`px-3 py-1 rounded-lg text-sm font-mono ${set.winner === 'a' ? 'bg-red-500/15 text-red-400' : 'bg-blue-500/15 text-blue-400'}`}>
+              Set {i + 1}: <strong>{set.score_a}-{set.score_b}</strong>
+            </div>
+          ))}
+          {state.status === 'live' && (score.a > 0 || score.b > 0) && (
+            <div className="px-3 py-1 rounded-lg text-sm font-mono bg-yellow-500/15 text-yellow-400 animate-pulse">
+              Set {state.current_set}: <strong>{score.a}-{score.b}</strong>*
+            </div>
+          )}
+        </div>
+        {/* Point flow visualization */}
+        <PointFlow points={state.points || []} playerA={pa.nickname} playerB={pb.nickname} />
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between px-8 py-3 bg-black/30">
         <span className="text-white/20 text-xs">🏓 ChiPi Sport</span>
-        {state.sets?.length > 0 && (
-          <div className="flex gap-4 text-white/30 text-xs">
-            {state.sets.map((set, i) => (
-              <span key={i}>Set {i + 1}: {set.score_a}-{set.score_b}</span>
-            ))}
-          </div>
-        )}
+        <span className="text-white/20 text-xs">Best of {(session.settings?.sets_to_win || 2) * 2 - 1} · {session.settings?.points_to_win || 11} pts</span>
       </div>
     </div>
   );

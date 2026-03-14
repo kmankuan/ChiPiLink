@@ -181,6 +181,26 @@ async def react(session_id: str, data: dict):
     await _broadcast(session_id, {"type": "reaction", "data": reactions})
     return reactions
 
+
+@router.put("/live/{session_id}/settings")
+async def update_live_settings(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Update live match settings mid-game (sets_to_win, points_to_win)."""
+    session = await services.get_live_session(session_id)
+    if not session:
+        raise HTTPException(404, "Session not found")
+    
+    update = {}
+    if "sets_to_win" in data:
+        update["settings.sets_to_win"] = int(data["sets_to_win"])
+    if "points_to_win" in data:
+        update["settings.points_to_win"] = int(data["points_to_win"])
+    
+    if update:
+        await db[services.C_LIVE].update_one({"session_id": session_id}, {"$set": update})
+        await _broadcast(session_id, {"type": "settings_changed", "data": data})
+    
+    return {"success": True, "updated": update}
+
 # Polling fallback for live state
 @router.get("/live/{session_id}/state")
 async def get_live_state(session_id: str):

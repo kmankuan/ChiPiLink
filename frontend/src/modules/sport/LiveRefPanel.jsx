@@ -12,8 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Undo2, X, Radio, Eye, ArrowLeftRight, Save, Plus, Trophy, ChevronRight, Zap } from 'lucide-react';
-import MomentumGraph from './components/MomentumGraph';
+import { Undo2, X, Radio, Eye, ArrowLeftRight, Save, Plus, Trophy, ChevronRight, Zap, Settings } from 'lucide-react';
+import PointFlow from './components/PointFlow';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -43,6 +43,7 @@ export default function LiveRefPanel() {
   const [showTechnique, setShowTechnique] = useState(null); // 'a' or 'b' — show technique picker
   const [showEndGame, setShowEndGame] = useState(false);
   const [showManualSet, setShowManualSet] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [manualSet, setManualSet] = useState({ score_a: 0, score_b: 0 });
   const [showTechPanel, setShowTechPanel] = useState(false); // Toggle technique mode
   const [endGameForm, setEndGameForm] = useState({ league_id: '', notes: '' });
@@ -139,6 +140,18 @@ export default function LiveRefPanel() {
     navigate('/sport');
   };
 
+  const updateSettings = async (key, value) => {
+    try {
+      await fetch(`${API}/api/sport/live/${sessionId}/settings`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ [key]: value }),
+      });
+      fetchSession();
+      toast.success('Settings updated');
+    } catch {}
+  };
+
+
   if (loading || !session) return <div className="flex items-center justify-center min-h-screen" style={{ background: '#1a1a2e' }}><Radio className="h-8 w-8 text-red-500 animate-pulse" /></div>;
 
   const s = session;
@@ -225,9 +238,25 @@ export default function LiveRefPanel() {
         </button>
       </div>
 
-      {/* Momentum Graph */}
-      <div className="px-3 py-1">
-        <MomentumGraph points={s.points || []} height={40} swapped={swapped} />
+      {/* Point Flow + Set History */}
+      <div className="px-3 py-1 space-y-1">
+        {/* Set scores (live scoreboard) */}
+        {(s.sets?.length > 0 || s.score?.a > 0 || s.score?.b > 0) && (
+          <div className="flex items-center justify-center gap-1 text-[9px]">
+            {s.sets?.map((set, i) => (
+              <span key={i} className={`px-1.5 py-0.5 rounded ${set.winner === (swapped ? 'b' : 'a') ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                {swapped ? `${set.score_b}-${set.score_a}` : `${set.score_a}-${set.score_b}`}
+              </span>
+            ))}
+            {s.status === 'live' && (
+              <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 animate-pulse">
+                {swapped ? `${s.score?.b || 0}-${s.score?.a || 0}` : `${s.score?.a || 0}-${s.score?.b || 0}`}*
+              </span>
+            )}
+          </div>
+        )}
+        {/* Point flow dots */}
+        <PointFlow points={s.points || []} playerA={left?.nickname} playerB={right?.nickname} swapped={swapped} />
       </div>
 
       {/* Controls */}
@@ -235,11 +264,19 @@ export default function LiveRefPanel() {
         <Button variant="ghost" size="sm" className="text-white/50 h-8 text-xs" onClick={undoPoint}>
           <Undo2 className="h-3.5 w-3.5 mr-1" /> Undo
         </Button>
-        <span className="text-white/20 text-[9px]">⚖️ {s.referee?.nickname}</span>
-        <Button variant="ghost" size="sm" className={`h-8 text-xs ${showTechPanel ? 'text-yellow-400' : 'text-white/50'}`}
-          onClick={() => setShowTechPanel(!showTechPanel)}>
-          <Zap className="h-3.5 w-3.5 mr-1" /> Tech
-        </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-white/20 text-[9px]">⚖️ {s.referee?.nickname}</span>
+          <span className="text-white/10 text-[9px]">Bo{(s.settings?.sets_to_win || 2) * 2 - 1}</span>
+        </div>
+        <div className="flex gap-1">
+          <Button variant="ghost" size="sm" className={`h-8 text-xs ${showTechPanel ? 'text-yellow-400' : 'text-white/50'}`}
+            onClick={() => setShowTechPanel(!showTechPanel)}>
+            <Zap className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 h-8 text-xs" onClick={() => setShowSettings(true)}>
+            <Settings className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Technique Picker */}
@@ -358,6 +395,45 @@ export default function LiveRefPanel() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2"><Settings className="h-4 w-4" /> Match Settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white/60 text-xs">Best of</Label>
+              <div className="grid grid-cols-3 gap-2 mt-1">
+                {[{v: 1, label: '1 set'}, {v: 2, label: 'Bo3'}, {v: 3, label: 'Bo5'}, {v: 4, label: 'Bo7'}].map(opt => (
+                  <Button key={opt.v} variant="ghost" size="sm"
+                    className={`h-10 ${(s.settings?.sets_to_win || 2) === opt.v ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-white/5 text-white/50'}`}
+                    onClick={() => { updateSettings('sets_to_win', opt.v); }}>
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label className="text-white/60 text-xs">Points per set</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                {[11, 21].map(pts => (
+                  <Button key={pts} variant="ghost" size="sm"
+                    className={`h-10 ${(s.settings?.points_to_win || 11) === pts ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-white/5 text-white/50'}`}
+                    onClick={() => { updateSettings('points_to_win', pts); }}>
+                    {pts} pts
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="text-white/20 text-[10px] text-center">
+              Current: Best of {(s.settings?.sets_to_win || 2) * 2 - 1} · {s.settings?.points_to_win || 11} pts/set
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

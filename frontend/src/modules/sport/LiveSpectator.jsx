@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MomentumGraph from './components/MomentumGraph';
+import PointFlow from './components/PointFlow';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -120,9 +121,22 @@ export default function LiveSpectator() {
         <p className="text-white/30 text-xs mt-3">Set {session.current_set} — {(session.sets_won?.a || 0)}-{(session.sets_won?.b || 0)}</p>
       </div>
 
-      {/* Momentum */}
-      <div className="px-4 py-2">
-        <MomentumGraph points={session.points || []} height={60} />
+      {/* Set History + Point Flow */}
+      <div className="px-4 py-2 space-y-1">
+        {/* Set scores */}
+        <div className="flex items-center justify-center gap-2">
+          {session.sets?.map((set, i) => (
+            <span key={i} className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${set.winner === 'a' ? 'bg-red-500/15 text-red-400' : 'bg-blue-500/15 text-blue-400'}`}>
+              {set.score_a}-{set.score_b}
+            </span>
+          ))}
+          {session.status === 'live' && (
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-yellow-500/15 text-yellow-400 animate-pulse">
+              {session.score?.a}-{session.score?.b}*
+            </span>
+          )}
+        </div>
+        <PointFlow points={session.points || []} playerA={pa.nickname} playerB={pb.nickname} />
       </div>
 
       {/* Reactions */}

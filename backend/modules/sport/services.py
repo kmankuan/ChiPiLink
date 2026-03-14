@@ -257,12 +257,21 @@ async def score_point(session_id: str, scored_by: str, technique: str = None) ->
             break
     point["streak"] = streak
 
-    # Auto-service rotation
-    total_points = score["a"] + score["b"]
+    # Auto-service rotation (table tennis rules)
+    # Each player serves 2 consecutive points, then switch
+    # At deuce (both >= pts_to_win - 1): alternate every 1 point
+    set_points = score["a"] + score["b"]  # Points in CURRENT set only
     is_deuce = score["a"] >= (pts_to_win - 1) and score["b"] >= (pts_to_win - 1)
-    service_interval = 1 if is_deuce else session["settings"].get("auto_service", 2) or 2
-    if service_interval and total_points > 0 and total_points % service_interval == 0:
-        session["server"] = other if session["server"] == scored_by else scored_by
+    
+    if is_deuce:
+        # At deuce: service changes every single point
+        # Toggle server from whoever served last
+        if set_points > 0:
+            session["server"] = "b" if session["server"] == "a" else "a"
+    else:
+        # Normal play: service changes every 2 points
+        if set_points > 0 and set_points % 2 == 0:
+            session["server"] = "b" if session["server"] == "a" else "a"
 
     # Detect emotions
     emotions = detect_emotions(score, scored_by, streak, session, point_num)
