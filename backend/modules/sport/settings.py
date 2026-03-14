@@ -69,13 +69,13 @@ DEFAULTS = {
 
     # Display
     "display": {
-        "theme": "chinese_modern",  # chinese_modern | minimal | neon
+        "theme": "chinese_modern",
         "primary_color": "#C8102E",
         "accent_color": "#B8860B",
         "show_elo_on_cards": True,
         "show_streak_counter": True,
-        "show_momentum_graph": True,
-        "momentum_graph_style": "mirrored_bar",  # mirrored_bar | line | wave
+        "show_battle_path": True,
+        "battle_goal_icon": "trophy",  # trophy | dragon | lantern | star | crown
     },
 
     # Spectator / Streaming

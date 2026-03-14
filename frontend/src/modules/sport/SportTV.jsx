@@ -6,10 +6,21 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Radio, Trophy } from 'lucide-react';
 import PointFlow from './components/PointFlow';
+import BattlePath from './components/BattlePath';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
+
+function _getStreak(points, side) {
+  if (!points || !points.length) return 0;
+  let streak = 0;
+  for (let i = points.length - 1; i >= 0; i--) {
+    if (points[i].scored_by === side) streak++;
+    else break;
+  }
+  return streak;
+}
 
 const EFFECT_MAP = {
   tense: '😱', fire: '🔥', clap: '👏', funny: '😂', strong: '💪', fast: '⚡', precise: '🎯', insane: '🤯',
@@ -317,8 +328,16 @@ export default function SportTV() {
         <PlayerColumn player={rightPlayer} score={score[rightSide]} setsWon={setsWon[rightSide]} totalSets={totalSets} isServing={state.server === rightSide} side={rightSide} points={state.all_points || state.points} sets={state.sets} swapped={swapped} />
       </div>
 
-      {/* Point flow (persistent all sets) */}
-      <div className="px-8 py-2">
+      {/* Battle Path + Point flow */}
+      <div className="px-8 py-2 space-y-2">
+        <BattlePath 
+          scoreA={score.a} scoreB={score.b} maxScore={state.settings?.points_to_win || 11}
+          playerA={state.player_a || session.player_a} playerB={state.player_b || session.player_b}
+          server={state.server}
+          streakA={_getStreak(state.points, 'a')} streakB={_getStreak(state.points, 'b')}
+          winner={state.status === 'finished' ? state.winner : null} swapped={swapped}
+          mode="full"
+        />
         <PointFlow points={state.all_points || state.points || []} playerA={leftPlayer?.nickname} playerB={rightPlayer?.nickname} swapped={swapped} />
       </div>
 
