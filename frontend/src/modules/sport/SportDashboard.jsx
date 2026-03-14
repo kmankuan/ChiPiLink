@@ -108,7 +108,7 @@ export default function SportDashboard() {
         )}
 
         {/* Nav Row */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" className="flex-1 rounded-full text-xs" onClick={() => navigate('/sport/rankings')}>
             <Trophy className="h-3.5 w-3.5 mr-1" /> {t('sport.rankings')}
           </Button>
@@ -118,6 +118,11 @@ export default function SportDashboard() {
           <Button variant="outline" size="sm" className="flex-1 rounded-full text-xs" onClick={() => navigate('/sport/players')}>
             <Users className="h-3.5 w-3.5 mr-1" /> {t('sport.players')}
           </Button>
+          {isAdmin && (
+            <Button variant="outline" size="sm" className="flex-1 rounded-full text-xs border-purple-200 text-purple-700" onClick={() => navigate('/sport/tournament/new')}>
+              <Award className="h-3.5 w-3.5 mr-1" /> Tournament
+            </Button>
+          )}
         </div>
 
         {/* Top Players */}

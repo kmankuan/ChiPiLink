@@ -1,34 +1,30 @@
 [
   {
-    "content": "Step 1: Backend foundation — models, settings, player CRUD, match CRUD",
+    "content": "Phase 2.1: Backend — Tournament service + bracket generation",
     "status": "completed"
   },
   {
-    "content": "Step 2: Backend live scoring — WebSocket, momentum engine, emotions",
+    "content": "Phase 2.2: Backend — Tournament routes (create, register, seed, generate, report)",
     "status": "completed"
   },
   {
-    "content": "Step 3: Backend leagues — standings, rating calculations",
+    "content": "Phase 2.3: Frontend — BracketView component (Challonge-style)",
     "status": "completed"
   },
   {
-    "content": "Step 4: Frontend — Dashboard, Record Match, Rankings, League",
+    "content": "Phase 2.4: Frontend — TournamentDetail page + CreateTournament page",
     "status": "completed"
   },
   {
-    "content": "Step 5: Frontend live scoring — Referee panel, Spectator, Overlay",
+    "content": "Phase 2.5: Frontend — RoundRobinMatrix component",
     "status": "completed"
   },
   {
-    "content": "Step 6: Frontend momentum graph + GIF emotions",
+    "content": "Phase 2.6: Integration — Routes registered, dashboard updated",
     "status": "completed"
   },
   {
-    "content": "Step 7: Remove old PinPanClub + add Sport to navigation",
-    "status": "completed"
-  },
-  {
-    "content": "Step 8: Testing + bug fixes",
+    "content": "Phase 2.7: Testing",
     "status": "completed"
   }
 ]

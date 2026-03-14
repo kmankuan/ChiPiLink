@@ -68,6 +68,8 @@ import LiveRefPanel from '@/modules/sport/LiveRefPanel';
 import LiveSpectator from '@/modules/sport/LiveSpectator';
 import LiveOverlay from '@/modules/sport/LiveOverlay';
 import SportTV from '@/modules/sport/SportTV';
+import TournamentDetail from '@/modules/sport/TournamentDetail';
+import CreateTournament from '@/modules/sport/CreateTournament';
 
 
 // Rapid Pin Module
@@ -265,6 +267,8 @@ function AppRouter() {
       <Route path="/sport/live/:sessionId/spectator" element={<LiveSpectator />} />
       <Route path="/sport/overlay/:sessionId" element={<LiveOverlay />} />
       <Route path="/sport/tv" element={<SportTV />} />
+      <Route path="/sport/tournament/new" element={<><Header /><CreateTournament /></>} />
+      <Route path="/sport/tournament/:tid" element={<TournamentDetail />} />
 
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}
