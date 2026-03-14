@@ -4,6 +4,7 @@ Sport Module — API Routes
 from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect, Query
 from typing import Optional
 from core.auth import get_current_user, get_admin_user
+from core.database import db
 from . import services
 from .models import *
 from .settings import get_settings, update_settings, get_section
@@ -131,6 +132,46 @@ async def end_live(session_id: str, user: dict = Depends(get_current_user)):
     result = await services.end_live_session(session_id)
     await _broadcast(session_id, {"type": "ended", "data": result})
     return result
+
+
+@router.post("/live/{session_id}/manual-set")
+async def add_manual_set(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Add a completed set manually (for games already in progress before referee started)."""
+    session = await services.get_live_session(session_id)
+    if not session:
+        raise HTTPException(404, "Session not found")
+    if session["status"] != "live":
+        raise HTTPException(400, "Session is not live")
+    
+    score_a = int(data.get("score_a", 0))
+    score_b = int(data.get("score_b", 0))
+    winner = data.get("winner", "a" if score_a > score_b else "b")
+    
+    new_set = {"set_num": session["current_set"], "score_a": score_a, "score_b": score_b, "winner": winner}
+    sets = session.get("sets", []) + [new_set]
+    sets_won = session.get("sets_won", {"a": 0, "b": 0})
+    sets_won[winner] += 1
+    new_current = session["current_set"] + 1
+    
+    # Check if match is won
+    status = "live"
+    if sets_won[winner] >= session["settings"]["sets_to_win"]:
+        status = "finished"
+    
+    await db[services.C_LIVE].update_one(
+        {"session_id": session_id},
+        {"$set": {"sets": sets, "sets_won": sets_won, "current_set": new_current, "status": status,
+                  "score": {"a": 0, "b": 0}}}
+    )
+    
+    if status == "finished":
+        updated = await services.get_live_session(session_id)
+        if updated:
+            updated["winner"] = winner
+            await services._finalize_live_match(updated)
+    
+    await _broadcast(session_id, {"type": "manual_set", "data": {"set": new_set, "sets_won": sets_won}})
+    return {"success": True, "set": new_set, "sets_won": sets_won, "status": status}
 
 @router.post("/live/{session_id}/react")
 async def react(session_id: str, data: dict):
