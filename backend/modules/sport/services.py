@@ -196,8 +196,8 @@ async def create_live_session(data: dict) -> dict:
     session = {
         "session_id": session_id,
         "status": "live",
-        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"]},
-        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"]},
+        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": data.get("player_a_photo", "")},
+        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": data.get("player_b_photo", "")},
         "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"]},
         "league_id": data.get("league_id"),
         "stream_url": data.get("stream_url", ""),
@@ -218,6 +218,13 @@ async def create_live_session(data: dict) -> dict:
         "reactions": {},
         "spectator_count": 0,
         "created_at": now,
+        # Display state — synced to TV/spectator
+        "display": {
+            "swapped": False,
+            "last_emotion": None,
+            "last_emotion_side": None,
+            "is_public": True,
+        },
     }
     await db[C_LIVE].insert_one(session)
     session.pop("_id", None)
@@ -304,12 +311,17 @@ async def score_point(session_id: str, scored_by: str, technique: str = None) ->
             session["score"] = {"a": 0, "b": 0}
             session["server"] = "a" if session["current_set"] % 2 == 1 else "b"
 
-    # Update DB
+    # Update DB — include display state for emotion sync
+    emotion_update = {}
+    if emotions:
+        emotion_update["display.last_emotion"] = emotions[0]["type"]
+        emotion_update["display.last_emotion_side"] = scored_by
+    
     await db[C_LIVE].update_one(
         {"session_id": session_id},
         {"$set": {"score": session["score"], "sets": session["sets"], "sets_won": session["sets_won"],
                   "server": session["server"], "current_set": session["current_set"],
-                  "status": session["status"]},
+                  "status": session["status"], **emotion_update},
          "$push": {"points": point}}
     )
 

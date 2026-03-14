@@ -26,6 +26,7 @@ export default function StartLive() {
   const [form, setForm] = useState({
     player_a_name: '', player_b_name: '', referee_name: '',
     sets_to_win: 2, points_to_win: 11, league_id: '', stream_url: '',
+    player_a_photo: '', player_b_photo: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -76,6 +77,11 @@ export default function StartLive() {
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">{t('sport.playerA')}</Label><Input value={form.player_a_name} onChange={e => set('player_a_name', e.target.value)} placeholder="Name..." list="live-players" className="h-10" /></div>
               <div><Label className="text-xs">{t('sport.playerB')}</Label><Input value={form.player_b_name} onChange={e => set('player_b_name', e.target.value)} placeholder="Name..." list="live-players" className="h-10" /></div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label className="text-[10px] text-muted-foreground">Photo URL (optional)</Label><Input value={form.player_a_photo} onChange={e => set('player_a_photo', e.target.value)} placeholder="https://..." className="h-8 text-xs" /></div>
+              <div><Label className="text-[10px] text-muted-foreground">Photo URL (optional)</Label><Input value={form.player_b_photo} onChange={e => set('player_b_photo', e.target.value)} placeholder="https://..." className="h-8 text-xs" /></div>
             </div>
 
             <div><Label className="text-xs">{t('sport.referee')}</Label><Input value={form.referee_name} onChange={e => set('referee_name', e.target.value)} placeholder="Referee..." list="live-players" className="h-10" /></div>

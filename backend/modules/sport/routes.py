@@ -201,6 +201,39 @@ async def update_live_settings(session_id: str, data: dict, user: dict = Depends
     
     return {"success": True, "updated": update}
 
+
+@router.put("/live/{session_id}/display")
+async def update_display(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Update display state (swapped sides, visibility, etc.) — syncs to TV."""
+    update = {}
+    if "swapped" in data:
+        update["display.swapped"] = bool(data["swapped"])
+    if "is_public" in data:
+        update["display.is_public"] = bool(data["is_public"])
+    if "last_emotion" in data:
+        update["display.last_emotion"] = data["last_emotion"]
+        update["display.last_emotion_side"] = data.get("last_emotion_side")
+    if "player_a_photo" in data:
+        update["player_a.photo_url"] = data["player_a_photo"]
+    if "player_b_photo" in data:
+        update["player_b.photo_url"] = data["player_b_photo"]
+    
+    if update:
+        await db[services.C_LIVE].update_one({"session_id": session_id}, {"$set": update})
+        await _broadcast(session_id, {"type": "display_update", "data": data})
+    return {"success": True}
+
+
+@router.put("/live/{session_id}/server")
+async def override_server(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Manually change who is serving."""
+    server = data.get("server")  # 'a' or 'b'
+    if server not in ("a", "b"):
+        raise HTTPException(400, "server must be 'a' or 'b'")
+    await db[services.C_LIVE].update_one({"session_id": session_id}, {"$set": {"server": server}})
+    await _broadcast(session_id, {"type": "server_changed", "data": {"server": server}})
+    return {"success": True, "server": server}
+
 # Polling fallback for live state
 @router.get("/live/{session_id}/state")
 async def get_live_state(session_id: str):
@@ -210,9 +243,14 @@ async def get_live_state(session_id: str):
     return {
         "score": s["score"], "sets": s["sets"], "sets_won": s["sets_won"],
         "server": s["server"], "current_set": s["current_set"], "status": s["status"],
-        "points": s["points"][-20:],  # Last 20 points for momentum
+        "points": s["points"][-20:],
         "reactions": s.get("reactions", {}),
         "stream_url": s.get("stream_url", ""),
+        "display": s.get("display", {}),
+        "player_a": s.get("player_a", {}),
+        "player_b": s.get("player_b", {}),
+        "referee": s.get("referee", {}),
+        "settings": s.get("settings", {}),
     }
 
 

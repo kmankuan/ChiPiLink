@@ -58,7 +58,13 @@ export default function LiveRefPanel() {
       setSession(data);
       // Auto-swap sides after set change
       if (data.current_set !== prevSetRef.current && prevSetRef.current > 0) {
-        setSwapped(prev => !prev);
+        const newSwapped = !swapped;
+        setSwapped(newSwapped);
+        // Sync to server so TV sees the swap
+        fetch(`${API}/api/sport/live/${sessionId}/display`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ swapped: newSwapped }),
+        }).catch(() => {});
         toast.info('Sides swapped for new set');
       }
       prevSetRef.current = data.current_set;
@@ -99,8 +105,14 @@ export default function LiveRefPanel() {
         const data = await res.json();
         setSession(prev => ({ ...prev, score: data.score, sets: data.sets, sets_won: data.sets_won, server: data.server, current_set: data.current_set, status: data.status, points: [...(prev?.points || []), data.point] }));
         if (data.emotions?.length > 0) {
-          setEmotion({ ...data.emotions[0], side });
+          const emoSide = side === leftSide ? 'left' : 'right';
+          setEmotion({ ...data.emotions[0], side: emoSide });
           setTimeout(() => setEmotion(null), 3000);
+          // Sync emotion to TV
+          fetch(`${API}/api/sport/live/${sessionId}/display`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ last_emotion: data.emotions[0].type, last_emotion_side: emoSide }),
+          }).catch(() => {});
         }
         if (data.status === 'finished') {
           setTimeout(() => setShowEndGame(true), 1500);
@@ -174,7 +186,14 @@ export default function LiveRefPanel() {
         <Badge className="bg-red-600 text-white animate-pulse text-[10px]"><Radio className="h-3 w-3 mr-1" /> LIVE</Badge>
         <div className="flex items-center gap-2">
           <span className="text-white/40 text-[10px]">Set {s.current_set}</span>
-          <button onClick={() => setSwapped(!swapped)} className="text-white/40 hover:text-white p-1" title="Swap sides">
+          <button onClick={() => {
+            const newSwapped = !swapped;
+            setSwapped(newSwapped);
+            fetch(`${API}/api/sport/live/${sessionId}/display`, {
+              method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ swapped: newSwapped }),
+            }).catch(() => {});
+          }} className="text-white/40 hover:text-white p-1" title="Swap sides">
             <ArrowLeftRight className="h-4 w-4" />
           </button>
         </div>
@@ -266,7 +285,16 @@ export default function LiveRefPanel() {
         </Button>
         <div className="flex items-center gap-2">
           <span className="text-white/20 text-[9px]">⚖️ {s.referee?.nickname}</span>
-          <span className="text-white/10 text-[9px]">Bo{(s.settings?.sets_to_win || 2) * 2 - 1}</span>
+          <button className="text-yellow-400/60 hover:text-yellow-400 text-[9px]"
+            onClick={() => {
+              const newServer = s.server === 'a' ? 'b' : 'a';
+              fetch(`${API}/api/sport/live/${sessionId}/server`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ server: newServer }),
+              }).then(() => fetchSession()).catch(() => {});
+            }}
+            title="Toggle service"
+          >🏓 switch</button>
         </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="sm" className={`h-8 text-xs ${showTechPanel ? 'text-yellow-400' : 'text-white/50'}`}
