@@ -13,6 +13,68 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
+function H2HMatrix({ matches, standings }) {
+  if (!standings.length) return <p className="text-center py-8 text-muted-foreground text-sm">No data yet</p>;
+
+  // Build result map
+  const results = {};
+  for (const m of matches) {
+    const aId = m.player_a?.player_id;
+    const bId = m.player_b?.player_id;
+    if (!aId || !bId || m.status !== 'validated') continue;
+    
+    const key = `${aId}_${bId}`;
+    if (!results[key]) results[key] = { wins: 0, losses: 0, scores: [] };
+    if (m.winner_id === aId) results[key].wins++;
+    else results[key].losses++;
+    results[key].scores.push(`${m.score_winner}-${m.score_loser}`);
+    
+    const rev = `${bId}_${aId}`;
+    if (!results[rev]) results[rev] = { wins: 0, losses: 0, scores: [] };
+    if (m.winner_id === bId) results[rev].wins++;
+    else results[rev].losses++;
+  }
+
+  return (
+    <div className="overflow-x-auto -mx-2">
+      <table className="text-[10px] border-collapse min-w-full">
+        <thead>
+          <tr>
+            <th className="p-1 text-left text-muted-foreground sticky left-0 bg-card z-10 min-w-[60px]">vs</th>
+            {standings.map(p => (
+              <th key={p.player_id} className="p-1 text-center text-muted-foreground min-w-[40px]" title={p.nickname}>
+                <div className="truncate w-10">{p.nickname?.substring(0, 4)}</div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {standings.map(row => (
+            <tr key={row.player_id} className="border-t border-muted/30">
+              <td className="p-1 font-medium sticky left-0 bg-card z-10 truncate max-w-[70px]">{row.nickname}</td>
+              {standings.map(col => {
+                if (row.player_id === col.player_id) {
+                  return <td key={col.player_id} className="p-1 text-center bg-muted/20">—</td>;
+                }
+                const r = results[`${row.player_id}_${col.player_id}`];
+                if (!r) return <td key={col.player_id} className="p-1 text-center text-muted-foreground/30">·</td>;
+                const won = r.wins > r.losses;
+                const tied = r.wins === r.losses && r.wins > 0;
+                return (
+                  <td key={col.player_id} className={`p-1 text-center font-mono font-bold ${won ? 'text-green-600 bg-green-50/50' : tied ? 'text-yellow-600 bg-yellow-50/50' : 'text-red-500 bg-red-50/30'}`}
+                    title={r.scores.join(', ')}>
+                    {r.wins}W
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function LeagueDetail() {
   const { leagueId } = useParams();
   const { t } = useTranslation();
@@ -96,8 +158,8 @@ export default function LeagueDetail() {
 
           <TabsContent value="matrix">
             <Card>
-              <CardContent className="p-3">
-                <p className="text-xs text-muted-foreground text-center py-4">Matrix view — coming in Phase 2</p>
+              <CardContent className="p-2">
+                <H2HMatrix matches={matches} standings={standings} />
               </CardContent>
             </Card>
           </TabsContent>

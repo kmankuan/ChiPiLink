@@ -123,6 +123,9 @@ export default function SportDashboard() {
               <Award className="h-3.5 w-3.5 mr-1" /> Tournament
             </Button>
           )}
+          <Button variant="outline" size="sm" className="rounded-full text-xs border-amber-200 text-amber-700" onClick={() => navigate('/sport/hall-of-fame')}>
+            <Trophy className="h-3.5 w-3.5 mr-1" /> Fame
+          </Button>
         </div>
 
         {/* Top Players */}

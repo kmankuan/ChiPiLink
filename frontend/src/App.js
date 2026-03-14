@@ -71,6 +71,8 @@ import SportTV from '@/modules/sport/SportTV';
 import TournamentDetail from '@/modules/sport/TournamentDetail';
 import CreateTournament from '@/modules/sport/CreateTournament';
 import SportAdmin from '@/modules/sport/SportAdmin';
+import PlayerProfile from '@/modules/sport/PlayerProfile';
+import HallOfFame from '@/modules/sport/HallOfFame';
 
 
 // Rapid Pin Module
@@ -80,7 +82,7 @@ import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/ra
 import { ArenaHub, ArenaCreate, ArenaDetail, ArenaPublic } from '@/modules/pinpanclub/pages/arena';
 
 // Hall of Fame & Referee
-import HallOfFame from '@/modules/pinpanclub/pages/HallOfFame';
+// import HallOfFame from '@/modules/pinpanclub/pages/HallOfFame'; // DEPRECATED
 import RefereeSettings from '@/modules/pinpanclub/pages/RefereeSettings';
 
 // Weekly Challenges Page
@@ -271,6 +273,8 @@ function AppRouter() {
       <Route path="/sport/tournament/new" element={<><Header /><CreateTournament /></>} />
       <Route path="/sport/tournament/:tid" element={<TournamentDetail />} />
       <Route path="/sport/admin" element={<><Header /><SportAdmin /></>} />
+      <Route path="/sport/player/:playerId" element={<><Header /><PlayerProfile /></>} />
+      <Route path="/sport/hall-of-fame" element={<><Header /><HallOfFame /></>} />
 
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}

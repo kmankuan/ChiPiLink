@@ -1,30 +1,26 @@
 [
   {
-    "content": "1. Lottie animation engine — replace CSS with real Lottie animations",
+    "content": "Phase 2 gap: League matrix view (H2H grid)",
     "status": "completed"
   },
   {
-    "content": "2. Admin settings UI for emotion customization",
+    "content": "Phase 2 gap: Double elimination bracket UI",
     "status": "completed"
   },
   {
-    "content": "3. Referee photo in PlayerPicker",
+    "content": "Phase 3: Player profile page (/sport/player/:id)",
     "status": "completed"
   },
   {
-    "content": "4. PointFlow with emotion indicators on referee panel",
+    "content": "Phase 3: Player-user linking workflow",
     "status": "completed"
   },
   {
-    "content": "5. TV full sync — service override + settings broadcast",
+    "content": "Phase 3: Achievements/badges system",
     "status": "completed"
   },
   {
-    "content": "6. Live label toggle UI (public/private match)",
-    "status": "completed"
-  },
-  {
-    "content": "7. Player photo upload from device (not just URL)",
+    "content": "Phase 3: Hall of Fame",
     "status": "completed"
   }
 ]

@@ -16,6 +16,7 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 const API = RESOLVED_API_URL;
 const FORMATS = [
   { value: 'single_elimination', label: 'Single Elimination', desc: 'Lose once, you\'re out' },
+  { value: 'double_elimination', label: 'Double Elimination', desc: 'Losers get a second chance' },
   { value: 'round_robin', label: 'Round Robin', desc: 'Everyone plays everyone' },
   { value: 'swiss', label: 'Swiss System', desc: 'Paired by record each round' },
 ];

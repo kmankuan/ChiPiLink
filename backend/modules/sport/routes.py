@@ -61,6 +61,40 @@ async def update_photo(player_id: str, data: dict, user: dict = Depends(get_curr
     await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": {"avatar_url": url}})
     return {"success": True}
 
+@router.post("/players/{player_id}/link-request")
+async def request_link(player_id: str, user: dict = Depends(get_current_user)):
+    """User requests to link their account to a player profile."""
+    player = await services.get_player(player_id)
+    if not player: raise HTTPException(404, "Player not found")
+    if player.get("linked_user_id"): raise HTTPException(400, "Player already linked")
+    
+    await db[services.C_PLAYERS].update_one(
+        {"player_id": player_id},
+        {"$set": {"link_request": {"user_id": user.get("user_id"), "user_name": user.get("name", ""), "requested_at": __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()}}}
+    )
+    return {"success": True, "message": "Link request submitted"}
+
+@router.get("/players/{player_id}/link-request")
+async def get_link_request(player_id: str, admin: dict = Depends(get_admin_user)):
+    """Admin views pending link request."""
+    player = await services.get_player(player_id)
+    if not player: raise HTTPException(404, "Player not found")
+    return player.get("link_request")
+
+@router.post("/players/{player_id}/link-approve")
+async def approve_link(player_id: str, admin: dict = Depends(get_admin_user)):
+    """Admin approves a player-user link request."""
+    player = await services.get_player(player_id)
+    if not player: raise HTTPException(404, "Player not found")
+    req = player.get("link_request")
+    if not req: raise HTTPException(400, "No pending link request")
+    try:
+        result = await services.link_player_to_user(player_id, req["user_id"], admin.get("user_id"))
+        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$unset": {"link_request": 1}})
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
 
 # ═══ MATCHES ═══
 
