@@ -87,7 +87,7 @@ export default function BottomNav() {
 
   useEffect(() => { setVisible(true); }, [path]);
 
-  if (path.startsWith('/embed') || path.startsWith('/auth/') || path === '/payment-status') return null;
+  if (path.startsWith('/embed') || path.startsWith('/auth/') || path === '/payment-status' || path.startsWith('/sport/live/') || path.startsWith('/sport/overlay/') || path === '/sport/tv') return null;
 
   const isHome = path === '/' || path === '';
   const isStore = path.startsWith('/unatienda');
