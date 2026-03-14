@@ -59,21 +59,32 @@ export default function SportDashboard() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-3 gap-2">
-          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#C8102E' }}
-            onClick={() => navigate('/sport/match/new')}>
-            <Plus className="h-4 w-4" /> {t('sport.recordMatch')}
-          </Button>
-          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#2d2217' }}
-            onClick={() => navigate('/sport/live/new')}>
-            <Zap className="h-4 w-4" /> Referee
-          </Button>
-          <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#7c3aed' }}
-            onClick={() => navigate('/sport/live/new?stream=1')}>
-            <Radio className="h-4 w-4" /> Stream
-          </Button>
-        </div>
+        {/* Quick Actions — only for logged-in users */}
+        {user ? (
+          <div className="grid grid-cols-3 gap-2">
+            <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#C8102E' }}
+              onClick={() => navigate('/sport/match/new')}>
+              <Plus className="h-4 w-4" /> {t('sport.recordMatch')}
+            </Button>
+            <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#2d2217' }}
+              onClick={() => navigate('/sport/live/new')}>
+              <Zap className="h-4 w-4" /> Referee
+            </Button>
+            {isAdmin && (
+              <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#7c3aed' }}
+                onClick={() => navigate('/sport/live/new?stream=1')}>
+                <Radio className="h-4 w-4" /> Stream
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-3 px-4 rounded-xl bg-white/50 border border-[#e8dfd2]">
+            <p className="text-sm text-[#8b7355]">{t('auth.loginMessage', 'Login to record matches and referee games')}</p>
+            <Button variant="outline" size="sm" className="mt-2 rounded-full text-xs" onClick={() => navigate('/login')}>
+              {t('auth.loginButton', 'Login')}
+            </Button>
+          </div>
+        )}
 
         {/* Live Matches */}
         {live.length > 0 && (
