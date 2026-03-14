@@ -198,32 +198,47 @@ async def create_live_session(data: dict) -> dict:
         "status": "live",
         "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": data.get("player_a_photo", "")},
         "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": data.get("player_b_photo", "")},
-        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"]},
+        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": data.get("referee_photo", "")},
         "league_id": data.get("league_id"),
         "stream_url": data.get("stream_url", ""),
         "settings": {
             "sets_to_win": data.get("sets_to_win", 2),
             "points_to_win": data.get("points_to_win", 11),
             "auto_service": settings.get("auto_service_tracking", True),
+            "auto_swap_sides": True,
         },
         "current_set": 1,
         "sets": [],
         "score": {"a": 0, "b": 0},
         "sets_won": {"a": 0, "b": 0},
         "server": "a",
-        "points": [],  # Full point-by-point history
+        "points": [],
+        "all_points": [],  # ALL points across ALL sets (persistent history)
         "timeouts": {"a": 0, "b": 0},
-        "momentum": [],  # Calculated momentum data
-        "emotions_triggered": [],
+        "cards": [],  # Yellow/red cards log
+        "calls": [],  # Let, timeout calls log
         "reactions": {},
         "spectator_count": 0,
         "created_at": now,
+        # Timers
+        "timers": {
+            "match_start": now,
+            "set_starts": [now],  # When each set started
+            "set_durations": [],  # Duration of completed sets (seconds)
+        },
         # Display state — synced to TV/spectator
         "display": {
             "swapped": False,
             "last_emotion": None,
             "last_emotion_side": None,
+            "last_emotion_at": None,
             "is_public": True,
+            "broadcast_mode": None,  # null=game | "intro" | "break" | "banner" | "standings"
+            "broadcast_data": {},  # Extra data for broadcast mode
+            "last_card": None,  # Last card shown
+            "last_call": None,  # Last call (let/timeout)
+            "last_effect": None,  # Referee's manual sticker
+            "last_effect_at": None,
         },
     }
     await db[C_LIVE].insert_one(session)
@@ -306,23 +321,24 @@ async def score_point(session_id: str, scored_by: str, technique: str = None) ->
             session["winner"] = scored_by
             emotions.append({"type": "winner", "player": scored_by})
         else:
-            # New set
+            # New set — record set duration, reset score
             session["current_set"] += 1
             session["score"] = {"a": 0, "b": 0}
             session["server"] = "a" if session["current_set"] % 2 == 1 else "b"
 
-    # Update DB — include display state for emotion sync
+    # Update DB — include display state for emotion sync + all_points
     emotion_update = {}
     if emotions:
         emotion_update["display.last_emotion"] = emotions[0]["type"]
         emotion_update["display.last_emotion_side"] = scored_by
+        emotion_update["display.last_emotion_at"] = datetime.now(timezone.utc).isoformat()
     
     await db[C_LIVE].update_one(
         {"session_id": session_id},
         {"$set": {"score": session["score"], "sets": session["sets"], "sets_won": session["sets_won"],
                   "server": session["server"], "current_set": session["current_set"],
                   "status": session["status"], **emotion_update},
-         "$push": {"points": point}}
+         "$push": {"points": point, "all_points": point}}
     )
 
     # If match finished, auto-create a recorded match

@@ -1,179 +1,270 @@
 /**
- * Sport TV Display — Full sync with referee panel
- * Reads display state (swapped, emotions, photos) from server
- * Merged set dots + scores in one component
+ * Sport TV — Full broadcast display
+ * Handles: game view, intro, break, cards, effects, timers, battle path
+ * Reads ALL display state from server for perfect sync with referee
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/badge';
 import { Radio, Trophy } from 'lucide-react';
+import PointFlow from './components/PointFlow';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
-function PlayerSide({ player, score, setsWon, totalSets, isServing, points = [], side }) {
-  // Point flow for this player's side
-  const myPoints = points.filter(p => p.scored_by === side);
-  const recentPoints = points.slice(-20);
-  const myRecent = recentPoints.filter(p => p.scored_by === side).length;
-  const momentum = recentPoints.length > 0 ? myRecent / recentPoints.length : 0.5;
+const EFFECT_MAP = {
+  tense: '😱', fire: '🔥', clap: '👏', funny: '😂', strong: '💪', fast: '⚡', precise: '🎯', insane: '🤯',
+};
+
+function formatTimer(startIso) {
+  if (!startIso) return '0:00';
+  const diff = Math.floor((Date.now() - new Date(startIso).getTime()) / 1000);
+  return `${Math.floor(diff / 60)}:${(diff % 60).toString().padStart(2, '0')}`;
+}
+
+function PlayerColumn({ player, score, setsWon, totalSets, isServing, side, points, sets, swapped }) {
+  const myPoints = (points || []).filter(p => p.scored_by === side);
+  const recent = (points || []).slice(-15);
+  const myRecent = recent.filter(p => p.scored_by === side).length;
+  const momentum = recent.length > 0 ? myRecent / recent.length : 0.5;
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center relative">
+    <div className="flex-1 flex flex-col items-center justify-center relative px-4">
       {/* Photo */}
       {player?.photo_url ? (
-        <img src={player.photo_url} alt={player.nickname} className="w-24 h-24 rounded-full object-cover border-4 border-white/10 mb-3" />
+        <img src={player.photo_url} className="w-28 h-28 rounded-full object-cover border-4 border-white/15 mb-3 shadow-xl" alt="" />
       ) : (
-        <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-3 border-4 border-white/10">
-          <span className="text-4xl text-white/30">{(player?.nickname || '?')[0]}</span>
+        <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center mb-3 border-4 border-white/10">
+          <span className="text-5xl text-white/20">{(player?.nickname || '?')[0]}</span>
         </div>
       )}
       
       {/* Name */}
-      <p className="text-white/60 text-2xl font-bold mb-2">{player?.nickname || '?'}</p>
+      <p className="text-white/70 text-3xl font-bold mb-2">{player?.nickname || '?'}</p>
       
       {/* Score */}
-      <p className="text-[10rem] font-black text-white leading-none" style={{ textShadow: '0 0 60px rgba(255,255,255,0.1)' }}>
-        {score}
-      </p>
+      <p className="text-[14rem] font-black text-white leading-none" style={{ textShadow: '0 0 80px rgba(255,255,255,0.08)' }}>{score}</p>
       
       {/* Service */}
-      {isServing && <p className="text-yellow-400 text-xl mt-2">🏓</p>}
+      {isServing && <p className="text-yellow-400 text-2xl mt-2">🏓</p>}
       
-      {/* ELO */}
-      <p className="text-white/15 text-sm mt-1">ELO {player?.elo || '?'}</p>
-      
-      {/* Momentum bar */}
-      <div className="w-32 h-1.5 rounded-full bg-white/5 mt-3 overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" 
-          style={{ width: `${momentum * 100}%`, background: momentum > 0.6 ? '#22c55e' : momentum > 0.4 ? '#eab308' : '#ef4444' }} />
-      </div>
-      
-      {/* Point flow dots */}
-      <div className="flex items-center gap-[2px] mt-2 max-w-[200px] justify-center flex-wrap">
-        {recentPoints.map((pt, i) => {
-          const isMine = pt.scored_by === side;
-          const streak = pt.streak || 1;
+      {/* Set dots with scores */}
+      <div className="flex gap-3 mt-3">
+        {Array.from({ length: totalSets }).map((_, i) => {
+          const won = i < (setsWon || 0);
+          const setData = sets?.[i];
           return (
-            <div key={i}
-              className={`rounded-full transition-all ${isMine ? 'bg-green-400' : 'bg-red-400/40'}`}
-              style={{ width: isMine ? Math.min(6 + streak, 12) : 4, height: isMine ? Math.min(6 + streak, 12) : 4, opacity: isMine ? 0.5 + streak * 0.1 : 0.2 }}
-            />
+            <div key={i} className="flex flex-col items-center">
+              <div className={`w-5 h-5 rounded-full transition-all ${won ? 'bg-yellow-400 shadow-lg shadow-yellow-400/30' : 'bg-white/10'}`} />
+              {setData && <span className="text-[9px] text-white/25 mt-0.5">{side === 'a' ? `${setData.score_a}-${setData.score_b}` : `${setData.score_b}-${setData.score_a}`}</span>}
+            </div>
           );
         })}
+      </div>
+      
+      {/* Momentum */}
+      <div className="w-40 h-2 rounded-full bg-white/5 mt-3 overflow-hidden">
+        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${momentum * 100}%`, background: momentum > 0.6 ? '#22c55e' : momentum > 0.4 ? '#eab308' : '#ef4444' }} />
+      </div>
+      
+      <p className="text-white/15 text-xs mt-1">ELO {player?.elo || '?'}</p>
+    </div>
+  );
+}
+
+function CardOverlay({ card, playerA, playerB }) {
+  if (!card) return null;
+  const isYellow = card.card_type === 'yellow';
+  const playerName = card.target === 'a' ? playerA?.nickname : playerB?.nickname;
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none animate-bounce">
+      <div className={`text-center p-8 rounded-3xl ${isYellow ? 'bg-yellow-500/30' : 'bg-red-500/30'}`} style={{ backdropFilter: 'blur(10px)' }}>
+        <div className="text-9xl mb-4">{isYellow ? '🟨' : '🟥'}</div>
+        <p className="text-4xl font-black text-white">{isYellow ? 'WARNING' : 'FOUL'}</p>
+        <p className="text-2xl text-white/70 mt-2">{playerName}</p>
       </div>
     </div>
   );
 }
 
-function SetDots({ setsWon, totalSets, sets, side }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="flex gap-2">
-        {Array.from({ length: totalSets }).map((_, i) => {
-          const won = i < (setsWon || 0);
-          const setData = sets?.[i]; // Actual set score if available
-          return (
-            <div key={i} className="flex flex-col items-center">
-              <div className={`w-4 h-4 rounded-full transition-all ${won ? 'bg-yellow-400 shadow-lg shadow-yellow-400/30' : 'bg-white/10'}`} />
-              {setData && (
-                <span className="text-[8px] text-white/30 mt-0.5">
-                  {side === 'a' ? `${setData.score_a}-${setData.score_b}` : `${setData.score_b}-${setData.score_a}`}
-                </span>
-              )}
-            </div>
-          );
-        })}
+function CallOverlay({ call, playerA, playerB }) {
+  if (!call) return null;
+  if (call.call_type === 'let') {
+    return (
+      <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+        <div className="text-center p-6 rounded-2xl bg-white/10" style={{ backdropFilter: 'blur(10px)' }}>
+          <p className="text-6xl font-black text-white animate-pulse">LET</p>
+          <p className="text-white/50 text-lg mt-1">Net touch — replay service</p>
+        </div>
       </div>
+    );
+  }
+  if (call.call_type === 'timeout') {
+    const name = call.target === 'a' ? playerA?.nickname : playerB?.nickname;
+    return (
+      <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+        <div className="text-center p-8 rounded-2xl bg-blue-500/20" style={{ backdropFilter: 'blur(10px)' }}>
+          <p className="text-6xl mb-2">⏸️</p>
+          <p className="text-4xl font-black text-white">TIMEOUT</p>
+          <p className="text-xl text-white/60 mt-2">{name}</p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+function EffectOverlay({ effectId }) {
+  const emoji = EFFECT_MAP[effectId] || '✨';
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none animate-bounce">
+      <span className="text-[10rem]">{emoji}</span>
+    </div>
+  );
+}
+
+function IntroScreen({ playerA, playerB, referee }) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
+      <p className="text-white/40 text-lg mb-8 tracking-widest">⚡ COMING UP NEXT ⚡</p>
+      <div className="flex items-center gap-16">
+        <div className="text-center">
+          {playerA?.photo_url ? <img src={playerA.photo_url} className="w-32 h-32 rounded-full object-cover border-4 border-white/20 mx-auto mb-4" alt="" /> : <div className="w-32 h-32 rounded-full bg-white/10 mx-auto mb-4 flex items-center justify-center text-5xl text-white/20">{(playerA?.nickname||'?')[0]}</div>}
+          <p className="text-3xl font-bold text-white">{playerA?.nickname}</p>
+          <p className="text-white/40">ELO {playerA?.elo}</p>
+        </div>
+        <div className="text-5xl font-black text-white/20">VS</div>
+        <div className="text-center">
+          {playerB?.photo_url ? <img src={playerB.photo_url} className="w-32 h-32 rounded-full object-cover border-4 border-white/20 mx-auto mb-4" alt="" /> : <div className="w-32 h-32 rounded-full bg-white/10 mx-auto mb-4 flex items-center justify-center text-5xl text-white/20">{(playerB?.nickname||'?')[0]}</div>}
+          <p className="text-3xl font-bold text-white">{playerB?.nickname}</p>
+          <p className="text-white/40">ELO {playerB?.elo}</p>
+        </div>
+      </div>
+      <p className="text-white/20 text-sm mt-8">⚖️ Referee: {referee?.nickname}</p>
+    </div>
+  );
+}
+
+function BreakScreen({ session, timer }) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
+      <p className="text-5xl mb-4">⏸️</p>
+      <p className="text-3xl font-bold text-white mb-2">BREAK</p>
+      <p className="text-white/40 text-lg">Match will resume shortly</p>
+      <p className="text-white/20 text-sm mt-4">Time elapsed: {timer}</p>
+      {session?.sets?.length > 0 && (
+        <div className="flex gap-4 mt-6">{session.sets.map((s, i) => <span key={i} className="text-white/30 text-sm">Set {i+1}: {s.score_a}-{s.score_b}</span>)}</div>
+      )}
     </div>
   );
 }
 
 export default function SportTV() {
-  const { t } = useTranslation();
   const [session, setSession] = useState(null);
   const [state, setState] = useState(null);
   const [emotion, setEmotion] = useState(null);
+  const [cardOverlay, setCardOverlay] = useState(null);
+  const [callOverlay, setCallOverlay] = useState(null);
+  const [effectOverlay, setEffectOverlay] = useState(null);
   const [rankings, setRankings] = useState([]);
+  const [timer, setTimer] = useState('0:00');
   const prevEmotionRef = useRef(null);
-  const pollRef = useRef(null);
-  const wsRef = useRef(null);
+  const prevCardRef = useRef(null);
+  const prevCallRef = useRef(null);
+  const prevEffectRef = useRef(null);
 
   const findLiveMatch = useCallback(async () => {
     try {
-      const [livesRes, rankRes] = await Promise.all([
-        fetch(`${API}/api/sport/live`),
-        rankings.length === 0 ? fetch(`${API}/api/sport/rankings?limit=10`) : Promise.resolve(null),
-      ]);
+      const livesRes = await fetch(`${API}/api/sport/live`);
+      if (!livesRes.ok) return;
+      const sessions = await livesRes.json();
+      if (sessions.length === 0) { setSession(null); setState(null); return; }
       
-      if (rankRes?.ok) setRankings(await rankRes.json());
-      
-      if (livesRes.ok) {
-        const sessions = await livesRes.json();
-        if (sessions.length > 0) {
-          const latest = sessions[0];
-          setSession(latest);
-          const sr = await fetch(`${API}/api/sport/live/${latest.session_id}/state`);
-          if (sr.ok) {
-            const st = await sr.json();
-            // Check for new emotion from display state
-            const newEmo = st.display?.last_emotion;
-            if (newEmo && newEmo !== prevEmotionRef.current) {
-              setEmotion({ type: newEmo, side: st.display?.last_emotion_side || 'center' });
-              setTimeout(() => setEmotion(null), 3000);
-              prevEmotionRef.current = newEmo;
-            }
-            setState(st);
-          }
-          return;
-        }
+      const latest = sessions[0];
+      setSession(latest);
+      const sr = await fetch(`${API}/api/sport/live/${latest.session_id}/state`);
+      if (!sr.ok) return;
+      const st = await sr.json();
+      setState(st);
+
+      // Detect new overlays from display state
+      const emo = st.display?.last_emotion;
+      const emoAt = st.display?.last_emotion_at;
+      if (emo && emoAt !== prevEmotionRef.current) {
+        setEmotion({ type: emo, side: st.display?.last_emotion_side || 'center' });
+        setTimeout(() => setEmotion(null), 3000);
+        prevEmotionRef.current = emoAt;
       }
-      setSession(null);
-      setState(null);
+
+      const lastCard = st.display?.last_card;
+      const lastCardAt = lastCard?.time;
+      if (lastCard && lastCardAt !== prevCardRef.current) {
+        setCardOverlay(lastCard);
+        setTimeout(() => setCardOverlay(null), 4000);
+        prevCardRef.current = lastCardAt;
+      }
+
+      const lastCall = st.display?.last_call;
+      const lastCallAt = lastCall?.time;
+      if (lastCall && lastCallAt !== prevCallRef.current) {
+        setCallOverlay(lastCall);
+        setTimeout(() => setCallOverlay(null), 4000);
+        prevCallRef.current = lastCallAt;
+      }
+
+      const lastEffect = st.display?.last_effect;
+      const lastEffectAt = st.display?.last_effect_at;
+      if (lastEffect && lastEffectAt !== prevEffectRef.current) {
+        setEffectOverlay(lastEffect);
+        setTimeout(() => setEffectOverlay(null), 3000);
+        prevEffectRef.current = lastEffectAt;
+      }
     } catch {}
-  }, [rankings.length]);
+  }, []);
 
   useEffect(() => {
     findLiveMatch();
-    pollRef.current = setInterval(findLiveMatch, 1500);
-    return () => clearInterval(pollRef.current);
+    fetch(`${API}/api/sport/rankings?limit=10`).then(r => r.ok ? r.json() : []).then(setRankings).catch(() => {});
+    const iv = setInterval(findLiveMatch, 1500);
+    return () => clearInterval(iv);
   }, [findLiveMatch]);
 
-  // WebSocket for faster updates
+  // Timer
+  useEffect(() => {
+    const iv = setInterval(() => {
+      if (state?.timers?.match_start) setTimer(formatTimer(state.timers.match_start));
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [state?.timers?.match_start]);
+
+  // WebSocket
   useEffect(() => {
     if (!session?.session_id) return;
     try {
       const ws = new WebSocket(`${API.replace('http', 'ws')}/api/sport/ws/live/${session.session_id}`);
       ws.onmessage = () => findLiveMatch();
-      wsRef.current = ws;
       return () => ws.close();
     } catch {}
   }, [session?.session_id, findLiveMatch]);
 
-  // IDLE SCREEN
+  // IDLE
   if (!session || !state) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
-        <div className="text-center mb-12">
-          <span className="text-6xl mb-4 block">🏓</span>
-          <h1 className="text-4xl font-black text-white mb-2">ChiPi Sport</h1>
-          <p className="text-white/40 text-lg">Waiting for live match...</p>
-          <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse mx-auto mt-4" />
-        </div>
+        <span className="text-7xl mb-4">🏓</span>
+        <h1 className="text-5xl font-black text-white mb-2">ChiPi Sport</h1>
+        <p className="text-white/30 text-xl">Waiting for live match...</p>
+        <div className="w-3 h-3 rounded-full bg-yellow-400 animate-pulse mx-auto mt-6" />
         {rankings.length > 0 && (
-          <div className="w-full max-w-2xl px-8">
-            <h2 className="text-white/50 text-sm font-bold mb-3 flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-yellow-400" /> ELO Rankings
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="w-full max-w-3xl px-8 mt-12">
+            <h2 className="text-white/40 text-sm font-bold mb-3"><Trophy className="h-4 w-4 inline mr-1 text-yellow-400" /> Rankings</h2>
+            <div className="grid grid-cols-2 gap-3">
               {rankings.slice(0, 10).map((p, i) => (
-                <div key={p.player_id} className="flex items-center justify-between px-4 py-2 rounded-lg bg-white/5">
+                <div key={p.player_id} className="flex items-center justify-between px-5 py-3 rounded-xl bg-white/5">
                   <div className="flex items-center gap-3">
-                    <span className="text-white/40 text-sm font-bold w-6">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
-                    <span className="text-white text-sm font-medium">{p.nickname}</span>
+                    <span className="text-lg font-bold w-8">{i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+                    <span className="text-white text-lg">{p.nickname}</span>
                   </div>
-                  <span className="text-white font-mono font-bold">{p.elo}</span>
+                  <span className="text-white font-mono font-bold text-lg">{p.elo}</span>
                 </div>
               ))}
             </div>
@@ -183,7 +274,12 @@ export default function SportTV() {
     );
   }
 
-  // LIVE MATCH — read display state for swap
+  // BROADCAST MODES
+  const broadcastMode = state.display?.broadcast_mode;
+  if (broadcastMode === 'intro') return <IntroScreen playerA={state.player_a || session.player_a} playerB={state.player_b || session.player_b} referee={state.referee || session.referee} />;
+  if (broadcastMode === 'break') return <BreakScreen session={state} timer={timer} />;
+
+  // LIVE GAME
   const swapped = state.display?.swapped || false;
   const leftPlayer = swapped ? (state.player_b || session.player_b) : (state.player_a || session.player_a);
   const rightPlayer = swapped ? (state.player_a || session.player_a) : (state.player_b || session.player_b);
@@ -195,42 +291,40 @@ export default function SportTV() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
-      <EmotionOverlay emotion={emotion} settings={{}} side={emotion?.side}
-        playerPhoto={emotion?.side === 'left' ? leftPlayer?.photo_url : rightPlayer?.photo_url} />
+      <EmotionOverlay emotion={emotion} settings={{}} side={emotion?.side} playerPhoto={emotion?.side === 'left' ? leftPlayer?.photo_url : rightPlayer?.photo_url} />
+      {cardOverlay && <CardOverlay card={cardOverlay} playerA={swapped ? state.player_b : state.player_a} playerB={swapped ? state.player_a : state.player_b} />}
+      {callOverlay && <CallOverlay call={callOverlay} playerA={swapped ? state.player_b : state.player_a} playerB={swapped ? state.player_a : state.player_b} />}
+      {effectOverlay && <EffectOverlay effectId={effectOverlay} />}
 
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-3">
-        <Badge className="bg-red-600 text-white animate-pulse text-sm px-3 py-1">
-          <Radio className="h-4 w-4 mr-2" /> LIVE
-        </Badge>
-        <span className="text-white/30 text-sm">Set {state.current_set} · Bo{totalSets * 2 - 1}</span>
+      <div className="flex items-center justify-between px-8 py-2">
+        <div className="flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-white/40 text-sm font-bold">LIVE</span>
+        </div>
+        <span className="text-white/25 text-sm font-mono">{timer} · Set {state.current_set}</span>
         <span className="text-white/20 text-sm">⚖️ {(state.referee || session.referee)?.nickname}</span>
       </div>
 
-      {/* Set dots with scores — merged */}
-      <div className="flex justify-center gap-16 px-8 pb-2">
-        <SetDots setsWon={setsWon[leftSide]} totalSets={totalSets} sets={state.sets} side={leftSide} />
-        <span className="text-white/15 text-[10px] self-center">SETS</span>
-        <SetDots setsWon={setsWon[rightSide]} totalSets={totalSets} sets={state.sets} side={rightSide} />
+      {/* Main — Player columns */}
+      <div className="flex-1 flex items-center">
+        <PlayerColumn player={leftPlayer} score={score[leftSide]} setsWon={setsWon[leftSide]} totalSets={totalSets} isServing={state.server === leftSide} side={leftSide} points={state.all_points || state.points} sets={state.sets} swapped={swapped} />
+        <div className="flex flex-col items-center px-4">
+          <div className="w-px h-24 bg-white/10" />
+          <span className="text-white/10 text-2xl my-2">vs</span>
+          <div className="w-px h-24 bg-white/10" />
+        </div>
+        <PlayerColumn player={rightPlayer} score={score[rightSide]} setsWon={setsWon[rightSide]} totalSets={totalSets} isServing={state.server === rightSide} side={rightSide} points={state.all_points || state.points} sets={state.sets} swapped={swapped} />
       </div>
 
-      {/* Main Score — Player sides */}
-      <div className="flex-1 flex items-center px-8">
-        <PlayerSide player={leftPlayer} score={score[leftSide]} setsWon={setsWon[leftSide]} totalSets={totalSets} isServing={state.server === leftSide} points={state.points || []} side={leftSide} />
-        
-        {/* VS Divider */}
-        <div className="flex flex-col items-center px-6">
-          <div className="w-px h-20 bg-white/10" />
-          <span className="text-white/15 text-lg my-2">vs</span>
-          <div className="w-px h-20 bg-white/10" />
-        </div>
-        
-        <PlayerSide player={rightPlayer} score={score[rightSide]} setsWon={setsWon[rightSide]} totalSets={totalSets} isServing={state.server === rightSide} points={state.points || []} side={rightSide} />
+      {/* Point flow (persistent all sets) */}
+      <div className="px-8 py-2">
+        <PointFlow points={state.all_points || state.points || []} playerA={leftPlayer?.nickname} playerB={rightPlayer?.nickname} swapped={swapped} />
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-center px-8 py-3 bg-black/30">
-        <span className="text-white/15 text-xs">🏓 ChiPi Sport</span>
+      <div className="flex items-center justify-center px-8 py-2 bg-black/30">
+        <span className="text-white/10 text-xs">🏓 ChiPi Sport</span>
       </div>
     </div>
   );

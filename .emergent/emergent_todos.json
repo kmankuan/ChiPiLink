@@ -1,26 +1,38 @@
 [
   {
-    "content": "Phase 2 gap: League matrix view (H2H grid)",
+    "content": "1. Bug fixes: sticker side on TV, photos, auto-swap",
     "status": "completed"
   },
   {
-    "content": "Phase 2 gap: Double elimination bracket UI",
+    "content": "2. TV bigger elements + persistent point history",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Player profile page (/sport/player/:id)",
+    "content": "3. Player picker dropdown redesign",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Player-user linking workflow",
+    "content": "4. Cards & Calls (yellow/red card, let, timeout)",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Achievements/badges system",
+    "content": "5. Referee emotion/effect board",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Hall of Fame",
+    "content": "6. TV Broadcast control (intro, break, game)",
+    "status": "completed"
+  },
+  {
+    "content": "7. Battle scene (deferred — needs more design time)",
+    "status": "pending"
+  },
+  {
+    "content": "8. Timer system (match timer, set timer)",
+    "status": "completed"
+  },
+  {
+    "content": "9. Settings for auto-swap + all features",
     "status": "completed"
   }
 ]

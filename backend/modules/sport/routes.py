@@ -168,6 +168,80 @@ async def undo_point(session_id: str, user: dict = Depends(get_current_user)):
     except ValueError as e:
         raise HTTPException(400, str(e))
 
+
+# ═══ CARDS & CALLS ═══
+
+@router.post("/live/{session_id}/card")
+async def issue_card(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Issue yellow/red card to a player."""
+    card_type = data.get("card_type", "yellow")  # yellow | red
+    target = data.get("target")  # "a" or "b"
+    if card_type not in ("yellow", "red") or target not in ("a", "b"):
+        raise HTTPException(400, "card_type must be yellow/red, target must be a/b")
+    
+    now = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+    card = {"card_type": card_type, "target": target, "time": now}
+    
+    update = {"$push": {"cards": card}, "$set": {"display.last_card": card, "display.last_card_at": now}}
+    # Red card = point penalty (opponent gets a point)
+    if card_type == "red":
+        other = "b" if target == "a" else "a"
+        update["$inc"] = {f"score.{other}": 1}
+    
+    await db[services.C_LIVE].update_one({"session_id": session_id}, update)
+    await _broadcast(session_id, {"type": "card", "data": card})
+    return {"success": True, "card": card}
+
+
+@router.post("/live/{session_id}/call")
+async def make_call(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Make a call: let (net touch), timeout."""
+    call_type = data.get("call_type")  # "let" | "timeout"
+    target = data.get("target")  # "a" or "b" (for timeout)
+    
+    now = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+    call = {"call_type": call_type, "target": target, "time": now}
+    
+    update_set = {"display.last_call": call}
+    if call_type == "timeout" and target in ("a", "b"):
+        update_set[f"timeouts.{target}"] = 1  # Mark timeout used
+    
+    await db[services.C_LIVE].update_one({"session_id": session_id}, {"$push": {"calls": call}, "$set": update_set})
+    await _broadcast(session_id, {"type": "call", "data": call})
+    return {"success": True, "call": call}
+
+
+# ═══ REFEREE EFFECTS (manual stickers to TV) ═══
+
+@router.post("/live/{session_id}/effect")
+async def send_effect(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Referee sends a manual sticker/effect to TV."""
+    effect_id = data.get("effect_id", "fire")
+    now = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+    await db[services.C_LIVE].update_one(
+        {"session_id": session_id},
+        {"$set": {"display.last_effect": effect_id, "display.last_effect_at": now}}
+    )
+    await _broadcast(session_id, {"type": "effect", "data": {"effect_id": effect_id}})
+    return {"success": True}
+
+
+# ═══ TV BROADCAST CONTROL ═══
+
+@router.post("/live/{session_id}/broadcast")
+async def set_broadcast(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Control what TV shows: game, intro, break, banner, standings."""
+    mode = data.get("mode")  # null=game | "intro" | "break" | "banner" | "standings" | "sponsor"
+    broadcast_data = data.get("data", {})
+    
+    await db[services.C_LIVE].update_one(
+        {"session_id": session_id},
+        {"$set": {"display.broadcast_mode": mode, "display.broadcast_data": broadcast_data}}
+    )
+    await _broadcast(session_id, {"type": "broadcast", "data": {"mode": mode, **broadcast_data}})
+    return {"success": True, "mode": mode}
+
+
 @router.post("/live/{session_id}/end")
 async def end_live(session_id: str, user: dict = Depends(get_current_user)):
     result = await services.end_live_session(session_id)
@@ -286,6 +360,7 @@ async def get_live_state(session_id: str):
         "score": s["score"], "sets": s["sets"], "sets_won": s["sets_won"],
         "server": s["server"], "current_set": s["current_set"], "status": s["status"],
         "points": s["points"][-20:],
+        "all_points": s.get("all_points", s.get("points", []))[-60:],  # Persistent across sets
         "reactions": s.get("reactions", {}),
         "stream_url": s.get("stream_url", ""),
         "display": s.get("display", {}),
@@ -293,6 +368,10 @@ async def get_live_state(session_id: str):
         "player_b": s.get("player_b", {}),
         "referee": s.get("referee", {}),
         "settings": s.get("settings", {}),
+        "timers": s.get("timers", {}),
+        "cards": s.get("cards", [])[-10:],
+        "calls": s.get("calls", [])[-10:],
+        "timeouts": s.get("timeouts", {}),
     }
 
 
