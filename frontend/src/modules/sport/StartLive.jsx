@@ -26,7 +26,7 @@ export default function StartLive() {
   const [form, setForm] = useState({
     player_a_name: '', player_b_name: '', referee_name: '',
     sets_to_win: 2, points_to_win: 11, league_id: '', stream_url: '',
-    player_a_photo: '', player_b_photo: '',
+    player_a_photo: '', player_b_photo: '', referee_photo: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -78,8 +78,8 @@ export default function StartLive() {
                 onChange={v => set('player_b_name', v)} onPhotoChange={v => set('player_b_photo', v)} testId="live-pb" />
             </div>
 
-            <PlayerPicker label={t('sport.referee')} value={form.referee_name} filterRole="referee"
-              onChange={v => set('referee_name', v)} testId="live-ref" placeholder="Referee..." />
+            <PlayerPicker label={t('sport.referee')} value={form.referee_name} photoValue={form.referee_photo} filterRole="referee"
+              onChange={v => set('referee_name', v)} onPhotoChange={v => set('referee_photo', v)} testId="live-ref" placeholder="Referee..." />
 
             <div className="grid grid-cols-2 gap-3">
               <div>

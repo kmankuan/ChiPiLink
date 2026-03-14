@@ -184,7 +184,20 @@ export default function LiveRefPanel() {
 
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2">
-        <Badge className="bg-red-600 text-white animate-pulse text-[10px]"><Radio className="h-3 w-3 mr-1" /> LIVE</Badge>
+        <button 
+          className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
+            s.display?.is_public !== false ? 'bg-green-600 text-white' : 'bg-white/10 text-white/40'
+          }`}
+          onClick={() => {
+            const newPublic = s.display?.is_public === false;
+            fetch(`${API}/api/sport/live/${sessionId}/display`, {
+              method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ is_public: newPublic }),
+            }).then(() => fetchSession()).catch(() => {});
+          }}
+        >
+          <Radio className="h-3 w-3 inline mr-0.5" /> {s.display?.is_public !== false ? 'LIVE' : 'PRIVATE'}
+        </button>
         <div className="flex items-center gap-2">
           <span className="text-white/40 text-[10px]">Set {s.current_set}</span>
           <button onClick={() => {

@@ -1,7 +1,6 @@
 /**
- * Point Flow — Shows who scored each point as colored dots on a timeline
- * Much clearer than mirrored bars. Red dots = Player A, Blue dots = Player B
- * Streaks visible as consecutive same-color dots
+ * PointFlow — Visual timeline of points with emotion indicators
+ * Shows on each player's side. Dots grow with streaks, emotions show as special markers.
  */
 export default function PointFlow({ points = [], playerA = 'A', playerB = 'B', swapped = false }) {
   if (points.length === 0) return null;
@@ -9,43 +8,77 @@ export default function PointFlow({ points = [], playerA = 'A', playerB = 'B', s
   const maxVisible = 30;
   const visible = points.slice(-maxVisible);
 
+  const EMOTION_MARKERS = {
+    streak_3: '🔥', streak_5: '🐉', streak_break: '💥',
+    deuce: '⚡', match_point: '🏮', winner: '🏆',
+    comeback: '🌊', perfect_set: '🏯', upset: '😱',
+  };
+
+  // Split points by player
+  const leftSide = swapped ? 'b' : 'a';
+  const rightSide = swapped ? 'a' : 'b';
+  const leftName = swapped ? playerB : playerA;
+  const rightName = swapped ? playerA : playerB;
+
   return (
-    <div className="w-full">
-      {/* Labels */}
-      <div className="flex justify-between text-[8px] text-white/30 mb-0.5 px-0.5">
-        <span>{swapped ? playerB : playerA}</span>
-        <span>{swapped ? playerA : playerB}</span>
-      </div>
-      {/* Dots */}
-      <div className="flex items-center gap-[2px] justify-center">
-        {visible.map((pt, i) => {
-          const isA = swapped ? pt.scored_by === 'b' : pt.scored_by === 'a';
-          const streak = pt.streak || 1;
-          const size = streak >= 5 ? 'w-3 h-3' : streak >= 3 ? 'w-2.5 h-2.5' : 'w-2 h-2';
-          const glow = streak >= 5 ? 'shadow-lg' : streak >= 3 ? 'shadow-md' : '';
-          return (
-            <div
-              key={i}
-              className={`${size} rounded-full transition-all ${glow}`}
-              style={{
-                backgroundColor: isA ? '#ef4444' : '#3b82f6',
-                opacity: 0.5 + Math.min(streak * 0.1, 0.5),
-                boxShadow: streak >= 3 ? `0 0 ${streak * 2}px ${isA ? '#ef4444' : '#3b82f6'}40` : 'none',
-              }}
-              title={`P${pt.num}: ${pt.scored_by === 'a' ? playerA : playerB} (${pt.score_after?.a}-${pt.score_after?.b})`}
-            />
-          );
-        })}
-      </div>
-      {/* Legend */}
-      <div className="flex justify-center gap-4 mt-1">
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          <span className="text-[8px] text-white/30">{swapped ? playerB : playerA}</span>
+    <div className="w-full space-y-1">
+      {/* Player A (left) flow */}
+      <div className="flex items-center gap-1">
+        <span className="text-[8px] text-red-400/60 w-8 text-right shrink-0">{leftName?.substring(0, 4)}</span>
+        <div className="flex items-center gap-[2px] flex-1 min-w-0">
+          {visible.map((pt, i) => {
+            const isMine = pt.scored_by === leftSide;
+            const streak = pt.streak || 1;
+            const emotions = pt.emotions || [];
+            const emoMarker = emotions.length > 0 ? EMOTION_MARKERS[emotions[0]] : null;
+
+            if (!isMine) return <div key={i} className="w-1 h-1 rounded-full bg-white/5" />;
+
+            return (
+              <div key={i} className="flex flex-col items-center" title={`P${pt.num}: ${pt.score_after?.a}-${pt.score_after?.b}`}>
+                {emoMarker && <span className="text-[6px] leading-none">{emoMarker}</span>}
+                <div
+                  className="rounded-full bg-red-400 transition-all"
+                  style={{
+                    width: Math.min(4 + streak * 1.5, 12),
+                    height: Math.min(4 + streak * 1.5, 12),
+                    opacity: 0.4 + Math.min(streak * 0.12, 0.6),
+                    boxShadow: streak >= 3 ? `0 0 ${streak * 2}px rgba(239,68,68,0.4)` : 'none',
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          <span className="text-[8px] text-white/30">{swapped ? playerA : playerB}</span>
+      </div>
+
+      {/* Player B (right) flow */}
+      <div className="flex items-center gap-1">
+        <span className="text-[8px] text-blue-400/60 w-8 text-right shrink-0">{rightName?.substring(0, 4)}</span>
+        <div className="flex items-center gap-[2px] flex-1 min-w-0">
+          {visible.map((pt, i) => {
+            const isMine = pt.scored_by === rightSide;
+            const streak = pt.streak || 1;
+            const emotions = pt.emotions || [];
+            const emoMarker = emotions.length > 0 ? EMOTION_MARKERS[emotions[0]] : null;
+
+            if (!isMine) return <div key={i} className="w-1 h-1 rounded-full bg-white/5" />;
+
+            return (
+              <div key={i} className="flex flex-col items-center" title={`P${pt.num}: ${pt.score_after?.a}-${pt.score_after?.b}`}>
+                {emoMarker && <span className="text-[6px] leading-none">{emoMarker}</span>}
+                <div
+                  className="rounded-full bg-blue-400 transition-all"
+                  style={{
+                    width: Math.min(4 + streak * 1.5, 12),
+                    height: Math.min(4 + streak * 1.5, 12),
+                    opacity: 0.4 + Math.min(streak * 0.12, 0.6),
+                    boxShadow: streak >= 3 ? `0 0 ${streak * 2}px rgba(59,130,246,0.4)` : 'none',
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,30 +1,30 @@
 [
   {
-    "content": "Phase 2.1: Backend — Tournament service + bracket generation",
+    "content": "1. Lottie animation engine — replace CSS with real Lottie animations",
     "status": "completed"
   },
   {
-    "content": "Phase 2.2: Backend — Tournament routes (create, register, seed, generate, report)",
+    "content": "2. Admin settings UI for emotion customization",
     "status": "completed"
   },
   {
-    "content": "Phase 2.3: Frontend — BracketView component (Challonge-style)",
+    "content": "3. Referee photo in PlayerPicker",
     "status": "completed"
   },
   {
-    "content": "Phase 2.4: Frontend — TournamentDetail page + CreateTournament page",
+    "content": "4. PointFlow with emotion indicators on referee panel",
     "status": "completed"
   },
   {
-    "content": "Phase 2.5: Frontend — RoundRobinMatrix component",
+    "content": "5. TV full sync — service override + settings broadcast",
     "status": "completed"
   },
   {
-    "content": "Phase 2.6: Integration — Routes registered, dashboard updated",
+    "content": "6. Live label toggle UI (public/private match)",
     "status": "completed"
   },
   {
-    "content": "Phase 2.7: Testing",
+    "content": "7. Player photo upload from device (not just URL)",
     "status": "completed"
   }
 ]

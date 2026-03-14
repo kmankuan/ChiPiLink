@@ -102,14 +102,27 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
         )}
       </div>
       
-      {/* Photo URL */}
+      {/* Photo URL or upload */}
       {onPhotoChange && (
-        <Input
-          value={photoValue || ''}
-          onChange={e => onPhotoChange(e.target.value)}
-          placeholder="Photo URL (optional)"
-          className="h-7 text-[10px] text-muted-foreground"
-        />
+        <div className="flex gap-1 items-center">
+          <Input
+            value={photoValue || ''}
+            onChange={e => onPhotoChange(e.target.value)}
+            placeholder="Photo URL or upload →"
+            className="h-7 text-[10px] text-muted-foreground flex-1"
+          />
+          <label className="shrink-0 cursor-pointer px-2 py-1 rounded text-[9px] bg-muted hover:bg-muted/80 text-muted-foreground">
+            📷
+            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              // Convert to base64 data URL for simplicity (no server upload needed)
+              const reader = new FileReader();
+              reader.onload = (ev) => { onPhotoChange(ev.target.result); };
+              reader.readAsDataURL(file);
+            }} />
+          </label>
+        </div>
       )}
 
       {/* Hidden datalist for browser autocomplete */}

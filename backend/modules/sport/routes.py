@@ -234,11 +234,12 @@ async def update_display(session_id: str, data: dict, user: dict = Depends(get_c
 @router.put("/live/{session_id}/server")
 async def override_server(session_id: str, data: dict, user: dict = Depends(get_current_user)):
     """Manually change who is serving."""
-    server = data.get("server")  # 'a' or 'b'
+    server = data.get("server")
     if server not in ("a", "b"):
         raise HTTPException(400, "server must be 'a' or 'b'")
     await db[services.C_LIVE].update_one({"session_id": session_id}, {"$set": {"server": server}})
-    await _broadcast(session_id, {"type": "server_changed", "data": {"server": server}})
+    # Broadcast full state refresh so TV picks up immediately
+    await _broadcast(session_id, {"type": "state_refresh"})
     return {"success": True, "server": server}
 
 # Polling fallback for live state
