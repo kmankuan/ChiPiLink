@@ -67,10 +67,6 @@ export default function StartLive() {
       <div className="max-w-lg mx-auto px-4 py-4">
         <Card>
           <CardContent className="p-4 space-y-4">
-            <datalist id="live-players">
-              {players.map(p => <option key={p.player_id} value={p.nickname} />)}
-            </datalist>
-
             <div className="grid grid-cols-2 gap-3">
               <PlayerPicker label={t('sport.playerA')} value={form.player_a_name} photoValue={form.player_a_photo}
                 onChange={v => set('player_a_name', v)} onPhotoChange={v => set('player_a_photo', v)} testId="live-pa" />
