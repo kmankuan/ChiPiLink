@@ -60,7 +60,14 @@ async def reply_to_topic(
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     try:
-        return await crm_chat_service.reply_to_topic(student_id, update_id, current_user["user_id"], message)
+        result = await crm_chat_service.reply_to_topic(student_id, update_id, current_user["user_id"], message)
+        # Publish to Ably for real-time delivery
+        try:
+            from modules.ably_integration import publish_to_channel
+            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": current_user["user_id"]})
+        except Exception:
+            pass
+        return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -127,6 +134,12 @@ async def admin_reply(
                 asyncio.create_task(notify_new_message(student["user_id"], student.get("name", ""), message[:100]))
         except Exception as e:
             logger.warning(f"Push notification failed (non-fatal): {e}")
+        # Ably real-time notification
+        try:
+            from modules.ably_integration import publish_to_channel
+            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": admin["user_id"], "is_admin": True})
+        except Exception:
+            pass
         return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

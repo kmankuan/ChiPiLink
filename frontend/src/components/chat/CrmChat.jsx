@@ -14,6 +14,7 @@ import {
   Headphones, ChevronRight, Clock, User
 } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
+import * as Ably from 'ably';
 
 const API = RESOLVED_API_URL;
 
@@ -152,6 +153,19 @@ function ThreadView({ topic, studentId, token, onBack, isAdmin, adminId }) {
     setLoading(true);
     fetchReplies();
   }, [fetchReplies]);
+
+  // Real-time updates via Ably — refresh when new messages arrive
+  useEffect(() => {
+    if (!studentId || !topic?.id) return;
+    try {
+      const ably = new Ably.Realtime({ authUrl: `${API}/api/ably/auth?clientId=crm_${studentId}`, authMethod: 'GET' });
+      const channel = ably.channels.get(`crm:${studentId}:${topic.id}`);
+      channel.subscribe('new_message', () => { fetchReplies(); });
+      return () => { channel.unsubscribe(); ably.close(); };
+    } catch (e) {
+      console.log('Ably CRM chat: fallback to manual refresh', e);
+    }
+  }, [studentId, topic?.id, fetchReplies]);
 
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });

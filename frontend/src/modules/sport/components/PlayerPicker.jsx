@@ -1,122 +1,155 @@
 /**
- * PlayerPicker — Smart player selector
- * Shows recent players as tappable chips, with autocomplete for new names.
- * Auto-fills photo URL from player's stored photo.
+ * PlayerPicker — Smart player selector with dropdown, photos, roles
+ * Shows recent players as tappable chips + searchable dropdown with photos.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X } from 'lucide-react';
+import { X, ChevronDown, Search, Plus } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 
 export default function PlayerPicker({ label, value, photoValue, onChange, onPhotoChange, filterRole, placeholder = 'Name...', testId }) {
   const [players, setPlayers] = useState([]);
-  const [showAll, setShowAll] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const wrapRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API}/api/sport/players?limit=50`)
+    fetch(`${API}/api/sport/players?limit=100`)
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         let filtered = data;
         if (filterRole === 'referee') {
-          // Show players who have refereed, sorted by most refereed
-          filtered = data.filter(p => (p.roles || []).includes('referee'))
-            .sort((a, b) => (b.stats?.matches_refereed || 0) - (a.stats?.matches_refereed || 0));
-          // If few referees, also show all players
-          if (filtered.length < 3) filtered = data;
+          const refs = data.filter(p => (p.roles || []).includes('referee')).sort((a, b) => (b.stats?.matches_refereed || 0) - (a.stats?.matches_refereed || 0));
+          filtered = refs.length >= 2 ? refs : data;
         } else {
-          // Sort by most matches played
           filtered = data.sort((a, b) => (b.stats?.matches || 0) - (a.stats?.matches || 0));
         }
         setPlayers(filtered);
-      })
-      .catch(() => {});
+      }).catch(() => {});
   }, [filterRole]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const selectPlayer = (p) => {
     onChange(p.nickname);
     if (onPhotoChange && p.avatar_url) onPhotoChange(p.avatar_url);
+    setOpen(false);
+    setSearch('');
   };
 
-  const visiblePlayers = showAll ? players : players.slice(0, 6);
-  const hasMore = players.length > 6;
+  const filtered = search
+    ? players.filter(p => (p.nickname || '').toLowerCase().includes(search.toLowerCase()))
+    : players;
+
+  const selectedPlayer = players.find(p => p.nickname === value);
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1" ref={wrapRef}>
       <Label className="text-xs">{label}</Label>
-      
-      {/* Recent players as chips */}
-      {players.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {visiblePlayers.map(p => (
-            <button
-              key={p.player_id}
-              type="button"
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] transition-all ${
-                value === p.nickname
-                  ? 'bg-green-600 text-white ring-2 ring-green-400/50'
-                  : 'bg-white/80 text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-              onClick={() => selectPlayer(p)}
-            >
-              {p.avatar_url ? (
-                <img src={p.avatar_url} className="w-3.5 h-3.5 rounded-full object-cover" alt="" />
-              ) : (
-                <span className="w-3.5 h-3.5 rounded-full bg-gray-300 flex items-center justify-center text-[7px] font-bold text-gray-600">
-                  {(p.nickname || '?')[0]}
-                </span>
-              )}
-              {p.nickname}
-              {filterRole === 'referee' && p.stats?.matches_refereed > 0 && (
-                <span className="text-[8px] opacity-60">⚖️{p.stats.matches_refereed}</span>
-              )}
-              {filterRole !== 'referee' && p.elo !== 1000 && (
-                <span className="text-[8px] opacity-60">{p.elo}</span>
-              )}
+
+      {/* Selected or input */}
+      <div className="relative">
+        {value ? (
+          <div className="flex items-center gap-2 h-10 px-3 rounded-md border bg-card cursor-pointer" onClick={() => setOpen(!open)}>
+            {(selectedPlayer?.avatar_url || photoValue) ? (
+              <img src={selectedPlayer?.avatar_url || photoValue} className="w-6 h-6 rounded-full object-cover" alt="" />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-bold">{(value || '?')[0]}</div>
+            )}
+            <span className="text-sm font-medium flex-1 truncate">{value}</span>
+            {selectedPlayer?.elo && <span className="text-[9px] text-muted-foreground">{selectedPlayer.elo}</span>}
+            {filterRole === 'referee' && selectedPlayer?.stats?.matches_refereed > 0 && (
+              <span className="text-[9px] text-muted-foreground">⚖️{selectedPlayer.stats.matches_refereed}</span>
+            )}
+            <button type="button" onClick={(e) => { e.stopPropagation(); onChange(''); if (onPhotoChange) onPhotoChange(''); }} className="text-muted-foreground hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
             </button>
-          ))}
-          {hasMore && !showAll && (
-            <button type="button" className="text-[10px] text-muted-foreground hover:underline px-1" onClick={() => setShowAll(true)}>
-              +{players.length - 6} more
-            </button>
-          )}
-        </div>
-      )}
-      
-      {/* Text input for new names */}
-      <div className="flex gap-1">
-        <Input
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="h-9 text-sm flex-1"
-          data-testid={testId}
-          list={`players-${testId}`}
-        />
-        {value && (
-          <button type="button" className="text-gray-400 hover:text-gray-600 px-1" onClick={() => { onChange(''); if (onPhotoChange) onPhotoChange(''); }}>
-            <X className="h-3.5 w-3.5" />
-          </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 h-10 px-3 rounded-md border bg-card cursor-pointer" onClick={() => setOpen(!open)}>
+            <Search className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground flex-1">{placeholder}</span>
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+        )}
+
+        {/* Dropdown */}
+        {open && (
+          <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-lg border bg-card shadow-xl max-h-60 overflow-hidden">
+            {/* Search */}
+            <div className="p-1.5 border-b">
+              <Input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search or type new name..."
+                className="h-8 text-xs"
+                autoFocus
+                data-testid={`${testId}-search`}
+              />
+            </div>
+
+            {/* Player list */}
+            <div className="max-h-44 overflow-y-auto">
+              {filtered.length === 0 && !search && (
+                <p className="text-xs text-muted-foreground text-center py-3">No players yet</p>
+              )}
+              {filtered.map(p => (
+                <button key={p.player_id} type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-muted/50 text-left transition-colors"
+                  onClick={() => selectPlayer(p)}>
+                  {p.avatar_url ? (
+                    <img src={p.avatar_url} className="w-7 h-7 rounded-full object-cover shrink-0" alt="" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">{(p.nickname || '?')[0]}</div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{p.nickname}</p>
+                    <div className="flex items-center gap-1">
+                      {(p.roles || []).map(r => (
+                        <span key={r} className="text-[8px] text-muted-foreground">{r === 'referee' ? '⚖️' : '🏓'}</span>
+                      ))}
+                      <span className="text-[8px] text-muted-foreground">{p.elo} ELO · {p.stats?.matches || 0}M</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+
+              {/* Create new option */}
+              {search && !filtered.some(p => p.nickname.toLowerCase() === search.toLowerCase()) && (
+                <button type="button"
+                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-green-50 text-left border-t"
+                  onClick={() => { onChange(search); setOpen(false); setSearch(''); }}>
+                  <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                    <Plus className="h-3.5 w-3.5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-green-700">Create "{search}"</p>
+                    <p className="text-[8px] text-green-600">New player</p>
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
-      
-      {/* Photo URL or upload */}
+
+      {/* Photo upload */}
       {onPhotoChange && (
         <div className="flex gap-1 items-center">
-          <Input
-            value={photoValue || ''}
-            onChange={e => onPhotoChange(e.target.value)}
-            placeholder="Photo URL or upload →"
-            className="h-7 text-[10px] text-muted-foreground flex-1"
-          />
+          <Input value={photoValue || ''} onChange={e => onPhotoChange(e.target.value)} placeholder="Photo URL or upload →" className="h-7 text-[10px] text-muted-foreground flex-1" />
           <label className="shrink-0 cursor-pointer px-2 py-1 rounded text-[9px] bg-muted hover:bg-muted/80 text-muted-foreground">
             📷
             <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
-              // Convert to base64 data URL for simplicity (no server upload needed)
               const reader = new FileReader();
               reader.onload = (ev) => { onPhotoChange(ev.target.result); };
               reader.readAsDataURL(file);
@@ -124,11 +157,6 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
           </label>
         </div>
       )}
-
-      {/* Hidden datalist for browser autocomplete */}
-      <datalist id={`players-${testId}`}>
-        {players.map(p => <option key={p.player_id} value={p.nickname} />)}
-      </datalist>
     </div>
   );
 }

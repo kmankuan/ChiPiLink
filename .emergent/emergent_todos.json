@@ -1,30 +1,18 @@
 [
   {
-    "content": "Backend: Ably token auth endpoint",
+    "content": "Item 2: Ably chat sidebar on TV display",
     "status": "completed"
   },
   {
-    "content": "Frontend: Ably + Chat provider setup",
+    "content": "Item 3: Ably real-time for Order CRM chat",
     "status": "completed"
   },
   {
-    "content": "Sport live: Ably pub/sub for score updates",
+    "content": "Item 4: Player dropdown picker with photos",
     "status": "completed"
   },
   {
-    "content": "Sport live: Chat room in spectator view",
+    "content": "Item 7: Technique analytics (player weakness/strength reports)",
     "status": "completed"
-  },
-  {
-    "content": "Sport live: Presence (spectator count)",
-    "status": "completed"
-  },
-  {
-    "content": "OpenAI translation for chat messages",
-    "status": "pending"
-  },
-  {
-    "content": "Test Ably integration end-to-end",
-    "status": "pending"
   }
 ]

@@ -8,6 +8,8 @@ import { Radio, Trophy } from 'lucide-react';
 import PointFlow from './components/PointFlow';
 import BattlePath from './components/BattlePath';
 import EmotionOverlay from './components/EmotionOverlay';
+import { AblyChatProvider } from '@/modules/ably/AblyProvider';
+import LiveChat from '@/modules/ably/LiveChat';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -299,6 +301,7 @@ export default function SportTV() {
   const score = state.score || { a: 0, b: 0 };
   const setsWon = state.sets_won || { a: 0, b: 0 };
   const totalSets = state.settings?.sets_to_win || 2;
+  const showChat = true; // Always show chat on TV
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)' }}>
@@ -317,8 +320,12 @@ export default function SportTV() {
         <span className="text-white/20 text-sm">⚖️ {(state.referee || session.referee)?.nickname}</span>
       </div>
 
-      {/* Main — Player columns */}
-      <div className="flex-1 flex items-center">
+      {/* Main content — game + chat sidebar */}
+      <div className="flex-1 flex min-h-0">
+        {/* Game area */}
+        <div className="flex-1 flex flex-col">
+          {/* Player columns */}
+          <div className="flex-1 flex items-center">
         <PlayerColumn player={leftPlayer} score={score[leftSide]} setsWon={setsWon[leftSide]} totalSets={totalSets} isServing={state.server === leftSide} side={leftSide} points={state.all_points || state.points} sets={state.sets} swapped={swapped} />
         <div className="flex flex-col items-center px-4">
           <div className="w-px h-24 bg-white/10" />
@@ -329,7 +336,7 @@ export default function SportTV() {
       </div>
 
       {/* Battle Path + Point flow */}
-      <div className="px-8 py-2 space-y-2">
+      <div className="px-6 py-2 space-y-2">
         <BattlePath 
           scoreA={score.a} scoreB={score.b} maxScore={state.settings?.points_to_win || 11}
           playerA={state.player_a || session.player_a} playerB={state.player_b || session.player_b}
@@ -339,6 +346,17 @@ export default function SportTV() {
           mode="full"
         />
         <PointFlow points={state.all_points || state.points || []} playerA={leftPlayer?.nickname} playerB={rightPlayer?.nickname} swapped={swapped} />
+      </div>
+        </div>
+
+        {/* Chat sidebar */}
+        {showChat && (
+          <div className="w-64 shrink-0 flex flex-col border-l border-white/5 bg-black/20">
+            <AblyChatProvider clientId={`tv_${session.session_id}`}>
+              <LiveChat roomId={`live:${session.session_id}`} userName="TV Viewer" compact={false} />
+            </AblyChatProvider>
+          </div>
+        )}
       </div>
 
       {/* Footer */}

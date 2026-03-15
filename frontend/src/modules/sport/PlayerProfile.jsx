@@ -16,6 +16,55 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 const API = RESOLVED_API_URL;
 
 function StatCard({ icon: Icon, label, value, color }) {
+
+function AnalyticsTab({ playerId }) {
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${API}/api/sport/players/${playerId}/analytics`).then(r => r.ok ? r.json() : null).then(setReport).catch(() => {}).finally(() => setLoading(false));
+  }, [playerId]);
+  if (loading) return <p className="text-center py-6 text-muted-foreground text-xs">Loading...</p>;
+  if (!report || report.total_analyzed_points === 0) return (
+    <Card><CardContent className="p-4 text-center"><Target className="h-8 w-8 text-muted-foreground mx-auto mb-2" /><p className="text-sm font-medium">No technique data yet</p><p className="text-xs text-muted-foreground mt-1">{report?.message || 'Referee needs to enable technique tagging (⚡ button) during live matches.'}</p></CardContent></Card>
+  );
+  return (
+    <div className="space-y-3">
+      <Card><CardContent className="p-3"><div className="grid grid-cols-3 gap-2 text-center">
+        <div><p className="text-lg font-bold">{report.win_rate_tagged}%</p><p className="text-[9px] text-muted-foreground">Win Rate (tagged)</p></div>
+        <div><p className="text-lg font-bold">{report.serve_accuracy}%</p><p className="text-[9px] text-muted-foreground">Serve Accuracy</p></div>
+        <div><p className="text-lg font-bold">{report.total_analyzed_points}</p><p className="text-[9px] text-muted-foreground">Points Analyzed</p></div>
+      </div></CardContent></Card>
+      {report.strengths?.length > 0 && (
+        <Card><CardContent className="p-3"><h4 className="text-xs font-bold text-green-600 mb-2">💪 Strengths</h4>
+          {report.strengths.map(s => (
+            <div key={s.technique} className="flex items-center justify-between py-1">
+              <span className="text-xs">{s.technique}</span>
+              <div className="flex items-center gap-2"><div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full bg-green-500 rounded-full" style={{width:`${s.percentage}%`}} /></div><span className="text-[10px] text-green-600 font-bold w-8 text-right">{s.percentage}%</span></div>
+            </div>
+          ))}
+        </CardContent></Card>
+      )}
+      {report.weaknesses?.length > 0 && (
+        <Card><CardContent className="p-3"><h4 className="text-xs font-bold text-red-500 mb-2">🎯 Weaknesses</h4>
+          {report.weaknesses.map(w => (
+            <div key={w.technique} className="flex items-center justify-between py-1">
+              <span className="text-xs">{w.technique}</span>
+              <div className="flex items-center gap-2"><div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full bg-red-500 rounded-full" style={{width:`${w.percentage}%`}} /></div><span className="text-[10px] text-red-500 font-bold w-8 text-right">{w.percentage}%</span></div>
+            </div>
+          ))}
+        </CardContent></Card>
+      )}
+      {report.recommendations?.length > 0 && (
+        <Card><CardContent className="p-3"><h4 className="text-xs font-bold mb-2">💡 Training Tips</h4>
+          {report.recommendations.map((r, i) => (
+            <div key={i} className="py-1.5 border-b last:border-0"><Badge variant="outline" className={`text-[8px] mr-1 ${r.urgency === 'high' ? 'border-red-200 text-red-600' : 'border-green-200 text-green-600'}`}>{r.area}</Badge><span className="text-xs text-muted-foreground">{r.tip}</span></div>
+          ))}
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
   return (
     <div className="p-2 rounded-lg bg-muted/30 text-center">
       <Icon className="h-4 w-4 mx-auto mb-0.5" style={{ color }} />
@@ -139,6 +188,7 @@ export default function PlayerProfile() {
             <TabsTrigger value="stats" className="flex-1 text-xs"><TrendingUp className="h-3 w-3 mr-1" /> ELO</TabsTrigger>
             <TabsTrigger value="h2h" className="flex-1 text-xs"><Swords className="h-3 w-3 mr-1" /> H2H</TabsTrigger>
             <TabsTrigger value="matches" className="flex-1 text-xs"><Trophy className="h-3 w-3 mr-1" /> History</TabsTrigger>
+            <TabsTrigger value="analytics" className="flex-1 text-xs"><Target className="h-3 w-3 mr-1" /> Tech</TabsTrigger>
           </TabsList>
 
           {/* ELO Graph */}
@@ -224,6 +274,11 @@ export default function PlayerProfile() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <AnalyticsTab playerId={playerId} />
           </TabsContent>
         </Tabs>
       </div>
