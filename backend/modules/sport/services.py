@@ -196,9 +196,9 @@ async def create_live_session(data: dict) -> dict:
     session = {
         "session_id": session_id,
         "status": "live",
-        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": data.get("player_a_photo", "")},
-        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": data.get("player_b_photo", "")},
-        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": data.get("referee_photo", "")},
+        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": data.get("player_a_photo", "") or pa.get("avatar_url", "")},
+        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": data.get("player_b_photo", "") or pb.get("avatar_url", "")},
+        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": data.get("referee_photo", "") or ref.get("avatar_url", "")},
         "league_id": data.get("league_id"),
         "stream_url": data.get("stream_url", ""),
         "settings": {
@@ -244,6 +244,13 @@ async def create_live_session(data: dict) -> dict:
     await db[C_LIVE].insert_one(session)
     session.pop("_id", None)
     logger.info(f"Live session created: {session_id} ({pa['nickname']} vs {pb['nickname']})")
+    
+    # Persist photos to player records (so they auto-fill next time)
+    for pid, photo_key in [(pa["player_id"], "player_a_photo"), (pb["player_id"], "player_b_photo"), (ref["player_id"], "referee_photo")]:
+        photo = data.get(photo_key, "")
+        if photo:
+            await db[C_PLAYERS].update_one({"player_id": pid, "$or": [{"avatar_url": None}, {"avatar_url": ""}]}, {"$set": {"avatar_url": photo}})
+    
     return session
 
 

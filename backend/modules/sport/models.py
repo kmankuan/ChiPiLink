@@ -43,6 +43,9 @@ class LiveMatchCreate(BaseModel):
     player_a_name: str
     player_b_name: str
     referee_name: str
+    player_a_photo: Optional[str] = None
+    player_b_photo: Optional[str] = None
+    referee_photo: Optional[str] = None
     league_id: Optional[str] = None
     sets_to_win: int = 2  # best of 3 = 2, best of 5 = 3
     points_to_win: int = 11
