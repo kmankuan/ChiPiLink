@@ -81,11 +81,30 @@ DEFAULTS = {
     # Spectator / Streaming
     "streaming": {
         "enabled": True,
-        "overlay_style": "bottom_bar",  # bottom_bar | top_bar | side_panel
-        "overlay_opacity": 0.85,
-        "show_momentum_in_overlay": True,
-        "show_emotions_in_overlay": True,
-        "default_stream_platform": "telegram",  # telegram | youtube | custom
+        "default_stream_platform": "telegram",
+    },
+
+    # TV Display Themes
+    "tv": {
+        "theme": "fighting_game",  # fighting_game | stadium | race_track
+        "background": "linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%)",
+        "accent_a": "#ef4444",   # Player A color (red)
+        "accent_b": "#3b82f6",   # Player B color (blue)
+        "show_elo": True,
+        "show_photos": True,
+        "show_chat": True,
+        "show_battle_timeline": True,
+        "show_set_history": True,
+        "show_combo_counter": True,
+        "hp_bar_style": "gradient",  # gradient | solid | neon
+        "score_size": "xl",  # md | lg | xl | 2xl
+        "photo_size": "lg",  # sm | md | lg | xl
+        "layout": {
+            "header": "top",  # top | hidden
+            "score": "center",  # center | top
+            "chat": "right",  # right | bottom | hidden
+            "timeline": "bottom",  # bottom | middle | hidden
+        },
     },
 
     # Referee

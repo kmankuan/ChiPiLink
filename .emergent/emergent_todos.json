@@ -1,18 +1,26 @@
 [
   {
-    "content": "Item 2: Ably chat sidebar on TV display",
+    "content": "1. Fix sticker positioning on TV (map a/b → left/right)",
     "status": "completed"
   },
   {
-    "content": "Item 3: Ably real-time for Order CRM chat",
+    "content": "2. Fix winner celebration on set/match finish",
     "status": "completed"
   },
   {
-    "content": "Item 4: Player dropdown picker with photos",
+    "content": "3. Build Fighting Game TV theme (HP bars, combo counter, round history)",
     "status": "completed"
   },
   {
-    "content": "Item 7: Technique analytics (player weakness/strength reports)",
+    "content": "4. TV theme config system (colors, sizes, layout, background)",
+    "status": "completed"
+  },
+  {
+    "content": "5. Remove duplicate elements (old circles, separate momentum bars)",
+    "status": "completed"
+  },
+  {
+    "content": "6. Service indicator next to score numbers",
     "status": "completed"
   }
 ]
