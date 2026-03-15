@@ -552,6 +552,106 @@ function AiHelperTab() {
   );
 }
 
+
+// ─── Live Status Tab ──────────────────────────────────────
+function LiveStatusTab() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios.get(`${API}/api/dev-info/architecture`, { headers: hdrs() })
+      .then(r => setData(r.data)).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+  if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
+  if (!data) return <p className="text-center text-muted-foreground text-sm py-8">Unable to load system status</p>;
+  return (
+    <div className="space-y-4">
+      {/* Services */}
+      <Card><CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-1"><Activity className="h-4 w-4" /> Services</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {Object.entries(data.services || {}).map(([name, svc]) => (
+            <div key={name} className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30">
+              <div><span className="text-xs font-medium">{name}</span><span className="text-[9px] text-muted-foreground ml-2">port {svc.port} — {svc.role}</span></div>
+              <Badge className={`text-[9px] ${svc.status === 'running' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{svc.status}</Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      {/* Integrations */}
+      <Card><CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-1"><Blocks className="h-4 w-4" /> Integrations</CardTitle></CardHeader>
+        <CardContent className="space-y-1">
+          {Object.entries(data.integrations || {}).map(([name, int_]) => (
+            <div key={name} className="flex items-center justify-between py-1 px-2 text-xs">
+              <span className="font-medium">{name}</span>
+              <div className="flex items-center gap-2">
+                {int_.via && <span className="text-[9px] text-muted-foreground">{int_.via}</span>}
+                <Badge variant="outline" className="text-[9px]">{int_.status}</Badge>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      {/* Modules */}
+      <Card><CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-1"><LayoutGrid className="h-4 w-4" /> Modules</CardTitle></CardHeader>
+        <CardContent className="space-y-1">
+          {Object.entries(data.modules || {}).map(([name, mod]) => (
+            <div key={name} className="flex items-center justify-between py-1 px-2 text-xs">
+              <div><span className="font-medium">{name}</span>{mod.note && <span className="text-[9px] text-red-400 ml-1">({mod.note})</span>}</div>
+              <div className="flex items-center gap-1">
+                <Badge className={`text-[9px] ${mod.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{mod.status}</Badge>
+                {mod.features && <span className="text-[8px] text-muted-foreground">{mod.features.length} features</span>}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      {/* Stats */}
+      <Card><CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-1"><Gauge className="h-4 w-4" /> Stats</CardTitle></CardHeader>
+        <CardContent><div className="grid grid-cols-3 gap-2">
+          {Object.entries(data.stats || {}).map(([k, v]) => (
+            <div key={k} className="text-center p-2 rounded bg-muted/30"><p className="text-lg font-bold">{v}</p><p className="text-[9px] text-muted-foreground">{k.replace(/_/g, ' ')}</p></div>
+          ))}
+        </div></CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ─── Advice Tab ──────────────────────────────────────────
+function AdviceTab() {
+  const [advice, setAdvice] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios.get(`${API}/api/dev-info/advice`, { headers: hdrs() })
+      .then(r => setAdvice(r.data.advice || [])).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+  if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
+  const priorityColor = { high: 'border-red-200 bg-red-50', medium: 'border-amber-200 bg-amber-50', low: 'border-blue-200 bg-blue-50' };
+  const priorityIcon = { high: '🔴', medium: '🟡', low: '🔵' };
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">Proactive advice based on your current app state. Auto-generated.</p>
+      {advice.length === 0 ? (
+        <Card className="border-green-200 bg-green-50"><CardContent className="p-4 text-center"><ShieldCheck className="h-8 w-8 text-green-600 mx-auto mb-2" /><p className="text-sm font-medium text-green-700">All good! No issues detected.</p></CardContent></Card>
+      ) : (
+        advice.map((a, i) => (
+          <Card key={i} className={`${priorityColor[a.priority] || ''}`}>
+            <CardContent className="p-3">
+              <div className="flex items-start gap-2">
+                <span className="text-sm">{priorityIcon[a.priority] || '📌'}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{a.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{a.description}</p>
+                  {a.action && <Badge variant="outline" className="text-[9px] mt-1 cursor-pointer" onClick={() => window.location.hash = a.action}>{a.category}</Badge>}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
+    </div>
+  );
+}
+
 // ─── Main Module ────────────────────────────────────────────
 export default function DevControlModule() {
   const { t } = useTranslation();
@@ -570,6 +670,8 @@ export default function DevControlModule() {
           <TabsTrigger value="api" className="gap-1.5 text-xs" data-testid="tab-api"><Globe className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.api', 'API Reference')}</span><span className="sm:hidden">API</span></TabsTrigger>
           <TabsTrigger value="roadmap" className="gap-1.5 text-xs" data-testid="tab-roadmap"><Map className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.roadmap', 'Roadmap')}</span><span className="sm:hidden">Plan</span></TabsTrigger>
           <TabsTrigger value="help-guide" className="gap-1.5 text-xs" data-testid="tab-help-guide"><FileText className="h-3.5 w-3.5" /><span className="hidden sm:inline">{t('devControl.tabs.helpGuide', 'Help Guide')}</span><span className="sm:hidden">Guide</span></TabsTrigger>
+          <TabsTrigger value="live-status" className="gap-1.5 text-xs" data-testid="tab-live-status"><Activity className="h-3.5 w-3.5" /><span className="hidden sm:inline">Live Status</span><span className="sm:hidden">Status</span></TabsTrigger>
+          <TabsTrigger value="advice" className="gap-1.5 text-xs" data-testid="tab-advice"><ShieldCheck className="h-3.5 w-3.5" /><span className="hidden sm:inline">Advice</span><span className="sm:hidden">Tips</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="ai-helper"><AiHelperTab /></TabsContent>
@@ -583,6 +685,8 @@ export default function DevControlModule() {
         <TabsContent value="api"><ApiReferenceTab /></TabsContent>
         <TabsContent value="roadmap"><RoadmapTab /></TabsContent>
         <TabsContent value="help-guide"><HelpGuideEditorTab /></TabsContent>
+        <TabsContent value="live-status"><LiveStatusTab /></TabsContent>
+        <TabsContent value="advice"><AdviceTab /></TabsContent>
       </Tabs>
     </div>
   );

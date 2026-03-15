@@ -154,16 +154,34 @@ function ThreadView({ topic, studentId, token, onBack, isAdmin, adminId }) {
     fetchReplies();
   }, [fetchReplies]);
 
-  // Real-time updates via Ably — refresh when new messages arrive
+  // Real-time updates via Ably — instant preview + delayed refetch
   useEffect(() => {
     if (!studentId || !topic?.id) return;
     try {
       const ably = new Ably.Realtime({ authUrl: `${API}/api/ably/auth?clientId=crm_${studentId}`, authMethod: 'GET' });
       const channel = ably.channels.get(`crm:${studentId}:${topic.id}`);
-      channel.subscribe('new_message', () => { fetchReplies(); });
+      channel.subscribe('new_message', (msg) => {
+        // Show instant preview from Ably payload (before Monday.com refetch)
+        const preview = msg.data;
+        if (preview?.text && preview?.sender) {
+          setReplies(prev => [...prev, {
+            id: `ably_${Date.now()}`,
+            body: preview.text,
+            text_body: preview.text,
+            creator: { name: preview.is_admin ? 'Admin' : 'Customer' },
+            created_at: new Date().toISOString(),
+            _preview: true,
+          }]);
+        }
+        // Delayed refetch to get full data from Monday.com
+        setTimeout(() => fetchReplies(), 800);
+      });
       return () => { channel.unsubscribe(); ably.close(); };
     } catch (e) {
-      console.log('Ably CRM chat: fallback to manual refresh', e);
+      // Ably unavailable — fall back to polling every 10s
+      console.log('Ably CRM: fallback to polling', e);
+      const interval = setInterval(fetchReplies, 10000);
+      return () => clearInterval(interval);
     }
   }, [studentId, topic?.id, fetchReplies]);
 

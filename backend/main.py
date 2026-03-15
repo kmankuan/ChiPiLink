@@ -262,6 +262,10 @@ api_router.include_router(sport_tournament_router)
 from modules.ably_integration import router as ably_router
 api_router.include_router(ably_router)
 
+# Dev Info (architecture + advice)
+from modules.dev_info import router as dev_info_router
+api_router.include_router(dev_info_router)
+
 
 # Include main router in app
 app.include_router(api_router)

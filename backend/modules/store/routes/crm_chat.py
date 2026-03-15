@@ -64,7 +64,7 @@ async def reply_to_topic(
         # Publish to Ably for real-time delivery
         try:
             from modules.ably_integration import publish_to_channel
-            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": current_user["user_id"]})
+            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": current_user["user_id"], "text": message, "is_admin": False})
         except Exception:
             pass
         return result
@@ -137,7 +137,7 @@ async def admin_reply(
         # Ably real-time notification
         try:
             from modules.ably_integration import publish_to_channel
-            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": admin["user_id"], "is_admin": True})
+            await publish_to_channel(f"crm:{student_id}:{update_id}", "new_message", {"sender": admin["user_id"], "is_admin": True, "text": message})
         except Exception:
             pass
         return result
