@@ -14,6 +14,15 @@ logger = logging.getLogger("sport")
 router = APIRouter(prefix="/sport", tags=["Sport"])
 
 
+async def _ably_publish(session_id, event, data):
+    """Publish to Ably channel for this live session."""
+    try:
+        from modules.ably_integration import publish_to_channel
+        await publish_to_channel(f"sport:live:{session_id}", event, data)
+    except Exception as e:
+        logger.debug(f"Ably publish skipped: {e}")
+
+
 # ═══ SETTINGS ═══
 
 @router.get("/settings")
@@ -153,8 +162,9 @@ async def score_point(session_id: str, data: LivePointScore, user: dict = Depend
     """Score a point in a live match."""
     try:
         result = await services.score_point(session_id, data.scored_by, data.technique)
-        # Push to WebSocket subscribers
+        # Broadcast via both WebSocket AND Ably
         await _broadcast(session_id, {"type": "point", "data": result})
+        await _ably_publish(session_id, "point", result)
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))

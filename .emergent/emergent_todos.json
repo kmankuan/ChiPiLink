@@ -1,38 +1,30 @@
 [
   {
-    "content": "1. Bug fixes: sticker side on TV, photos, auto-swap",
+    "content": "Backend: Ably token auth endpoint",
     "status": "completed"
   },
   {
-    "content": "2. TV bigger elements + persistent point history",
+    "content": "Frontend: Ably + Chat provider setup",
     "status": "completed"
   },
   {
-    "content": "3. Player picker dropdown redesign",
+    "content": "Sport live: Ably pub/sub for score updates",
     "status": "completed"
   },
   {
-    "content": "4. Cards & Calls (yellow/red card, let, timeout)",
+    "content": "Sport live: Chat room in spectator view",
     "status": "completed"
   },
   {
-    "content": "5. Referee emotion/effect board",
+    "content": "Sport live: Presence (spectator count)",
     "status": "completed"
   },
   {
-    "content": "6. TV Broadcast control (intro, break, game)",
-    "status": "completed"
-  },
-  {
-    "content": "7. Battle scene (deferred — needs more design time)",
+    "content": "OpenAI translation for chat messages",
     "status": "pending"
   },
   {
-    "content": "8. Timer system (match timer, set timer)",
-    "status": "completed"
-  },
-  {
-    "content": "9. Settings for auto-swap + all features",
-    "status": "completed"
+    "content": "Test Ably integration end-to-end",
+    "status": "pending"
   }
 ]

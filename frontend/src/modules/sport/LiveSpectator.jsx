@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import MomentumGraph from './components/MomentumGraph';
 import PointFlow from './components/PointFlow';
 import EmotionOverlay from './components/EmotionOverlay';
+import { AblyChatProvider } from '@/modules/ably/AblyProvider';
+import LiveChat from '@/modules/ably/LiveChat';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -137,6 +139,13 @@ export default function LiveSpectator() {
           )}
         </div>
         <PointFlow points={session.points || []} playerA={pa.nickname} playerB={pb.nickname} />
+      </div>
+
+      {/* Live Chat */}
+      <div className="px-4 py-1">
+        <AblyChatProvider clientId={`spectator_${Date.now()}`}>
+          <LiveChat roomId={`live:${sessionId}`} userName="Spectator" compact={true} />
+        </AblyChatProvider>
       </div>
 
       {/* Reactions */}

@@ -258,6 +258,10 @@ from modules.sport import router as sport_router, tournament_router as sport_tou
 api_router.include_router(sport_router)
 api_router.include_router(sport_tournament_router)
 
+# Ably Real-time Integration
+from modules.ably_integration import router as ably_router
+api_router.include_router(ably_router)
+
 
 # Include main router in app
 app.include_router(api_router)
