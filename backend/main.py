@@ -266,6 +266,10 @@ api_router.include_router(ably_router)
 from modules.dev_info import router as dev_info_router
 api_router.include_router(dev_info_router)
 
+# ChiPi Tutor Module
+from modules.tutor import router as tutor_router
+api_router.include_router(tutor_router)
+
 
 # Include main router in app
 app.include_router(api_router)

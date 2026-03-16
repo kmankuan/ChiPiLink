@@ -1,26 +1,30 @@
 [
   {
-    "content": "1. Fix sticker positioning on TV (map a/b → left/right)",
+    "content": "Tutor Phase 1.1: Backend — Student model, Monday board mapper, agent config",
     "status": "completed"
   },
   {
-    "content": "2. Fix winner celebration on set/match finish",
+    "content": "Tutor Phase 1.2: Backend — Agent engine (prompt builder, knowledge sources, chat)",
     "status": "completed"
   },
   {
-    "content": "3. Build Fighting Game TV theme (HP bars, combo counter, round history)",
-    "status": "completed"
+    "content": "Tutor Phase 1.3: Backend — Tutor engine on port 8003 (defer to Phase 2)",
+    "status": "pending"
   },
   {
-    "content": "4. TV theme config system (colors, sizes, layout, background)",
-    "status": "completed"
+    "content": "Tutor Phase 1.4: Frontend — Student list, board mapper config, agent setup",
+    "status": "pending"
   },
   {
-    "content": "5. Remove duplicate elements (old circles, separate momentum bars)",
-    "status": "completed"
+    "content": "Tutor Phase 1.5: Frontend — Agent chat interface (3 modes: staff/student/parent)",
+    "status": "pending"
   },
   {
-    "content": "6. Service indicator next to score numbers",
+    "content": "Tutor Phase 1.6: Frontend — Knowledge source manager",
+    "status": "pending"
+  },
+  {
+    "content": "Tutor Phase 1.7: Register routes + test",
     "status": "completed"
   }
 ]
