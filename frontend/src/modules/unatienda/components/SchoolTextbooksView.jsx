@@ -1081,9 +1081,9 @@ export default function SchoolTextbooksView({
                 <div className="flex justify-between text-red-600 font-bold"><span>{lang === 'es' ? 'Faltante' : 'Shortfall'}:</span><span>${pendingOrderData.shortfall?.toFixed(2)}</span></div>
               </div>
               <p className="text-xs text-muted-foreground">
-                {lang === 'es' ? 'Puede crear el pedido ahora y pagar después. El pedido quedará en estado "Pendiente de Pago" hasta que su billetera tenga saldo suficiente.' :
-                 lang === 'zh' ? '您可以现在创建订单，稍后付款。订单将保持"待付款"状态，直到您的钱包有足够余额。' :
-                 'You can place the order now and pay later. The order will be in "Awaiting Payment" status until your wallet has sufficient balance.'}
+                {lang === 'es' ? 'Puede crear el pedido ahora y pagar después. El pedido será cancelado automáticamente si no se paga en 3 días.' :
+                 lang === 'zh' ? '您可以现在创建订单，稍后付款。如果3天内未付款，订单将自动取消。' :
+                 'You can place the order now and pay later. The order will be automatically cancelled if not paid within 3 days.'}
               </p>
             </div>
             <DialogFooter className="gap-2">

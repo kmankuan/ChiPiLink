@@ -421,7 +421,7 @@ async def pay_order(order_id: str, user: dict = Depends(get_current_user)):
 
 @router.post("/{order_id}/cancel")
 async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
-    """Cancel an awaiting_payment order — releases awaiting_payment_quantity."""
+    """Cancel an awaiting_payment order — releases awaiting_payment_quantity. User-facing."""
     from core.database import db
     from datetime import datetime, timezone
     
@@ -429,7 +429,7 @@ async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
     if not order:
         raise HTTPException(404, "Order not found")
     if order.get("status") != "awaiting_payment":
-        raise HTTPException(400, "Only awaiting_payment orders can be cancelled")
+        raise HTTPException(400, "Only awaiting_payment orders can be cancelled by users")
     
     # Release awaiting_payment_quantity
     for item in order.get("items", []):
@@ -444,10 +444,143 @@ async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
     await db.store_textbook_orders.update_one(
         {"order_id": order_id},
-        {"$set": {"status": "cancelled", "cancelled_at": now, "updated_at": now}}
+        {"$set": {"status": "cancelled", "cancelled_at": now, "cancelled_by": "user", "updated_at": now}}
     )
     
     return {"success": True, "order_id": order_id, "status": "cancelled"}
+
+
+@router.post("/admin/{order_id}/cancel")
+async def admin_cancel_order(order_id: str, data: dict = {}, admin: dict = Depends(get_admin_user)):
+    """Admin cancels ANY order — reverses stock/presale + refunds wallet if paid."""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(404, "Order not found")
+    
+    status = order.get("status", "")
+    if status == "cancelled":
+        raise HTTPException(400, "Order already cancelled")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    reason = data.get("reason", "")
+    refunded = False
+    
+    # Reverse inventory based on original order status
+    for item in order.get("items", []):
+        qty = item.get("quantity_ordered", 1)
+        book_id = item.get("book_id")
+        if not book_id:
+            continue
+        
+        if status == "awaiting_payment":
+            # Release awaiting_payment_quantity
+            await db.store_products.update_one({"book_id": book_id}, {"$inc": {"awaiting_payment_quantity": -qty}})
+        elif status in ("submitted", "processing", "ready"):
+            # Return reserved to available (presale mode) or restore stock
+            payment_method = order.get("payment_method", "wallet")
+            if order.get("source") == "monday_import":
+                # Presale order — remove from reserved
+                await db.store_products.update_one({"book_id": book_id}, {"$inc": {"reserved_quantity": -qty}})
+            else:
+                # Regular order — restore stock
+                await db.store_products.update_one({"book_id": book_id}, {"$inc": {"inventory_quantity": qty}})
+        elif status == "delivered":
+            # Already delivered — restore stock (return)
+            await db.store_products.update_one({"book_id": book_id}, {"$inc": {"inventory_quantity": qty}})
+    
+    # Refund wallet if order was paid
+    if status in ("submitted", "processing", "ready", "delivered") and order.get("payment_method") == "wallet":
+        total = order.get("total_amount", 0)
+        user_id = order.get("user_id")
+        if total > 0 and user_id:
+            try:
+                from modules.users.services.wallet_service import wallet_service
+                from modules.users.models.wallet_models import Currency
+                await wallet_service.credit(
+                    user_id=user_id, amount=total, currency=Currency.USD,
+                    description=f"Refund for cancelled order {order_id}",
+                    reference_type="order_refund", reference_id=order_id,
+                )
+                refunded = True
+            except Exception as e:
+                logger.error(f"Refund failed for order {order_id}: {e}")
+    
+    # Update order
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {
+            "status": "cancelled", "cancelled_at": now, "cancelled_by": admin.get("user_id"),
+            "cancel_reason": reason, "refunded": refunded,
+            "refunded_amount": order.get("total_amount", 0) if refunded else 0, "updated_at": now,
+        }}
+    )
+    
+    return {"success": True, "order_id": order_id, "previous_status": status, "refunded": refunded}
+
+@router.get("/admin/config/auto-cancel")
+async def get_auto_cancel_config(admin: dict = Depends(get_admin_user)):
+    """Get awaiting_payment auto-cancel configuration."""
+    from core.database import db
+    config = await db.app_config.find_one({"config_key": "order_auto_cancel"}, {"_id": 0})
+    if not config:
+        return {"enabled": True, "hours": 72, "message_en": "Orders not paid within 3 days will be automatically cancelled.", "message_es": "Los pedidos no pagados en 3 días serán cancelados automáticamente.", "message_zh": "未在3天内付款的订单将自动取消。"}
+    return config.get("value", {})
+
+
+@router.put("/admin/config/auto-cancel")
+async def update_auto_cancel_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update awaiting_payment auto-cancel configuration."""
+    from core.database import db
+    from datetime import datetime, timezone
+    await db.app_config.update_one(
+        {"config_key": "order_auto_cancel"},
+        {"$set": {"config_key": "order_auto_cancel", "value": data, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+    return {"success": True}
+
+
+@router.post("/admin/auto-cancel/run")
+async def run_auto_cancel(admin: dict = Depends(get_admin_user)):
+    """Manually trigger auto-cancel of expired awaiting_payment orders."""
+    from core.database import db
+    from datetime import datetime, timezone, timedelta
+    
+    config = await db.app_config.find_one({"config_key": "order_auto_cancel"}, {"_id": 0})
+    hours = (config or {}).get("value", {}).get("hours", 72)
+    enabled = (config or {}).get("value", {}).get("enabled", True)
+    
+    if not enabled:
+        return {"cancelled": 0, "message": "Auto-cancel is disabled"}
+    
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    
+    # Find expired awaiting_payment orders
+    expired = await db.store_textbook_orders.find(
+        {"status": "awaiting_payment", "created_at": {"$lt": cutoff}}, {"_id": 0, "order_id": 1, "items": 1}
+    ).to_list(100)
+    
+    cancelled = 0
+    for order in expired:
+        # Release awaiting_payment_quantity
+        for item in order.get("items", []):
+            book_id = item.get("book_id")
+            qty = item.get("quantity_ordered", 1)
+            if book_id:
+                await db.store_products.update_one({"book_id": book_id}, {"$inc": {"awaiting_payment_quantity": -qty}})
+        
+        await db.store_textbook_orders.update_one(
+            {"order_id": order["order_id"]},
+            {"$set": {"status": "cancelled", "cancelled_at": datetime.now(timezone.utc).isoformat(), "cancelled_by": "auto_cancel", "cancel_reason": f"Not paid within {hours} hours"}}
+        )
+        cancelled += 1
+    
+    return {"cancelled": cancelled, "hours": hours, "checked": len(expired)}
+
+
 
 
 @router.put("/admin/{order_id}/paid-date")
