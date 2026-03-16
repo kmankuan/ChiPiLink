@@ -29,6 +29,7 @@ export function OrderSummaryModal({
   submitting = false,
   lang = 'es',
   getLocalizedText,
+  awaitingPaymentNote = null,
 }) {
   const [config, setConfig] = useState(null);
 
@@ -172,7 +173,7 @@ export function OrderSummaryModal({
                   </span>
                 </div>
               )}
-              {show.wallet_balance && walletBalance !== null && (
+              {show.wallet_balance && walletBalance !== null && !awaitingPaymentNote && (
                 <>
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -191,7 +192,13 @@ export function OrderSummaryModal({
                   )}
                 </>
               )}
-              <Badge variant="outline" className="text-xs w-fit">{t.payWith}</Badge>
+              {awaitingPaymentNote ? (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-2.5 text-xs text-amber-700" data-testid="awaiting-payment-note">
+                  {awaitingPaymentNote}
+                </div>
+              ) : (
+                <Badge variant="outline" className="text-xs w-fit">{t.payWith}</Badge>
+              )}
             </div>
           </div>
         </ScrollArea>
@@ -208,7 +215,7 @@ export function OrderSummaryModal({
           </Button>
           <Button
             onClick={onConfirm}
-            disabled={submitting || (remaining !== null && remaining < 0)}
+            disabled={submitting}
             data-testid="summary-confirm-btn"
             className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
           >

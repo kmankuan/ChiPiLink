@@ -32,6 +32,67 @@ DEFAULT_CONFIG = {
         "en": "Login to access exclusive school textbooks",
         "es": "Inicia sesión para acceder a textos escolares exclusivos",
         "zh": "登录以访问专属学校教科书"
+    },
+    "payment_methods": {
+        "wallet": {
+            "enabled": True,
+            "label": {"en": "Wallet", "es": "Billetera", "zh": "钱包"},
+            "description": {"en": "Pay from your wallet balance", "es": "Pagar desde el saldo de tu billetera", "zh": "从钱包余额支付"},
+            "icon": "wallet",
+            "order": 0
+        },
+        "cash": {
+            "enabled": True,
+            "label": {"en": "Cash", "es": "Efectivo", "zh": "现金"},
+            "description": {"en": "Leave cash at the cashier", "es": "Deja el efectivo en la caja", "zh": "在收银台留下现金"},
+            "instructions": {
+                "en": "Please leave the cash at the school cashier. A top-up request will be generated and your wallet will be credited once confirmed.",
+                "es": "Por favor deja el efectivo en la caja de la escuela. Se generara una solicitud de recarga y tu billetera sera acreditada una vez confirmada.",
+                "zh": "请在学校收银台留下现金。将生成充值请求，确认后您的钱包将被充值。"
+            },
+            "icon": "banknote",
+            "order": 1
+        },
+        "bank_transfer": {
+            "enabled": True,
+            "label": {"en": "Bank Transfer", "es": "Transferencia Bancaria", "zh": "银行转账"},
+            "description": {"en": "Transfer to our bank account", "es": "Transfiere a nuestra cuenta bancaria", "zh": "转账到我们的银行账户"},
+            "instructions": {
+                "en": "Transfer the amount to the bank account below. Send proof of payment to the email indicated.",
+                "es": "Transfiere el monto a la cuenta bancaria indicada. Envia el comprobante de pago al correo indicado.",
+                "zh": "将金额转到以下银行账户。将付款证明发送到指定的电子邮件。"
+            },
+            "bank_details": {
+                "bank_name": "Banco General",
+                "account_number": "00-00-00-000000-0",
+                "account_type": {"en": "Savings Account", "es": "Cuenta de Ahorros", "zh": "储蓄账户"},
+                "account_holder": "PCA School",
+                "email": "pagos@example.com",
+                "reference_note": {
+                    "en": "Use your student's name as reference",
+                    "es": "Use el nombre del estudiante como referencia",
+                    "zh": "使用学生姓名作为参考"
+                }
+            },
+            "icon": "building-2",
+            "order": 2
+        },
+        "yappy": {
+            "enabled": False,
+            "label": {"en": "Yappy", "es": "Yappy", "zh": "Yappy"},
+            "description": {"en": "Pay with Yappy", "es": "Pagar con Yappy", "zh": "使用Yappy支付"},
+            "instructions": {"en": "Coming soon", "es": "Proximamente", "zh": "即将推出"},
+            "icon": "smartphone",
+            "order": 3
+        },
+        "credit_card": {
+            "enabled": False,
+            "label": {"en": "Credit Card", "es": "Tarjeta de Credito", "zh": "信用卡"},
+            "description": {"en": "Pay with credit card", "es": "Pagar con tarjeta de credito", "zh": "信用卡支付"},
+            "instructions": {"en": "Coming soon", "es": "Proximamente", "zh": "即将推出"},
+            "icon": "credit-card",
+            "order": 4
+        }
     }
 }
 
@@ -44,6 +105,7 @@ class StoreConfigUpdate(BaseModel):
     maintenance_mode: Optional[bool] = None
     textbooks_category_label: Optional[dict] = None
     textbooks_login_message: Optional[dict] = None
+    payment_methods: Optional[dict] = None
 
 class StoreConfigResponse(BaseModel):
     config: dict
@@ -65,7 +127,8 @@ async def get_public_config():
             "show_prices_to_public": DEFAULT_CONFIG["show_prices_to_public"],
             "textbooks_category_label": DEFAULT_CONFIG["textbooks_category_label"],
             "textbooks_login_message": DEFAULT_CONFIG["textbooks_login_message"],
-            "maintenance_mode": DEFAULT_CONFIG["maintenance_mode"]
+            "maintenance_mode": DEFAULT_CONFIG["maintenance_mode"],
+            "payment_methods": DEFAULT_CONFIG["payment_methods"]
         }
     
     return {
@@ -74,7 +137,8 @@ async def get_public_config():
         "show_prices_to_public": config.get("show_prices_to_public", DEFAULT_CONFIG["show_prices_to_public"]),
         "textbooks_category_label": config.get("textbooks_category_label", DEFAULT_CONFIG["textbooks_category_label"]),
         "textbooks_login_message": config.get("textbooks_login_message", DEFAULT_CONFIG["textbooks_login_message"]),
-        "maintenance_mode": config.get("maintenance_mode", DEFAULT_CONFIG["maintenance_mode"])
+        "maintenance_mode": config.get("maintenance_mode", DEFAULT_CONFIG["maintenance_mode"]),
+        "payment_methods": config.get("payment_methods", DEFAULT_CONFIG["payment_methods"])
     }
 
 

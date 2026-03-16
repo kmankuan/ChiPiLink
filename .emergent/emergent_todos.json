@@ -1,30 +1,22 @@
 [
   {
-    "content": "1. Fix emotion sticker positioning (player side, not center)",
-    "status": "in_progress"
+    "content": "Backend: Add payment_methods config to store_configuration defaults + expose in public API",
+    "status": "completed"
   },
   {
-    "content": "2. Set dots → Stars above player photos",
-    "status": "pending"
+    "content": "Frontend: Implement full Pay → Send Order flow in SchoolTextbooksView",
+    "status": "completed"
   },
   {
-    "content": "3. Score counters dynamic following HP bar position",
-    "status": "pending"
+    "content": "Frontend: PaymentMethodsDialog + Cash/Bank Transfer detail dialogs",
+    "status": "completed"
   },
   {
-    "content": "4. Set win celebration explosion + configurable message",
-    "status": "pending"
+    "content": "Frontend: OrderSummaryModal updated with awaitingPaymentNote",
+    "status": "completed"
   },
   {
-    "content": "5. HP center → configurable gif/icon/photo",
-    "status": "pending"
-  },
-  {
-    "content": "6. Bigger referee name+photo, bigger timer",
-    "status": "pending"
-  },
-  {
-    "content": "7. Change referee mid-match ability",
-    "status": "pending"
+    "content": "Test the full flow end-to-end (needs real student data to fully verify)",
+    "status": "completed"
   }
 ]

@@ -351,6 +351,11 @@ export default function SchoolTextbooksView({
   const [summaryStudent, setSummaryStudent] = useState(null);
   const [depositOpen, setDepositOpen] = useState(false);
   const [walletPolling, setWalletPolling] = useState(false);
+  // Payment flow state: tracks which students have completed the Pay step
+  const [paymentAcknowledged, setPaymentAcknowledged] = useState({}); // { studentId: paymentMethod }
+  const [showPayMethodsFor, setShowPayMethodsFor] = useState(null); // studentId or null
+  const [showMethodDetail, setShowMethodDetail] = useState(null); // 'cash' | 'bank_transfer' | null
+  const paymentMethods = storeConfig?.payment_methods || {};
   
   const texts = {
     en: {
@@ -521,22 +526,76 @@ export default function SchoolTextbooksView({
     }));
   };
   
-  const handleSubmit = (student) => {
+  // ---- PAY → SEND ORDER two-step flow ----
+
+  // Step 1: "Pay" button clicked — check wallet or show payment methods
+  const handlePayClick = async (student) => {
     const studentId = student.student_id || student.sync_id;
     const books = getStudentBooks(studentId);
     const orderData = getStudentOrder(studentId);
     const items = orderData?.items || [];
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
-    
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
+    const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
 
+    // Refresh wallet balance
+    let freshBalance = walletBalance || 0;
+    try {
+      const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+      freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+      setWalletBalance(freshBalance);
+    } catch {}
+
+    if ((freshBalance + 0.01) >= total) {
+      // Wallet has enough — mark payment as wallet and unlock Send Order
+      setPaymentAcknowledged(prev => ({ ...prev, [studentId]: 'wallet' }));
+      toast.success(lang === 'es' ? 'Saldo suficiente. Ahora puedes enviar el pedido.' : 'Sufficient balance. You can now send the order.');
+    } else {
+      // Show payment methods dialog
+      setShowPayMethodsFor(studentId);
+    }
+  };
+
+  // Step 1b: User selects a payment method from the dialog
+  const handleSelectPaymentMethod = (methodKey) => {
+    if (methodKey === 'wallet') {
+      // Open deposit flow to top up wallet
+      setShowPayMethodsFor(null);
+      setDepositOpen(true);
+    } else {
+      // Show method detail (cash instructions or bank transfer details)
+      setShowMethodDetail(methodKey);
+    }
+  };
+
+  // Step 1c: User acknowledges payment method instructions → unlock Send Order
+  const handleAcknowledgeMethod = (methodKey) => {
+    const studentId = showPayMethodsFor;
+    setShowMethodDetail(null);
+    setShowPayMethodsFor(null);
+    if (studentId) {
+      setPaymentAcknowledged(prev => ({ ...prev, [studentId]: methodKey }));
+      toast.success(lang === 'es' ? 'Metodo de pago confirmado. Ahora puedes enviar el pedido.' : 'Payment method confirmed. You can now send the order.');
+    }
+  };
+
+  // Step 2: "Send Order" button — show confirmation about awaiting_payment status
+  const handleSendOrderClick = (student) => {
+    const studentId = student.student_id || student.sync_id;
+    const books = getStudentBooks(studentId);
+    const orderData = getStudentOrder(studentId);
+    const items = orderData?.items || [];
+    const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+    const selectedList = availableItems.filter(i => books[i.book_id]);
+    if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
     setSummaryStudent(student);
   };
 
   const [showPaymentPending, setShowPaymentPending] = useState(false);
   const [pendingOrderData, setPendingOrderData] = useState(null);
 
+  // Step 2b: Confirm order from summary modal
   const handleConfirmOrder = () => executeSubmit(async () => {
     if (!summaryStudent) return;
     const student = summaryStudent;
@@ -547,34 +606,29 @@ export default function SchoolTextbooksView({
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
     const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
+    const payMethod = paymentAcknowledged[studentId] || 'awaiting_payment';
 
-    // Check wallet balance — if insufficient, show payment pending dialog instead of blocking
-    let freshBalance = walletBalance || 0;
-    try {
-      const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
-      freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
-      setWalletBalance(freshBalance);
-    } catch {}
-
-    if ((freshBalance + 0.01) < total) {
-      // Show pending payment dialog — let user place order with awaiting_payment status
-      setPendingOrderData({ student, studentId, selectedList, total, balance: freshBalance, shortfall: total - freshBalance });
-      setShowPaymentPending(true);
-      setSummaryStudent(null);
-      return;
+    if (payMethod === 'wallet') {
+      // Wallet payment — deduct and submit
+      let freshBalance = walletBalance || 0;
+      try {
+        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+        freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+        setWalletBalance(freshBalance);
+      } catch {}
+      if ((freshBalance + 0.01) >= total) {
+        await _submitOrder(studentId, selectedList, 'wallet');
+      } else {
+        // Balance changed since Pay step — submit as awaiting_payment
+        await _submitOrder(studentId, selectedList, 'awaiting_payment');
+      }
+    } else {
+      // Cash / Bank Transfer / other — submit as awaiting_payment
+      await _submitOrder(studentId, selectedList, 'awaiting_payment');
     }
-
-    // Balance sufficient — proceed normally
-    await _submitOrder(studentId, selectedList, 'wallet');
+    // Clear payment acknowledged for this student after order
+    setPaymentAcknowledged(prev => { const n = { ...prev }; delete n[studentId]; return n; });
   });
-
-  const handlePlaceAwaitingPayment = async () => {
-    if (!pendingOrderData) return;
-    setShowPaymentPending(false);
-    await executeSubmit(async () => {
-      await _submitOrder(pendingOrderData.studentId, pendingOrderData.selectedList, 'awaiting_payment');
-    });
-  };
 
   const _submitOrder = async (studentId, selectedList, paymentMethod) => {
     try {
@@ -917,7 +971,7 @@ export default function SchoolTextbooksView({
                         })}
                       </div>
                       
-                      {/* Submit bar */}
+                      {/* Submit bar — two-step: Pay → Send Order */}
                       {availableItems.length > 0 && (
                         <div className="sticky bottom-0 z-10 border-t px-4 py-3 bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.15)]" data-testid={`order-bar-${studentId}`}>
                           {/* Wallet balance row */}
@@ -932,24 +986,22 @@ export default function SchoolTextbooksView({
                             </span>
                             <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
                           </div>
-                          {/* Insufficient balance — info notice (order can still be placed as awaiting_payment) */}
-                          {selectedList.length > 0 && walletBalance !== null && (walletBalance + 0.01) < selectedTotal && (
-                            <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-2.5 space-y-2" data-testid={`topup-guide-${studentId}`}>
-                              <div className="flex items-center gap-1.5 text-amber-700 text-[11px] font-semibold">
-                                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                                {lang === 'es'
-                                  ? `Saldo insuficiente ($${(selectedTotal - (walletBalance || 0)).toFixed(2)} faltante). Puedes enviar el pedido y pagar después.`
-                                  : `Insufficient balance ($${(selectedTotal - (walletBalance || 0)).toFixed(2)} short). You can place the order and pay later.`}
-                              </div>
-                              <div className="flex gap-2">
-                                <Button variant="outline" size="sm" className="flex-1 h-7 text-[10px] gap-1 border-amber-300 text-amber-700 hover:bg-amber-100"
-                                  onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
-                                  <Banknote className="h-3 w-3" />
-                                  {lang === 'es' ? 'Recargar' : 'Top Up'}
-                                </Button>
-                              </div>
+
+                          {/* Payment acknowledged indicator */}
+                          {paymentAcknowledged[studentId] && (
+                            <div className="mb-2 flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs bg-green-50 dark:bg-green-900/20 text-green-700" data-testid={`payment-ack-${studentId}`}>
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              {paymentAcknowledged[studentId] === 'wallet'
+                                ? (lang === 'es' ? 'Pago con billetera confirmado' : 'Wallet payment confirmed')
+                                : paymentAcknowledged[studentId] === 'cash'
+                                  ? (lang === 'es' ? 'Pago en efectivo seleccionado' : 'Cash payment selected')
+                                  : paymentAcknowledged[studentId] === 'bank_transfer'
+                                    ? (lang === 'es' ? 'Transferencia bancaria seleccionada' : 'Bank transfer selected')
+                                    : (lang === 'es' ? 'Metodo de pago confirmado' : 'Payment method confirmed')
+                              }
                             </div>
                           )}
+
                           <div className="flex items-center justify-between gap-3 pb-safe">
                             <div className="text-sm">
                               <span className="text-muted-foreground">{selectedList.length} {lang === 'es' ? 'seleccionado(s)' : 'selected'}</span>
@@ -957,16 +1009,33 @@ export default function SchoolTextbooksView({
                                 <span className="ml-2 font-bold text-purple-600">${selectedTotal.toFixed(2)}</span>
                               )}
                             </div>
-                            <Button
-                              onClick={() => handleSubmit(student)}
-                              disabled={submitting || selectedList.length === 0}
-                              className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
-                              size="sm"
-                              data-testid={`submit-order-btn-${studentId}`}
-                            >
-                              {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                              {t.submitOrder}
-                            </Button>
+                            <div className="flex gap-2">
+                              {/* Step 1: Pay button — always visible */}
+                              {!paymentAcknowledged[studentId] && (
+                                <Button
+                                  onClick={() => handlePayClick(student)}
+                                  disabled={submitting || selectedList.length === 0}
+                                  variant="outline"
+                                  size="sm"
+                                  className="gap-1.5 border-purple-300 text-purple-700 hover:bg-purple-50 shrink-0"
+                                  data-testid={`pay-btn-${studentId}`}
+                                >
+                                  <Wallet className="h-3.5 w-3.5" />
+                                  {lang === 'es' ? 'Pagar' : 'Pay'}
+                                </Button>
+                              )}
+                              {/* Step 2: Send Order — enabled only after Pay step */}
+                              <Button
+                                onClick={() => handleSendOrderClick(student)}
+                                disabled={submitting || selectedList.length === 0 || !paymentAcknowledged[studentId]}
+                                className={`gap-1.5 shrink-0 ${paymentAcknowledged[studentId] ? 'bg-purple-600 hover:bg-purple-700' : 'bg-muted text-muted-foreground'}`}
+                                size="sm"
+                                data-testid={`submit-order-btn-${studentId}`}
+                              >
+                                {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                                {t.submitOrder}
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1016,7 +1085,7 @@ export default function SchoolTextbooksView({
         </div>
       )}
 
-      {/* Order Summary Preview Modal */}
+      {/* Order Summary Preview Modal — now includes awaiting_payment warning */}
       {summaryStudent && (() => {
         const sid = summaryStudent.student_id || summaryStudent.sync_id;
         const bks = getStudentBooks(sid);
@@ -1024,6 +1093,8 @@ export default function SchoolTextbooksView({
         const itms = od?.items || [];
         const avail = itms.filter(i => i.status === 'available' || i.status === 'reorder_approved');
         const sel = avail.filter(i => bks[i.book_id]);
+        const payMethod = paymentAcknowledged[sid] || 'awaiting_payment';
+        const isWalletPay = payMethod === 'wallet';
         return (
           <OrderSummaryModal
             open={!!summaryStudent}
@@ -1035,6 +1106,11 @@ export default function SchoolTextbooksView({
             walletBalance={walletBalance}
             submitting={submitting}
             lang={lang}
+            awaitingPaymentNote={!isWalletPay ? (
+              lang === 'es'
+                ? 'Tu pedido se creara en estado "Pendiente de Pago". Sera confirmado cuando se reciba el pago.'
+                : 'Your order will be created in "Awaiting Payment" status. It will be confirmed when payment is received.'
+            ) : null}
           />
         );
       })()}
@@ -1046,38 +1122,136 @@ export default function SchoolTextbooksView({
         token={token}
         onSuccess={() => {
           refreshWallet();
-          setWalletPolling(true); // Start polling to detect admin approval
+          setWalletPolling(true);
           toast.info(lang === 'es'
-            ? 'Solicitud enviada. Tu saldo se actualizará automáticamente cuando sea aprobada.'
+            ? 'Solicitud enviada. Tu saldo se actualizara automaticamente cuando sea aprobada.'
             : 'Request sent. Your balance will update automatically when approved.');
         }}
       />
 
-      {/* Awaiting Payment Dialog */}
-      {showPaymentPending && pendingOrderData && (
-        <Dialog open={true} onOpenChange={() => setShowPaymentPending(false)}>
+      {/* Payment Methods Dialog */}
+      {showPayMethodsFor && !showMethodDetail && (
+        <Dialog open={true} onOpenChange={() => setShowPayMethodsFor(null)}>
           <DialogContent className="max-w-sm">
             <DialogHeader>
-              <DialogTitle>{lang === 'es' ? 'Saldo Insuficiente' : lang === 'zh' ? '余额不足' : 'Insufficient Balance'}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-purple-600" />
+                {lang === 'es' ? 'Metodo de Pago' : 'Payment Method'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground mb-3">
+                {lang === 'es'
+                  ? 'Selecciona como deseas realizar el pago para recargar tu billetera:'
+                  : 'Select how you want to make your payment to top up your wallet:'}
+              </p>
+              {Object.entries(paymentMethods)
+                .filter(([key]) => key !== 'wallet')
+                .sort(([,a], [,b]) => (a.order || 0) - (b.order || 0))
+                .map(([key, method]) => {
+                  const isEnabled = method.enabled !== false;
+                  const IconMap = { banknote: Banknote, 'building-2': Building2, smartphone: Phone, 'credit-card': Wallet };
+                  const MethodIcon = IconMap[method.icon] || Wallet;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => isEnabled && handleSelectPaymentMethod(key)}
+                      disabled={!isEnabled}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                        isEnabled
+                          ? 'border-border hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer'
+                          : 'border-border/50 opacity-50 cursor-not-allowed'
+                      }`}
+                      data-testid={`pay-method-${key}`}
+                    >
+                      <div className={`p-2 rounded-lg ${isEnabled ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30' : 'bg-muted text-muted-foreground'}`}>
+                        <MethodIcon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{method.label?.[lang] || method.label?.es || key}</p>
+                        <p className="text-[10px] text-muted-foreground">{method.description?.[lang] || method.description?.es || ''}</p>
+                      </div>
+                      {isEnabled ? (
+                        <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                      ) : (
+                        <Badge variant="secondary" className="text-[9px] shrink-0">{lang === 'es' ? 'Pronto' : 'Soon'}</Badge>
+                      )}
+                    </button>
+                  );
+                })}
+              {/* Wallet top-up option */}
+              <button
+                onClick={() => handleSelectPaymentMethod('wallet')}
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer transition-all text-left"
+                data-testid="pay-method-wallet-topup"
+              >
+                <div className="p-2 rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30">
+                  <Wallet className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">{lang === 'es' ? 'Recargar Billetera' : 'Top Up Wallet'}</p>
+                  <p className="text-[10px] text-muted-foreground">{lang === 'es' ? 'Depositar fondos a tu billetera' : 'Deposit funds to your wallet'}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Payment Method Detail Dialog (Cash / Bank Transfer instructions) */}
+      {showMethodDetail && showPayMethodsFor && (
+        <Dialog open={true} onOpenChange={() => setShowMethodDetail(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>
+                {showMethodDetail === 'cash'
+                  ? (paymentMethods.cash?.label?.[lang] || 'Cash')
+                  : showMethodDetail === 'bank_transfer'
+                    ? (paymentMethods.bank_transfer?.label?.[lang] || 'Bank Transfer')
+                    : showMethodDetail}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
-              <div className="bg-amber-50 p-3 rounded-lg text-sm">
-                <div className="flex justify-between"><span>{lang === 'es' ? 'Total del pedido' : 'Order total'}:</span><span className="font-bold">${pendingOrderData.total?.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span>{lang === 'es' ? 'Saldo actual' : 'Current balance'}:</span><span className="font-bold">${pendingOrderData.balance?.toFixed(2)}</span></div>
-                <div className="flex justify-between text-red-600 font-bold"><span>{lang === 'es' ? 'Faltante' : 'Shortfall'}:</span><span>${pendingOrderData.shortfall?.toFixed(2)}</span></div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {lang === 'es' ? 'Puede crear el pedido ahora y pagar después. El pedido será cancelado automáticamente si no se paga en 3 días.' :
-                 lang === 'zh' ? '您可以现在创建订单，稍后付款。如果3天内未付款，订单将自动取消。' :
-                 'You can place the order now and pay later. The order will be automatically cancelled if not paid within 3 days.'}
+              {/* Instructions */}
+              <p className="text-sm text-muted-foreground">
+                {paymentMethods[showMethodDetail]?.instructions?.[lang] || paymentMethods[showMethodDetail]?.instructions?.es || ''}
               </p>
+
+              {/* Bank transfer details */}
+              {showMethodDetail === 'bank_transfer' && paymentMethods.bank_transfer?.bank_details && (() => {
+                const bd = paymentMethods.bank_transfer.bank_details;
+                return (
+                  <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5 text-sm" data-testid="bank-details">
+                    {bd.bank_name && <div className="flex justify-between"><span className="text-muted-foreground">{lang === 'es' ? 'Banco:' : 'Bank:'}</span><span className="font-medium">{bd.bank_name}</span></div>}
+                    {bd.account_type && <div className="flex justify-between"><span className="text-muted-foreground">{lang === 'es' ? 'Tipo:' : 'Type:'}</span><span className="font-medium">{bd.account_type?.[lang] || bd.account_type?.es || bd.account_type}</span></div>}
+                    {bd.account_number && <div className="flex justify-between"><span className="text-muted-foreground">{lang === 'es' ? 'Cuenta:' : 'Account:'}</span><span className="font-mono font-medium">{bd.account_number}</span></div>}
+                    {bd.account_holder && <div className="flex justify-between"><span className="text-muted-foreground">{lang === 'es' ? 'Titular:' : 'Holder:'}</span><span className="font-medium">{bd.account_holder}</span></div>}
+                    {bd.email && <div className="flex justify-between"><span className="text-muted-foreground">{lang === 'es' ? 'Correo:' : 'Email:'}</span><span className="font-medium">{bd.email}</span></div>}
+                    {bd.reference_note && (
+                      <div className="mt-2 text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/20 rounded p-2">
+                        <AlertTriangle className="h-3 w-3 inline mr-1" />
+                        {bd.reference_note?.[lang] || bd.reference_note?.es || bd.reference_note}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Cash specific note */}
+              {showMethodDetail === 'cash' && (
+                <div className="rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground" data-testid="cash-details">
+                  <Banknote className="h-4 w-4 inline mr-1.5 text-green-600" />
+                  {lang === 'es'
+                    ? 'Al dejar el efectivo, el cajero generara una solicitud de recarga que sera acreditada a tu billetera.'
+                    : 'When you leave the cash, the cashier will generate a top-up request that will be credited to your wallet.'}
+                </div>
+              )}
             </div>
-            <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setShowPaymentPending(false)}>
-                {lang === 'es' ? 'Cancelar' : 'Cancel'}
-              </Button>
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={handlePlaceAwaitingPayment}>
-                {lang === 'es' ? 'Crear Pedido (Pagar Después)' : lang === 'zh' ? '创建订单（稍后付款）' : 'Place Order (Pay Later)'}
+            <DialogFooter>
+              <Button onClick={() => handleAcknowledgeMethod(showMethodDetail)} className="w-full bg-purple-600 hover:bg-purple-700">
+                <Check className="h-4 w-4 mr-1.5" />
+                {lang === 'es' ? 'Entendido, Confirmar' : 'Understood, Confirm'}
               </Button>
             </DialogFooter>
           </DialogContent>
