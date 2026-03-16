@@ -678,6 +678,46 @@ export default function SchoolTextbooksView({
     }
   };
   
+  // Pay for an existing awaiting_payment order
+  const [payingOrderId, setPayingOrderId] = useState(null);
+  const handlePayExistingOrder = async (orderId, studentId) => {
+    setPayingOrderId(orderId);
+    try {
+      // Refresh wallet first
+      let freshBalance = walletBalance || 0;
+      try {
+        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+        freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+        setWalletBalance(freshBalance);
+      } catch {}
+
+      const orderData = getStudentOrder(studentId);
+      const total = orderData?.total_amount || 0;
+
+      if ((freshBalance + 0.01) < total) {
+        toast.error(lang === 'es'
+          ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}`
+          : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
+        return;
+      }
+
+      const res = await axios.post(
+        `${API_URL}/api/sysbook/orders/${orderId}/pay`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 30000 }
+      );
+      if (res.data?.success) {
+        toast.success(lang === 'es' ? 'Pago completado exitosamente!' : 'Payment completed successfully!');
+        refreshWallet();
+        await fetchOrderForStudent(studentId);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || (lang === 'es' ? 'Error al procesar el pago' : 'Payment failed'));
+    } finally {
+      setPayingOrderId(null);
+    }
+  };
+
   const handleReorderRequest = async () => {
     if (!reorderItem) return;
     const studentId = expandedStudentId;
@@ -872,13 +912,21 @@ export default function SchoolTextbooksView({
 
                       {/* Order Status Stepper */}
                       {orderData?.status && orderedItems.length > 0 && (() => {
-                        const steps = [
+                        const isAwaitingPayment = orderData.status === 'awaiting_payment';
+                        const steps = isAwaitingPayment ? [
+                          { key: 'awaiting_payment', label: lang === 'es' ? 'Pendiente Pago' : 'Awaiting Payment', icon: Wallet },
+                          { key: 'submitted', label: lang === 'es' ? 'Enviado' : 'Submitted', icon: Send },
+                          { key: 'processing', label: lang === 'es' ? 'Procesando' : 'Processing', icon: Package },
+                          { key: 'ready', label: lang === 'es' ? 'Listo' : 'Ready', icon: CheckCircle2 },
+                        ] : [
                           { key: 'submitted', label: lang === 'es' ? 'Enviado' : 'Submitted', icon: Send },
                           { key: 'paid', label: lang === 'es' ? 'Pagado' : 'Paid', icon: Wallet },
                           { key: 'processing', label: lang === 'es' ? 'Procesando' : 'Processing', icon: Package },
                           { key: 'ready', label: lang === 'es' ? 'Listo' : 'Ready', icon: CheckCircle2 },
                         ];
-                        const statusOrder = { submitted: 0, awaiting_link: 0, paid: 1, processing: 2, ready: 3, delivered: 4 };
+                        const statusOrder = isAwaitingPayment
+                          ? { awaiting_payment: 0, submitted: 1, processing: 2, ready: 3, delivered: 4 }
+                          : { submitted: 0, awaiting_link: 0, paid: 1, processing: 2, ready: 3, delivered: 4 };
                         const currentIdx = statusOrder[orderData.status] ?? 0;
                         return (
                           <div className="px-4 py-2.5 bg-muted/10 border-b" data-testid={`order-stepper-${studentId}`}>
@@ -1051,6 +1099,66 @@ export default function SchoolTextbooksView({
                               </Button>
                             </div>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Pay Now bar — for existing awaiting_payment orders */}
+                      {orderData?.status === 'awaiting_payment' && orderData?.order_id && (
+                        <div className="sticky bottom-0 z-10 border-t px-4 py-3 bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.15)]" data-testid={`pay-now-bar-${studentId}`}>
+                          {/* Wallet balance */}
+                          <div className={`flex items-center justify-between mb-2 px-2 py-1.5 rounded-lg text-xs ${
+                            walletBalance !== null && walletBalance >= (orderData.total_amount || 0)
+                              ? 'bg-green-50 dark:bg-green-900/20 text-green-700'
+                              : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700'
+                          }`}>
+                            <span className="flex items-center gap-1.5">
+                              <Wallet className="h-3.5 w-3.5" />
+                              {lang === 'es' ? 'Saldo:' : 'Balance:'}
+                            </span>
+                            <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
+                          </div>
+
+                          {/* Awaiting payment notice */}
+                          <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-2 text-xs text-amber-700">
+                            <AlertTriangle className="h-3 w-3 inline mr-1" />
+                            {lang === 'es'
+                              ? `Pedido pendiente de pago: $${(orderData.total_amount || 0).toFixed(2)}`
+                              : `Order awaiting payment: $${(orderData.total_amount || 0).toFixed(2)}`}
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 pb-safe">
+                            <div className="text-sm">
+                              <span className="text-muted-foreground">{orderedItems.length} {lang === 'es' ? 'libro(s)' : 'book(s)'}</span>
+                              <span className="ml-2 font-bold text-purple-600">${(orderData.total_amount || 0).toFixed(2)}</span>
+                            </div>
+                            <Button
+                              onClick={() => handlePayExistingOrder(orderData.order_id, studentId)}
+                              disabled={payingOrderId === orderData.order_id || (walletBalance !== null && (walletBalance + 0.01) < (orderData.total_amount || 0))}
+                              className="gap-1.5 bg-green-600 hover:bg-green-700 shrink-0"
+                              size="sm"
+                              data-testid={`pay-now-btn-${studentId}`}
+                            >
+                              {payingOrderId === orderData.order_id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wallet className="h-3.5 w-3.5" />}
+                              {payingOrderId === orderData.order_id
+                                ? (lang === 'es' ? 'Procesando...' : 'Processing...')
+                                : (lang === 'es' ? 'Pagar Ahora' : 'Pay Now')}
+                            </Button>
+                          </div>
+
+                          {/* If balance insufficient, show top-up option */}
+                          {walletBalance !== null && (walletBalance + 0.01) < (orderData.total_amount || 0) && (
+                            <div className="mt-2 flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1 h-7 text-[10px] gap-1 border-amber-300 text-amber-700 hover:bg-amber-100"
+                                onClick={() => setDepositOpen(true)}
+                              >
+                                <Banknote className="h-3 w-3" />
+                                {lang === 'es' ? 'Recargar Billetera' : 'Top Up Wallet'}
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
