@@ -573,7 +573,7 @@ export default function SchoolTextbooksView({
     setShowPaymentPending(false);
     await executeSubmit(async () => {
       await _submitOrder(pendingOrderData.studentId, pendingOrderData.selectedList, 'awaiting_payment');
-    })();
+    });
   };
 
   const _submitOrder = async (studentId, selectedList, paymentMethod) => {
@@ -932,25 +932,22 @@ export default function SchoolTextbooksView({
                             </span>
                             <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
                           </div>
-                          {/* Insufficient balance — enhanced guidance */}
+                          {/* Insufficient balance — info notice (order can still be placed as awaiting_payment) */}
                           {selectedList.length > 0 && walletBalance !== null && (walletBalance + 0.01) < selectedTotal && (
-                            <div className="mb-2 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 p-2.5 space-y-2" data-testid={`topup-guide-${studentId}`}>
-                              <div className="flex items-center gap-1.5 text-red-700 text-[11px] font-semibold">
+                            <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-2.5 space-y-2" data-testid={`topup-guide-${studentId}`}>
+                              <div className="flex items-center gap-1.5 text-amber-700 text-[11px] font-semibold">
                                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                                 {lang === 'es'
-                                  ? `Necesitas $${(selectedTotal - (walletBalance || 0)).toFixed(2)} más para completar el pedido`
-                                  : `You need $${(selectedTotal - (walletBalance || 0)).toFixed(2)} more to complete your order`}
+                                  ? `Saldo insuficiente ($${(selectedTotal - (walletBalance || 0)).toFixed(2)} faltante). Puedes enviar el pedido y pagar después.`
+                                  : `Insufficient balance ($${(selectedTotal - (walletBalance || 0)).toFixed(2)} short). You can place the order and pay later.`}
                               </div>
-                              <p className="text-[10px] text-red-600/80">
-                                {lang === 'es'
-                                  ? 'Recarga tu billetera con una de estas opciones:'
-                                  : 'Top up your wallet with one of these options:'}
-                              </p>
-                              <Button variant="default" size="sm" className="w-full h-8 text-[10px] gap-1 bg-red-600 hover:bg-red-700 text-white"
-                                onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
-                                <Banknote className="h-3 w-3" />
-                                {lang === 'es' ? 'Recargar Ahora' : 'Top Up Now'}
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="flex-1 h-7 text-[10px] gap-1 border-amber-300 text-amber-700 hover:bg-amber-100"
+                                  onClick={() => setDepositOpen(true)} data-testid={`inline-deposit-${studentId}`}>
+                                  <Banknote className="h-3 w-3" />
+                                  {lang === 'es' ? 'Recargar' : 'Top Up'}
+                                </Button>
+                              </div>
                             </div>
                           )}
                           <div className="flex items-center justify-between gap-3 pb-safe">
@@ -962,7 +959,7 @@ export default function SchoolTextbooksView({
                             </div>
                             <Button
                               onClick={() => handleSubmit(student)}
-                              disabled={submitting || selectedList.length === 0 || (walletBalance !== null && (walletBalance + 0.01) < selectedTotal)}
+                              disabled={submitting || selectedList.length === 0}
                               className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
                               size="sm"
                               data-testid={`submit-order-btn-${studentId}`}
