@@ -198,17 +198,16 @@ async def _fetch_activities(db, config):
 async def get_ticker_feed():
     """Public: returns activities + sponsors + display config."""
     db = get_db()
-    config = _merge_defaults(_get_config(db))
+    config = _merge_defaults(await _get_config(db))
 
     if not config.get("enabled"):
         return {"enabled": False, "activities": [], "sponsors": [], "config": {}}
 
-    activities = _fetch_activities(db, config)
-    active_sponsors = [
-        {k: v for k, v in s.items() if k != "_id"}
-        for s in config.get("sponsors", [])
-        if s.get("active", True)
-    ]
+    activities = await _fetch_activities(db, config)
+    active_sponsors = []
+    for s in config.get("sponsors", []):
+        if s.get("active", True):
+            active_sponsors.append({k: str(v) if hasattr(v, '__str__') and type(v).__name__ == 'ObjectId' else v for k, v in s.items() if k != "_id"})
 
     return {
         "enabled": True,
@@ -231,7 +230,7 @@ async def get_ticker_feed():
 async def get_ticker_config():
     """Admin: get full ticker configuration."""
     db = get_db()
-    config = _merge_defaults(_get_config(db))
+    config = _merge_defaults(await _get_config(db))
     return config
 
 
@@ -239,7 +238,7 @@ async def get_ticker_config():
 async def update_ticker_config(body: dict):
     """Admin: update ticker configuration (partial update)."""
     db = get_db()
-    current = _get_config(db)
+    current = await _get_config(db)
 
     # Deep merge activity_sources
     if "activity_sources" in body:
@@ -270,7 +269,7 @@ async def update_ticker_config(body: dict):
 async def add_sponsor(body: dict):
     """Admin: add a new sponsor banner."""
     db = get_db()
-    config = _get_config(db)
+    config = await _get_config(db)
 
     sponsor = {
         "id": str(ObjectId()),
@@ -300,7 +299,7 @@ async def add_sponsor(body: dict):
 async def update_sponsor(sponsor_id: str, body: dict):
     """Admin: update a sponsor."""
     db = get_db()
-    config = _get_config(db)
+    config = await _get_config(db)
     sponsors = config.get("sponsors", [])
 
     found = False
@@ -324,7 +323,7 @@ async def update_sponsor(sponsor_id: str, body: dict):
 async def delete_sponsor(sponsor_id: str):
     """Admin: remove a sponsor."""
     db = get_db()
-    config = _get_config(db)
+    config = await _get_config(db)
     sponsors = [s for s in config.get("sponsors", []) if s.get("id") != sponsor_id]
 
     await db.app_config.update_one(
