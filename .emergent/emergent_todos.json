@@ -1,30 +1,22 @@
 [
   {
-    "content": "Tutor Phase 1.1: Backend — models, services, routes",
+    "content": "Tutor 2.1: Student create form",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.2: Backend — AI agent engine",
+    "content": "Tutor 2.2: AI worksheet/quiz generator",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.3: Port 8003 setup + proxy",
+    "content": "Tutor 2.3: Club daily schedule",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.4: Frontend — Student list + Board mapper config",
+    "content": "Tutor 2.4: Session tracker (start/stop, notes, performance)",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.5: Frontend — Agent setup + chat interface (3 modes)",
-    "status": "completed"
-  },
-  {
-    "content": "Tutor Phase 1.6: Frontend — Knowledge source manager",
-    "status": "completed"
-  },
-  {
-    "content": "Tutor Phase 1.7: Add Tutor to navigation + App.js routes",
+    "content": "Tutor 2.5: School feed (manual entry + auto-translate)",
     "status": "completed"
   }
 ]

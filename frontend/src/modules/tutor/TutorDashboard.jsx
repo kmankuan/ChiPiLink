@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { GraduationCap, Users, Plus, Search, Settings, Bot, BookOpen, ChevronRight, MessageCircle } from 'lucide-react';
+import { GraduationCap, Users, Plus, Search, Settings, Bot, BookOpen, ChevronRight, MessageCircle, Calendar } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -45,6 +45,9 @@ export default function TutorDashboard() {
               <h1 className="text-lg font-bold text-white">ChiPi Tutor</h1>
             </div>
             <div className="flex gap-2">
+              <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/schedule')}>
+                <Calendar className="h-3.5 w-3.5 mr-1" /> Schedule
+              </Button>
               <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/board-mapper')}>
                 <Settings className="h-3.5 w-3.5 mr-1" /> Config
               </Button>
