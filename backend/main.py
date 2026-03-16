@@ -266,9 +266,9 @@ api_router.include_router(ably_router)
 from modules.dev_info import router as dev_info_router
 api_router.include_router(dev_info_router)
 
-# ChiPi Tutor Module
-from modules.tutor import router as tutor_router
-api_router.include_router(tutor_router)
+# ChiPi Tutor — Proxy to Tutor Engine (port 8003)
+from modules.tutor_proxy import router as tutor_proxy_router
+api_router.include_router(tutor_proxy_router)
 
 
 # Include main router in app
@@ -466,6 +466,19 @@ async def startup_event():
                     logger.warning(f"Hub bootstrap stderr: {result.stderr.strip()}")
         except Exception as e:
             logger.warning(f"Integration Hub bootstrap skipped: {e}")
+
+        # Bootstrap Tutor Engine (port 8003)
+        try:
+            import subprocess
+            tutor_script = "/app/tutor-engine/bootstrap.sh"
+            if os.path.exists(tutor_script):
+                result = subprocess.run(["bash", tutor_script], capture_output=True, text=True, timeout=15)
+                for line in result.stdout.strip().split("\n"):
+                    if line.strip():
+                        logger.info(line.strip())
+        except Exception as e:
+            logger.warning(f"Tutor Engine bootstrap skipped: {e}")
+
 
     # Self-check: verify the server can actually respond to HTTP requests
     async def _self_check():
