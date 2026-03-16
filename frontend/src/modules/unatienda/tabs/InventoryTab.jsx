@@ -293,6 +293,8 @@ export default function InventoryTab({ token }) {
                         Stock <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </th>
+                    <th className="text-right p-3 font-medium text-xs hidden sm:table-cell">Reserved</th>
+                    <th className="text-right p-3 font-medium text-xs hidden sm:table-cell">Awaiting Pay</th>
                     <th className="text-center p-3 font-medium text-xs hidden sm:table-cell">Status</th>
                     <th className="text-center p-3 font-medium text-xs">Actions</th>
                   </tr>
@@ -300,6 +302,9 @@ export default function InventoryTab({ token }) {
                 <tbody>
                   {pageProducts.map((p) => {
                     const qty = p.inventory_quantity ?? 0;
+                    const reserved = p.reserved_quantity ?? 0;
+                    const awaitingPay = p.awaiting_payment_quantity ?? 0;
+                    const available = qty - reserved;
                     const name = p.name || p.nombre || 'Unnamed';
                     const cat = p.category || p.categoria || '\u2014';
                     const price = p.price ?? p.precio ?? 0;
@@ -320,6 +325,10 @@ export default function InventoryTab({ token }) {
                         <td className="p-3 text-xs text-muted-foreground hidden sm:table-cell">{cat}</td>
                         <td className="p-3 text-right text-xs font-mono">${price.toFixed(2)}</td>
                         <td className="p-3 text-right text-xs font-mono font-bold">{qty}</td>
+                        <td className="p-3 text-right text-xs font-mono hidden sm:table-cell">{reserved}</td>
+                        <td className="p-3 text-right text-xs font-mono hidden sm:table-cell">
+                          {awaitingPay > 0 ? <span className="text-amber-600">{awaitingPay}</span> : <span className="text-muted-foreground">0</span>}
+                        </td>
                         <td className="p-3 text-center hidden sm:table-cell">
                           <Badge variant="outline" className={`text-[10px] ${statusColor}`}>{statusLabel}</Badge>
                         </td>

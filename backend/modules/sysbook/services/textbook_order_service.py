@@ -723,24 +723,37 @@ class TextbookOrderService(BaseService):
                 await self._refund_wallet(user_id, total_amount, wallet_transaction)
             raise create_err
 
-        # 8. Deduct stock (non-blocking — order is already saved)
-        try:
-            for item in order_items:
-                qty = item.get("quantity_ordered", 1)
-                if is_presale:
+        # 8. Deduct stock — SKIP for awaiting_payment orders (no phantom reservations)
+        if is_awaiting_payment:
+            # Track as awaiting_payment_quantity (separate from reserved/stock)
+            try:
+                for item in order_items:
+                    qty = item.get("quantity_ordered", 1)
                     await db.store_products.update_one(
                         {"book_id": item["book_id"]},
-                        {"$inc": {"reserved_quantity": qty}}
+                        {"$inc": {"awaiting_payment_quantity": qty}}
                     )
-                else:
-                    await db.store_products.update_one(
-                        {"book_id": item["book_id"]},
-                        {"$inc": {"inventory_quantity": -qty}}
-                    )
-        except Exception as stock_err:
-            logger.error(f"[create_and_submit_order] Stock deduction failed (non-blocking): {stock_err}")
-            if wallet_transaction:
-                await self._notify_admin_post_order_failure(order_id, user_name, student.get("full_name", ""), total_amount, "stock_deduction", str(stock_err))
+                logger.info(f"[create_and_submit_order] Awaiting payment — {len(order_items)} items tracked (not reserved)")
+            except Exception as e:
+                logger.warning(f"[create_and_submit_order] Awaiting payment tracking failed: {e}")
+        else:
+            try:
+                for item in order_items:
+                    qty = item.get("quantity_ordered", 1)
+                    if is_presale:
+                        await db.store_products.update_one(
+                            {"book_id": item["book_id"]},
+                            {"$inc": {"reserved_quantity": qty}}
+                        )
+                    else:
+                        await db.store_products.update_one(
+                            {"book_id": item["book_id"]},
+                            {"$inc": {"inventory_quantity": -qty}}
+                        )
+            except Exception as stock_err:
+                logger.error(f"[create_and_submit_order] Stock deduction failed (non-blocking): {stock_err}")
+                if wallet_transaction:
+                    await self._notify_admin_post_order_failure(order_id, user_name, student.get("full_name", ""), total_amount, "stock_deduction", str(stock_err))
 
         # 8b. Update draft order to mark submitted items as 'ordered'
         try:

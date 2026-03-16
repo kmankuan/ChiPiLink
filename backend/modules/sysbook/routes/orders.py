@@ -362,6 +362,93 @@ async def update_order_note(
     return {"status": "ok", "note": note}
 
 
+@router.post("/{order_id}/pay")
+async def pay_order(order_id: str, user: dict = Depends(get_current_user)):
+    """Pay for an awaiting_payment order — charges wallet and moves to submitted status."""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(404, "Order not found")
+    if order.get("status") != "awaiting_payment":
+        raise HTTPException(400, f"Order is not awaiting payment (status: {order.get('status')})")
+    
+    total = order.get("total_amount", 0)
+    user_id = order.get("user_id") or user.get("user_id")
+    
+    # Check and charge wallet
+    try:
+        from modules.users.services.wallet_service import wallet_service
+        from modules.users.models.wallet_models import Currency
+        
+        wallet = await wallet_service.get_wallet(user_id)
+        balance = wallet.get("balance_usd", 0) if wallet else 0
+        if balance < total:
+            raise HTTPException(400, f"Insufficient balance. Available: ${balance:.2f}, Required: ${total:.2f}")
+        
+        await wallet_service.charge(
+            user_id=user_id, amount=total, currency=Currency.USD,
+            description=f"Payment for order {order_id}",
+            reference_type="textbook_order", reference_id=order_id,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Payment failed: {str(e)}")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Move inventory: awaiting_payment_quantity → reserved_quantity (presale) or deduct stock
+    for item in order.get("items", []):
+        qty = item.get("quantity_ordered", 1)
+        book_id = item.get("book_id")
+        if book_id:
+            # Remove from awaiting, add to reserved
+            await db.store_products.update_one(
+                {"book_id": book_id},
+                {"$inc": {"awaiting_payment_quantity": -qty, "reserved_quantity": qty}}
+            )
+    
+    # Update order status
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"status": "submitted", "payment_method": "wallet", "paid_at": now, "updated_at": now}}
+    )
+    
+    return {"success": True, "order_id": order_id, "status": "submitted", "paid_amount": total}
+
+
+@router.post("/{order_id}/cancel")
+async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
+    """Cancel an awaiting_payment order — releases awaiting_payment_quantity."""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(404, "Order not found")
+    if order.get("status") != "awaiting_payment":
+        raise HTTPException(400, "Only awaiting_payment orders can be cancelled")
+    
+    # Release awaiting_payment_quantity
+    for item in order.get("items", []):
+        qty = item.get("quantity_ordered", 1)
+        book_id = item.get("book_id")
+        if book_id:
+            await db.store_products.update_one(
+                {"book_id": book_id},
+                {"$inc": {"awaiting_payment_quantity": -qty}}
+            )
+    
+    now = datetime.now(timezone.utc).isoformat()
+    await db.store_textbook_orders.update_one(
+        {"order_id": order_id},
+        {"$set": {"status": "cancelled", "cancelled_at": now, "updated_at": now}}
+    )
+    
+    return {"success": True, "order_id": order_id, "status": "cancelled"}
+
 
 @router.put("/admin/{order_id}/paid-date")
 async def update_paid_date(
