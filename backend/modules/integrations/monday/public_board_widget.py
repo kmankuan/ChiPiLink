@@ -160,7 +160,7 @@ async def get_widget_data():
 
 
 async def _fetch_and_cache(config: dict) -> tuple:
-    """Fetch board items from Monday.com and cache in DB."""
+    """Fetch ALL board items from Monday.com using pagination and cache in DB."""
     board_id = config["board_id"]
     columns_to_show = config.get("columns_to_show", [])
     subitem_columns_to_show = config.get("subitem_columns_to_show", [])
@@ -168,39 +168,47 @@ async def _fetch_and_cache(config: dict) -> tuple:
     group_filter = config.get("group_filter")
     max_items = config.get("max_items", 10)
 
-    # Build query — include subitems if configured
-    # Also fetch board columns for title mapping
+    # Use cursor-based pagination to get ALL items (not limited to 500)
+    all_raw_items = []
+    live_col_titles = {}
+    
     if show_subitems:
-        query = f"""
-            query {{
-                boards(ids: [{board_id}]) {{
+        # First page — includes board columns for title mapping
+        cursor = None
+        page = 0
+        while True:
+            page += 1
+            if cursor:
+                query = f"""query {{ next_items_page(limit: 500, cursor: "{cursor}") {{
+                    cursor items {{ id name group {{ id title }} column_values {{ id text }}
+                    subitems {{ id name column_values {{ id text }} }} }} }} }}"""
+                data = await monday_client.execute(query, timeout=45.0)
+                page_data = data.get("next_items_page", {})
+            else:
+                query = f"""query {{ boards(ids: [{board_id}]) {{
                     columns {{ id title }}
-                    items_page(limit: {min(max_items + 10, 500)}) {{
-                        items {{
-                            id
-                            name
-                            group {{ id title }}
-                            column_values {{ id text }}
-                            subitems {{
-                                id
-                                name
-                                column_values {{ id text }}
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-        """
-        data = await monday_client.execute(query)
-        boards = data.get("boards", [])
-        raw_items = boards[0]["items_page"]["items"] if boards else []
-        # Build live column title map from the board
-        live_col_titles = {}
-        for col in (boards[0].get("columns", []) if boards else []):
-            live_col_titles[col["id"]] = col.get("title", col["id"])
+                    items_page(limit: 500) {{
+                        cursor items {{ id name group {{ id title }} column_values {{ id text }}
+                        subitems {{ id name column_values {{ id text }} }} }} }} }} }}"""
+                data = await monday_client.execute(query, timeout=45.0)
+                boards = data.get("boards", [])
+                if not boards:
+                    break
+                for col in boards[0].get("columns", []):
+                    live_col_titles[col["id"]] = col.get("title", col["id"])
+                page_data = boards[0].get("items_page", {})
+            
+            items = page_data.get("items", [])
+            all_raw_items.extend(items)
+            cursor = page_data.get("cursor")
+            
+            if not cursor or not items or page >= 10:  # Safety: max 10 pages (5000 items)
+                break
     else:
-        raw_items = await monday_client.get_board_items(board_id, limit=max_items + 10)
-        live_col_titles = {}
+        all_raw_items = await monday_client.get_board_items(board_id, limit=2000)
+    
+    raw_items = all_raw_items
+    logger.info(f"Widget fetched {len(raw_items)} total items from board {board_id}")
 
     # Filter by group if configured
     if group_filter:
