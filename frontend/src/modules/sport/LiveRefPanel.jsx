@@ -71,6 +71,9 @@ export default function LiveRefPanel() {
   const [showSettings, setShowSettings] = useState(false);
   const [showTechPanel, setShowTechPanel] = useState(false);
   const [showControls, setShowControls] = useState(false); // Toggle referee controls panel
+  const [showChangeRef, setShowChangeRef] = useState(false); // Referee change dialog
+  const [newRefName, setNewRefName] = useState('');
+  const [changingRef, setChangingRef] = useState(false);
   const [manualSet, setManualSet] = useState({ score_a: 0, score_b: 0 });
   const [endGameForm, setEndGameForm] = useState({ league_id: '', notes: '' });
   const [leagues, setLeagues] = useState([]);
@@ -180,6 +183,26 @@ export default function LiveRefPanel() {
     if (!confirm('End match?')) return;
     await fetch(`${API}/api/sport/live/${sessionId}/end`, { method: 'POST', headers });
     navigate('/sport');
+  };
+
+  const changeReferee = async () => {
+    if (!newRefName.trim()) { toast.error('Enter referee name'); return; }
+    setChangingRef(true);
+    try {
+      const res = await fetch(`${API}/api/sport/live/${sessionId}/referee`, {
+        method: 'PUT', headers, body: JSON.stringify({ name: newRefName.trim() })
+      });
+      if (res.ok) {
+        toast.success(`Referee changed to ${newRefName.trim()}`);
+        setShowChangeRef(false);
+        setNewRefName('');
+        fetchSession();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to change referee');
+      }
+    } catch { toast.error('Error changing referee'); }
+    finally { setChangingRef(false); }
   };
 
   if (loading || !session) return <div className="flex items-center justify-center min-h-screen" style={{ background: '#1a1a2e' }}><Radio className="h-8 w-8 text-red-500 animate-pulse" /></div>;
@@ -317,6 +340,15 @@ export default function LiveRefPanel() {
                 <button className="px-2 py-1 rounded bg-amber-500/20 text-amber-400 text-[10px]" onClick={() => setBroadcast('standings')}>🏆 Standings</button>
               </div>
             </div>
+            {/* Referee & Match Actions */}
+            <div>
+              <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Match</p>
+              <div className="flex gap-1 flex-wrap">
+                <button className="px-2 py-1 rounded bg-white/10 text-white/60 text-[10px]" onClick={() => setShowChangeRef(true)}>⚖️ Change Ref</button>
+                <button className="px-2 py-1 rounded bg-white/10 text-white/60 text-[10px]" onClick={() => setShowManualSet(true)}><Plus className="h-3 w-3 inline mr-0.5" />Add Set</button>
+                <button className="px-2 py-1 rounded bg-red-500/20 text-red-400 text-[10px]" onClick={endMatch}><Square className="h-3 w-3 inline mr-0.5" />End</button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -365,6 +397,33 @@ export default function LiveRefPanel() {
 
       {/* End Game Dialog */}
       <Dialog open={showEndGame} onOpenChange={setShowEndGame}>
+
+      {/* Change Referee Dialog */}
+      <Dialog open={showChangeRef} onOpenChange={setShowChangeRef}>
+        <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-xs">
+          <DialogHeader><DialogTitle className="text-white flex items-center gap-2">⚖️ Change Referee</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="text-xs text-white/40">Current: <strong className="text-white/70">{s.referee?.nickname || 'Unknown'}</strong></div>
+            <div>
+              <Label className="text-white/60 text-xs">New Referee Name</Label>
+              <Input
+                value={newRefName}
+                onChange={e => setNewRefName(e.target.value)}
+                placeholder="Enter referee name..."
+                className="h-9 bg-white/5 border-white/10 text-white mt-1"
+                onKeyDown={e => e.key === 'Enter' && changeReferee()}
+                data-testid="input-new-referee"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" className="text-white/50" onClick={() => setShowChangeRef(false)}>Cancel</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={changeReferee} disabled={changingRef || !newRefName.trim()}>
+              {changingRef ? 'Changing...' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-sm">
           <DialogHeader><DialogTitle className="text-white flex items-center gap-2"><Trophy className="h-5 w-5 text-yellow-400" /> Match Complete</DialogTitle></DialogHeader>
           <div className="space-y-3">

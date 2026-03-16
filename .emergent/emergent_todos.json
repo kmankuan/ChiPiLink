@@ -1,22 +1,18 @@
 [
   {
-    "content": "Backend: Add payment_methods config to store_configuration defaults + expose in public API",
+    "content": "1. Backend: Add hp_bar_style config (chevron default) to sport settings",
     "status": "completed"
   },
   {
-    "content": "Frontend: Implement full Pay → Send Order flow in SchoolTextbooksView",
+    "content": "2. Frontend: Chevron HP bar showing point-by-point battle timeline from state.points",
     "status": "completed"
   },
   {
-    "content": "Frontend: PaymentMethodsDialog + Cash/Bank Transfer detail dialogs",
+    "content": "3. Frontend: Add referee change UI to LiveRefPanel + dialog",
     "status": "completed"
   },
   {
-    "content": "Frontend: OrderSummaryModal updated with awaitingPaymentNote",
-    "status": "completed"
-  },
-  {
-    "content": "Test the full flow end-to-end (needs real student data to fully verify)",
+    "content": "4. Visual testing: TV bar with points + RefPanel Change Ref dialog",
     "status": "completed"
   }
 ]

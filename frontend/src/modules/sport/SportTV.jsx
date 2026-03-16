@@ -249,38 +249,105 @@ export default function SportTV() {
               </div>
             </div>
 
-            {/* HP BARS with dynamic score positions */}
+            {/* HP BARS — Chevron Battle Timeline */}
             <div className="w-full max-w-5xl mb-4">
-              <div className="relative flex items-center gap-0 h-14">
-                {/* Left HP bar */}
-                <div className="flex-1 h-10 rounded-l-full overflow-hidden bg-white/5 relative">
-                  <div className="absolute inset-y-0 left-0 rounded-l-full transition-all duration-500" style={{width:`${pctL}%`, background:`linear-gradient(90deg, ${colorA}40, ${colorA})`}} />
-                  {/* Score follows the bar end */}
-                  <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{left:`max(${pctL}% - 30px, 10px)`}}>
-                    <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
-                    {state.server === ls && <span className="text-yellow-400 text-sm ml-2">🏓</span>}
-                  </div>
-                </div>
+              {(() => {
+                const barStyle = cfg.hp_bar_style || 'chevron';
+                const currentSetPoints = (state.points || []).filter(p => p.set === state.current_set);
+                const totalSlots = Math.max(max, currentSetPoints.length + 1); // at least max, expand for deuce
 
-                {/* Center icon */}
-                <div className="w-16 h-16 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center z-10 shrink-0 -mx-2">
-                  {centerIcon ? (
-                    <img src={centerIcon} className="w-12 h-12 rounded-full object-contain" alt="" />
-                  ) : (
-                    <span className="text-2xl">🏓</span>
-                  )}
-                </div>
+                if (barStyle === 'chevron') {
+                  // Chevron timeline: each slot shows who scored that point in order
+                  return (
+                    <div>
+                      <div className="relative flex items-center gap-0 h-14">
+                        {/* Left score */}
+                        <div className="shrink-0 w-16 text-right pr-3">
+                          <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
+                          {state.server === ls && <span className="text-yellow-400 text-xs ml-1">🏓</span>}
+                        </div>
 
-                {/* Right HP bar */}
-                <div className="flex-1 h-10 rounded-r-full overflow-hidden bg-white/5 relative">
-                  <div className="absolute inset-y-0 right-0 rounded-r-full transition-all duration-500" style={{width:`${pctR}%`, background:`linear-gradient(270deg, ${colorB}40, ${colorB})`}} />
-                  {/* Score follows the bar end */}
-                  <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{right:`max(${pctR}% - 30px, 10px)`}}>
-                    {state.server === rs && <span className="text-yellow-400 text-sm mr-2">🏓</span>}
-                    <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
+                        {/* Chevron bar */}
+                        <div className="flex-1 flex items-center gap-[2px] h-12 rounded-lg overflow-hidden bg-white/[0.03] px-1 py-1">
+                          {Array.from({length: totalSlots}).map((_, i) => {
+                            const pt = currentSetPoints[i];
+                            const scorer = pt?.scored_by;
+                            const isLeft = scorer === ls;
+                            const isRight = scorer === rs;
+                            const isFilled = !!scorer;
+                            const isLatest = i === currentSetPoints.length - 1 && isFilled;
+                            const fillColor = isLeft ? colorA : isRight ? colorB : 'transparent';
+
+                            // Check if part of a streak
+                            const prevPt = i > 0 ? currentSetPoints[i-1] : null;
+                            const nextPt = currentSetPoints[i+1];
+                            const isStreakContinue = prevPt && prevPt.scored_by === scorer;
+                            const isStreakStart = !isStreakContinue && nextPt && nextPt.scored_by === scorer;
+
+                            return (
+                              <div
+                                key={i}
+                                className="h-full transition-all duration-300"
+                                style={{
+                                  flex: 1,
+                                  clipPath: 'polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%, 20% 50%)',
+                                  background: isFilled
+                                    ? `linear-gradient(180deg, ${fillColor}ee, ${fillColor})`
+                                    : 'rgba(255,255,255,0.03)',
+                                  boxShadow: isLatest ? `0 0 12px ${fillColor}80` : 'none',
+                                  transform: isLatest ? 'scaleY(1.1)' : 'scaleY(1)',
+                                  opacity: isFilled ? 1 : 0.4,
+                                  border: isFilled ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+
+                        {/* Right score */}
+                        <div className="shrink-0 w-16 text-left pl-3">
+                          {state.server === rs && <span className="text-yellow-400 text-xs mr-1">🏓</span>}
+                          <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
+                        </div>
+                      </div>
+
+                      {/* Center icon overlay */}
+                      <div className="flex justify-center -mt-[52px] mb-[10px] pointer-events-none">
+                        <div className="w-14 h-14 rounded-full bg-black/70 border-2 border-white/10 flex items-center justify-center z-10">
+                          {centerIcon ? (
+                            <img src={centerIcon} className="w-10 h-10 rounded-full object-contain" alt="" />
+                          ) : (
+                            <span className="text-2xl">🏓</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Fallback: gradient style (original)
+                return (
+                  <div className="relative flex items-center gap-0 h-14">
+                    <div className="flex-1 h-10 rounded-l-full overflow-hidden bg-white/5 relative">
+                      <div className="absolute inset-y-0 left-0 rounded-l-full transition-all duration-500" style={{width:`${pctL}%`, background:`linear-gradient(90deg, ${colorA}40, ${colorA})`}} />
+                      <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{left:`max(${pctL}% - 30px, 10px)`}}>
+                        <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
+                        {state.server === ls && <span className="text-yellow-400 text-sm ml-2">🏓</span>}
+                      </div>
+                    </div>
+                    <div className="w-16 h-16 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center z-10 shrink-0 -mx-2">
+                      {centerIcon ? <img src={centerIcon} className="w-12 h-12 rounded-full object-contain" alt="" /> : <span className="text-2xl">🏓</span>}
+                    </div>
+                    <div className="flex-1 h-10 rounded-r-full overflow-hidden bg-white/5 relative">
+                      <div className="absolute inset-y-0 right-0 rounded-r-full transition-all duration-500" style={{width:`${pctR}%`, background:`linear-gradient(270deg, ${colorB}40, ${colorB})`}} />
+                      <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{right:`max(${pctR}% - 30px, 10px)`}}>
+                        {state.server === rs && <span className="text-yellow-400 text-sm mr-2">🏓</span>}
+                        <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Combo counters */}
               <div className="flex justify-between mt-1">

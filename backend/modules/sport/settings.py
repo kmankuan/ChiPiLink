@@ -96,7 +96,7 @@ DEFAULTS = {
         "show_battle_timeline": True,
         "show_set_history": True,
         "show_combo_counter": True,
-        "hp_bar_style": "gradient",  # gradient | solid | neon
+        "hp_bar_style": "chevron",  # chevron | classic | neon | equalizer | diamond | gradient
         "score_size": "xl",
         "photo_size": "lg",
         "center_icon_url": "",  # GIF/image between HP bars. Empty = 🏓 emoji
