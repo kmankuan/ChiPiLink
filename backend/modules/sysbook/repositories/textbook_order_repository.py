@@ -31,7 +31,24 @@ class TextbookOrderRepository(BaseRepository):
         return await self.find_one({"order_id": order_id})
     
     async def get_by_student(self, student_id: str, year: int) -> Optional[Dict]:
-        """Get draft order for a specific student and year (for browsing only)"""
+        """Get active order for a specific student and year (draft or awaiting_payment)"""
+        # First check for awaiting_payment orders (user needs to complete payment)
+        awaiting = await self.find_one({
+            "student_id": student_id,
+            "year": year,
+            "status": "awaiting_payment"
+        })
+        if awaiting:
+            return awaiting
+        # Then check for submitted/active orders
+        submitted = await self.find_one({
+            "student_id": student_id,
+            "year": year,
+            "status": {"$in": ["submitted", "paid", "processing", "ready"]}
+        })
+        if submitted:
+            return submitted
+        # Finally check for draft orders
         return await self.find_one({
             "student_id": student_id,
             "year": year,

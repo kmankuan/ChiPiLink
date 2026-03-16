@@ -220,6 +220,54 @@ export default function Orders() {
   const [ordersSubTab, setOrdersSubTab] = useState('textbooks');
   const [expandedOrders, setExpandedOrders] = useState({});
   const [crmChatStudent, setCrmChatStudent] = useState(null);
+  const [payingOrderId, setPayingOrderId] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(null);
+
+  // Fetch wallet balance
+  useEffect(() => {
+    if (token) {
+      fetch(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d) setWalletBalance(d.wallet?.balance_usd ?? 0); })
+        .catch(() => {});
+    }
+  }, [token]);
+
+  const handleFinishPayment = async (orderId) => {
+    setPayingOrderId(orderId);
+    try {
+      // Refresh wallet
+      const walletRes = await fetch(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (walletRes.ok) {
+        const wd = await walletRes.json();
+        setWalletBalance(wd.wallet?.balance_usd ?? 0);
+      }
+
+      const res = await fetch(`${API_URL}/api/sysbook/orders/${orderId}/pay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const { toast } = await import('sonner');
+        toast.success(t('orders.paymentSuccess', 'Payment completed successfully!'));
+        // Refresh orders and wallet
+        fetchTextbookOrders();
+        fetch(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+          .then(r => r.ok ? r.json() : null)
+          .then(d => { if (d) setWalletBalance(d.wallet?.balance_usd ?? 0); })
+          .catch(() => {});
+      } else {
+        const { toast } = await import('sonner');
+        toast.error(data.detail || t('orders.paymentError', 'Payment failed'));
+      }
+    } catch (err) {
+      const { toast } = await import('sonner');
+      toast.error(t('orders.paymentError', 'Payment failed'));
+    } finally {
+      setPayingOrderId(null);
+    }
+  };
 
   const toggleOrderExpansion = (orderId) => {
     setExpandedOrders(prev => ({ ...prev, [orderId]: !prev[orderId] }));
@@ -290,12 +338,13 @@ export default function Orders() {
 
   const getTextbookStatusBadge = (status) => {
     const cfg = {
-      draft:      { bg: 'bg-gray-500', text: 'text-white', icon: Pencil, label: t('orders.statusDraft', 'Draft') },
-      submitted:  { bg: 'bg-blue-600', text: 'text-white', icon: Send, label: t('orders.statusSubmitted', 'Submitted') },
-      processing: { bg: 'bg-amber-500', text: 'text-white', icon: Clock, label: t('orders.statusProcessing', 'Processing') },
-      ready:      { bg: 'bg-green-600', text: 'text-white', icon: CheckCircle2, label: t('orders.statusReady', 'Ready') },
-      delivered:  { bg: 'bg-emerald-600', text: 'text-white', icon: Check, label: t('orders.statusDelivered', 'Delivered') },
-      cancelled:  { bg: 'bg-red-600', text: 'text-white', icon: X, label: t('orders.statusCancelled', 'Cancelled') },
+      draft:            { bg: 'bg-gray-500', text: 'text-white', icon: Pencil, label: t('orders.statusDraft', 'Draft') },
+      awaiting_payment: { bg: 'bg-amber-500', text: 'text-white', icon: CreditCard, label: t('orders.statusAwaitingPayment', 'Awaiting Payment') },
+      submitted:        { bg: 'bg-blue-600', text: 'text-white', icon: Send, label: t('orders.statusSubmitted', 'Submitted') },
+      processing:       { bg: 'bg-amber-500', text: 'text-white', icon: Clock, label: t('orders.statusProcessing', 'Processing') },
+      ready:            { bg: 'bg-green-600', text: 'text-white', icon: CheckCircle2, label: t('orders.statusReady', 'Ready') },
+      delivered:        { bg: 'bg-emerald-600', text: 'text-white', icon: Check, label: t('orders.statusDelivered', 'Delivered') },
+      cancelled:        { bg: 'bg-red-600', text: 'text-white', icon: X, label: t('orders.statusCancelled', 'Cancelled') },
     };
     const c = cfg[status] || cfg.draft;
     const Icon = c.icon;
@@ -502,6 +551,40 @@ export default function Orders() {
                             <p className="text-xs text-muted-foreground mt-3">
                               {t('orders.lastSubmitted', 'Last submitted')}: {new Date(order.last_submitted_at).toLocaleDateString()}
                             </p>
+                          )}
+
+                          {/* Finish Payment — for awaiting_payment orders */}
+                          {order.status === 'awaiting_payment' && (
+                            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-3 space-y-2" data-testid={`finish-payment-${order.order_id}`}>
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs text-amber-700 font-medium flex items-center gap-1.5">
+                                  <CreditCard className="h-3.5 w-3.5" />
+                                  {t('orders.awaitingPayment', 'Awaiting Payment')}
+                                </div>
+                                {walletBalance !== null && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {t('orders.walletBalance', 'Balance')}: <strong className={walletBalance >= (order.total_amount || 0) ? 'text-green-600' : 'text-red-500'}>${walletBalance.toFixed(2)}</strong>
+                                  </span>
+                                )}
+                              </div>
+                              <Button
+                                onClick={() => handleFinishPayment(order.order_id)}
+                                disabled={payingOrderId === order.order_id || (walletBalance !== null && walletBalance < (order.total_amount || 0))}
+                                className="w-full gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
+                                size="sm"
+                                data-testid={`finish-payment-btn-${order.order_id}`}
+                              >
+                                {payingOrderId === order.order_id
+                                  ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />{t('orders.processing', 'Processing...')}</>
+                                  : <><CreditCard className="h-3.5 w-3.5" />{t('orders.finishPayment', 'Finish Payment')} — ${(order.total_amount || 0).toFixed(2)}</>
+                                }
+                              </Button>
+                              {walletBalance !== null && walletBalance < (order.total_amount || 0) && (
+                                <p className="text-[10px] text-amber-600/80 text-center">
+                                  {t('orders.insufficientBalance', 'Insufficient wallet balance. Please top up to complete payment.')}
+                                </p>
+                              )}
+                            </div>
                           )}
 
                           {/* Chat buttons */}

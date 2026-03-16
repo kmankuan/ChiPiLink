@@ -1,18 +1,18 @@
 [
   {
-    "content": "1. Backend: Add hp_bar_style config (chevron default) to sport settings",
+    "content": "Backend: Fix get_by_student to find awaiting_payment/submitted orders",
     "status": "completed"
   },
   {
-    "content": "2. Frontend: Chevron HP bar showing point-by-point battle timeline from state.points",
+    "content": "Frontend: Remove Pay Now bar from textbooks list, replace with 'Go to My Orders' notice",
     "status": "completed"
   },
   {
-    "content": "3. Frontend: Add referee change UI to LiveRefPanel + dialog",
+    "content": "Frontend: Add awaiting_payment badge + Finish Payment button in Orders.jsx",
     "status": "completed"
   },
   {
-    "content": "4. Visual testing: TV bar with points + RefPanel Change Ref dialog",
+    "content": "Cleanup: Remove unused handlePayExistingOrder from SchoolTextbooksView",
     "status": "completed"
   }
 ]
