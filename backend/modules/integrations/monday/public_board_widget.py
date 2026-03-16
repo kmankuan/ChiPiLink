@@ -175,7 +175,7 @@ async def _fetch_and_cache(config: dict) -> tuple:
             query {{
                 boards(ids: [{board_id}]) {{
                     columns {{ id title }}
-                    items_page(limit: {max_items + 10}) {{
+                    items_page(limit: {min(max_items + 10, 500)}) {{
                         items {{
                             id
                             name
