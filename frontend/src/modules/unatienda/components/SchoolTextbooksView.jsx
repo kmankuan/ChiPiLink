@@ -355,6 +355,7 @@ export default function SchoolTextbooksView({
   const [paymentAcknowledged, setPaymentAcknowledged] = useState({}); // { studentId: paymentMethod }
   const [showPayMethodsFor, setShowPayMethodsFor] = useState(null); // studentId or null
   const [showMethodDetail, setShowMethodDetail] = useState(null); // 'cash' | 'bank_transfer' | null
+  const [payLoading, setPayLoading] = useState(false); // Loading state for Pay button
   const paymentMethods = storeConfig?.payment_methods || {};
   
   const texts = {
@@ -528,8 +529,8 @@ export default function SchoolTextbooksView({
   
   // ---- PAY → SEND ORDER two-step flow ----
 
-  // Step 1: "Pay" button clicked — check wallet or show payment methods
-  const handlePayClick = async (student) => {
+  // Step 1: "Pay" button clicked — always open payment methods dialog immediately
+  const handlePayClick = (student) => {
     const studentId = student.student_id || student.sync_id;
     const books = getStudentBooks(studentId);
     const orderData = getStudentOrder(studentId);
@@ -537,32 +538,45 @@ export default function SchoolTextbooksView({
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
-    const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
-
-    // Refresh wallet balance
-    let freshBalance = walletBalance || 0;
-    try {
-      const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
-      freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
-      setWalletBalance(freshBalance);
-    } catch {}
-
-    if ((freshBalance + 0.01) >= total) {
-      // Wallet has enough — mark payment as wallet and unlock Send Order
-      setPaymentAcknowledged(prev => ({ ...prev, [studentId]: 'wallet' }));
-      toast.success(lang === 'es' ? 'Saldo suficiente. Ahora puedes enviar el pedido.' : 'Sufficient balance. You can now send the order.');
-    } else {
-      // Show payment methods dialog
-      setShowPayMethodsFor(studentId);
-    }
+    // Always open the payment methods dialog — wallet balance check happens inside
+    setShowPayMethodsFor(studentId);
   };
 
   // Step 1b: User selects a payment method from the dialog
-  const handleSelectPaymentMethod = (methodKey) => {
+  const handleSelectPaymentMethod = async (methodKey) => {
     if (methodKey === 'wallet') {
-      // Open deposit flow to top up wallet
-      setShowPayMethodsFor(null);
-      setDepositOpen(true);
+      // Check wallet balance first
+      const studentId = showPayMethodsFor;
+      const books = getStudentBooks(studentId);
+      const orderData = getStudentOrder(studentId);
+      const items = orderData?.items || [];
+      const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+      const selectedList = availableItems.filter(i => books[i.book_id]);
+      const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
+
+      setPayLoading(true);
+      try {
+        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+        const freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+        setWalletBalance(freshBalance);
+
+        if ((freshBalance + 0.01) >= total) {
+          // Balance sufficient — acknowledge wallet payment and unlock Send Order
+          setShowPayMethodsFor(null);
+          setPaymentAcknowledged(prev => ({ ...prev, [studentId]: 'wallet' }));
+          toast.success(lang === 'es' ? 'Saldo suficiente. Ahora puedes enviar el pedido.' : 'Sufficient balance. You can now send the order.');
+        } else {
+          // Balance insufficient — open deposit flow to top up
+          setShowPayMethodsFor(null);
+          setDepositOpen(true);
+        }
+      } catch {
+        // Wallet check failed — open deposit flow
+        setShowPayMethodsFor(null);
+        setDepositOpen(true);
+      } finally {
+        setPayLoading(false);
+      }
     } else {
       // Show method detail (cash instructions or bank transfer details)
       setShowMethodDetail(methodKey);
@@ -1017,7 +1031,7 @@ export default function SchoolTextbooksView({
                                   disabled={submitting || selectedList.length === 0}
                                   variant="outline"
                                   size="sm"
-                                  className="gap-1.5 border-purple-300 text-purple-700 hover:bg-purple-50 shrink-0"
+                                  className="gap-1.5 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/30 shrink-0 active:bg-purple-100"
                                   data-testid={`pay-btn-${studentId}`}
                                 >
                                   <Wallet className="h-3.5 w-3.5" />
@@ -1179,18 +1193,24 @@ export default function SchoolTextbooksView({
                     </button>
                   );
                 })}
-              {/* Wallet top-up option */}
+              {/* Wallet payment option — checks balance when selected */}
               <button
                 onClick={() => handleSelectPaymentMethod('wallet')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer transition-all text-left"
+                disabled={payLoading}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                  payLoading ? 'opacity-70 cursor-wait' : 'border-border hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer'
+                }`}
                 data-testid="pay-method-wallet-topup"
               >
                 <div className="p-2 rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30">
-                  <Wallet className="h-4 w-4" />
+                  {payLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{lang === 'es' ? 'Recargar Billetera' : 'Top Up Wallet'}</p>
-                  <p className="text-[10px] text-muted-foreground">{lang === 'es' ? 'Depositar fondos a tu billetera' : 'Deposit funds to your wallet'}</p>
+                  <p className="text-sm font-medium">
+                    {lang === 'es' ? 'Billetera' : 'Wallet'}
+                    {walletBalance !== null && <span className="text-xs text-muted-foreground ml-1.5">(${(walletBalance ?? 0).toFixed(2)})</span>}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">{payLoading ? (lang === 'es' ? 'Verificando saldo...' : 'Checking balance...') : (lang === 'es' ? 'Pagar desde el saldo de tu billetera' : 'Pay from your wallet balance')}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
               </button>
