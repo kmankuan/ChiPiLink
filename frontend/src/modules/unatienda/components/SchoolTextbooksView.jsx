@@ -468,19 +468,8 @@ export default function SchoolTextbooksView({
     refreshWallet();
   }, [refreshWallet]);
 
-  // Real-time wallet balance updates via Ably
-  useEffect(() => {
-    if (!user?.user_id) return;
-    try {
-      const Ably = require('ably');
-      const ably = new Ably.Realtime({ authUrl: `${API_URL}/api/ably/auth?clientId=wallet_${user.user_id}`, authMethod: 'GET' });
-      const channel = ably.channels.get(`wallet:${user.user_id}`);
-      channel.subscribe('balance_updated', () => { refreshWallet(); });
-      return () => { channel.unsubscribe(); ably.close(); };
-    } catch (e) {
-      // Ably not available — fall back to manual refresh
-    }
-  }, [user?.user_id, refreshWallet]);
+  // Real-time wallet balance updates — rely on polling via walletPolling state
+  // (Ably real-time removed to avoid "Connection closed" teardown errors in this component)
 
 
   // Poll wallet balance after deposit (auto-detect admin approval)

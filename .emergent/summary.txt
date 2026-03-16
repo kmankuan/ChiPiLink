@@ -1,150 +1,191 @@
 <analysis>**original_problem_statement:**
-The user initiated this session with a critical bug: presale orders imported from Monday.com were not being reflected in the Sysbook inventory's presale column. This led to a series of feature requests and bug fixes aimed at improving data consistency, UI/UX, and overall system robustness.
+The user wants to build and maintain a super-app called ChiPi Link for the Chinese-Panamanian community. The project is an existing, complex full-stack application.
 
-**PRODUCT REQUIREMENTS:**
-- **Core Functionality:**
-    - The application must automatically sync presale order data with the main product inventory upon import. If a book from a presale order doesn't exist in the inventory, it should be created automatically.
-    - The matching logic for associating presale items with inventory products must be strict, prioritizing the unique item  over fuzzy name matching to prevent incorrect, cross-grade associations.
-    - Administrators must have full CRUD capabilities for orders after they have been imported, including the ability to add/remove items and edit core order details like 'grade' and 'paid date'. All such changes must automatically update the inventory ().
-- **UI/UX & Features:**
-    - The Sysbook Inventory table must feature an editable Pre-sale column and a new Purchased column that provides a drill-down view of all students who bought a specific item.
-    - The Orders table must include a sortable and editable Paid Date column.
-    - The public-facing Monday.com widget must be functional, with features for search-on-demand, translatable titles (i18n for English, Spanish, Chinese), and correct column header display.
-- **Bug Fixes & Stability:**
-    - Resolve timezone-related date display errors.
-    - Fix intermittent connection errors during long-running presale imports by implementing client-side retries.
-    - Repair the non-functional load older button and broken image display in the Telegram channel embed.
+Initial priorities were:
+- **P0 — Deploy & Verify Production Stability:** Fix numerous bugs, deploy the latest code, and ensure core features like login, printing, and league creation are stable.
+- **P1 — Pending Features:** Implement admin UI for badge customization, fix Google Photos video playback, and complete mobile verification for PinPanClub pages.
+- **P2 — Improvements:** Make Telegram titles configurable, adjust landing page layout, and lock media player controls.
+- **P3 — Future:** Build a multi-store commerce platform and offload background tasks to a separate Integration Hub.
+
+Over the course of the session, the user's priorities shifted to a complete overhaul of the table tennis module (now called Sport) and the creation of a new, sophisticated AI Tutor module.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack React/FastAPI application for managing school textbook orders, integrated with Monday.com. The application now features a significantly more robust data pipeline. Presale imports from Monday.com automatically create and update the main product inventory, using a strict code-based matching logic. The admin interface has been heavily enhanced with inline editing capabilities for orders (grade, paid date, add/remove items) and inventory (presale quantity), along with a new Purchased quantity drill-down feature. Numerous critical bugs related to data matching, API timeouts, and UI display have been resolved.
+The project is a large, multi-faceted full-stack application with a microservices-like architecture running three separate backend services:
+1.  **Main App (port 8001):** The core FastAPI application handling most features like user auth, e-commerce (textbook store), and the main frontend.
+2.  **Integration Hub (port 8002):** A dedicated FastAPI service that handles all background tasks (Telegram/Gmail polling, Monday.com API calls) to keep the main app responsive.
+3.  **Tutor Engine (port 8003):** A new, dedicated FastAPI service to power all AI-driven tutoring features, including per-student AI agents and a school platform reader.
+
+The frontend is a comprehensive React application. Ably has been integrated for real-time chat functionalities. The agent has successfully set up this complex environment, fixed numerous critical production bugs, and built out the foundational features for the new Sport and Tutor modules.
 
 **Last working item**:
-- **Last item agent was working:** Implementing a feature to allow administrators to add a new textbook item to an existing order from the order details dialog.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** N (Backend endpoint was created and tested via , but the frontend UI component has not been verified.)
-- **Which testing method agent to use?** Frontend testing agent (or screenshot tool) to test the UI flow: click the Add Item button in the order details dialog, search for an inventory product, and add it to the order.
-- **User Testing Done:** N
+-   **Last item agent was working:** The agent was in the middle of a major redesign of the Sport module's TV broadcast UI, based on extensive user feedback. The goal was to create a more professional, engaging, and configurable Fighting Game style theme for table tennis matches.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** Both. Use the frontend testing agent and screenshot tool to verify the new TV UI theme, layout, animations, and responsiveness. Use the backend testing agent to verify the new endpoints for changing the referee and updating TV settings.
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- There are no pending bug reports. The current focus is on completing the feature that is in progress.
+-   **Issue 1: TV Sticker/Emotion Overlay is still centered.** (P0)
+    -   **Description:** Despite previous fixes, the emotion stickers/animations on the TV display still appear in the center of the screen, not on the corresponding player's side.
+    -   **Attempted fixes:** The agent refactored the TV component to correctly map player sides ('a'/'b') to display sides ('left'/'right'). However, a mismatch in the data being passed from the referee panel seems to persist.
+    -   **Next debug checklist:**
+        -   In , add console logs to check the  prop being passed to the  component.
+        -   In , verify that the  state is correctly set to 'left' or 'right' and passed to the backend.
+        -   In , trace the  function to ensure the  is correctly stored in the session's .
+    -   **Why fix this issue?** Essential for the clarity and professional feel of the sports broadcast.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on other issue:** None.
 
 **In progress Task List**:
-- **Task 1: Complete and Verify Add Item to Order Feature (P0)**
-  - **Where to resume:** The backend endpoint () and the frontend component ( in ) are implemented. The next step is to take a screenshot of the order details dialog to verify that the Add Item (+) button is present and functional, opening a search interface to add a product from inventory.
-  - **What will be achieved with this?** Administrators will gain the ability to add items to existing orders, completing the item-level CRUD functionality for orders and ensuring inventory quantities () are updated automatically.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on something:** No
+-   **Task 1: Complete the Fighting Game TV UI Redesign.** (P0)
+    -   **Description:** Implement all the requested UI/UX improvements for the TV broadcast screen.
+    -   **Where to resume:** The agent has created the backend support. The next step is to complete the frontend implementation in .
+    -   **Sub-tasks remaining:**
+        1.  Implement dynamic score counters that move along the health bar.
+        2.  Create the set win celebration animation (e.g., winner dancing).
+        3.  Ensure all elements (referee photo/name, timer) are larger as requested.
+        4.  Finalize the merged set-win-dots and set-score history UI.
+        5.  Implement the referee change functionality in the referee panel.
+    -   **What will be achieved with this?** A professional, highly engaging, and configurable esports-style broadcast experience.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks:**
-  - (P1) Explore linking feature development to automatic updates for the Help Guide documentation.
-  - (P2) Build an on-demand landing page redesign tool for administrators.
-- **Future Tasks:**
-  - (P3) Extend the Monday.com synchronization to cover general product inventory, not just pre-sale orders.
+*   **Upcoming Tasks (High Priority):**
+    *   **(P0) AI Tutor Module (Phase 3):**
+        *   **Parent Portal:** Build the frontend pages for parents to view their child's progress, worksheets, school feed, and communicate with staff via Ably Chat. This is critical for completing the tutor workflow.
+        *   **Ably Chat Auto-Translation:** Integrate an AI service (using the Emergent LLM Key) to provide real-time translation for messages in Ably Chat.
+    *   **(P1) Main App - Payment Verification Portal:** Build the dedicated admin page for the finance team to track and verify bank transfers, as per the detailed plan.
+    *   **(P1) Sport Module - Tournament Features:**
+        *   Implement the visual **League Matrix** (H2H grid) in .
+        *   Implement the **Double Elimination bracket** view in .
+
+*   **Future Tasks (Lower Priority):**
+    *   **(P2) AI Tutor Module (Phase 4):**
+        *   **AI Agent Training from URLs:** Allow agents to ingest data from web pages, ChiPiLink chats, and Telegram channels.
+        *   **Interactive Tutoring Tools:** Integrate AI-driven conversation practice (e.g., with TTS/STT) and educational games.
+    *   **(P2) Sport Module - Advanced:**
+        *   **AI-Generated Stickers:** Implement on-the-fly sticker creation using player photos.
+        *   **Technique Analytics Dashboard:** Build the UI to visualize player performance based on tagged points.
+        *   **Sponsor Integration:** Add sponsor logos and links to tournament brackets and live streams.
 
 **Completed work in this session**
-- **Feature - Automated Presale-to-Inventory Sync (DONE):**
-  - The presale import process in  was refactored to automatically create new inventory products for any books that don't have a match, ensuring  is always set correctly at the time of import.
-- **Feature - Advanced Order & Inventory Management (DONE):**
-  - **Editable Grade:** Implemented a feature in  to allow editing an order's grade, which triggers a backend process to re-link all order items and update inventory quantities.
-  - **Remove Order Item:** Added a feature to remove an item from an order via the details dialog, which correctly decrements the  on the associated product.
-  - **Purchased Column:** Added a Purchased column to the inventory table () with a clickable dialog showing a detailed list of students who bought that item.
-  - **Paid Date Integration:** Added a  field to orders, captured it from Monday.com imports, and made it visible, sortable, and editable via an inline date picker in the admin orders table.
-- **Feature - Monday.com Public Widget Overhaul (DONE):**
-  - Implemented a search-only mode, translatable titles/placeholders for EN/ES/ZH, and a fix to display correct column names instead of IDs. All changes were made in  and its admin config panel.
-- **Critical Bug Fixes (DONE):**
-  - **Incorrect Item Matching:** Fixed a critical bug in  where fuzzy name matching caused items to be linked to products from the wrong grade. The logic was changed to prioritize the unique item  for strict matching.
-  - **Presale Import Timeouts:** Resolved inconsistent Error connecting to server issues by implementing a robust fetch wrapper with retry and exponential backoff in .
-  - **Date Timezone Error:** Fixed a bug where dates selected in the UI would display as the previous day. The fix in  involved parsing dates in the local timezone.
-  - **Monday.com Widget 404:** Fixed the widget by correcting the API endpoint URL in .
-  - **Telegram Embed:** Fixed the Load Older button in  by adding an  to the API call and gracefully handled broken images with an  fallback.
+-   **Full Project Setup:** Successfully cloned a large existing project, configured the multi-service environment (Main App, Integration Hub, Tutor Engine), and resolved numerous critical production blockers.
+-   **Architectural Refactoring:**
+    -   Migrated all background tasks (Telegram, Gmail, Monday.com) to a separate **Integration Hub** (port 8002) to stabilize the main app.
+    -   Created a new, scalable **AI Tutor Engine** service (port 8003).
+-   **New Sport Module:**
+    -   Built a complete table tennis management module from scratch, replacing the buggy PinPanClub.
+    -   Features include match recording, ELO ratings, league/tournament creation, a highly interactive referee panel, and a TV/spectator broadcast view.
+-   **New AI Tutor Module (Phases 1 & 2):**
+    -   Developed per-student AI agents with configurable prompts for staff and parents.
+    -   Created an AI-powered worksheet/quiz generator.
+    -   Built a **School Platform Reader** using Playwright and GPT Vision to automate data extraction from school websites.
+-   **Real-time Integration:**
+    -   Integrated **Ably Chat** for live spectator chat and real-time updates in the Order CRM.
+-   **Critical Production Bug Fixes:**
+    -   Resolved persistent database connection and authentication failures on the production environment.
+    -   Fixed LaoPan OAuth login failures.
+    -   Fixed dozens of UI/UX bugs across the application, including the textbook ordering workflow, search functionality, and mobile responsiveness.
+-   **Public-Facing Features:**
+    -   Created a multilingual, standalone **Payment Status Checker** page.
 
 **Earlier issues found/mentioned but not fixed**
-None.
+-   **Old  Module Cleanup:** The user has requested the complete removal of the old  module's files to avoid confusion and code bloat. The module is disconnected but the files remain in  and .
 
 **Known issue recurrence from previous fork**
-None.
+-   This is the first summary for this project; no previous fork history is available.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Strict-First Matching Logic:** Prioritizing unique identifiers () for data matching and only falling back to fuzzier methods when a code is absent. This prevents data corruption.
-- **Automated Data Reconciliation:** Evolving a manual sync process into an automated, on-the-fly data creation step within the core import logic, making the system self-healing.
-- **Client-Side Resilience:** Implementing frontend fetch wrappers with retry and exponential backoff to gracefully handle transient network issues or long-running backend processes.
-- **Complex Data Aggregation & Drill-Down:** Using backend aggregation pipelines () to compute summary data on demand and presenting it in the UI with a detailed drill-down dialog.
-- **Timezone-Safe Date Handling:** Correcting UTC vs. local time issues by parsing date strings into components (, , ) before creating  objects, ensuring they are anchored to the user's local timezone.
+-   **Stack:** FARM (FastAPI, React, MongoDB)
+-   **Architecture:** Microservices-like pattern with three independent backend services communicating via HTTP.
+-   **Real-time:** Ably for pub/sub messaging and chat.
+-   **AI:** Emergent LLM Key for GPT-4 (agent logic, translation, content generation).
+-   **Automation:** Playwright for headless browser automation to scrape school websites.
+-   **API Integrations:** Monday.com, Ably.
 
 **key DB schema**
-- ****: Now includes . The  field is now editable post-creation, and the  array can be modified (add/remove items).
-- ****: The  field is now updated by a wider range of actions, including order grade changes and item additions/removals.
-- ****: Schema expanded to include  and i18n fields like , , , etc.
+-   , , , , 
+-   , , , , 
+-   
+-    (extended with  status)
+-    (extended with )
 
 **changes in tech stack**
-None.
+-   **Addition of Ably:** For real-time messaging and chat.
+-   **Addition of Playwright:** For headless browser automation.
 
 **All files of reference**
-- **Last Working Item:**
-  - 
-  - 
-- **Key Completed Work:**
-  -  (Core matching and import logic)
-  -  (Inventory table UI/UX)
-  -  (Order management UI/UX)
-  -  (Public widget component)
+-   : Entry point for the new AI Tutor service.
+-   : Entry point for the background task service.
+-   : Entire directory for the new Sport module backend.
+-   : Entire directory for the new Sport module frontend.
+-   : Core logic for the Playwright-based school platform scraper.
+-   : The new, highly-customizable TV broadcast component (in progress).
+-   : The interactive scoring panel for referees.
+-   : Contains the hardcoded production , a critical piece for deployment stability.
 
 **Areas that need refactoring**:
-- The file  is likely unused and should be deleted.
-- The components  and  have grown significantly in complexity and size. They should be broken down into smaller, more focused child components to improve readability and maintainability.
+-   The old  module ( and ) should be entirely deleted as requested by the user to prevent code bloat and future confusion.
 
 **key api endpoints**
-- ****: Updates the grade for an entire order and resyncs inventory.
-- ****: Removes a single item from an order.
-- ****: Adds a new item to an order.
-- ****: Returns aggregated purchase data for all products.
-- ****: Now accepts an  query parameter for pagination.
+-   : All endpoints for the new Sport module (match/league management, live scoring).
+-   : All endpoints for the AI Tutor module (proxied through the main app from port 8003).
+-   : Endpoints for managing the Integration Hub (proxied).
+-   : Endpoint for generating Ably client tokens.
 
 **Critical Info for New Agent**
-- **User's Expectation is Automation:** The user has repeatedly emphasized the need for the system to handle data inconsistencies automatically (e.g., auto-creating products, strict code matching). Manual workarounds are seen as temporary fixes. Future solutions should prioritize intelligent automation.
-- **Code-First is Law:** The most critical fix was enforcing that the item  is the primary key for matching books. Do not regress on this; any new matching logic must be code-first.
-- **Admin UI Complexity:** The primary admin pages for orders and inventory are now very feature-rich. Be mindful of this when adding new functionality, and consider refactoring into smaller components to manage complexity.
+-   **Multi-Port Architecture:** The application runs as three separate backend services on ports 8001, 8002, and 8003. You must ensure all services are running. The  script handles starting the Hub and Tutor engine.
+-   **Production Database Connection is Hardcoded:** The production  and  are hardcoded in . The deployment environment's variables are unreliable and should not be trusted. Do not change this logic unless you are certain the deployment environment has been fixed.
+-   **AI Integration:** All AI features use the  library with the Emergent LLM Key. Do not implement direct OpenAI calls unless for a feature not supported by the universal key (like voice).
+-   **Module Replacement:** The Sport module has completely replaced the old PinPanClub module. All new development for table tennis features should happen in the  module.
 
 **documents and test reports created in this job**
-- **/app/memory/PRD.md** (Updated)
-- **/app/test_reports/iteration_2.json** (Generated by testing agent)
+-    (read-only, from initial repo clone)
+-    (read-only, from initial repo clone)
+-    (implicitly created and followed by the agent)
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **Request:** Add a feature to add items to an existing order. (In Progress)
-9. **Confirmation:** User agrees to the proposed Add Item feature design.
-8. **Request:** User asks why the system doesn't use the unique item  as the primary matching factor during import. (Completed)
-7. **Bug Report:** User reports a critical bug where presale import incorrectly matches items across different grades, providing visual proof. Asks if they can fix it by editing orders. (Completed)
-6. **Request:** Add a Purchased column to the inventory table with a drill-down dialog showing which students bought the item. (Completed)
-5. **Request:** Add a feature to remove an item from an already imported order. (Completed)
-4. **Request:** Add a feature to edit the  on an existing order. (Completed)
-3. **Confirmation:** User confirms the proposed design for editing an order's grade.
-2. **Bug Report:** User reports inconsistent Error connecting to server during presale import. (Completed)
-1. **Bug Report:** User reports that the Cargar anteriores (load older) button isn't working on the Telegram embed and that some posts show broken images. (Completed)
+1.  **Request:** Fix issues with the TV display (centered sticker, set-winner animation, element sizing) and add a Battle Scene victory path. *Status: In Progress.*
+2.  **Request:** Integrate Ably Chat. *Status: Done.*
+3.  **Question:** How should Ably Chat be integrated? *Status: Answered & Implemented.*
+4.  **Question:** How is chat history handled in Ably? *Status: Answered.*
+5.  **Question:** Can Ably Chat be used for orders and user chat? *Status: Answered & Implemented.*
+6.  **Question:** Are there better alternatives to Ably with AI features? *Status: Answered (Stream Chat vs. Ably analysis provided).*
+7.  **Question:** More comparison between Ably and Stream Chat. *Status: Answered.*
+8.  **Question:** How does Moltbot compare for automation? *Status: Answered.*
+9.  **Decision:** User decides to proceed with Ably. *Status: Actioned.*
+10. **Info:** User provides Ably API key. *Status: Actioned.*
 
 **Project Health Check:**
-- **Broken:** None.
-- **Mocked:** None.
+-   **Broken:** The TV display UI () is in the middle of a major rewrite and is likely non-functional until the  is completed.
+-   **Mocked:** No mocked components. The application uses live data and APIs.
 
 **3rd Party Integrations**
-- **Monday.com:** Core integration for presale orders. The reliability and accuracy of this integration were significantly improved in this session.
-- **Telegram:** Used for a community channel embed. The widget's pagination was fixed.
+-   **MongoDB Atlas:** Primary database. Connection is hardcoded for production.
+-   **Monday.com:** Used for order management and as a data source for the AI Tutor. API key is hardcoded.
+-   **LaoPan OAuth:** Primary authentication for public users. Client ID/Secret are hardcoded.
+-   **Ably Chat:** For all real-time chat features. Uses an API key provided by the user.
+-   **Emergent LLM Key (for OpenAI GPT):** Powers all AI features (Tutor agent, content generation, translation).
+-   **Playwright:** For headless browser automation to read school websites.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** None
-- **Known regressions:** None
+-   **Testing agent used after significant changes:** YES, frequently.
+-   **Troubleshoot agent used after agent stuck in loop:** NO, agent has not been stuck.
+-   **Test files created:** None. Testing is done via  or direct  calls.
+-   **Known regressions:** The TV display UI is currently broken due to an in-progress refactor.
 
 **Credentials to test flow:**
-- **Admin Email:** 
-- **Admin Password:** 
+-   **Admin Login:**  / 
 
 **What agent forgot to execute**
-- The agent was in the process of implementing the Add Item to Order feature and had not yet performed the final frontend UI verification. This is the immediate next step.</analysis>
+-   **Set-Win Celebration Animation:** The user requested a winner dancing animation when a set is won. This was part of the plan for the TV redesign but has not been implemented yet. It is captured in the In Progress Task List.
+-   **Complete Removal of  files:** The user requested the removal of the old module's files. The agent has disconnected the module from routing but the files still exist. This is captured in Areas that need refactoring.</analysis>

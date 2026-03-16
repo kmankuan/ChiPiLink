@@ -1,26 +1,30 @@
 [
   {
-    "content": "Fix 1: Order with 'awaiting_payment' status",
-    "status": "completed"
+    "content": "1. Fix emotion sticker positioning (player side, not center)",
+    "status": "in_progress"
   },
   {
-    "content": "Fix 2: Order chat on waiting payment orders",
-    "status": "completed"
+    "content": "2. Set dots → Stars above player photos",
+    "status": "pending"
   },
   {
-    "content": "Fix 3: Top-up request approval fix (target user resolution)",
-    "status": "completed"
+    "content": "3. Score counters dynamic following HP bar position",
+    "status": "pending"
   },
   {
-    "content": "Fix 4: Real-time wallet updates via Ably",
-    "status": "completed"
+    "content": "4. Set win celebration explosion + configurable message",
+    "status": "pending"
   },
   {
-    "content": "Fix 5: Guardian name change — update not duplicate",
-    "status": "completed"
+    "content": "5. HP center → configurable gif/icon/photo",
+    "status": "pending"
   },
   {
-    "content": "Fix 6: Return to page after LaoPan OAuth login",
-    "status": "completed"
+    "content": "6. Bigger referee name+photo, bigger timer",
+    "status": "pending"
+  },
+  {
+    "content": "7. Change referee mid-match ability",
+    "status": "pending"
   }
 ]

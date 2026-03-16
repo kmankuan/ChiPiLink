@@ -13,7 +13,7 @@ from datetime import datetime
 class IntegrationHubMigrationTester:
     def __init__(self):
         # Use production URLs from frontend/.env
-        self.main_app_url = "https://chipi-main.preview.emergentagent.com"
+        self.main_app_url = "https://tutor-engine-ui.preview.emergentagent.com"
         self.hub_url = "http://localhost:8002"  # Integration Hub
         self.tests_run = 0
         self.tests_passed = 0

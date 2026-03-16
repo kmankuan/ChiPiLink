@@ -97,8 +97,19 @@ DEFAULTS = {
         "show_set_history": True,
         "show_combo_counter": True,
         "hp_bar_style": "gradient",  # gradient | solid | neon
-        "score_size": "xl",  # md | lg | xl | 2xl
-        "photo_size": "lg",  # sm | md | lg | xl
+        "score_size": "xl",
+        "photo_size": "lg",
+        "center_icon_url": "",  # GIF/image between HP bars. Empty = 🏓 emoji
+        "set_win_messages": {
+            "en": "Congratulations {winner}! This set is yours!",
+            "es": "¡Felicidades {winner}! ¡Este set es tuyo!",
+            "zh": "恭喜 {winner}！这局是你的！",
+        },
+        "match_win_messages": {
+            "en": "🏆 {winner} WINS THE MATCH!",
+            "es": "🏆 ¡{winner} GANA EL PARTIDO!",
+            "zh": "🏆 {winner} 赢得比赛！",
+        },
         "layout": {
             "header": "top",  # top | hidden
             "score": "center",  # center | top

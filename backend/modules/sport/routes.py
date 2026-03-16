@@ -246,6 +246,26 @@ async def send_effect(session_id: str, data: dict, user: dict = Depends(get_curr
     return {"success": True}
 
 
+@router.put("/live/{session_id}/referee")
+async def change_referee(session_id: str, data: dict, user: dict = Depends(get_current_user)):
+    """Change referee mid-match."""
+    from .services import get_or_create_player
+    name = data.get("name", "").strip()
+    if not name:
+        raise HTTPException(400, "Referee name required")
+    ref = await get_or_create_player(name)
+    if "referee" not in ref.get("roles", []):
+        await db[services.C_PLAYERS].update_one({"player_id": ref["player_id"]}, {"$addToSet": {"roles": "referee"}})
+    photo = data.get("photo_url", "") or ref.get("avatar_url", "")
+    await db[services.C_LIVE].update_one(
+        {"session_id": session_id},
+        {"$set": {"referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": photo}}}
+    )
+    await _broadcast(session_id, {"type": "state_refresh"})
+    return {"success": True, "referee": ref["nickname"]}
+
+
+
 # ═══ TV BROADCAST CONTROL ═══
 
 @router.post("/live/{session_id}/broadcast")
