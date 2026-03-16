@@ -29,6 +29,7 @@ export default function StudentDetail() {
   const [newUrl, setNewUrl] = useState('');
   const [newNote, setNewNote] = useState('');
   const [rebuilding, setRebuilding] = useState(false);
+  const [readingSchool, setReadingSchool] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = () => {
@@ -51,6 +52,24 @@ export default function StudentDetail() {
     const r = await fetch(`${API}/api/tutor/students/${studentId}/agent/rebuild`, { method: 'POST', headers });
     if (r.ok) { const d = await r.json(); toast.success(`Prompt rebuilt: ${d.prompt_tokens} tokens, ${d.knowledge_items} sources`); fetchAll(); }
     setRebuilding(false);
+  };
+
+  const readSchool = async () => {
+    setReadingSchool(true);
+    try {
+      const r = await fetch(`${API}/api/tutor/students/${studentId}/read-school`, { method: 'POST', headers, body: JSON.stringify({}) });
+      if (r.ok) {
+        const d = await r.json();
+        const itemCount = d.items?.length || 0;
+        const errors = d.errors?.length || 0;
+        toast.success(`School read: ${itemCount} items found${errors ? `, ${errors} errors` : ''}`);
+        fetchAll();
+      } else {
+        const e = await r.json();
+        toast.error(e.detail || 'Failed to read school platform');
+      }
+    } catch (e) { toast.error('Error reading school'); }
+    setReadingSchool(false);
   };
 
   const addUrl = async () => {
@@ -93,8 +112,16 @@ export default function StudentDetail() {
           <Button size="sm" className="flex-1 bg-green-600 text-white" onClick={() => navigate(`/tutor/student/${studentId}/chat`)}>
             <Bot className="h-3.5 w-3.5 mr-1" /> Chat with Agent
           </Button>
+          <Button size="sm" variant="outline" className="flex-1" onClick={() => navigate(`/tutor/student/${studentId}/worksheets`)}>
+            <BookOpen className="h-3.5 w-3.5 mr-1" /> Worksheets
+          </Button>
+        </div>
+        <div className="flex gap-2 mb-4">
           <Button size="sm" variant="outline" className="flex-1" onClick={rebuildPrompt} disabled={rebuilding}>
             <RefreshCw className={`h-3.5 w-3.5 mr-1 ${rebuilding ? 'animate-spin' : ''}`} /> Rebuild Agent
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1" onClick={readSchool} disabled={readingSchool}>
+            <Globe className={`h-3.5 w-3.5 mr-1 ${readingSchool ? 'animate-spin' : ''}`} /> {readingSchool ? 'Reading...' : 'Read School'}
           </Button>
         </div>
 

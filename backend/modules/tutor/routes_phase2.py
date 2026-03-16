@@ -86,6 +86,30 @@ async def student_sessions(student_id: str, user: dict = Depends(get_current_use
 
 # ═══ SCHOOL FEED ═══
 
+
+# ═══ SCHOOL READER ═══
+
+@router.post("/students/{student_id}/read-school")
+async def read_school(student_id: str, data: dict = {}, user: dict = Depends(get_current_user)):
+    """Trigger school platform read for a student. Optionally pass credentials."""
+    from .school_reader import school_reader
+    try:
+        result = await school_reader.read_platform(student_id, data.get("credentials"))
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@router.post("/read-url")
+async def read_url(data: dict, user: dict = Depends(get_current_user)):
+    """Read any URL with AI vision and extract educational content."""
+    from .school_reader import school_reader
+    url = data.get("url", "")
+    student_id = data.get("student_id")
+    instruction = data.get("instruction")
+    if not url: raise HTTPException(400, "url required")
+    return await school_reader.read_url(url, student_id, instruction)
+
+
 @router.post("/school-feed")
 async def add_feed_item(data: dict, user: dict = Depends(get_current_user)):
     return await svc2.add_school_feed_item(data)
