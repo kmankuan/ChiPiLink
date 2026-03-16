@@ -14,7 +14,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useCrmNotifications } from '@/hooks/useCrmNotifications';
 import {
   Home, ShoppingBag, ClipboardList, Bell, User, LogIn,
-  Sun, Moon, Settings, LogOut, Trophy
+  Sun, Moon, Settings, LogOut, Trophy, GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -146,9 +146,10 @@ export default function BottomNav() {
                 </div>
                 <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2"><User className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/orders" className="flex items-center gap-2"><ClipboardList className="h-4 w-4" />{t('nav.orders', 'Orders')}</Link></DropdownMenuItem>
-                {user?.tiene_membresia_activa && (
+                {user?.tiene_membresia_activa && (<>
                   <DropdownMenuItem asChild><Link to="/sport" className="flex items-center gap-2"><Trophy className="h-4 w-4" />Sport</Link></DropdownMenuItem>
-                )}
+                  <DropdownMenuItem asChild><Link to="/tutor" className="flex items-center gap-2"><GraduationCap className="h-4 w-4" />Tutor</Link></DropdownMenuItem>
+                </>)}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={toggleTheme} className="flex items-center gap-2">
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

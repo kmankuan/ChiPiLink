@@ -1,30 +1,30 @@
 [
   {
-    "content": "Tutor Phase 1.1: Backend — Student model, Monday board mapper, agent config",
+    "content": "Tutor Phase 1.1: Backend — models, services, routes",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.2: Backend — Agent engine (prompt builder, knowledge sources, chat)",
+    "content": "Tutor Phase 1.2: Backend — AI agent engine",
     "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.3: Backend — Tutor engine on port 8003 (defer to Phase 2)",
-    "status": "pending"
+    "content": "Tutor Phase 1.3: Port 8003 setup + proxy",
+    "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.4: Frontend — Student list, board mapper config, agent setup",
-    "status": "pending"
+    "content": "Tutor Phase 1.4: Frontend — Student list + Board mapper config",
+    "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.5: Frontend — Agent chat interface (3 modes: staff/student/parent)",
-    "status": "pending"
+    "content": "Tutor Phase 1.5: Frontend — Agent setup + chat interface (3 modes)",
+    "status": "completed"
   },
   {
     "content": "Tutor Phase 1.6: Frontend — Knowledge source manager",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Tutor Phase 1.7: Register routes + test",
+    "content": "Tutor Phase 1.7: Add Tutor to navigation + App.js routes",
     "status": "completed"
   }
 ]

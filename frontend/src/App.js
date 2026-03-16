@@ -74,6 +74,12 @@ import SportAdmin from '@/modules/sport/SportAdmin';
 import PlayerProfile from '@/modules/sport/PlayerProfile';
 import HallOfFame from '@/modules/sport/HallOfFame';
 
+// Tutor Module
+import TutorDashboard from '@/modules/tutor/TutorDashboard';
+import StudentDetail from '@/modules/tutor/StudentDetail';
+import AgentChat from '@/modules/tutor/AgentChat';
+import BoardMapper from '@/modules/tutor/BoardMapper';
+
 
 // Rapid Pin Module
 import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
@@ -275,6 +281,13 @@ function AppRouter() {
       <Route path="/sport/admin" element={<><Header /><SportAdmin /></>} />
       <Route path="/sport/player/:playerId" element={<><Header /><PlayerProfile /></>} />
       <Route path="/sport/hall-of-fame" element={<><Header /><HallOfFame /></>} />
+
+      {/* Tutor Module */}
+      <Route path="/tutor" element={<><Header /><TutorDashboard /></>} />
+      <Route path="/tutor/student/new" element={<><Header /><StudentDetail /></>} />
+      <Route path="/tutor/student/:studentId" element={<><Header /><StudentDetail /></>} />
+      <Route path="/tutor/student/:studentId/chat" element={<AgentChat />} />
+      <Route path="/tutor/board-mapper" element={<><Header /><BoardMapper /></>} />
 
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}
