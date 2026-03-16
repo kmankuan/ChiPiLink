@@ -663,8 +663,9 @@ class TextbookOrderService(BaseService):
         user_name = user.get("name", "") if user else ""
         user_email = user.get("email", "") if user else ""
 
-        # 6. Wallet payment: charge before creating order
+        # 6. Wallet payment: charge before creating order (skip for awaiting_payment)
         wallet_transaction = None
+        is_awaiting_payment = payment_method == "awaiting_payment"
         if payment_method == "wallet" and total_amount > 0:
             from modules.users.services.wallet_service import wallet_service
             from modules.users.models.wallet_models import Currency
@@ -698,7 +699,8 @@ class TextbookOrderService(BaseService):
                 "year": current_year,
                 "items": order_items,
                 "total_amount": total_amount,
-                "status": OrderStatus.SUBMITTED.value,
+                "status": "awaiting_payment" if is_awaiting_payment else OrderStatus.SUBMITTED.value,
+                "payment_method": payment_method or "wallet",
                 "submitted_at": now,
                 "user_name": user_name,
                 "user_email": user_email,

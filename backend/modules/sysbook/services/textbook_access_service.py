@@ -227,6 +227,13 @@ class TextbookAccessService(BaseService):
         }
         
         full_name = f"{data.first_name} {data.last_name}".strip()
+        
+        # Check for existing student by this user with same name — UPDATE instead of creating duplicate
+        existing = await self.student_repo.find_by_user_and_name(user_id, full_name)
+        if not existing:
+            # Also check by first_name + last_name + school
+            existing = await self.student_repo.find_by_user_name_school(user_id, data.first_name, data.last_name, data.school_id)
+        
         student_data = {
             "user_id": user_id,
             "first_name": data.first_name,
@@ -243,9 +250,22 @@ class TextbookAccessService(BaseService):
             "enrollments": [enrollment]
         }
         
-        result = await self.student_repo.create(student_data)
-        
-        self.log_info(f"Student record created: {result['student_id']} by user {user_id}")
+        if existing:
+            # Update existing student instead of creating duplicate
+            update_fields = {k: v for k, v in student_data.items() if k != "enrollments"}
+            # Add new enrollment if year not already present
+            existing_years = [e.get("year") for e in existing.get("enrollments", [])]
+            if enrollment["year"] not in existing_years:
+                update_fields["enrollments"] = existing.get("enrollments", []) + [enrollment]
+            else:
+                update_fields["enrollments"] = existing.get("enrollments", [])
+            
+            await self.student_repo.update(existing["student_id"], update_fields)
+            result = await self.student_repo.get_by_id(existing["student_id"])
+            self.log_info(f"Student record UPDATED (not duplicated): {existing['student_id']} by user {user_id}")
+        else:
+            result = await self.student_repo.create(student_data)
+            self.log_info(f"Student record created: {result['student_id']} by user {user_id}")
         
         # Send notification to admins/moderators
         await self._notify_new_request(result, enrollment)

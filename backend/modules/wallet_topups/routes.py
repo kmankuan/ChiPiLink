@@ -122,7 +122,23 @@ async def approve_topup(topup_id: str, data: dict = None, admin: dict = Depends(
 
     # Credit the wallet
     credited = False
-    target_user = item.get("target_user_id")
+    # Allow admin to specify target_user_id during approval if it's missing
+    target_user = data.get("target_user_id") or item.get("target_user_id")
+    if not target_user:
+        # Try to find user by email
+        target_email = item.get("target_user_email", "")
+        if target_email:
+            user_match = await db.auth_users.find_one({"email": target_email}, {"_id": 0, "user_id": 1})
+            if user_match:
+                target_user = user_match["user_id"]
+    
+    if not target_user:
+        logger.warning(f"Topup {topup_id} approved but no target user — wallet NOT credited. Admin must specify target_user_id.")
+        return {"success": True, "topup_id": topup_id, "approved": True, "credited": False, "error": "No target user found. Specify target_user_id to credit wallet."}
+    
+    # Save the resolved target user back to the record
+    if target_user != item.get("target_user_id"):
+        await db[PENDING_COL].update_one({"id": topup_id}, {"$set": {"target_user_id": target_user}})
     if target_user:
         try:
             from modules.users.services.wallet_service import wallet_service
@@ -136,6 +152,12 @@ async def approve_topup(topup_id: str, data: dict = None, admin: dict = Depends(
                 description=f"Bank transfer from {item.get('sender_name', 'unknown')} (auto-detected, approved by {admin.get('email')})"
             )
             credited = True
+            # Publish to Ably for real-time wallet update on frontend
+            try:
+                from modules.ably_integration import publish_to_channel
+                await publish_to_channel(f"wallet:{target_user}", "balance_updated", {"amount": item["amount"], "new_balance": None})
+            except Exception:
+                pass
             # Sync wallet tx to Monday
             try:
                 from modules.users.routes.wallet import _monday_sync_tx

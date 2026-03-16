@@ -99,6 +99,34 @@ class StudentRecordRepository(BaseRepository):
         """Update a student record"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, student_id, data)
+
+    async def find_by_user_and_name(self, user_id: str, full_name: str):
+        """Find existing student by user_id and full name (case-insensitive)."""
+        import re
+        return await self._collection.find_one(
+            {"user_id": user_id, "full_name": {"$regex": f"^{re.escape(full_name)}$", "$options": "i"}, "status": {"$ne": "inactive"}},
+            {"_id": 0}
+        )
+    
+    async def find_by_user_name_school(self, user_id: str, first_name: str, last_name: str, school_id: str):
+        """Find existing student by user_id + first/last name + school."""
+        import re
+        return await self._collection.find_one(
+            {"user_id": user_id, "first_name": {"$regex": f"^{re.escape(first_name)}$", "$options": "i"},
+             "last_name": {"$regex": f"^{re.escape(last_name)}$", "$options": "i"},
+             "school_id": school_id, "status": {"$ne": "inactive"}},
+            {"_id": 0}
+        )
+    
+    async def update(self, student_id: str, data: dict):
+        """Update student fields."""
+        data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        await self._collection.update_one({"student_id": student_id}, {"$set": data})
+        return await self.find_one({"student_id": student_id})
+    
+    async def get_by_id(self, student_id: str):
+        return await self.find_one({"student_id": student_id})
+
     
     async def add_enrollment(self, student_id: str, enrollment: Dict) -> bool:
         """Add a new enrollment year to a student"""

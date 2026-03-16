@@ -123,7 +123,10 @@ export function AuthProvider({ children }) {
   // LaoPan OAuth login
   const loginWithLaoPan = async (redirectAfter = null) => {
     const CACHE_KEY = 'laopan_auth_url';
-    const params = redirectAfter ? `?redirect=${encodeURIComponent(redirectAfter)}` : '';
+    // Save current page so we can return after login
+    const returnTo = redirectAfter || window.location.pathname + window.location.search;
+    try { sessionStorage.setItem('chipi_return_to', returnTo); } catch {}
+    const params = returnTo ? `?redirect=${encodeURIComponent(returnTo)}` : '';
     
     // Try to get auth URL from backend (with retry)
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -170,7 +173,11 @@ export function AuthProvider({ children }) {
       setToken(newToken);
       setUser(userData);
       
-      return { user: userData, redirectAfter: redirect_after };
+      // Determine where to redirect: backend redirect_after > saved return page > home
+      const returnTo = redirect_after || sessionStorage.getItem('chipi_return_to') || '/';
+      try { sessionStorage.removeItem('chipi_return_to'); } catch {}
+      
+      return { user: userData, redirectAfter: returnTo };
     } catch (error) {
       console.error('LaoPan callback error:', error);
       throw error;

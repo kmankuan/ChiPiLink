@@ -1,22 +1,26 @@
 [
   {
-    "content": "Tutor 3.1: Backend — Parent portal endpoints",
+    "content": "Fix 1: Order with 'awaiting_payment' status",
     "status": "completed"
   },
   {
-    "content": "Tutor 3.2: Backend — Parent notification system (auto-translate)",
+    "content": "Fix 2: Order chat on waiting payment orders",
     "status": "completed"
   },
   {
-    "content": "Tutor 3.3: Frontend — Parent portal page",
+    "content": "Fix 3: Top-up request approval fix (target user resolution)",
     "status": "completed"
   },
   {
-    "content": "Tutor 3.4: Frontend — Parent chat via Ably",
+    "content": "Fix 4: Real-time wallet updates via Ably",
     "status": "completed"
   },
   {
-    "content": "Tutor 3.5: Register routes + parent linking",
+    "content": "Fix 5: Guardian name change — update not duplicate",
+    "status": "completed"
+  },
+  {
+    "content": "Fix 6: Return to page after LaoPan OAuth login",
     "status": "completed"
   }
 ]

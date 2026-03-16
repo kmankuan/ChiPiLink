@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -467,6 +468,21 @@ export default function SchoolTextbooksView({
     refreshWallet();
   }, [refreshWallet]);
 
+  // Real-time wallet balance updates via Ably
+  useEffect(() => {
+    if (!user?.user_id) return;
+    try {
+      const Ably = require('ably');
+      const ably = new Ably.Realtime({ authUrl: `${API_URL}/api/ably/auth?clientId=wallet_${user.user_id}`, authMethod: 'GET' });
+      const channel = ably.channels.get(`wallet:${user.user_id}`);
+      channel.subscribe('balance_updated', () => { refreshWallet(); });
+      return () => { channel.unsubscribe(); ably.close(); };
+    } catch (e) {
+      // Ably not available — fall back to manual refresh
+    }
+  }, [user?.user_id, refreshWallet]);
+
+
   // Poll wallet balance after deposit (auto-detect admin approval)
   useEffect(() => {
     if (!walletPolling) return;
@@ -526,14 +542,11 @@ export default function SchoolTextbooksView({
     
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
 
-    const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
-    if (walletBalance !== null && (walletBalance + 0.01) < total) {
-      toast.error(lang === 'es' ? 'Saldo insuficiente en billetera' : 'Insufficient wallet balance');
-      return;
-    }
-
     setSummaryStudent(student);
   };
+
+  const [showPaymentPending, setShowPaymentPending] = useState(false);
+  const [pendingOrderData, setPendingOrderData] = useState(null);
 
   const handleConfirmOrder = () => executeSubmit(async () => {
     if (!summaryStudent) return;
@@ -544,50 +557,69 @@ export default function SchoolTextbooksView({
     const items = orderData?.items || [];
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
+    const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
 
+    // Check wallet balance — if insufficient, show payment pending dialog instead of blocking
+    let freshBalance = walletBalance || 0;
     try {
-      // Refresh wallet balance before submitting to avoid stale data
-      try {
-        const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
-        const freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
-        setWalletBalance(freshBalance);
-        const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
-        if ((freshBalance + 0.01) < total) {
-          toast.error(lang === 'es' ? `Saldo insuficiente. Disponible: $${freshBalance.toFixed(2)}, Requerido: $${total.toFixed(2)}` : `Insufficient balance. Available: $${freshBalance.toFixed(2)}, Required: $${total.toFixed(2)}`);
-          return;
-        }
-      } catch {}
+      const walletRes = await axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } });
+      freshBalance = walletRes.data.wallet?.balance_usd ?? 0;
+      setWalletBalance(freshBalance);
+    } catch {}
 
+    if ((freshBalance + 0.01) < total) {
+      // Show pending payment dialog — let user place order with awaiting_payment status
+      setPendingOrderData({ student, studentId, selectedList, total, balance: freshBalance, shortfall: total - freshBalance });
+      setShowPaymentPending(true);
+      setSummaryStudent(null);
+      return;
+    }
+
+    // Balance sufficient — proceed normally
+    await _submitOrder(studentId, selectedList, 'wallet');
+  });
+
+  const handlePlaceAwaitingPayment = async () => {
+    if (!pendingOrderData) return;
+    setShowPaymentPending(false);
+    await executeSubmit(async () => {
+      await _submitOrder(pendingOrderData.studentId, pendingOrderData.selectedList, 'awaiting_payment');
+    })();
+  };
+
+  const _submitOrder = async (studentId, selectedList, paymentMethod) => {
+    try {
       const res = await axios.post(
         `${API_URL}/api/sysbook/orders/submit`,
         {
           student_id: studentId,
           items: selectedList.map(b => ({ book_id: b.book_id, quantity: 1 })),
-          payment_method: 'wallet',
+          payment_method: paymentMethod,
         },
         { headers: { Authorization: `Bearer ${token}` }, timeout: 30000 }
       );
       // Show warnings if some items failed
       if (res.data?.warnings?.length > 0) {
         toast.warning(`${t.orderSuccess} (${res.data.items_failed} ${lang === 'es' ? 'libro(s) no disponible(s)' : 'book(s) unavailable'})`);
+      } else if (paymentMethod === 'awaiting_payment') {
+        toast.success(lang === 'es' ? 'Pedido creado — pendiente de pago' : lang === 'zh' ? '订单已创建 — 待付款' : 'Order placed — awaiting payment');
       } else {
         toast.success(t.orderSuccess);
       }
       setSelectedBooks(prev => ({ ...prev, [studentId]: {} }));
+      try { sessionStorage.removeItem('chipi_selected_textbooks'); } catch {}
       setSummaryStudent(null);
-      // Refresh wallet balance after payment
       axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
         .catch(() => {});
       await fetchOrderForStudent(studentId);
     } catch (error) {
       toast.error(error.response?.data?.detail || t.orderError);
-      // Refresh wallet balance on error (it may have been charged)
       axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
         .catch(() => {});
     }
-  });
+  };
   
   const handleReorderRequest = async () => {
     if (!reorderItem) return;
@@ -1034,6 +1066,38 @@ export default function SchoolTextbooksView({
             : 'Request sent. Your balance will update automatically when approved.');
         }}
       />
+
+      {/* Awaiting Payment Dialog */}
+      {showPaymentPending && pendingOrderData && (
+        <Dialog open={true} onOpenChange={() => setShowPaymentPending(false)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>{lang === 'es' ? 'Saldo Insuficiente' : lang === 'zh' ? '余额不足' : 'Insufficient Balance'}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="bg-amber-50 p-3 rounded-lg text-sm">
+                <div className="flex justify-between"><span>{lang === 'es' ? 'Total del pedido' : 'Order total'}:</span><span className="font-bold">${pendingOrderData.total?.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>{lang === 'es' ? 'Saldo actual' : 'Current balance'}:</span><span className="font-bold">${pendingOrderData.balance?.toFixed(2)}</span></div>
+                <div className="flex justify-between text-red-600 font-bold"><span>{lang === 'es' ? 'Faltante' : 'Shortfall'}:</span><span>${pendingOrderData.shortfall?.toFixed(2)}</span></div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {lang === 'es' ? 'Puede crear el pedido ahora y pagar después. El pedido quedará en estado "Pendiente de Pago" hasta que su billetera tenga saldo suficiente.' :
+                 lang === 'zh' ? '您可以现在创建订单，稍后付款。订单将保持"待付款"状态，直到您的钱包有足够余额。' :
+                 'You can place the order now and pay later. The order will be in "Awaiting Payment" status until your wallet has sufficient balance.'}
+              </p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowPaymentPending(false)}>
+                {lang === 'es' ? 'Cancelar' : 'Cancel'}
+              </Button>
+              <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={handlePlaceAwaitingPayment}>
+                {lang === 'es' ? 'Crear Pedido (Pagar Después)' : lang === 'zh' ? '创建订单（稍后付款）' : 'Place Order (Pay Later)'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
     </div>
   );
 }
