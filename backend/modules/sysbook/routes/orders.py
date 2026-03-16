@@ -413,10 +413,24 @@ async def pay_order(order_id: str, user: dict = Depends(get_current_user)):
     # Update order status
     await db.store_textbook_orders.update_one(
         {"order_id": order_id},
-        {"$set": {"status": "submitted", "payment_method": "wallet", "paid_at": now, "updated_at": now}}
+        {"$set": {"status": "submitted", "payment_method": "wallet", "paid_at": now, "paid_date": now, "updated_at": now}}
     )
     
-    return {"success": True, "order_id": order_id, "status": "submitted", "paid_amount": total}
+    # Sync paid_date to Monday.com if order has a monday_item_id
+    try:
+        monday_item_id = order.get("monday_item_id") or order.get("monday_item_ids", [None])[0] if order.get("monday_item_ids") else None
+        if monday_item_id:
+            from modules.integrations.monday.core_client import monday_client
+            date_only = now[:10]  # YYYY-MM-DD
+            await monday_client.update_column_values(
+                str(order.get("monday_board_id", "")), str(monday_item_id),
+                {"date_mm10yfj1": {"date": date_only}}
+            )
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Monday paid_date sync failed: {e}")
+    
+    return {"success": True, "order_id": order_id, "status": "submitted", "paid_amount": total, "paid_date": now}
 
 
 @router.post("/{order_id}/cancel")
