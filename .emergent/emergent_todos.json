@@ -1,22 +1,22 @@
 [
   {
-    "content": "Tutor 2.1: Student create form",
+    "content": "Tutor 3.1: Backend — Parent portal endpoints",
     "status": "completed"
   },
   {
-    "content": "Tutor 2.2: AI worksheet/quiz generator",
+    "content": "Tutor 3.2: Backend — Parent notification system (auto-translate)",
     "status": "completed"
   },
   {
-    "content": "Tutor 2.3: Club daily schedule",
+    "content": "Tutor 3.3: Frontend — Parent portal page",
     "status": "completed"
   },
   {
-    "content": "Tutor 2.4: Session tracker (start/stop, notes, performance)",
+    "content": "Tutor 3.4: Frontend — Parent chat via Ably",
     "status": "completed"
   },
   {
-    "content": "Tutor 2.5: School feed (manual entry + auto-translate)",
+    "content": "Tutor 3.5: Register routes + parent linking",
     "status": "completed"
   }
 ]

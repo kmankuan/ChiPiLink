@@ -11,6 +11,8 @@ C_KNOWLEDGE = "tutor_knowledge"
 C_SESSIONS = "tutor_sessions"
 C_BOARD_MAPS = "tutor_board_mappings"
 C_TEMPLATES = "tutor_prompt_templates"
+C_WORKSHEETS = "tutor_worksheets"
+C_SCHOOL_FEED = "tutor_school_feed"
 
 
 def new_student(data: dict) -> dict:

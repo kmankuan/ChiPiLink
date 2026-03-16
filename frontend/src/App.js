@@ -82,6 +82,7 @@ import AgentChat from '@/modules/tutor/AgentChat';
 import BoardMapper from '@/modules/tutor/BoardMapper';
 import ClubSchedule from '@/modules/tutor/ClubSchedule';
 import WorksheetGenerator from '@/modules/tutor/WorksheetGenerator';
+import ParentPortal from '@/modules/tutor/ParentPortal';
 
 
 // Rapid Pin Module
@@ -293,6 +294,7 @@ function AppRouter() {
       <Route path="/tutor/student/:studentId/worksheets" element={<><Header /><WorksheetGenerator /></>} />
       <Route path="/tutor/board-mapper" element={<><Header /><BoardMapper /></>} />
       <Route path="/tutor/schedule" element={<><Header /><ClubSchedule /></>} />
+      <Route path="/tutor/parent" element={<><Header /><ParentPortal /></>} />
 
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}

@@ -77,7 +77,9 @@ async def health():
 # Import and register tutor routes
 from modules.tutor.routes import router as tutor_router
 from modules.tutor.routes_phase2 import router as tutor_router2
+from modules.tutor.routes_parent import router as tutor_router_parent
 app.include_router(tutor_router, prefix="/api")
 app.include_router(tutor_router2, prefix="/api")
+app.include_router(tutor_router_parent, prefix="/api")
 
 logger.info(f"Tutor Engine starting — DB: {DB_NAME}")
