@@ -63,6 +63,8 @@ import SportDashboard from '@/modules/sport/SportDashboard';
 import RecordMatch from '@/modules/sport/RecordMatch';
 import SportRankings from '@/modules/sport/Rankings';
 import SportLeagueDetail from '@/modules/sport/LeagueDetail';
+import LeaguesList from '@/modules/sport/LeaguesList';
+import PlayersList from '@/modules/sport/PlayersList';
 import StartLive from '@/modules/sport/StartLive';
 import LiveRefPanel from '@/modules/sport/LiveRefPanel';
 import LiveSpectator from '@/modules/sport/LiveSpectator';
@@ -274,7 +276,9 @@ function AppRouter() {
       <Route path="/sport" element={<><Header /><SportDashboard /></>} />
       <Route path="/sport/match/new" element={<><Header /><RecordMatch /></>} />
       <Route path="/sport/rankings" element={<><Header /><SportRankings /></>} />
+      <Route path="/sport/leagues" element={<><Header /><LeaguesList /></>} />
       <Route path="/sport/league/:leagueId" element={<><Header /><SportLeagueDetail /></>} />
+      <Route path="/sport/players" element={<><Header /><PlayersList /></>} />
       <Route path="/sport/live/new" element={<><Header /><StartLive /></>} />
       <Route path="/sport/live/:sessionId" element={<LiveRefPanel />} />
       <Route path="/sport/live/:sessionId/spectator" element={<LiveSpectator />} />
