@@ -1,53 +1,71 @@
-import { useEffect } from "react";
+import { lazy, Suspense } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import "@/i18n";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { SportLayout } from "@/components/layout/SportLayout";
+import { Toaster } from "@/components/ui/sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Lazy load pages
+const SportDashboard = lazy(() => import("@/pages/sport/SportDashboard"));
+const Rankings = lazy(() => import("@/pages/sport/Rankings"));
+const PlayersList = lazy(() => import("@/pages/sport/PlayersList"));
+const PlayerProfile = lazy(() => import("@/pages/sport/PlayerProfile"));
+const LeaguesList = lazy(() => import("@/pages/sport/LeaguesList"));
+const MatchesList = lazy(() => import("@/pages/sport/MatchesList"));
+const RecordMatch = lazy(() => import("@/pages/sport/RecordMatch"));
+const TournamentsList = lazy(() => import("@/pages/sport/TournamentsList"));
+const TournamentDetail = lazy(() => import("@/pages/sport/TournamentDetail"));
+const LiveList = lazy(() => import("@/pages/sport/LiveList"));
+const StartLive = lazy(() => import("@/pages/sport/StartLive"));
+const LiveRefPanel = lazy(() => import("@/pages/sport/LiveRefPanel"));
+const LiveSpectator = lazy(() => import("@/pages/sport/LiveSpectator"));
+const SportTV = lazy(() => import("@/pages/sport/SportTV"));
+const Login = lazy(() => import("@/pages/sport/Login"));
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+const PageLoader = () => (
+  <div className="p-6 space-y-4">
+    <Skeleton className="h-8 w-48" />
+    <Skeleton className="h-64 w-full rounded-xl" />
+  </div>
+);
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public pages without layout */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/sport/tv" element={<SportTV />} />
+
+            {/* Pages with sport layout */}
+            <Route element={<SportLayout />}>
+              <Route path="/sport" element={<SportDashboard />} />
+              <Route path="/sport/rankings" element={<Rankings />} />
+              <Route path="/sport/players" element={<PlayersList />} />
+              <Route path="/sport/player/:id" element={<PlayerProfile />} />
+              <Route path="/sport/leagues" element={<LeaguesList />} />
+              <Route path="/sport/matches" element={<MatchesList />} />
+              <Route path="/sport/match/new" element={<RecordMatch />} />
+              <Route path="/sport/tournaments" element={<TournamentsList />} />
+              <Route path="/sport/tournament/:id" element={<TournamentDetail />} />
+              <Route path="/sport/live" element={<LiveList />} />
+              <Route path="/sport/live/new" element={<StartLive />} />
+              <Route path="/sport/live/:id" element={<LiveSpectator />} />
+              <Route path="/sport/live/:id/referee" element={<LiveRefPanel />} />
+            </Route>
+
+            {/* Redirect root to sport dashboard */}
+            <Route path="/" element={<Navigate to="/sport" replace />} />
+            <Route path="*" element={<Navigate to="/sport" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
-    </div>
+      <Toaster richColors position="top-right" />
+    </AuthProvider>
   );
 }
 

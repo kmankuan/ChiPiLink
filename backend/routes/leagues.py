@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
-from ..core.database import sport_leagues
-from ..core.auth import get_admin_user
-from ..models.league import League, LeagueCreate, LeagueUpdate
+from core.database import sport_leagues
+from core.auth import get_admin_user
+from models.league import League, LeagueCreate, LeagueUpdate
 from datetime import datetime, timezone
 import uuid
 

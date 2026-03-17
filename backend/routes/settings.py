@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
-from ..core.database import sport_settings
-from ..core.auth import get_admin_user
-from ..models.settings import SportSettings, TVSettings
+from core.database import sport_settings
+from core.auth import get_admin_user
+from models.settings import SportSettings, TVSettings
 from typing import Dict, Any
 
 router = APIRouter(prefix="/api/sport/settings", tags=["settings"])

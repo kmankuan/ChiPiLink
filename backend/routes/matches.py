@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
-from ..core.database import sport_matches, sport_players
-from ..core.auth import get_admin_user, get_optional_user
-from ..models.match import Match, MatchCreate, MatchValidation, MatchPlayer, MatchReferee
-from ..services.elo import calculate_elo_changes
+from core.database import sport_matches, sport_players
+from core.auth import get_admin_user, get_optional_user
+from models.match import Match, MatchCreate, MatchValidation, MatchPlayer, MatchReferee
+from services.elo import calculate_elo_changes
 from datetime import datetime, timezone
 import uuid
 

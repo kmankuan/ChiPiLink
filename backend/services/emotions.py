@@ -1,5 +1,5 @@
 from typing import List, Optional, Dict, Any
-from ..models.live_session import Point, ScoreState
+from models.live_session import Point, ScoreState
 from datetime import datetime
 
 def detect_emotions(points: List[Point], current_score: ScoreState, settings: Dict[str, Any]) -> List[str]:

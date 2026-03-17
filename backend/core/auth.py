@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Security, Depends
+from fastapi import HTTPException, Security, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from typing import Optional, Dict, Any
@@ -7,6 +7,7 @@ JWT_SECRET = "chipilink_super_secret_key_2026"
 JWT_ALGORITHM = "HS256"
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 def decode_jwt_token(token: str) -> Dict[str, Any]:
     """Decode JWT token and return payload"""
@@ -30,7 +31,7 @@ async def get_admin_user(current_user: Dict[str, Any] = Depends(get_current_user
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
-async def get_optional_user(credentials: Optional[HTTPAuthorizationCredentials] = Security(security, auto_error=False)) -> Optional[Dict[str, Any]]:
+async def get_optional_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)) -> Optional[Dict[str, Any]]:
     """Get current user if token provided, otherwise None"""
     if not credentials:
         return None
@@ -38,5 +39,5 @@ async def get_optional_user(credentials: Optional[HTTPAuthorizationCredentials] 
         token = credentials.credentials
         payload = decode_jwt_token(token)
         return payload
-    except HTTPException:
+    except (HTTPException, Exception):
         return None

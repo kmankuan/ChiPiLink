@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
-from ..core.database import sport_tournaments, sport_players
-from ..core.auth import get_admin_user
-from ..models.tournament import Tournament, TournamentCreate, TournamentRegistration, TournamentMatchResult
-from ..models.player import PlayerSimple
-from ..services.bracket import generate_single_elimination_brackets, advance_winner_in_bracket
+from core.database import sport_tournaments, sport_players
+from core.auth import get_admin_user
+from models.tournament import Tournament, TournamentCreate, TournamentRegistration, TournamentMatchResult
+from models.player import PlayerSimple
+from services.bracket import generate_single_elimination_brackets, advance_winner_in_bracket
 from datetime import datetime, timezone
 import uuid
 

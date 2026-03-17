@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
-from ..models.tournament import TournamentBracket, TournamentMatch
-from ..models.player import PlayerSimple
+from models.tournament import TournamentBracket, TournamentMatch
+from models.player import PlayerSimple
 import uuid
 import math
 

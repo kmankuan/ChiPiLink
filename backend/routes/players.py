@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
-from ..core.database import sport_players
-from ..core.auth import get_admin_user, get_optional_user
-from ..models.player import Player, PlayerCreate, PlayerUpdate, PlayerSimple
+from core.database import sport_players
+from core.auth import get_admin_user, get_optional_user
+from models.player import Player, PlayerCreate, PlayerUpdate, PlayerSimple
 from datetime import datetime, timezone
 import uuid
 
@@ -17,38 +17,26 @@ async def get_players(
 ):
     """Get all players"""
     try:
-        # Build query filter
-        query_filter = {}
-        if active_only:
-            query_filter["active"] = True
-        
-        # Build sort criteria
-        sort_direction = -1 if order == "desc" else 1
-        sort_criteria = [(sort_by, sort_direction)]
-        
-        # Execute query
-        cursor = sport_players.find(query_filter, {"_id": 0}).sort(sort_criteria).limit(limit)
-        players_data = await cursor.to_list(length=limit)
-        
-        # Convert to Player objects
-        players = []
-        for data in players_data:
-            # Parse datetime fields
-            if "created_at" in data and isinstance(data["created_at"], str):
-                data["created_at"] = datetime.fromisoformat(data["created_at"])
-            if "updated_at" in data and isinstance(data["updated_at"], str):
-                data["updated_at"] = datetime.fromisoformat(data["updated_at"])
-            
-            players.append(Player(**data))
-        
-        return players
+        return await _fetch_players_list(active_only, sort_by, order, limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch players: {str(e)}")
 
-@router.get("/rankings", response_model=List[Player])
-async def get_rankings():
-    """Get player rankings (sorted by ELO desc)"""
-    return await get_players(active_only=True, sort_by="elo", order="desc")
+async def _fetch_players_list(active_only=True, sort_by="elo", order="desc", limit=100):
+    """Internal helper to fetch players"""
+    query_filter = {}
+    if active_only:
+        query_filter["active"] = True
+    sort_direction = -1 if order == "desc" else 1
+    cursor = sport_players.find(query_filter, {"_id": 0}).sort([(sort_by, sort_direction)]).limit(limit)
+    players_data = await cursor.to_list(length=limit)
+    players = []
+    for data in players_data:
+        if "created_at" in data and isinstance(data["created_at"], str):
+            data["created_at"] = datetime.fromisoformat(data["created_at"])
+        if "updated_at" in data and isinstance(data["updated_at"], str):
+            data["updated_at"] = datetime.fromisoformat(data["updated_at"])
+        players.append(Player(**data))
+    return players
 
 @router.get("/{player_id}", response_model=Player)
 async def get_player(player_id: str):

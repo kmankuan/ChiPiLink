@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisconnect
 from typing import List, Optional, Dict, Any
-from ..core.database import sport_live_sessions, sport_players
-from ..core.auth import get_optional_user
-from ..models.live_session import (
+from core.database import sport_live_sessions, sport_players
+from core.auth import get_optional_user
+from models.live_session import (
     LiveSession, LiveSessionCreate, ScorePoint, RefereeUpdate,
     Point, ScoreState, LiveSessionTimers, LiveSessionDisplay, LiveSessionSettings
 )
-from ..models.player import PlayerSimple
-from ..services.emotions import detect_emotions, calculate_momentum, should_change_server
+from models.player import PlayerSimple
+from services.emotions import detect_emotions, calculate_momentum, should_change_server
 from datetime import datetime, timezone
 import uuid
 import json
@@ -42,17 +42,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@router.websocket("/ws/live/{session_id}")
-async def websocket_endpoint(websocket: WebSocket, session_id: str):
-    await manager.connect(websocket, session_id)
-    try:
-        while True:
-            # Keep connection alive and handle any incoming messages
-            data = await websocket.receive_text()
-            # Echo back for heartbeat
-            await websocket.send_text(f"pong: {data}")
-    except WebSocketDisconnect:
-        manager.disconnect(websocket, session_id)
+# WebSocket is registered separately in server.py due to prefix conflict
 
 @router.get("", response_model=List[LiveSession])
 async def get_live_sessions(

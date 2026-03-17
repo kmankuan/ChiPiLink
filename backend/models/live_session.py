@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
-from .player import PlayerSimple
+from models.player import PlayerSimple
 
 class LiveSessionSettings(BaseModel):
     model_config = ConfigDict(extra="allow")
