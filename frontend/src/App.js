@@ -40,6 +40,7 @@ function App() {
           <Routes>
             {/* Public pages without layout */}
             <Route path="/login" element={<Login />} />
+            <Route path="/admin/login" element={<Login />} />
             <Route path="/sport/tv" element={<SportTV />} />
 
             {/* Pages with sport layout */}
