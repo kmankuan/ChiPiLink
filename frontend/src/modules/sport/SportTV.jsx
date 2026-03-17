@@ -241,7 +241,7 @@ export default function SportTV() {
                   ))}
                 </div>
                 <div className="mt-2 flex items-center gap-1">
-                  <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
+                  <span className="text-8xl font-black text-white" style={{textShadow:`0 0 30px ${colorA}50`}}>{sc[ls]}</span>
                   {state.server === ls && <span className="text-yellow-400 text-lg">🏓</span>}
                 </div>
               </div>
@@ -327,7 +327,7 @@ export default function SportTV() {
                 </div>
                 <div className="mt-2 flex items-center gap-1">
                   {state.server === rs && <span className="text-yellow-400 text-lg">🏓</span>}
-                  <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
+                  <span className="text-8xl font-black text-white" style={{textShadow:`0 0 30px ${colorB}50`}}>{sc[rs]}</span>
                 </div>
               </div>
             </div>
