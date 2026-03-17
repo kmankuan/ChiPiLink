@@ -97,6 +97,13 @@ async def approve_link(player_id: str, admin: dict = Depends(get_admin_user)):
     if not player: raise HTTPException(404, "Player not found")
     req = player.get("link_request")
     if not req: raise HTTPException(400, "No pending link request")
+    try:
+        result = await services.link_player_to_user(player_id, req["user_id"], admin.get("user_id"))
+        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$unset": {"link_request": 1}})
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
 
 # ═══ ANALYTICS ═══
 
@@ -105,14 +112,6 @@ async def get_player_analytics(player_id: str):
     """Get technique analytics report for a player."""
     from .analytics import get_player_technique_report
     return await get_player_technique_report(player_id)
-
-
-    try:
-        result = await services.link_player_to_user(player_id, req["user_id"], admin.get("user_id"))
-        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$unset": {"link_request": 1}})
-        return result
-    except ValueError as e:
-        raise HTTPException(400, str(e))
 
 
 # ═══ MATCHES ═══

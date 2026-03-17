@@ -1,18 +1,26 @@
 [
   {
-    "content": "Backend: Fix get_by_student to find awaiting_payment/submitted orders",
+    "content": "A) TV Settings tab in Sport Admin (colors, trophy, bar style, messages, display toggles)",
     "status": "completed"
   },
   {
-    "content": "Frontend: Remove Pay Now bar from textbooks list, replace with 'Go to My Orders' notice",
+    "content": "A) Live Settings tab in Sport Admin (service tracking, technique tagging, reactions, timeouts)",
     "status": "completed"
   },
   {
-    "content": "Frontend: Add awaiting_payment badge + Finish Payment button in Orders.jsx",
+    "content": "B) League Matrix H2H — already implemented and working in LeagueDetail.jsx",
     "status": "completed"
   },
   {
-    "content": "Cleanup: Remove unused handlePayExistingOrder from SchoolTextbooksView",
+    "content": "B) Backend bug: approve_link function was split by analytics decorator — FIXED",
+    "status": "completed"
+  },
+  {
+    "content": "C) Player Link Request — UI already existed in PlayerProfile, backend fixed",
+    "status": "completed"
+  },
+  {
+    "content": "C) Admin approval UI for link requests added to Players tab",
     "status": "completed"
   }
 ]
