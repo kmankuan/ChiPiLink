@@ -64,18 +64,19 @@ All endpoints under `/api/sport/`:
 ## Frontend Pages
 - `/sport` - Dashboard with stats, top players, recent matches
 - `/sport/rankings` - Player leaderboard
-- `/sport/players` - Players grid with search
-- `/sport/player/:id` - Player profile + match history
+- `/sport/players` - Players grid with search (shows base64 photos)
+- `/sport/player/:id` - Player profile + match history + **photo upload** (admin)
 - `/sport/leagues` - Leagues list
 - `/sport/matches` - Matches list
 - `/sport/match/new` - Record match form
 - `/sport/tournaments` - Tournaments list
-- `/sport/tournament/:id` - Tournament bracket view
+- `/sport/tournament/:id` - Tournament bracket view (**single + double elimination**)
 - `/sport/live` - Active live sessions
 - `/sport/live/new` - Start live session
 - `/sport/live/:id` - Spectator view
 - `/sport/live/:id/referee` - Referee scoring panel
 - `/sport/tv` - Full-screen TV broadcast display
+- `/sport/admin` - **Admin Settings (6 tabs: TV, Emotions, Match, Live, Display, Referee)**
 - `/login` - Admin login
 
 ## i18n
