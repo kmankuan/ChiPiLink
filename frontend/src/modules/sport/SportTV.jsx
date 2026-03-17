@@ -12,6 +12,8 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
 const EFFECT_MAP = { tense:'😱', fire:'🔥', clap:'👏', funny:'😂', strong:'💪', fast:'⚡', precise:'🎯', insane:'🤯' };
+const TECH_EMOJI = { forehand:'💥', backhand:'🔄', smash:'⚡', serve_ace:'🎯', drop_shot:'🪶', block:'🛡️', lob:'🌙', error:'💫' };
+const EMOTION_EMOJI = { streak_3:'🔥', streak_5:'🐉', streak_break:'💥', deuce:'⚡', match_point:'🏮', winner:'🏆', comeback:'🌊', perfect_set:'🏯', upset:'😱' };
 
 function formatTimer(startIso) {
   if (!startIso) return '0:00';
@@ -172,13 +174,24 @@ export default function SportTV() {
   const pctR = Math.min(sc[rs] / Math.max(max, 1), 1) * 100;
   const ref = state.referee || session.referee;
 
-  // Determine which side has the latest emotion (for inline sticker beside photo)
+  // Determine which side has the latest emotion
   const emotionSide = emotion?.side; // 'left' or 'right'
-  const EMOTION_EMOJI = { streak_3:'🔥', streak_5:'🐉', streak_break:'💥', deuce:'⚡', match_point:'🏮', winner:'🏆', comeback:'🌊', perfect_set:'🏯', upset:'😱' };
+  const currentSetPoints = (state.points || []).filter(p => p.set === state.current_set);
+  const totalSlots = Math.max(max, currentSetPoints.length + 1);
+
+  // Helper: get emoji for a point (technique or streak-based)
+  const getPointEmoji = (pt, idx) => {
+    if (!pt) return '·';
+    if (pt.technique && TECH_EMOJI[pt.technique]) return TECH_EMOJI[pt.technique];
+    // Streak-based fallback
+    const streak = pt.streak || 1;
+    if (streak >= 5) return '🐉';
+    if (streak >= 3) return '🔥';
+    return ['💪','😤','⚡','🎯','👊'][idx % 5];
+  };
 
   return (
     <div className="min-h-screen flex flex-col" style={{background:bg}}>
-      {/* Remove full-screen EmotionOverlay — stickers now inline beside player photos */}
       {cardOvl && <CardOverlay card={cardOvl} playerA={swapped?state.player_b:state.player_a} playerB={swapped?state.player_a:state.player_b} />}
       {callOvl && <CallOverlay call={callOvl} playerA={swapped?state.player_b:state.player_a} playerB={swapped?state.player_a:state.player_b} />}
       {effectOvl && <EffectOverlay effectId={effectOvl} />}
@@ -187,7 +200,7 @@ export default function SportTV() {
       <div className="flex-1 flex min-h-0">
         {/* GAME AREA */}
         <div className="flex-1 flex flex-col">
-          {/* Header — referee big + timer big */}
+          {/* Header — referee + timer */}
           <div className="flex items-center justify-between px-8 py-3">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
@@ -208,127 +221,131 @@ export default function SportTV() {
             </div>
           </div>
 
-          {/* MAIN — Players + Vertical Bar + Scores */}
+          {/* MAIN — Players + Totem Bar */}
           <div className="flex-1 flex items-center justify-center px-8">
-            <div className="flex items-end gap-6 w-full max-w-5xl">
+            <div className="flex items-start gap-6 w-full max-w-5xl">
 
-              {/* LEFT PLAYER column */}
+              {/* LEFT PLAYER */}
               <div className="flex-1 flex flex-col items-center">
-                {/* Stars */}
-                <div className="flex gap-1 mb-2 h-8">
-                  {Array.from({length: totalSetsToWin}).map((_,i) => (
-                    <Star key={i} className={`h-6 w-6 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-lg' : 'text-white/10'}`}
-                      style={i < (sw[ls]||0) ? {filter:'drop-shadow(0 0 8px rgba(234,179,8,0.5))'} : {}} />
-                  ))}
-                </div>
-                {/* Photo + inline sticker */}
-                <div className="relative">
-                  {lp?.photo_url ? (
-                    <img src={lp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
-                  )}
-                  {/* Inline emotion sticker — beside photo */}
-                  {emotion && emotionSide === 'left' && (
-                    <div className="absolute -right-10 top-1/2 -translate-y-1/2 animate-bounce" style={{filter:`drop-shadow(0 0 8px ${colorA}60)`}}>
-                      <span className="text-4xl">{EMOTION_EMOJI[emotion.type] || '✨'}</span>
+                {/* Merged sticker + combo ABOVE photo */}
+                <div className="h-16 flex flex-col items-center justify-end">
+                  {emotion && emotionSide === 'left' ? (
+                    <div className="text-center animate-bounce">
+                      <span className="text-5xl" style={{filter:`drop-shadow(0 0 12px ${colorA}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
                     </div>
-                  )}
+                  ) : streakL >= 2 ? (
+                    <div className="text-center">
+                      <span className="text-4xl" style={{filter:`drop-shadow(0 0 8px ${colorA}40)`}}>{streakL >= 5 ? '🐉' : streakL >= 3 ? '🔥' : '⚡'}</span>
+                      <p className="text-[10px] font-black" style={{color:colorA}}>{streakL}x</p>
+                    </div>
+                  ) : null}
                 </div>
+                {/* Photo */}
+                {lp?.photo_url ? (
+                  <img src={lp.photo_url} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
+                ) : (
+                  <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
+                )}
+                {/* Name + ELO */}
                 <p className="text-2xl font-black mt-2" style={{color:colorA}}>{lp?.nickname}</p>
                 <p className="text-white/20 text-xs">ELO {lp?.elo}</p>
+                {/* Stars BELOW photo */}
+                <div className="flex gap-1 mt-2">
+                  {Array.from({length: totalSetsToWin}).map((_,i) => (
+                    <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
+                      style={i < (sw[ls]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
+                  ))}
+                </div>
                 {/* Score */}
-                <div className="mt-3 flex items-center gap-1">
+                <div className="mt-2 flex items-center gap-1">
                   <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
                   {state.server === ls && <span className="text-yellow-400 text-lg">🏓</span>}
                 </div>
-                {/* Combo */}
-                {streakL >= 2 && <span className="text-xs font-black mt-1" style={{color:colorA}}>{streakL >= 5 ? '🐉' : streakL >= 3 ? '🔥' : '⚡'} {streakL}x COMBO</span>}
               </div>
 
-              {/* CENTER — Vertical Battle Bar (bottom to top) + Trophy on top */}
-              <div className="flex flex-col items-center" style={{width: '160px'}}>
-                {/* Configurable trophy/gift icon on top */}
-                <div className="w-16 h-16 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center mb-3 shrink-0">
+              {/* CENTER — Totem Faces Battle Bar + Trophy on top */}
+              <div className="flex flex-col items-center" style={{width: '120px'}}>
+                {/* Configurable trophy/gift icon */}
+                <div className="w-14 h-14 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center mb-2 shrink-0">
                   {centerIcon ? (
-                    <img src={centerIcon} className="w-12 h-12 rounded-full object-contain" alt="" />
+                    <img src={centerIcon} className="w-10 h-10 rounded-full object-contain" alt="" />
                   ) : (
-                    <span className="text-3xl">🏓</span>
+                    <span className="text-2xl">🏓</span>
                   )}
                 </div>
 
-                {/* Vertical bar — bottom to top, each segment = 1 point */}
-                {(() => {
-                  const currentSetPoints = (state.points || []).filter(p => p.set === state.current_set);
-                  const totalSlots = Math.max(max, currentSetPoints.length + 1);
-                  return (
-                    <div className="flex flex-col-reverse items-center gap-[2px] w-full rounded-lg overflow-hidden bg-white/[0.03] px-2 py-2" style={{height: '280px'}}>
-                      {Array.from({length: totalSlots}).map((_, i) => {
-                        const pt = currentSetPoints[i];
-                        const scorer = pt?.scored_by;
-                        const isLeft = scorer === ls;
-                        const isRight = scorer === rs;
-                        const isFilled = !!scorer;
-                        const isLatest = i === currentSetPoints.length - 1 && isFilled;
-                        const fillColor = isLeft ? colorA : isRight ? colorB : 'transparent';
+                {/* Totem Faces — bottom to top, each block = 1 point with emoji */}
+                <div className="flex flex-col-reverse items-center gap-[3px] w-full rounded-xl overflow-hidden bg-white/[0.02] px-1 py-2" style={{height: '300px'}}>
+                  {Array.from({length: totalSlots}).map((_, i) => {
+                    const pt = currentSetPoints[i];
+                    const scorer = pt?.scored_by;
+                    const isLeft = scorer === ls;
+                    const isFilled = !!scorer;
+                    const isLatest = i === currentSetPoints.length - 1 && isFilled;
+                    const fillColor = isLeft ? colorA : (scorer ? colorB : 'transparent');
+                    const emoji = getPointEmoji(pt, i);
 
-                        return (
-                          <div
-                            key={i}
-                            className="w-full transition-all duration-300"
-                            style={{
-                              flex: 1,
-                              clipPath: 'polygon(0 100%, 0 20%, 50% 0%, 100% 20%, 100% 100%, 50% 80%)',
-                              background: isFilled
-                                ? `linear-gradient(90deg, ${fillColor}cc, ${fillColor})`
-                                : 'rgba(255,255,255,0.03)',
-                              boxShadow: isLatest ? `0 0 12px ${fillColor}80` : 'none',
-                              transform: isLatest ? 'scaleX(1.15)' : 'scaleX(1)',
-                              opacity: isFilled ? 1 : 0.3,
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
+                    return (
+                      <div
+                        key={i}
+                        className="w-full flex items-center justify-center transition-all duration-300"
+                        style={{
+                          flex: 1,
+                          borderRadius: '8px',
+                          background: isFilled
+                            ? `linear-gradient(180deg, ${fillColor}, ${fillColor}cc)`
+                            : 'rgba(255,255,255,0.02)',
+                          border: isFilled ? 'none' : '1px solid rgba(255,255,255,0.04)',
+                          boxShadow: isLatest ? `0 0 14px ${fillColor}80, inset 0 1px 0 rgba(255,255,255,0.15)` : isFilled ? `inset 0 2px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.3)` : 'none',
+                          transform: isLatest ? 'scale(1.08)' : 'scale(1)',
+                          opacity: isFilled ? 1 : 0.3,
+                          fontSize: isFilled ? '16px' : '10px',
+                        }}
+                      >
+                        {emoji}
+                      </div>
+                    );
+                  })}
+                </div>
 
-                {/* VS label */}
-                <span className="text-white/10 text-sm font-black mt-2">VS</span>
+                <span className="text-white/10 text-xs font-black mt-2">VS</span>
               </div>
 
-              {/* RIGHT PLAYER column */}
+              {/* RIGHT PLAYER */}
               <div className="flex-1 flex flex-col items-center">
-                {/* Stars */}
-                <div className="flex gap-1 mb-2 h-8">
-                  {Array.from({length: totalSetsToWin}).map((_,i) => (
-                    <Star key={i} className={`h-6 w-6 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-lg' : 'text-white/10'}`}
-                      style={i < (sw[rs]||0) ? {filter:'drop-shadow(0 0 8px rgba(234,179,8,0.5))'} : {}} />
-                  ))}
-                </div>
-                {/* Photo + inline sticker */}
-                <div className="relative">
-                  {rp?.photo_url ? (
-                    <img src={rp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
-                  )}
-                  {/* Inline emotion sticker — beside photo */}
-                  {emotion && emotionSide === 'right' && (
-                    <div className="absolute -left-10 top-1/2 -translate-y-1/2 animate-bounce" style={{filter:`drop-shadow(0 0 8px ${colorB}60)`}}>
-                      <span className="text-4xl">{EMOTION_EMOJI[emotion.type] || '✨'}</span>
+                {/* Merged sticker + combo ABOVE photo */}
+                <div className="h-16 flex flex-col items-center justify-end">
+                  {emotion && emotionSide === 'right' ? (
+                    <div className="text-center animate-bounce">
+                      <span className="text-5xl" style={{filter:`drop-shadow(0 0 12px ${colorB}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
                     </div>
-                  )}
+                  ) : streakR >= 2 ? (
+                    <div className="text-center">
+                      <span className="text-4xl" style={{filter:`drop-shadow(0 0 8px ${colorB}40)`}}>{streakR >= 5 ? '🐉' : streakR >= 3 ? '🔥' : '⚡'}</span>
+                      <p className="text-[10px] font-black" style={{color:colorB}}>{streakR}x</p>
+                    </div>
+                  ) : null}
                 </div>
+                {/* Photo */}
+                {rp?.photo_url ? (
+                  <img src={rp.photo_url} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
+                ) : (
+                  <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
+                )}
                 <p className="text-2xl font-black mt-2" style={{color:colorB}}>{rp?.nickname}</p>
                 <p className="text-white/20 text-xs">ELO {rp?.elo}</p>
+                {/* Stars BELOW photo */}
+                <div className="flex gap-1 mt-2">
+                  {Array.from({length: totalSetsToWin}).map((_,i) => (
+                    <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
+                      style={i < (sw[rs]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
+                  ))}
+                </div>
                 {/* Score */}
-                <div className="mt-3 flex items-center gap-1">
+                <div className="mt-2 flex items-center gap-1">
                   {state.server === rs && <span className="text-yellow-400 text-lg">🏓</span>}
                   <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
                 </div>
-                {/* Combo */}
-                {streakR >= 2 && <span className="text-xs font-black mt-1" style={{color:colorB}}>{streakR >= 5 ? '🐉' : streakR >= 3 ? '🔥' : '⚡'} {streakR}x COMBO</span>}
               </div>
             </div>
           </div>
