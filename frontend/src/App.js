@@ -22,6 +22,7 @@ const StartLive = lazy(() => import("@/pages/sport/StartLive"));
 const LiveRefPanel = lazy(() => import("@/pages/sport/LiveRefPanel"));
 const LiveSpectator = lazy(() => import("@/pages/sport/LiveSpectator"));
 const SportTV = lazy(() => import("@/pages/sport/SportTV"));
+const SportAdmin = lazy(() => import("@/pages/sport/SportAdmin"));
 const Login = lazy(() => import("@/pages/sport/Login"));
 
 const PageLoader = () => (
@@ -56,6 +57,7 @@ function App() {
               <Route path="/sport/live/new" element={<StartLive />} />
               <Route path="/sport/live/:id" element={<LiveSpectator />} />
               <Route path="/sport/live/:id/referee" element={<LiveRefPanel />} />
+              <Route path="/sport/admin" element={<SportAdmin />} />
             </Route>
 
             {/* Redirect root to sport dashboard */}

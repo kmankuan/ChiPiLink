@@ -76,9 +76,14 @@ export default function PlayersList() {
             <Link key={player.player_id} to={`/sport/player/${player.player_id}`}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-4 text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-red-600 mx-auto flex items-center justify-center text-white text-xl font-bold mb-3">
-                    {player.nickname?.charAt(0)?.toUpperCase()}
-                  </div>
+                  {(player.photo_base64 || player.avatar_url) ? (
+                    <img src={player.photo_base64 || player.avatar_url} alt={player.nickname}
+                      className="w-16 h-16 rounded-full mx-auto object-cover mb-3 shadow" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-red-600 mx-auto flex items-center justify-center text-white text-xl font-bold mb-3">
+                      {player.nickname?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
                   <p className="font-semibold truncate">{player.nickname}</p>
                   <p className="text-lg font-bold font-mono text-red-600">{player.elo}</p>
                   <div className="flex items-center justify-center gap-2 mt-2 text-xs text-gray-500">

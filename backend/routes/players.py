@@ -1,4 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import UploadFile, File
+from pydantic import BaseModel as PydanticBaseModel
+import base64
 from typing import List, Optional
 from core.database import sport_players
 from core.auth import get_admin_user, get_optional_user
@@ -149,3 +152,61 @@ async def delete_player(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete player: {str(e)}")
+
+
+class PhotoUploadRequest(PydanticBaseModel):
+    photo_base64: str  # base64 encoded image data
+
+@router.post("/{player_id}/photo")
+async def upload_player_photo(
+    player_id: str,
+    photo_data: PhotoUploadRequest,
+    admin_user=Depends(get_admin_user)
+):
+    """Upload a player photo (base64 encoded). Admin only."""
+    existing = await sport_players.find_one({"player_id": player_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    b64 = photo_data.photo_base64
+    # Validate it's a reasonable base64 image (max ~5MB)
+    if len(b64) > 7_000_000:
+        raise HTTPException(status_code=400, detail="Image too large (max 5MB)")
+
+    await sport_players.update_one(
+        {"player_id": player_id},
+        {"$set": {
+            "photo_base64": b64,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "Photo uploaded successfully", "player_id": player_id}
+
+@router.post("/{player_id}/photo/file")
+async def upload_player_photo_file(
+    player_id: str,
+    file: UploadFile = File(...),
+    admin_user=Depends(get_admin_user)
+):
+    """Upload a player photo as multipart file. Admin only."""
+    existing = await sport_players.find_one({"player_id": player_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, or WebP images allowed")
+
+    contents = await file.read()
+    if len(contents) > 5_000_000:
+        raise HTTPException(status_code=400, detail="Image too large (max 5MB)")
+
+    b64 = f"data:{file.content_type};base64,{base64.b64encode(contents).decode()}"
+
+    await sport_players.update_one(
+        {"player_id": player_id},
+        {"$set": {
+            "photo_base64": b64,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "Photo uploaded successfully", "player_id": player_id}

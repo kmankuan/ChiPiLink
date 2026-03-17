@@ -24,6 +24,7 @@ class Player(BaseModel):
     roles: List[str] = ["player"]
     linked_user_id: Optional[str] = None
     avatar_url: Optional[str] = None
+    photo_base64: Optional[str] = None  # base64 encoded photo
     stats: PlayerStats = Field(default_factory=PlayerStats)
     created_at: datetime
     created_from: str = "admin"  # admin, match, registration

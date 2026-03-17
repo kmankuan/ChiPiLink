@@ -4,7 +4,7 @@ from core.database import sport_tournaments, sport_players
 from core.auth import get_admin_user
 from models.tournament import Tournament, TournamentCreate, TournamentRegistration, TournamentMatchResult
 from models.player import PlayerSimple
-from services.bracket import generate_single_elimination_brackets, advance_winner_in_bracket
+from services.bracket import generate_single_elimination_brackets, generate_double_elimination_brackets, advance_winner_in_bracket
 from datetime import datetime, timezone
 import uuid
 
@@ -199,8 +199,12 @@ async def start_tournament(
                 p["registered_at"] = datetime.fromisoformat(p["registered_at"])
             player_participants.append(PlayerSimple(**p))
         
-        # Generate brackets
-        brackets = generate_single_elimination_brackets(player_participants, tournament_data["third_place_match"])
+        # Generate brackets based on format
+        fmt = tournament_data.get("format", "single_elimination")
+        if fmt == "double_elimination":
+            brackets = generate_double_elimination_brackets(player_participants)
+        else:
+            brackets = generate_single_elimination_brackets(player_participants, tournament_data["third_place_match"])
         
         # Convert brackets to dict format for storage
         brackets_data = []

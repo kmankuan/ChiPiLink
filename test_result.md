@@ -213,6 +213,66 @@ frontend:
           agent: "testing"
           comment: "✅ Record Match page fully functional. Page loads correctly with all form elements present: Player A select dropdown, Player B select dropdown, Referee select dropdown, Winner select dropdown, Winner Score and Loser Score inputs. Form validation in place. Record Match button ready for submission. UI clean and well-organized."
 
+  - task: "Admin Settings Page (/sport/admin)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/sport/SportAdmin.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE - Admin Settings page implemented with 6 tabs (TV, Emotions, Match, Live, Display, Referee). Requires testing for all tabs, settings display, and save functionality."
+
+  - task: "Admin Settings Save Flow"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/sport/SportAdmin.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE - Save flow with 'Unsaved' badge when changes made, Save button functionality. Requires testing for state persistence and API integration."
+
+  - task: "Player Profile - Photo Upload"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/sport/PlayerProfile.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE - Photo upload functionality for admins. Hover over photo to show camera overlay. Requires testing for upload flow and photo display."
+
+  - task: "Player Profile - Stats Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/sport/PlayerProfile.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE - Updated stat boxes display (Matches, Wins, Losses, Win Rate, Streak). Requires verification of correct data display."
+
+  - task: "Players List - Photo Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/sport/PlayersList.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW FEATURE - Players list updated to show photos or initials in gradient circles. Requires testing for photo display and fallback to initials."
+
 backend:
   - task: "Backend API Integration"
     implemented: true
@@ -238,9 +298,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All tasks completed successfully"
+    - "Admin Settings Page (/sport/admin)"
+    - "Admin Settings Save Flow"
+    - "Player Profile - Photo Upload"
+    - "Player Profile - Stats Display"
+    - "Players List - Photo Display"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
@@ -248,3 +312,7 @@ agent_communication:
       message: "Comprehensive frontend testing completed successfully. All 9 test scenarios passed including: Dashboard with hero banner and stats, Rankings with medal styling, Players list with search, Player profile (Carlos), Login flow with authentication, Language switcher (EN/ES/ZH), Navigation across all pages, TV Display with dark theme, and Record Match form. No critical issues found. Application is production-ready."
     - agent: "testing"
       message: "COMPREHENSIVE BACKEND API TESTING COMPLETED WITH 100% SUCCESS RATE - All 34 backend API tests passed successfully. Verified complete ChiPi Sport Engine API functionality including: Health check, Players CRUD (5+ players with Carlos ELO 1050), Rankings sorted correctly, Leagues (Spring 2026), Matches (Carlos vs Angel), Empty tournaments/live sessions as expected, Public TV settings, Admin authentication, Protected endpoints, and full Live Session flow (create/score/undo/end). All APIs returning correct data formats and business logic. Backend is fully functional and production-ready."
+    - agent: "main"
+      message: "NEW FEATURES ADDED: Admin Settings page with 6 tabs, Photo upload for player profiles, Updated player stats display. Ready for testing agent to verify functionality."
+    - agent: "testing"
+      message: "Starting comprehensive testing of new features: Admin Settings (6 tabs), Save Flow, Player Profile Photo Upload, Stats Display, and Players List Photo Display."

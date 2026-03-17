@@ -4,88 +4,166 @@ from models.player import PlayerSimple
 import uuid
 import math
 
+
 def generate_single_elimination_brackets(participants: List[PlayerSimple], third_place_match: bool = True) -> List[TournamentBracket]:
-    """Generate single elimination tournament brackets
-    
-    Args:
-        participants: List of tournament participants (should be sorted by seed)
-        third_place_match: Whether to include a third place match
-        
-    Returns:
-        List of tournament brackets with matches
-    """
+    """Generate single elimination tournament brackets"""
     num_participants = len(participants)
     if num_participants < 2:
         return []
     
-    # Calculate number of rounds needed
     num_rounds = math.ceil(math.log2(num_participants))
-    
-    # Pad participants to next power of 2 if needed
     next_power_of_2 = 2 ** num_rounds
     padded_participants = participants + [None] * (next_power_of_2 - num_participants)
     
     brackets = []
-    
-    # Generate first round
-    first_round_matches = []
     round_names = get_round_names(num_rounds, third_place_match)
     
-    # Pair participants using standard tournament seeding
+    # Generate first round
     pairings = generate_seeded_pairings(padded_participants)
-    
+    first_round_matches = []
     for i, (player_a, player_b) in enumerate(pairings):
         match = TournamentMatch(
-            match_id=f"tm_{uuid.uuid4().hex[:10]}",
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
             round=1,
             position=i + 1,
             player_a=player_a,
             player_b=player_b,
-            status="pending"
+            status="pending" if player_a and player_b else "bye"
         )
         first_round_matches.append(match)
     
-    brackets.append(TournamentBracket(
-        round=1,
-        name=round_names[0],
-        matches=first_round_matches
-    ))
+    brackets.append(TournamentBracket(round=1, name=round_names[0], matches=first_round_matches))
     
-    # Generate subsequent rounds (empty initially)
+    # Generate subsequent rounds
     for round_num in range(2, num_rounds + 1):
         num_matches = 2 ** (num_rounds - round_num)
         matches = []
-        
         for i in range(num_matches):
+            feeds = [i * 2 + 1, i * 2 + 2]
             match = TournamentMatch(
-                match_id=f"tm_{uuid.uuid4().hex[:10]}",
+                match_id=f"tm_{uuid.uuid4().hex[:8]}",
                 round=round_num,
                 position=i + 1,
-                status="pending"
+                status="waiting",
+                feeds_from=feeds
             )
             matches.append(match)
-        
-        brackets.append(TournamentBracket(
-            round=round_num,
-            name=round_names[round_num - 1],
-            matches=matches
-        ))
+        brackets.append(TournamentBracket(round=round_num, name=round_names[round_num - 1], matches=matches))
     
-    # Add third place match if enabled
+    # Third place match
     if third_place_match and num_rounds > 1:
-        third_place_match_obj = TournamentMatch(
-            match_id=f"tm_{uuid.uuid4().hex[:10]}",
-            round=num_rounds + 1,
-            position=1,
-            status="pending"
-        )
-        
         brackets.append(TournamentBracket(
             round=num_rounds + 1,
             name="Third Place",
-            matches=[third_place_match_obj]
+            matches=[TournamentMatch(
+                match_id=f"tm_{uuid.uuid4().hex[:8]}",
+                round=num_rounds + 1,
+                position=1,
+                status="waiting",
+                is_third_place=True
+            )]
         ))
     
+    return brackets
+
+
+def generate_double_elimination_brackets(participants: List[PlayerSimple]) -> List[TournamentBracket]:
+    """Generate double elimination tournament brackets.
+    
+    Structure:
+    - Winners Bracket (W): standard single-elimination
+    - Losers Bracket (L): losers drop down; must lose twice to be eliminated
+    - Grand Final: winners bracket champ vs losers bracket champ
+    """
+    num_participants = len(participants)
+    if num_participants < 4:
+        return []
+
+    num_rounds_w = math.ceil(math.log2(num_participants))
+    next_power = 2 ** num_rounds_w
+    padded = participants + [None] * (next_power - num_participants)
+
+    brackets = []
+    bracket_index = 0
+
+    # ── Winners Bracket ──
+    pairings = generate_seeded_pairings(padded)
+    w_r1_matches = []
+    for i, (pa, pb) in enumerate(pairings):
+        w_r1_matches.append(TournamentMatch(
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
+            round=1, position=i + 1,
+            player_a=pa, player_b=pb,
+            status="pending" if pa and pb else "bye",
+        ))
+    brackets.append(TournamentBracket(
+        round=1, name=f"Winners R1",
+        matches=w_r1_matches,
+    ))
+
+    for wr in range(2, num_rounds_w + 1):
+        n_matches = 2 ** (num_rounds_w - wr)
+        matches = [TournamentMatch(
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
+            round=wr, position=j + 1,
+            status="waiting",
+        ) for j in range(n_matches)]
+
+        rname = "Winners Final" if wr == num_rounds_w else f"Winners R{wr}"
+        brackets.append(TournamentBracket(round=wr, name=rname, matches=matches))
+
+    # ── Losers Bracket ──
+    # Losers bracket has roughly 2*(num_rounds_w - 1) rounds
+    # Round L1: losers from W R1 play each other  (n/4 matches if 8 players)
+    # Round L2: winners of L1 play losers from W R2
+    # Round L3: winners of L2 play each other
+    # ... and so on until 1 player remains
+    losers_round_base = num_rounds_w + 1  # offset round numbers
+    num_losers_rounds = 2 * (num_rounds_w - 1)
+
+    for lr in range(1, num_losers_rounds + 1):
+        # Calculate matches for this losers round
+        if lr == 1:
+            n_matches = next_power // 4
+        elif lr % 2 == 0:
+            # Even losers rounds: same count as previous (drop-down round)
+            n_matches = max(1, brackets[-1].matches.__len__())
+        else:
+            # Odd losers rounds: halve the count
+            n_matches = max(1, brackets[-1].matches.__len__() // 2)
+
+        rnum = losers_round_base + lr - 1
+        rname = "Losers Final" if lr == num_losers_rounds else f"Losers R{lr}"
+        matches = [TournamentMatch(
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
+            round=rnum, position=j + 1,
+            status="waiting",
+        ) for j in range(n_matches)]
+        brackets.append(TournamentBracket(round=rnum, name=rname, matches=matches))
+
+    # ── Grand Final ──
+    gf_round = losers_round_base + num_losers_rounds
+    brackets.append(TournamentBracket(
+        round=gf_round,
+        name="Grand Final",
+        matches=[TournamentMatch(
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
+            round=gf_round, position=1,
+            status="waiting",
+        )],
+    ))
+
+    # Optional reset match (if losers bracket champ wins grand final)
+    brackets.append(TournamentBracket(
+        round=gf_round + 1,
+        name="Grand Final Reset",
+        matches=[TournamentMatch(
+            match_id=f"tm_{uuid.uuid4().hex[:8]}",
+            round=gf_round + 1, position=1,
+            status="waiting",
+        )],
+    ))
+
     return brackets
 
 def generate_seeded_pairings(participants: List[Optional[PlayerSimple]]) -> List[tuple]:
