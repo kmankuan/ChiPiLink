@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Radio, Trophy, Star } from 'lucide-react';
-import EmotionOverlay from './components/EmotionOverlay';
+// EmotionOverlay removed — stickers now shown inline beside player photos
 import { AblyChatProvider } from '@/modules/ably/AblyProvider';
 import LiveChat from '@/modules/ably/LiveChat';
 import RESOLVED_API_URL from '@/config/apiUrl';
@@ -172,9 +172,13 @@ export default function SportTV() {
   const pctR = Math.min(sc[rs] / Math.max(max, 1), 1) * 100;
   const ref = state.referee || session.referee;
 
+  // Determine which side has the latest emotion (for inline sticker beside photo)
+  const emotionSide = emotion?.side; // 'left' or 'right'
+  const EMOTION_EMOJI = { streak_3:'🔥', streak_5:'🐉', streak_break:'💥', deuce:'⚡', match_point:'🏮', winner:'🏆', comeback:'🌊', perfect_set:'🏯', upset:'😱' };
+
   return (
     <div className="min-h-screen flex flex-col" style={{background:bg}}>
-      <EmotionOverlay emotion={emotion} settings={{}} side={emotion?.side} playerPhoto={emotion?.side==='left'?lp?.photo_url:rp?.photo_url} />
+      {/* Remove full-screen EmotionOverlay — stickers now inline beside player photos */}
       {cardOvl && <CardOverlay card={cardOvl} playerA={swapped?state.player_b:state.player_a} playerB={swapped?state.player_a:state.player_b} />}
       {callOvl && <CallOverlay call={callOvl} playerA={swapped?state.player_b:state.player_a} playerB={swapped?state.player_a:state.player_b} />}
       {effectOvl && <EffectOverlay effectId={effectOvl} />}
@@ -204,159 +208,133 @@ export default function SportTV() {
             </div>
           </div>
 
-          {/* MAIN — Players + HP bars + Scores */}
-          <div className="flex-1 flex flex-col items-center justify-center px-8">
-            {/* Player cards with stars above photos */}
-            <div className="flex items-start justify-between w-full max-w-5xl mb-6">
-              {/* LEFT PLAYER */}
-              <div className="flex flex-col items-center">
-                {/* Stars above photo */}
+          {/* MAIN — Players + Vertical Bar + Scores */}
+          <div className="flex-1 flex items-center justify-center px-8">
+            <div className="flex items-end gap-6 w-full max-w-5xl">
+
+              {/* LEFT PLAYER column */}
+              <div className="flex-1 flex flex-col items-center">
+                {/* Stars */}
                 <div className="flex gap-1 mb-2 h-8">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
                     <Star key={i} className={`h-6 w-6 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-lg' : 'text-white/10'}`}
                       style={i < (sw[ls]||0) ? {filter:'drop-shadow(0 0 8px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
-                {lp?.photo_url ? (
-                  <img src={lp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
-                )}
+                {/* Photo + inline sticker */}
+                <div className="relative">
+                  {lp?.photo_url ? (
+                    <img src={lp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
+                  )}
+                  {/* Inline emotion sticker — beside photo */}
+                  {emotion && emotionSide === 'left' && (
+                    <div className="absolute -right-10 top-1/2 -translate-y-1/2 animate-bounce" style={{filter:`drop-shadow(0 0 8px ${colorA}60)`}}>
+                      <span className="text-4xl">{EMOTION_EMOJI[emotion.type] || '✨'}</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-2xl font-black mt-2" style={{color:colorA}}>{lp?.nickname}</p>
                 <p className="text-white/20 text-xs">ELO {lp?.elo}</p>
+                {/* Score */}
+                <div className="mt-3 flex items-center gap-1">
+                  <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
+                  {state.server === ls && <span className="text-yellow-400 text-lg">🏓</span>}
+                </div>
+                {/* Combo */}
+                {streakL >= 2 && <span className="text-xs font-black mt-1" style={{color:colorA}}>{streakL >= 5 ? '🐉' : streakL >= 3 ? '🔥' : '⚡'} {streakL}x COMBO</span>}
               </div>
 
-              {/* VS / Center */}
-              <div className="flex flex-col items-center justify-center mt-10">
-                <span className="text-white/10 text-3xl font-black">VS</span>
+              {/* CENTER — Vertical Battle Bar (bottom to top) + Trophy on top */}
+              <div className="flex flex-col items-center" style={{width: '160px'}}>
+                {/* Configurable trophy/gift icon on top */}
+                <div className="w-16 h-16 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center mb-3 shrink-0">
+                  {centerIcon ? (
+                    <img src={centerIcon} className="w-12 h-12 rounded-full object-contain" alt="" />
+                  ) : (
+                    <span className="text-3xl">🏓</span>
+                  )}
+                </div>
+
+                {/* Vertical bar — bottom to top, each segment = 1 point */}
+                {(() => {
+                  const currentSetPoints = (state.points || []).filter(p => p.set === state.current_set);
+                  const totalSlots = Math.max(max, currentSetPoints.length + 1);
+                  return (
+                    <div className="flex flex-col-reverse items-center gap-[2px] w-full rounded-lg overflow-hidden bg-white/[0.03] px-2 py-2" style={{height: '280px'}}>
+                      {Array.from({length: totalSlots}).map((_, i) => {
+                        const pt = currentSetPoints[i];
+                        const scorer = pt?.scored_by;
+                        const isLeft = scorer === ls;
+                        const isRight = scorer === rs;
+                        const isFilled = !!scorer;
+                        const isLatest = i === currentSetPoints.length - 1 && isFilled;
+                        const fillColor = isLeft ? colorA : isRight ? colorB : 'transparent';
+
+                        return (
+                          <div
+                            key={i}
+                            className="w-full transition-all duration-300"
+                            style={{
+                              flex: 1,
+                              clipPath: 'polygon(0 100%, 0 20%, 50% 0%, 100% 20%, 100% 100%, 50% 80%)',
+                              background: isFilled
+                                ? `linear-gradient(90deg, ${fillColor}cc, ${fillColor})`
+                                : 'rgba(255,255,255,0.03)',
+                              boxShadow: isLatest ? `0 0 12px ${fillColor}80` : 'none',
+                              transform: isLatest ? 'scaleX(1.15)' : 'scaleX(1)',
+                              opacity: isFilled ? 1 : 0.3,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+
+                {/* VS label */}
+                <span className="text-white/10 text-sm font-black mt-2">VS</span>
               </div>
 
-              {/* RIGHT PLAYER */}
-              <div className="flex flex-col items-center">
+              {/* RIGHT PLAYER column */}
+              <div className="flex-1 flex flex-col items-center">
+                {/* Stars */}
                 <div className="flex gap-1 mb-2 h-8">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
                     <Star key={i} className={`h-6 w-6 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-lg' : 'text-white/10'}`}
                       style={i < (sw[rs]||0) ? {filter:'drop-shadow(0 0 8px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
-                {rp?.photo_url ? (
-                  <img src={rp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
-                )}
+                {/* Photo + inline sticker */}
+                <div className="relative">
+                  {rp?.photo_url ? (
+                    <img src={rp.photo_url} className="w-24 h-24 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-4xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
+                  )}
+                  {/* Inline emotion sticker — beside photo */}
+                  {emotion && emotionSide === 'right' && (
+                    <div className="absolute -left-10 top-1/2 -translate-y-1/2 animate-bounce" style={{filter:`drop-shadow(0 0 8px ${colorB}60)`}}>
+                      <span className="text-4xl">{EMOTION_EMOJI[emotion.type] || '✨'}</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-2xl font-black mt-2" style={{color:colorB}}>{rp?.nickname}</p>
                 <p className="text-white/20 text-xs">ELO {rp?.elo}</p>
+                {/* Score */}
+                <div className="mt-3 flex items-center gap-1">
+                  {state.server === rs && <span className="text-yellow-400 text-lg">🏓</span>}
+                  <span className="text-6xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
+                </div>
+                {/* Combo */}
+                {streakR >= 2 && <span className="text-xs font-black mt-1" style={{color:colorB}}>{streakR >= 5 ? '🐉' : streakR >= 3 ? '🔥' : '⚡'} {streakR}x COMBO</span>}
               </div>
             </div>
+          </div>
 
-            {/* HP BARS — Chevron Battle Timeline */}
-            <div className="w-full max-w-5xl mb-4">
-              {(() => {
-                const barStyle = cfg.hp_bar_style || 'chevron';
-                const currentSetPoints = (state.points || []).filter(p => p.set === state.current_set);
-                const totalSlots = Math.max(max, currentSetPoints.length + 1); // at least max, expand for deuce
-
-                if (barStyle === 'chevron') {
-                  // Chevron timeline: each slot shows who scored that point in order
-                  return (
-                    <div>
-                      <div className="relative flex items-center gap-0 h-14">
-                        {/* Left score */}
-                        <div className="shrink-0 w-16 text-right pr-3">
-                          <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
-                          {state.server === ls && <span className="text-yellow-400 text-xs ml-1">🏓</span>}
-                        </div>
-
-                        {/* Chevron bar */}
-                        <div className="flex-1 flex items-center gap-[2px] h-12 rounded-lg overflow-hidden bg-white/[0.03] px-1 py-1">
-                          {Array.from({length: totalSlots}).map((_, i) => {
-                            const pt = currentSetPoints[i];
-                            const scorer = pt?.scored_by;
-                            const isLeft = scorer === ls;
-                            const isRight = scorer === rs;
-                            const isFilled = !!scorer;
-                            const isLatest = i === currentSetPoints.length - 1 && isFilled;
-                            const fillColor = isLeft ? colorA : isRight ? colorB : 'transparent';
-
-                            // Check if part of a streak
-                            const prevPt = i > 0 ? currentSetPoints[i-1] : null;
-                            const nextPt = currentSetPoints[i+1];
-                            const isStreakContinue = prevPt && prevPt.scored_by === scorer;
-                            const isStreakStart = !isStreakContinue && nextPt && nextPt.scored_by === scorer;
-
-                            return (
-                              <div
-                                key={i}
-                                className="h-full transition-all duration-300"
-                                style={{
-                                  flex: 1,
-                                  clipPath: 'polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%, 20% 50%)',
-                                  background: isFilled
-                                    ? `linear-gradient(180deg, ${fillColor}ee, ${fillColor})`
-                                    : 'rgba(255,255,255,0.03)',
-                                  boxShadow: isLatest ? `0 0 12px ${fillColor}80` : 'none',
-                                  transform: isLatest ? 'scaleY(1.1)' : 'scaleY(1)',
-                                  opacity: isFilled ? 1 : 0.4,
-                                  border: isFilled ? 'none' : '1px solid rgba(255,255,255,0.05)',
-                                }}
-                              />
-                            );
-                          })}
-                        </div>
-
-                        {/* Right score */}
-                        <div className="shrink-0 w-16 text-left pl-3">
-                          {state.server === rs && <span className="text-yellow-400 text-xs mr-1">🏓</span>}
-                          <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
-                        </div>
-                      </div>
-
-                      {/* Center icon overlay */}
-                      <div className="flex justify-center -mt-[52px] mb-[10px] pointer-events-none">
-                        <div className="w-14 h-14 rounded-full bg-black/70 border-2 border-white/10 flex items-center justify-center z-10">
-                          {centerIcon ? (
-                            <img src={centerIcon} className="w-10 h-10 rounded-full object-contain" alt="" />
-                          ) : (
-                            <span className="text-2xl">🏓</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Fallback: gradient style (original)
-                return (
-                  <div className="relative flex items-center gap-0 h-14">
-                    <div className="flex-1 h-10 rounded-l-full overflow-hidden bg-white/5 relative">
-                      <div className="absolute inset-y-0 left-0 rounded-l-full transition-all duration-500" style={{width:`${pctL}%`, background:`linear-gradient(90deg, ${colorA}40, ${colorA})`}} />
-                      <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{left:`max(${pctL}% - 30px, 10px)`}}>
-                        <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorA}50`}}>{sc[ls]}</span>
-                        {state.server === ls && <span className="text-yellow-400 text-sm ml-2">🏓</span>}
-                      </div>
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center z-10 shrink-0 -mx-2">
-                      {centerIcon ? <img src={centerIcon} className="w-12 h-12 rounded-full object-contain" alt="" /> : <span className="text-2xl">🏓</span>}
-                    </div>
-                    <div className="flex-1 h-10 rounded-r-full overflow-hidden bg-white/5 relative">
-                      <div className="absolute inset-y-0 right-0 rounded-r-full transition-all duration-500" style={{width:`${pctR}%`, background:`linear-gradient(270deg, ${colorB}40, ${colorB})`}} />
-                      <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 flex items-center" style={{right:`max(${pctR}% - 30px, 10px)`}}>
-                        {state.server === rs && <span className="text-yellow-400 text-sm mr-2">🏓</span>}
-                        <span className="text-5xl font-black text-white" style={{textShadow:`0 0 20px ${colorB}50`}}>{sc[rs]}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Combo counters */}
-              <div className="flex justify-between mt-1">
-                <div>{streakL >= 2 && <span className="text-xs font-black" style={{color:colorA}}>{streakL >= 5 ? '🐉' : streakL >= 3 ? '🔥' : '⚡'} {streakL}x COMBO</span>}</div>
-                <div>{streakR >= 2 && <span className="text-xs font-black" style={{color:colorB}}>{streakR >= 5 ? '🐉' : streakR >= 3 ? '🔥' : '⚡'} {streakR}x COMBO</span>}</div>
-              </div>
-            </div>
-
-            {/* Set scores inline */}
+          {/* Set scores + Match finished */}
+          <div className="flex flex-col items-center px-8 pb-2">
             {state.sets?.length > 0 && (
               <div className="flex items-center gap-3 mb-2">
                 {state.sets.map((set,i) => {
@@ -367,10 +345,8 @@ export default function SportTV() {
                 })}
               </div>
             )}
-
-            {/* Match finished */}
             {state.status === 'finished' && (
-              <div className="text-center mt-4 animate-bounce">
+              <div className="text-center mt-2 animate-bounce">
                 <span className="text-6xl">🏆</span>
                 <p className="text-4xl font-black text-yellow-400 mt-2">{state.winner===ls?lp?.nickname:rp?.nickname} WINS!</p>
               </div>
