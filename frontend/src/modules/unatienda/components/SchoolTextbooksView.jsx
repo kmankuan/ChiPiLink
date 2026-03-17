@@ -3,7 +3,7 @@
  * Extracted from Unatienda.jsx for maintainability.
  * Handles: student tabs, student cards with order status, login prompt, inline link student flow.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -60,6 +60,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const [loading, setLoading] = useState(true);
   const [schoolsError, setSchoolsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const submitGuardRef = useRef(false); // Extra guard against double-click
 
   // Guardian info — persisted in localStorage, shown as header
   const GUARDIAN_KEY = 'chipilink_guardian_info';
@@ -95,7 +96,8 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = async () => {
-    if (submitting) return;
+    if (submitting || submitGuardRef.current) return;
+    submitGuardRef.current = true;
 
     const vt = {
       en: { firstName: 'Enter student first name', lastName: 'Enter student last name', school: 'Select a school', grade: 'Select a grade', relation: 'Select your relationship', success: 'Student linked! Pending admin approval.', error: 'Failed to submit' },
@@ -136,6 +138,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
       toast.error(err.response?.data?.detail || v.error);
     } finally {
       setSubmitting(false);
+      submitGuardRef.current = false;
     }
   };
 

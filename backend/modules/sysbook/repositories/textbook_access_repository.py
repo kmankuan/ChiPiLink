@@ -72,8 +72,8 @@ class StudentRecordRepository(BaseRepository):
         return await self.find_one({"student_id": student_id})
     
     async def get_by_user(self, user_id: str, include_inactive: bool = False) -> List[Dict]:
-        """Get all student records for a user"""
-        query = {"user_id": user_id}
+        """Get all student records for a user (excludes archived)"""
+        query = {"user_id": user_id, "$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
         if not include_inactive:
             query["is_active"] = True
         return await self.find_many(
@@ -101,20 +101,21 @@ class StudentRecordRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, student_id, data)
 
     async def find_by_user_and_name(self, user_id: str, full_name: str):
-        """Find existing student by user_id and full name (case-insensitive)."""
+        """Find existing student by user_id and full name (case-insensitive). Includes archived."""
         import re
         return await self._collection.find_one(
-            {"user_id": user_id, "full_name": {"$regex": f"^{re.escape(full_name)}$", "$options": "i"}, "status": {"$ne": "inactive"}},
+            {"user_id": user_id, "full_name": {"$regex": f"^{re.escape(full_name)}$", "$options": "i"},
+             "status": {"$ne": "inactive"}},
             {"_id": 0}
         )
     
     async def find_by_user_name_school(self, user_id: str, first_name: str, last_name: str, school_id: str):
-        """Find existing student by user_id + first/last name + school."""
+        """Find existing student by user_id + first/last name + school. Includes archived."""
         import re
         return await self._collection.find_one(
             {"user_id": user_id, "first_name": {"$regex": f"^{re.escape(first_name)}$", "$options": "i"},
              "last_name": {"$regex": f"^{re.escape(last_name)}$", "$options": "i"},
-             "school_id": school_id, "status": {"$ne": "inactive"}},
+             "school_id": school_id},
             {"_id": 0}
         )
     
