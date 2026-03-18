@@ -1,11 +1,13 @@
 /**
  * PlayerPicker — Smart player selector with dropdown, photos, roles
  * Shows recent players as tappable chips + searchable dropdown with photos.
+ * Photo upload uses AvatarUpload component with camera + crop support.
  */
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, ChevronDown, Search, Plus } from 'lucide-react';
+import { X, ChevronDown, Search, Plus, Camera } from 'lucide-react';
+import AvatarUpload from '@/components/shared/AvatarUpload';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -40,7 +42,10 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
 
   const selectPlayer = (p) => {
     onChange(p.nickname);
-    if (onPhotoChange && p.avatar_url) onPhotoChange(p.avatar_url);
+    // Use photo_base64 first, fallback to avatar_url
+    if (onPhotoChange) {
+      onPhotoChange(p.photo_base64 || p.avatar_url || '');
+    }
     setOpen(false);
     setSearch('');
   };
@@ -50,6 +55,8 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
     : players;
 
   const selectedPlayer = players.find(p => p.nickname === value);
+  // Resolve the best photo source
+  const displayPhoto = photoValue || selectedPlayer?.photo_base64 || selectedPlayer?.avatar_url;
 
   return (
     <div className="space-y-1" ref={wrapRef}>
@@ -59,8 +66,8 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
       <div className="relative">
         {value ? (
           <div className="flex items-center gap-2 h-10 px-3 rounded-md border bg-card cursor-pointer" onClick={() => setOpen(!open)}>
-            {(selectedPlayer?.avatar_url || photoValue) ? (
-              <img src={selectedPlayer?.avatar_url || photoValue} className="w-6 h-6 rounded-full object-cover" alt="" />
+            {displayPhoto ? (
+              <img src={displayPhoto} className="w-6 h-6 rounded-full object-cover" alt="" />
             ) : (
               <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-bold">{(value || '?')[0]}</div>
             )}
@@ -105,8 +112,8 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
                 <button key={p.player_id} type="button"
                   className="w-full flex items-center gap-2 px-3 py-2 hover:bg-muted/50 text-left transition-colors"
                   onClick={() => selectPlayer(p)}>
-                  {p.avatar_url ? (
-                    <img src={p.avatar_url} className="w-7 h-7 rounded-full object-cover shrink-0" alt="" />
+                  {(p.photo_base64 || p.avatar_url) ? (
+                    <img src={p.photo_base64 || p.avatar_url} className="w-7 h-7 rounded-full object-cover shrink-0" alt="" />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">{(p.nickname || '?')[0]}</div>
                   )}
@@ -141,20 +148,49 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
         )}
       </div>
 
-      {/* Photo upload */}
-      {onPhotoChange && (
-        <div className="flex gap-1 items-center">
-          <Input value={photoValue || ''} onChange={e => onPhotoChange(e.target.value)} placeholder="Photo URL or upload →" className="h-7 text-[10px] text-muted-foreground flex-1" />
-          <label className="shrink-0 cursor-pointer px-2 py-1 rounded text-[9px] bg-muted hover:bg-muted/80 text-muted-foreground">
-            📷
-            <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+      {/* Photo: show small preview + upload button (NOT raw base64 text) */}
+      {onPhotoChange && value && (
+        <div className="flex items-center gap-2">
+          {displayPhoto ? (
+            <img src={displayPhoto} className="w-8 h-8 rounded-full object-cover border" alt="" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">
+              {(value || '?')[0]}
+            </div>
+          )}
+          <label className="flex items-center gap-1 cursor-pointer px-2 py-1 rounded-md text-xs bg-muted hover:bg-muted/80 text-muted-foreground">
+            <Camera className="h-3 w-3" />
+            {displayPhoto ? 'Change' : 'Add photo'}
+            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
+              if (file.size > 5 * 1024 * 1024) { return; }
               const reader = new FileReader();
-              reader.onload = (ev) => { onPhotoChange(ev.target.result); };
+              reader.onload = (ev) => {
+                // Resize to max 200x200 for the live session (keep payload small)
+                const img = new Image();
+                img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  const size = 200;
+                  canvas.width = size;
+                  canvas.height = size;
+                  const ctx = canvas.getContext('2d');
+                  const min = Math.min(img.width, img.height);
+                  const sx = (img.width - min) / 2;
+                  const sy = (img.height - min) / 2;
+                  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+                  onPhotoChange(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = ev.target.result;
+              };
               reader.readAsDataURL(file);
             }} />
           </label>
+          {displayPhoto && (
+            <button type="button" onClick={() => onPhotoChange('')} className="text-xs text-muted-foreground hover:text-red-500">
+              <X className="h-3 w-3" />
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -40,17 +40,32 @@ export default function StartLive() {
     if (!form.player_a_name || !form.player_b_name || !form.referee_name) { toast.error('Enter all names'); return; }
     setSubmitting(true);
     try {
+      // Send photos as small thumbnails (max 200x200 JPEG) to avoid huge payloads
+      // The backend stores player photos separately — we only need small refs for the session
+      const payload = {
+        ...form,
+        player_a_photo: form.player_a_photo && form.player_a_photo.startsWith('data:') && form.player_a_photo.length > 50000
+          ? form.player_a_photo.substring(0, 50000) // truncate if somehow still huge
+          : form.player_a_photo,
+        player_b_photo: form.player_b_photo && form.player_b_photo.startsWith('data:') && form.player_b_photo.length > 50000
+          ? form.player_b_photo.substring(0, 50000)
+          : form.player_b_photo,
+        referee_photo: form.referee_photo && form.referee_photo.startsWith('data:') && form.referee_photo.length > 50000
+          ? form.referee_photo.substring(0, 50000)
+          : form.referee_photo,
+      };
       const res = await fetch(`${API}/api/sport/live`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         const session = await res.json();
         navigate(`/sport/live/${session.session_id}`);
       } else {
-        const err = await res.json(); toast.error(err.detail || 'Error');
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to start match');
       }
-    } catch { toast.error('Network error'); }
+    } catch (e) { toast.error('Network error — check connection'); }
     finally { setSubmitting(false); }
   };
 
