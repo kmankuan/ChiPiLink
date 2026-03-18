@@ -120,10 +120,10 @@ export default function StartLive() {
             {leagues.length > 0 && (
               <div>
                 <Label className="text-xs">{t('sport.leagues')} (optional)</Label>
-                <Select value={form.league_id} onValueChange={v => set('league_id', v)}>
+                <Select value={form.league_id || 'none'} onValueChange={v => set('league_id', v === 'none' ? '' : v)}>
                   <SelectTrigger className="h-10"><SelectValue placeholder="No league" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No league</SelectItem>
+                    <SelectItem value="none">No league</SelectItem>
                     {leagues.filter(l => l.status === 'active').map(l => <SelectItem key={l.league_id} value={l.league_id}>{l.name}</SelectItem>)}
                   </SelectContent>
                 </Select>

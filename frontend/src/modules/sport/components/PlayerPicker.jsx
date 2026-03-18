@@ -1,16 +1,40 @@
 /**
  * PlayerPicker — Smart player selector with dropdown, photos, roles
- * Shows recent players as tappable chips + searchable dropdown with photos.
- * Photo upload uses AvatarUpload component with camera + crop support.
+ * Photo handling: uses AvatarUpload for camera + gallery + crop/resize.
+ * Auto-resizes player photos to thumbnails for live session payloads.
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, ChevronDown, Search, Plus, Camera } from 'lucide-react';
+import { X, ChevronDown, Search, Plus } from 'lucide-react';
 import AvatarUpload from '@/components/shared/AvatarUpload';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
+
+/** Resize any image (URL or base64) to a small JPEG thumbnail */
+function resizeToThumbnail(src, size = 200) {
+  return new Promise((resolve) => {
+    if (!src) { resolve(''); return; }
+    // If it's a short URL (not base64), keep as-is
+    if (src.length < 500 && !src.startsWith('data:')) { resolve(src); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      resolve(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => resolve('');
+    img.src = src;
+  });
+}
 
 export default function PlayerPicker({ label, value, photoValue, onChange, onPhotoChange, filterRole, placeholder = 'Name...', testId }) {
   const [players, setPlayers] = useState([]);
@@ -33,36 +57,36 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
       }).catch(() => {});
   }, [filterRole]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const selectPlayer = (p) => {
+  const selectPlayer = useCallback(async (p) => {
     onChange(p.nickname);
-    // Use photo_base64 first, fallback to avatar_url
     if (onPhotoChange) {
-      onPhotoChange(p.photo_base64 || p.avatar_url || '');
+      // Resize stored photo to thumbnail for the live session payload
+      const rawPhoto = p.photo_base64 || p.avatar_url || '';
+      const thumb = await resizeToThumbnail(rawPhoto);
+      onPhotoChange(thumb);
     }
     setOpen(false);
     setSearch('');
-  };
+  }, [onChange, onPhotoChange]);
 
   const filtered = search
     ? players.filter(p => (p.nickname || '').toLowerCase().includes(search.toLowerCase()))
     : players;
 
   const selectedPlayer = players.find(p => p.nickname === value);
-  // Resolve the best photo source
   const displayPhoto = photoValue || selectedPlayer?.photo_base64 || selectedPlayer?.avatar_url;
 
   return (
-    <div className="space-y-1" ref={wrapRef}>
+    <div className="space-y-1.5" ref={wrapRef}>
       <Label className="text-xs">{label}</Label>
 
-      {/* Selected or input */}
+      {/* Selected player or search input */}
       <div className="relative">
         {value ? (
           <div className="flex items-center gap-2 h-10 px-3 rounded-md border bg-card cursor-pointer" onClick={() => setOpen(!open)}>
@@ -73,10 +97,8 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
             )}
             <span className="text-sm font-medium flex-1 truncate">{value}</span>
             {selectedPlayer?.elo && <span className="text-[9px] text-muted-foreground">{selectedPlayer.elo}</span>}
-            {filterRole === 'referee' && selectedPlayer?.stats?.matches_refereed > 0 && (
-              <span className="text-[9px] text-muted-foreground">⚖️{selectedPlayer.stats.matches_refereed}</span>
-            )}
-            <button type="button" onClick={(e) => { e.stopPropagation(); onChange(''); if (onPhotoChange) onPhotoChange(''); }} className="text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={(e) => { e.stopPropagation(); onChange(''); if (onPhotoChange) onPhotoChange(''); }}
+              className="text-muted-foreground hover:text-foreground">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -91,19 +113,11 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
         {/* Dropdown */}
         {open && (
           <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-lg border bg-card shadow-xl max-h-60 overflow-hidden">
-            {/* Search */}
             <div className="p-1.5 border-b">
-              <Input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search or type new name..."
-                className="h-8 text-xs"
-                autoFocus
-                data-testid={`${testId}-search`}
-              />
+              <Input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search or type new name..." className="h-8 text-xs" autoFocus
+                data-testid={`${testId}-search`} />
             </div>
-
-            {/* Player list */}
             <div className="max-h-44 overflow-y-auto">
               {filtered.length === 0 && !search && (
                 <p className="text-xs text-muted-foreground text-center py-3">No players yet</p>
@@ -128,8 +142,6 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
                   </div>
                 </button>
               ))}
-
-              {/* Create new option */}
               {search && !filtered.some(p => p.nickname.toLowerCase() === search.toLowerCase()) && (
                 <button type="button"
                   className="w-full flex items-center gap-2 px-3 py-2 hover:bg-green-50 text-left border-t"
@@ -137,10 +149,7 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
                   <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                     <Plus className="h-3.5 w-3.5 text-green-600" />
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-green-700">Create "{search}"</p>
-                    <p className="text-[8px] text-green-600">New player</p>
-                  </div>
+                  <p className="text-xs font-medium text-green-700">Create "{search}"</p>
                 </button>
               )}
             </div>
@@ -148,50 +157,18 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
         )}
       </div>
 
-      {/* Photo: show small preview + upload button (NOT raw base64 text) */}
+      {/* Photo: AvatarUpload with camera + gallery + crop/resize */}
       {onPhotoChange && value && (
-        <div className="flex items-center gap-2">
-          {displayPhoto ? (
-            <img src={displayPhoto} className="w-8 h-8 rounded-full object-cover border" alt="" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">
-              {(value || '?')[0]}
-            </div>
-          )}
-          <label className="flex items-center gap-1 cursor-pointer px-2 py-1 rounded-md text-xs bg-muted hover:bg-muted/80 text-muted-foreground">
-            <Camera className="h-3 w-3" />
-            {displayPhoto ? 'Change' : 'Add photo'}
-            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              if (file.size > 5 * 1024 * 1024) { return; }
-              const reader = new FileReader();
-              reader.onload = (ev) => {
-                // Resize to max 200x200 for the live session (keep payload small)
-                const img = new Image();
-                img.onload = () => {
-                  const canvas = document.createElement('canvas');
-                  const size = 200;
-                  canvas.width = size;
-                  canvas.height = size;
-                  const ctx = canvas.getContext('2d');
-                  const min = Math.min(img.width, img.height);
-                  const sx = (img.width - min) / 2;
-                  const sy = (img.height - min) / 2;
-                  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-                  onPhotoChange(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.src = ev.target.result;
-              };
-              reader.readAsDataURL(file);
-            }} />
-          </label>
-          {displayPhoto && (
-            <button type="button" onClick={() => onPhotoChange('')} className="text-xs text-muted-foreground hover:text-red-500">
-              <X className="h-3 w-3" />
-            </button>
-          )}
-        </div>
+        <AvatarUpload
+          currentPhoto={displayPhoto}
+          currentInitial={(value || '?')[0]}
+          size="sm"
+          onUpload={async (base64) => {
+            // AvatarUpload already crops to 400x400 — resize to 200x200 for session payload
+            const thumb = await resizeToThumbnail(base64, 200);
+            onPhotoChange(thumb);
+          }}
+        />
       )}
     </div>
   );
