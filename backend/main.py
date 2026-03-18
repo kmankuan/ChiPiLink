@@ -254,7 +254,7 @@ api_router.include_router(showcase_admin_router)
 from modules.hub_proxy import router as hub_proxy_router
 api_router.include_router(hub_proxy_router)
 
-# Sport Module (Table Tennis — direct routes, no proxy)
+# Sport Module — Direct routes (reliable, no external service dependency)
 from modules.sport import router as sport_router, tournament_router as sport_tournament_router
 api_router.include_router(sport_router)
 api_router.include_router(sport_tournament_router)
