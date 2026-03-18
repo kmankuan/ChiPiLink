@@ -60,11 +60,11 @@ export function QuickAccessButton({ icon: Icon, label, to, color = 'primary', mo
 
 export const QUICK_ACCESS_ITEMS = [
   { icon: Store, label: 'Unatienda', to: '/unatienda', color: 'primary', moduleKey: 'unatienda' },
-  { icon: Trophy, label: 'PinPan League', to: '/pinpanclub/superpin/ranking', color: 'yellow', moduleKey: 'super_pin' },
+  { icon: Trophy, label: 'Sport League', to: '/sport/rankings', color: 'yellow', moduleKey: 'super_pin' },
   { icon: Zap, label: 'Rapid Pin', to: '/rapidpin', color: 'orange', moduleKey: 'rapid_pin' },
   { icon: Calendar, label: 'Eventos', to: '/eventos', color: 'blue', moduleKey: 'events' },
   { icon: Image, label: 'Galeria', to: '/galeria', color: 'purple', moduleKey: 'gallery' },
-  { icon: Users, label: 'Jugadores', to: '/pinpanclub/players', color: 'green', moduleKey: 'players' },
+  { icon: Users, label: 'Jugadores', to: '/sport/players', color: 'green', moduleKey: 'players' },
 ];
 
 // ---- Section Header ----

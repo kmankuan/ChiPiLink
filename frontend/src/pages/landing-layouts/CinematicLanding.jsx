@@ -19,11 +19,11 @@ import {
 
 const MODULES = [
   { key: 'unatienda', icon: Store, label: 'Unatienda', to: '/unatienda', accent: '#059669' },
-  { key: 'super_pin', icon: Trophy, label: 'PinPan League', to: '/pinpanclub/superpin/ranking', accent: '#d97706' },
+  { key: 'super_pin', icon: Trophy, label: 'Sport League', to: '/sport/rankings', accent: '#d97706' },
   { key: 'rapid_pin', icon: Zap, label: 'Rapid Pin', to: '/rapidpin', accent: '#dc2626' },
   { key: 'events', icon: Calendar, label: 'Eventos', to: '/eventos', accent: '#0284c7' },
   { key: 'gallery', icon: Image, label: 'Galeria', to: '/galeria', accent: '#7c3aed' },
-  { key: 'players', icon: Users, label: 'Jugadores', to: '/pinpanclub/players', accent: '#0d9488' },
+  { key: 'players', icon: Users, label: 'Jugadores', to: '/sport/players', accent: '#0d9488' },
 ];
 
 export default function CinematicLanding({ communityData, moduleStatuses }) {
@@ -152,7 +152,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
       <section className="relative py-16 sm:py-24 px-6 sm:px-12" data-testid="pinpanclub-section">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-400/60 mb-2">PinPanClub</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-400/60 mb-2">Sport</p>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-4">
               {t('landing.pinpan.heading', 'Table Tennis Community')}
             </h2>
@@ -161,7 +161,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
             </p>
             <div className="flex gap-3">
               <Button
-                onClick={() => navigate('/pinpanclub')}
+                onClick={() => navigate('/sport')}
                 className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-5 gap-2"
                 data-testid="pinpan-cta"
               >
@@ -170,7 +170,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => navigate('/pinpanclub/players')}
+                onClick={() => navigate('/sport/players')}
                 className="border-white/10 text-white/60 hover:bg-white/5 font-bold px-5 gap-2"
               >
                 <Users className="h-4 w-4" />

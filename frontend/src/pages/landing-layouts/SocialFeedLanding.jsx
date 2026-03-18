@@ -182,11 +182,11 @@ export default function SocialFeedLanding({ communityData, moduleStatuses }) {
           }
         })}
 
-        {/* PinPanClub at the bottom */}
+        {/* Sport at the bottom */}
         <div className="rounded-2xl border border-border/30 overflow-hidden">
           <PinPanClubFeedBlock
             config={{
-              titulo: { es: 'PinPanClub', en: 'PinPanClub' },
+              titulo: { es: 'Sport', en: 'Sport' },
               subtitulo: { es: 'Actividad reciente', en: 'Recent Activity' },
               sections: {
                 recent_matches: { enabled: true, limit: 3 },
@@ -194,7 +194,7 @@ export default function SocialFeedLanding({ communityData, moduleStatuses }) {
                 active_challenges: { enabled: true, limit: 3 },
                 recent_achievements: { enabled: true, limit: 4 },
               },
-              style: { show_cta: true, cta_text: { es: 'Ver PinPanClub', en: 'See PinPanClub' }, cta_url: '/pinpanclub' },
+              style: { show_cta: true, cta_text: { es: 'Ver Sport', en: 'See Sport' }, cta_url: '/sport' },
             }}
           />
         </div>

@@ -352,11 +352,11 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
                 <section key={block.id} data-block="quickAccess" className="px-4 py-4">
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
                     <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Trophy} label="PinPan League" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Trophy} label="Sport League" to="/sport/rankings" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
                     <QuickAccessButton icon={Zap} label="Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
                     <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" color="blue" moduleKey="events" moduleStatuses={moduleStatuses} />
                     <QuickAccessButton icon={Image} label="Galeria" to="/galeria" color="purple" moduleKey="gallery" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" color="green" moduleKey="players" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Users} label="Jugadores" to="/sport/players" color="green" moduleKey="players" moduleStatuses={moduleStatuses} />
                   </div>
                 </section>
               );
@@ -384,14 +384,14 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
                   <PinPanClubFeedBlock
                     config={{
                       titulo: { es: 'Actividad del Club', en: 'Club Activity', zh: '俱乐部动态' },
-                      subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub', zh: 'PinPanClub最新动态' },
+                      subtitulo: { es: 'Lo último en Sport', en: 'Latest from Sport', zh: 'Sport最新动态' },
                       sections: {
                         recent_matches: { enabled: true, limit: 5 },
                         leaderboard: { enabled: true, limit: 10 },
                         active_challenges: { enabled: true, limit: 4 },
                         recent_achievements: { enabled: true, limit: 6 },
                       },
-                      style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' }, cta_url: '/pinpanclub' },
+                      style: { show_cta: true, cta_text: { es: 'Ver más en Sport', en: 'See more in Sport' }, cta_url: '/sport' },
                     }}
                   />
                 </section>
@@ -443,8 +443,8 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
             <h2 className="text-2xl font-bold mb-4">{t('landing.hero.title', 'Welcome to ChiPi Link')}</h2>
             <p className="text-muted-foreground mb-8">{t('landing.hero.subtitle', 'Your community super app')}</p>
             <div className="flex gap-4 justify-center">
-              <Button onClick={() => navigate('/pinpanclub')}>
-                <Trophy className="h-4 w-4 mr-2" /> Ir a PinPanClub
+              <Button onClick={() => navigate('/sport')}>
+                <Trophy className="h-4 w-4 mr-2" /> Ir a Sport
               </Button>
               <Button variant="outline" onClick={() => navigate('/unatienda')}>
                 <Store className="h-4 w-4 mr-2" /> Ver Unatienda
@@ -489,7 +489,7 @@ export default function SuperAppLanding() {
     { id: 'hero', label: 'Hero Carousel', icon: Image, visible: true, order: 0 },
     { id: 'quickAccess', label: 'Acceso Rápido', icon: Zap, visible: true, order: 1 },
     { id: 'announcements', label: 'Anuncios', icon: Bell, visible: true, order: 2 },
-    { id: 'pinpanclub', label: 'PinPanClub', icon: Trophy, visible: true, order: 3 },
+    { id: 'pinpanclub', label: 'Sport', icon: Trophy, visible: true, order: 3 },
     { id: 'news', label: 'Noticias', icon: Newspaper, visible: true, order: 4 },
     { id: 'events', label: 'Eventos', icon: Calendar, visible: true, order: 5 },
     { id: 'gallery', label: 'Galería', icon: Image, visible: true, order: 6 },

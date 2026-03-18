@@ -84,13 +84,37 @@ export default function LiveChat({ roomId, userName = 'Spectator', compact = fal
     if (!input.trim() || !room) return;
     setSending(true);
     try {
-      await room.messages.send({
-        text: input.trim(),
-        data: { senderName: userName, text: input.trim() },
+      // Send via backend for auto-translation
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/ably/chat/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ room_id: roomId, text: input.trim() }),
       });
-      setInput('');
+      if (res.ok) {
+        setInput('');
+      } else {
+        // Fallback: send directly to Ably without translation
+        await room.messages.send({
+          text: input.trim(),
+          data: { senderName: userName, text: input.trim() },
+        });
+        setInput('');
+      }
     } catch (e) {
-      console.error('Send error:', e);
+      // Fallback: direct send
+      try {
+        await room.messages.send({
+          text: input.trim(),
+          data: { senderName: userName, text: input.trim() },
+        });
+        setInput('');
+      } catch (e2) {
+        console.error('Send error:', e2);
+      }
     }
     setSending(false);
   };
@@ -117,7 +141,16 @@ export default function LiveChat({ roomId, userName = 'Spectator', compact = fal
             <span className="font-bold text-white/60">{msg.senderName}: </span>
             <span className="text-white/80">{msg.text}</span>
             {msg.translation && (
-              <span className="text-white/30 italic ml-1">({msg.translation})</span>
+              <span className="text-white/30 italic ml-1">
+                <Globe className="inline h-2.5 w-2.5 mr-0.5" />
+                {msg.translation}
+              </span>
+            )}
+            {msg.translations && Object.keys(msg.translations).length > 0 && !msg.translation && (
+              <span className="text-white/30 italic ml-1">
+                <Globe className="inline h-2.5 w-2.5 mr-0.5" />
+                {Object.values(msg.translations)[0]}
+              </span>
             )}
           </div>
         ))}

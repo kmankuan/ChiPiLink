@@ -132,8 +132,8 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           {/* Store */}
           <ModuleTile icon={Store} label={t('modules.unatienda', 'Unatienda')} to="/unatienda" bg="bg-emerald-600" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
 
-          {/* PinPan League */}
-          <ModuleTile icon={Trophy} label="PinPan League" to="/pinpanclub/superpin/ranking" bg="bg-amber-500" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
+          {/* Sport League */}
+          <ModuleTile icon={Trophy} label="Sport League" to="/sport/rankings" bg="bg-amber-500" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
 
           {/* Rapid Pin */}
           <ModuleTile icon={Zap} label="Rapid Pin" to="/rapidpin" bg="bg-red-600" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
@@ -141,17 +141,17 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           {/* Events */}
           <ModuleTile icon={Calendar} label={t('modules.events', 'Eventos')} to="/eventos" bg="bg-sky-600" moduleKey="events" moduleStatuses={moduleStatuses} />
 
-          {/* PinPanClub tile — spans 2 cols */}
+          {/* Sport tile — spans 2 cols */}
           <Tile
-            onClick={() => navigate('/pinpanclub')}
+            onClick={() => navigate('/sport')}
             testId="tile-pinpanclub"
             className="col-span-2 row-span-1"
           >
-            <img src={landingImages.pinpanclub} alt="PinPanClub" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={landingImages.pinpanclub} alt="Sport" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
             <div className="relative h-full flex items-center p-5 gap-4">
               <div className="flex-1">
-                <p className="text-xs text-white/50 font-semibold uppercase tracking-wider">PinPanClub</p>
+                <p className="text-xs text-white/50 font-semibold uppercase tracking-wider">Sport</p>
                 <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mt-0.5">
                   {t('landing.pinpan.title', 'Table Tennis Community')}
                 </h3>
@@ -169,7 +169,7 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           <ModuleTile icon={Image} label={t('modules.gallery', 'Galeria')} to="/galeria" bg="bg-violet-600" moduleKey="gallery" moduleStatuses={moduleStatuses} />
 
           {/* Players */}
-          <ModuleTile icon={Users} label={t('modules.players', 'Jugadores')} to="/pinpanclub/players" bg="bg-teal-600" moduleKey="players" moduleStatuses={moduleStatuses} />
+          <ModuleTile icon={Users} label={t('modules.players', 'Jugadores')} to="/sport/players" bg="bg-teal-600" moduleKey="players" moduleStatuses={moduleStatuses} />
 
           {/* Community Feed tile — spans 2 cols */}
           <Tile

@@ -165,7 +165,7 @@ export default function HorizonLanding({ communityData }) {
 
           {/* Play */}
           <button
-            onClick={() => navigate('/pinpanclub')}
+            onClick={() => navigate('/sport')}
             className="group relative overflow-hidden rounded-2xl p-5 text-left transition-all duration-200 hover:shadow-md active:scale-[0.97]"
             style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.05)' }}
             data-testid="action-play"
@@ -173,7 +173,7 @@ export default function HorizonLanding({ communityData }) {
             <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style={{ background: '#d97706', opacity: 0.9 }}>
               <Play className="h-5 w-5 text-white" />
             </div>
-            <p className="text-sm font-bold text-[#1A1A1A] tracking-tight">PinPanClub</p>
+            <p className="text-sm font-bold text-[#1A1A1A] tracking-tight">Sport</p>
             <p className="text-[10px] text-[#999] mt-0.5">{t('landing.play.hint', 'Matches & rankings')}</p>
             <ChevronRight className="absolute top-5 right-4 h-4 w-4 text-[#ddd] group-hover:text-[#999] transition-colors" />
           </button>
@@ -225,7 +225,7 @@ export default function HorizonLanding({ communityData }) {
               <div className="md:col-span-3 flex flex-col justify-center px-6 sm:px-10 py-8 sm:py-12">
                 <div className="inline-flex items-center gap-1.5 mb-3">
                   <Trophy className="h-4 w-4 text-[#d97706]" />
-                  <p className="text-xs font-bold tracking-[0.15em] uppercase text-[#d97706]">PinPanClub</p>
+                  <p className="text-xs font-bold tracking-[0.15em] uppercase text-[#d97706]">Sport</p>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-3" style={{ color: '#1A1A1A' }}>
                   {t('landing.pinpan.heading', 'Table Tennis Community')}
@@ -254,7 +254,7 @@ export default function HorizonLanding({ communityData }) {
 
                 <div className="flex flex-wrap gap-3">
                   <Button
-                    onClick={() => navigate('/pinpanclub')}
+                    onClick={() => navigate('/sport')}
                     className="rounded-full px-5 font-bold gap-2 shadow-md"
                     style={{ background: '#d97706' }}
                     data-testid="pinpan-cta"
@@ -264,7 +264,7 @@ export default function HorizonLanding({ communityData }) {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => navigate('/pinpanclub/players')}
+                    onClick={() => navigate('/sport/players')}
                     className="rounded-full px-5 font-bold gap-2 border-[#d97706]/20 text-[#92400e] hover:bg-[#d97706]/5"
                     data-testid="pinpan-players-btn"
                   >

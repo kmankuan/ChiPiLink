@@ -189,11 +189,11 @@ export default function MagazineLanding({ communityData, moduleStatuses }) {
         )}
       </div>
 
-      {/* PinPanClub full width */}
+      {/* Sport full width */}
       <div className="mt-8 rounded-2xl border border-border/30 overflow-hidden">
         <PinPanClubFeedBlock
           config={{
-            titulo: { es: 'PinPanClub', en: 'PinPanClub' },
+            titulo: { es: 'Sport', en: 'Sport' },
             subtitulo: { es: 'Actividad reciente', en: 'Recent Activity' },
             sections: {
               recent_matches: { enabled: true, limit: 5 },
@@ -201,7 +201,7 @@ export default function MagazineLanding({ communityData, moduleStatuses }) {
               active_challenges: { enabled: true, limit: 4 },
               recent_achievements: { enabled: true, limit: 6 },
             },
-            style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' }, cta_url: '/pinpanclub' },
+            style: { show_cta: true, cta_text: { es: 'Ver más en Sport', en: 'See more in Sport' }, cta_url: '/sport' },
           }}
         />
       </div>

@@ -144,19 +144,19 @@ export default function BentoGridLanding({ communityData, moduleStatuses }) {
       {/* Row 3: News grid */}
       <NewsTile noticias={noticias} />
 
-      {/* Row 4: PinPanClub */}
+      {/* Row 4: Sport */}
       <div className="rounded-2xl border border-border/50 overflow-hidden">
         <PinPanClubFeedBlock
           config={{
             titulo: { es: 'Actividad del Club', en: 'Club Activity', zh: '俱乐部动态' },
-            subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub', zh: 'PinPanClub最新动态' },
+            subtitulo: { es: 'Lo último en Sport', en: 'Latest from Sport', zh: 'Sport最新动态' },
             sections: {
               recent_matches: { enabled: true, limit: 5 },
               leaderboard: { enabled: true, limit: 10 },
               active_challenges: { enabled: true, limit: 4 },
               recent_achievements: { enabled: true, limit: 6 },
             },
-            style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub', zh: '查看PinPanClub更多' }, cta_url: '/pinpanclub' },
+            style: { show_cta: true, cta_text: { es: 'Ver más en Sport', en: 'See more in Sport', zh: '查看Sport更多' }, cta_url: '/sport' },
           }}
         />
       </div>

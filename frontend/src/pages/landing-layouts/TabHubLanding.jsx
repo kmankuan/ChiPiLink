@@ -58,10 +58,10 @@ function ServicesTab({ moduleStatuses, destacados }) {
         </button>
       )}
 
-      {/* PinPanClub */}
+      {/* Sport */}
       <PinPanClubFeedBlock
         config={{
-          titulo: { es: 'PinPanClub', en: 'PinPanClub' },
+          titulo: { es: 'Sport', en: 'Sport' },
           subtitulo: { es: 'Actividad reciente', en: 'Recent Activity' },
           sections: {
             recent_matches: { enabled: true, limit: 3 },
@@ -69,7 +69,7 @@ function ServicesTab({ moduleStatuses, destacados }) {
             active_challenges: { enabled: true, limit: 3 },
             recent_achievements: { enabled: true, limit: 4 },
           },
-          style: { show_cta: true, cta_text: { es: 'Ver PinPanClub', en: 'View PinPanClub' }, cta_url: '/pinpanclub' },
+          style: { show_cta: true, cta_text: { es: 'Ver Sport', en: 'View Sport' }, cta_url: '/sport' },
         }}
       />
     </div>
