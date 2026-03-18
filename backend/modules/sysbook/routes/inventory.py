@@ -77,6 +77,110 @@ async def get_purchased_summary(admin: dict = Depends(get_admin_user)):
     return summary
 
 
+@router.get("/products/{book_id}/presale-orders")
+async def get_presale_orders(book_id: str, admin: dict = Depends(get_admin_user)):
+    """Get all orders contributing to the presale (reserved) count for this book.
+    Presale orders are those with is_presale=True or status in awaiting states."""
+    orders = await db.store_textbook_orders.find(
+        {"items.book_id": book_id, "$or": [
+            {"is_presale": True},
+            {"status": {"$in": ["awaiting_payment", "awaiting_link", "pending", "submitted"]}}
+        ]},
+        {"_id": 0, "order_id": 1, "student_name": 1, "parent_name": 1,
+         "user_name": 1, "user_email": 1, "grade": 1, "items": 1, "status": 1,
+         "is_presale": 1, "created_at": 1}
+    ).to_list(500)
+
+    presale_list = []
+    total_qty = 0
+    for order in orders:
+        for item in order.get("items", []):
+            if item.get("book_id") == book_id:
+                qty = item.get("quantity_ordered", 1)
+                total_qty += qty
+                presale_list.append({
+                    "order_id": order["order_id"],
+                    "student_name": order.get("student_name", ""),
+                    "parent_name": order.get("parent_name", ""),
+                    "user_name": order.get("user_name", ""),
+                    "user_email": order.get("user_email", ""),
+                    "grade": order.get("grade", ""),
+                    "quantity": qty,
+                    "status": order.get("status", ""),
+                    "is_presale": order.get("is_presale", False),
+                    "created_at": order.get("created_at"),
+                })
+                break
+
+    return {"book_id": book_id, "total_qty": total_qty, "orders": presale_list}
+
+
+@router.get("/products/{book_id}/stock-history")
+async def get_stock_history(book_id: str, admin: dict = Depends(get_admin_user)):
+    """Get stock movement history for a product — adjustments, orders, imports."""
+    # Get stock movement logs
+    movements = await db.sysbook_stock_movements.find(
+        {"book_id": book_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(50)
+
+    # Get fulfilled orders that reduced stock
+    fulfilled_orders = await db.store_textbook_orders.find(
+        {"items.book_id": book_id, "status": {"$in": ["ready", "delivered", "completed"]}},
+        {"_id": 0, "order_id": 1, "student_name": 1, "grade": 1, "items": 1, "status": 1, "created_at": 1}
+    ).sort("created_at", -1).limit(50).to_list(50)
+
+    order_entries = []
+    for order in fulfilled_orders:
+        for item in order.get("items", []):
+            if item.get("book_id") == book_id:
+                order_entries.append({
+                    "type": "order_fulfilled",
+                    "order_id": order["order_id"],
+                    "student_name": order.get("student_name", ""),
+                    "grade": order.get("grade", ""),
+                    "quantity": -(item.get("quantity_ordered", 1)),
+                    "status": order.get("status", ""),
+                    "created_at": order.get("created_at"),
+                })
+                break
+
+    # Get the product's current stock
+    product = await db.store_products.find_one(
+        {"book_id": book_id, **SYSBOOK_FILTER},
+        {"_id": 0, "inventory_quantity": 1, "reserved_quantity": 1, "name": 1}
+    )
+
+    return {
+        "book_id": book_id,
+        "current_stock": product.get("inventory_quantity", 0) if product else 0,
+        "reserved": product.get("reserved_quantity", 0) if product else 0,
+        "movements": movements,
+        "fulfilled_orders": order_entries,
+    }
+
+
+@router.get("/presale-summary")
+async def get_presale_summary(admin: dict = Depends(get_admin_user)):
+    """Get total presale quantity per book_id across all presale/pending orders."""
+    pipeline = [
+        {"$match": {"$or": [
+            {"is_presale": True},
+            {"status": {"$in": ["awaiting_payment", "awaiting_link", "pending", "submitted"]}}
+        ]}},
+        {"$unwind": "$items"},
+        {"$group": {
+            "_id": "$items.book_id",
+            "total_qty": {"$sum": "$items.quantity_ordered"},
+            "order_count": {"$sum": 1},
+        }},
+    ]
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(5000)
+    summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
+    return summary
+
+
+
 
 @router.get("/dashboard")
 async def sysbook_inventory_dashboard(admin: dict = Depends(get_admin_user)):

@@ -196,14 +196,41 @@ function ThresholdCell({ product, globalThreshold, onSave }) {
   );
 }
 
-/* ── Presale Cell (Editable with Confirmation) ── */
-function PresaleCell({ product, onSave }) {
+/* ── Presale Cell (Clickable — shows drill-down of presale orders + editable) ── */
+function PresaleCell({ product, onSave, presaleData }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDrilldown, setShowDrilldown] = useState(false);
+  const [orders, setOrders] = useState(null);
+  const [loadingOrders, setLoadingOrders] = useState(false);
   const [newValue, setNewValue] = useState('');
   const [saving, setSaving] = useState(false);
   const reserved = product.reserved_quantity || 0;
+  const presaleQty = presaleData?.qty || reserved;
+  const presaleOrderCount = presaleData?.orders || 0;
 
-  const handleOpen = () => { setNewValue(String(reserved)); setShowConfirm(true); };
+  const fetchOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API_PREFIX}/products/${product.book_id}/presale-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+      }
+    } catch {} finally { setLoadingOrders(false); }
+  };
+
+  const handleClick = () => {
+    if (reserved > 0) {
+      setShowDrilldown(true);
+      if (!orders) fetchOrders();
+    } else {
+      setNewValue(String(reserved));
+      setShowConfirm(true);
+    }
+  };
 
   const handleConfirm = async () => {
     const val = parseInt(newValue);
@@ -218,46 +245,202 @@ function PresaleCell({ product, onSave }) {
 
   return (
     <>
-      <div onClick={handleOpen}
+      <div onClick={handleClick}
         className={`cursor-pointer rounded px-2 py-1 text-center font-semibold transition-all hover:ring-2 hover:ring-primary/50
           ${reserved > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'text-muted-foreground'}`}
-        title={`${reserved} pre-sale reserved. Click to edit.`}
+        title={reserved > 0 ? `${reserved} pre-sale reserved${presaleOrderCount > 0 ? ` in ${presaleOrderCount} orders` : ''}. Click for details.` : 'No pre-sales. Click to set.'}
         data-testid={`presale-cell-${product.book_id}`}>
         {reserved > 0 ? reserved : '—'}
       </div>
+
+      {/* Presale orders drill-down dialog */}
+      <Dialog open={showDrilldown} onOpenChange={setShowDrilldown}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Pre-sale Orders: {product.name}</DialogTitle>
+            <DialogDescription className="text-xs">
+              {product.code || ''} · Grade {product.grade || '—'} · {reserved} reserved
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            {loadingOrders ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            ) : orders && orders.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 sticky top-0">
+                  <tr>
+                    <th className="text-left p-2 text-xs font-semibold">Student</th>
+                    <th className="text-left p-2 text-xs font-semibold">Parent/User</th>
+                    <th className="text-center p-2 text-xs font-semibold">Grade</th>
+                    <th className="text-center p-2 text-xs font-semibold">Qty</th>
+                    <th className="text-center p-2 text-xs font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((p, i) => (
+                    <tr key={i} className="border-b hover:bg-muted/30">
+                      <td className="p-2 text-xs font-medium">{p.student_name || '—'}</td>
+                      <td className="p-2 text-xs text-muted-foreground">{p.parent_name || p.user_name || p.user_email || '—'}</td>
+                      <td className="p-2 text-xs text-center">{p.grade || '—'}</td>
+                      <td className="p-2 text-xs text-center font-semibold">{p.quantity}</td>
+                      <td className="p-2 text-xs text-center">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium
+                          ${p.status === 'submitted' ? 'bg-blue-100 text-blue-700' :
+                            p.status === 'awaiting_payment' ? 'bg-amber-100 text-amber-700' :
+                            p.status === 'awaiting_link' ? 'bg-orange-100 text-orange-700' :
+                            p.is_presale ? 'bg-purple-100 text-purple-700' :
+                            'bg-gray-100 text-gray-700'}`}>
+                          {p.is_presale ? '📋 ' : ''}{p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No pre-sale orders found</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => { setShowDrilldown(false); setNewValue(String(reserved)); setShowConfirm(true); }}>
+              Edit Value
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit value dialog */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm">Edit Pre-sale Quantity</DialogTitle>
-            <DialogDescription className="text-xs">
-              <strong>{product.name}</strong> ({product.code || '—'})
-            </DialogDescription>
+            <DialogTitle className="text-sm">Edit Pre-sale: {product.name}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-1">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground w-16">Current:</span>
-              <span className="font-semibold text-amber-700">{reserved}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Label className="text-xs w-16">New:</Label>
+          <div className="space-y-3 py-2">
+            <div>
+              <Label className="text-xs">Pre-sale reserved quantity</Label>
               <Input type="number" min="0" value={newValue}
-                onChange={(e) => setNewValue(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleConfirm(); }}
-                autoFocus className="h-8 w-24 text-center"
+                onChange={e => setNewValue(e.target.value)}
+                className="h-9 mt-1"
                 data-testid={`presale-input-${product.book_id}`} />
             </div>
-            {parseInt(newValue) !== reserved && !isNaN(parseInt(newValue)) && (
-              <div className="text-xs text-center p-2 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-700">
-                Changing pre-sale from <strong>{reserved}</strong> to <strong>{parseInt(newValue)}</strong>
-              </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" size="sm" onClick={() => setShowConfirm(false)}>Cancel</Button>
+            <Button size="sm" onClick={handleConfirm} disabled={saving}
+              data-testid={`presale-confirm-${product.book_id}`}>
+              {saving ? 'Saving...' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/* ── Stock Cell (Clickable — shows stock history + adjust) ── */
+function StockCellWithHistory({ product, onAdjustStock, globalThreshold }) {
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState(null);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const stock = product.inventory_quantity || 0;
+  const isOut = stock <= 0;
+  const threshold = product.low_stock_threshold || globalThreshold || 5;
+  const isLow = stock > 0 && stock < threshold;
+
+  const fetchHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API_PREFIX}/products/${product.book_id}/stock-history`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) setHistory(await res.json());
+    } catch {} finally { setLoadingHistory(false); }
+  };
+
+  const handleClick = (e) => {
+    if (e.shiftKey || stock === 0) {
+      // Shift+click or zero stock → adjust stock directly
+      onAdjustStock?.(product);
+    } else {
+      setShowHistory(true);
+      if (!history) fetchHistory();
+    }
+  };
+
+  const allEntries = [
+    ...(history?.movements || []).map(m => ({ ...m, type: m.type || 'adjustment', created_at: m.created_at })),
+    ...(history?.fulfilled_orders || []),
+  ].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '')).slice(0, 30);
+
+  return (
+    <>
+      <div onClick={handleClick}
+        className={`cursor-pointer rounded px-2 py-1 text-center font-semibold
+          ${isOut ? 'bg-red-100 text-red-700 dark:bg-red-900/30' : isLow ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'}
+          hover:ring-2 hover:ring-primary/50 transition-all`}
+        title={`Stock: ${stock}. Click for history. Shift+click to adjust.`}>
+        {stock}
+      </div>
+
+      <Dialog open={showHistory} onOpenChange={setShowHistory}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Stock History: {product.name}</DialogTitle>
+            <DialogDescription className="text-xs">
+              {product.code || ''} · Current: {stock} · Reserved: {product.reserved_quantity || 0}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            {loadingHistory ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            ) : allEntries.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 sticky top-0">
+                  <tr>
+                    <th className="text-left p-2 text-xs font-semibold">Type</th>
+                    <th className="text-left p-2 text-xs font-semibold">Details</th>
+                    <th className="text-center p-2 text-xs font-semibold">Qty</th>
+                    <th className="text-left p-2 text-xs font-semibold">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allEntries.map((entry, i) => (
+                    <tr key={i} className="border-b hover:bg-muted/30">
+                      <td className="p-2 text-xs">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium
+                          ${entry.type === 'order_fulfilled' ? 'bg-blue-100 text-blue-700' :
+                            entry.type === 'manual_adjustment' ? 'bg-purple-100 text-purple-700' :
+                            entry.type === 'import' ? 'bg-green-100 text-green-700' :
+                            'bg-gray-100 text-gray-700'}`}>
+                          {entry.type === 'order_fulfilled' ? '📦 Order' :
+                           entry.type === 'manual_adjustment' ? '✏️ Adjust' :
+                           entry.type === 'import' ? '📥 Import' :
+                           entry.type || '—'}
+                        </span>
+                      </td>
+                      <td className="p-2 text-xs text-muted-foreground">
+                        {entry.student_name || entry.reason || entry.notes || '—'}
+                      </td>
+                      <td className="p-2 text-xs text-center font-semibold">
+                        <span className={entry.quantity > 0 ? 'text-green-600' : 'text-red-600'}>
+                          {entry.quantity > 0 ? '+' : ''}{entry.quantity}
+                        </span>
+                      </td>
+                      <td className="p-2 text-xs text-muted-foreground">
+                        {entry.created_at ? new Date(entry.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No stock history found</p>
             )}
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" size="sm" onClick={() => setShowConfirm(false)}>Cancel</Button>
-            <Button size="sm" onClick={handleConfirm} disabled={saving} className="gap-1"
-              data-testid={`presale-confirm-${product.book_id}`}>
-              {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-              Confirm
+          <DialogFooter>
+            <Button size="sm" onClick={() => { setShowHistory(false); onAdjustStock?.(product); }}>
+              Adjust Stock
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -371,23 +554,12 @@ function renderCellContent(col, product, helpers) {
           onSave={(v) => updateProductField(bookId, 'price', parseFloat(v) || 0)}
           type="number" className="justify-end font-medium" />
       );
-    case 'stock': {
-      const stock = (product.inventory_quantity || 0) - (product.reserved_quantity || 0);
-      const isOut = stock <= 0;
-      const isLow = stock > 0 && stock < 5;
-      return (
-        <div className={`cursor-pointer rounded px-2 py-1 text-center font-semibold
-          ${isOut ? 'bg-red-100 text-red-700 dark:bg-red-900/30' : isLow ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'}
-          hover:ring-2 hover:ring-primary/50 transition-all`}
-          onClick={() => onAdjustStock?.(product)} title="Click to adjust stock">
-          {product.inventory_quantity || 0}
-        </div>
-      );
-    }
+    case 'stock':
+      return <StockCellWithHistory product={product} onAdjustStock={onAdjustStock} globalThreshold={globalThreshold} />;
     case 'threshold':
       return <ThresholdCell product={product} globalThreshold={globalThreshold} onSave={updateProductField} />;
     case 'presale':
-      return <PresaleCell product={product} onSave={updateProductField} />;
+      return <PresaleCell product={product} onSave={updateProductField} presaleData={helpers?.presaleSummary?.[product.book_id]} />;
     case 'presale_lock':
       return (
         <div className="flex justify-center">
@@ -424,7 +596,7 @@ function renderCellContent(col, product, helpers) {
 }
 
 /* ── Sysbook Inventory Table ── */
-function SysbookTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop, globalThreshold, purchasedSummary }) {
+function SysbookTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop, globalThreshold, purchasedSummary, presaleSummary }) {
   const totalWidth = columns.reduce((s, c) => s + (columnWidths[c.key] || c.width), 0) + (columnWidths.select || 40) + (columnWidths.actions || 80);
   const allSelected = products.length > 0 && products.every(p => selectedIds.has(p.book_id));
   const someSelected = products.some(p => selectedIds.has(p.book_id)) && !allSelected;
@@ -466,7 +638,7 @@ function SysbookTable({ products, columns, columnWidths, onResize, sortConfig, o
                 <td key={col.key}
                   className={`p-1 ${col.sticky ? 'sticky left-0 z-10 bg-background border-r' : ''} ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
                   style={{ width: `${columnWidths[col.key] || col.width}px`, minWidth: `${columnWidths[col.key] || col.width}px` }}>
-                  {renderCellContent(col, p, { updateProductField, onAdjustStock, globalThreshold, purchasedSummary })}
+                  {renderCellContent(col, p, { updateProductField, onAdjustStock, globalThreshold, purchasedSummary, presaleSummary })}
                 </td>
               ))}
               <td className="p-1 text-right" style={{ width: `${columnWidths.actions || 80}px` }}>
@@ -685,6 +857,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
 
   const [products, setProducts] = useState([]);
   const [purchasedSummary, setPurchasedSummary] = useState({});
+  const [presaleSummary, setPresaleSummary] = useState({});
   const [filters, setFilters] = useState({ grades: [], subjects: [] });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -786,9 +959,10 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
       let url = `${API_PREFIX}/products?limit=500`;
       if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
       if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
-      const [prodRes, purchRes] = await Promise.all([
+      const [prodRes, purchRes, presaleRes] = await Promise.all([
         fetch(url, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_PREFIX}/purchased-summary`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_PREFIX}/presale-summary`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const data = await prodRes.json();
       const all = data.products || [];
@@ -800,6 +974,10 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
       if (purchRes.ok) {
         const ps = await purchRes.json();
         setPurchasedSummary(ps);
+      }
+      if (presaleRes.ok) {
+        const prs = await presaleRes.json();
+        setPresaleSummary(prs);
       }
     } catch { toast.error('Error loading inventory'); }
     finally { setLoading(false); }
@@ -1106,7 +1284,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
                   onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
                   dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop}
-                  globalThreshold={globalThreshold} purchasedSummary={purchasedSummary} />
+                  globalThreshold={globalThreshold} purchasedSummary={purchasedSummary} presaleSummary={presaleSummary} />
               </div>
             </DialogContent>
           </Dialog>
@@ -1137,7 +1315,7 @@ export default function SysbookInventoryTable({ token, onRefresh }) {
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
                   onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
                   dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop}
-                  globalThreshold={globalThreshold} purchasedSummary={purchasedSummary} />
+                  globalThreshold={globalThreshold} purchasedSummary={purchasedSummary} presaleSummary={presaleSummary} />
               </div>
             </CardContent>
           </Card>
