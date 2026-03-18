@@ -254,7 +254,7 @@ api_router.include_router(showcase_admin_router)
 from modules.hub_proxy import router as hub_proxy_router
 api_router.include_router(hub_proxy_router)
 
-# Sport Module — Direct routes (always works) + Sport Engine started as bonus service
+# Sport Module — Direct routes (always works) + proxy to port 8004 when available
 from modules.sport import router as sport_router, tournament_router as sport_tournament_router
 api_router.include_router(sport_router)
 api_router.include_router(sport_tournament_router)
@@ -321,6 +321,20 @@ async def track_requests_middleware(request, call_next):
 
 # Initialize monitor after app is defined
 _init_monitor()
+
+# Sport Engine proxy middleware — offloads /api/sport/* to port 8004 when available
+@app.middleware("http")
+async def sport_proxy_middleware(request, call_next):
+    """If Sport Engine (port 8004) is running, proxy sport requests there.
+    Otherwise, fall through to direct routes in the main app."""
+    if request.url.path.startswith("/api/sport/"):
+        from modules.sport_proxy import proxy_if_available
+        path = request.url.path[len("/api/sport/"):]
+        result = await proxy_if_available(request, path)
+        if result is not None:
+            return result
+    # Fall through to direct routes
+    return await call_next(request)
 
 # ============== LIFECYCLE EVENTS ==============
 
@@ -468,33 +482,41 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Integration Hub bootstrap skipped: {e}")
 
-        # Bootstrap Tutor Engine (port 8003)
-        try:
-            import subprocess
-            tutor_script = "/app/tutor-engine/bootstrap.sh"
-            if os.path.exists(tutor_script):
-                result = subprocess.run(["bash", tutor_script], capture_output=True, text=True, timeout=15)
-                for line in result.stdout.strip().split("\n"):
-                    if line.strip():
-                        logger.info(line.strip())
-        except Exception as e:
-            logger.warning(f"Tutor Engine bootstrap skipped: {e}")
+        # Start separated services via Process Manager (reliable, no supervisor dependency)
+        from core.service_manager import service_manager
 
-        # Bootstrap Sport Engine (port 8004) — as subprocess, no supervisor
-        try:
-            import subprocess
-            sport_script = "/app/sport-engine/bootstrap.sh"
-            if os.path.exists(sport_script):
-                result = subprocess.run(["bash", sport_script], capture_output=True, text=True, timeout=20)
-                for line in result.stdout.strip().split("\n"):
-                    if line.strip():
-                        logger.info(line.strip())
-                if result.stderr:
-                    for line in result.stderr.strip().split("\n"):
-                        if line.strip():
-                            logger.warning(f"[sport-bootstrap] {line.strip()}")
-        except Exception as e:
-            logger.warning(f"Sport Engine bootstrap skipped: {e}")
+        if os.path.exists("/app/tutor-engine/main.py"):
+            service_manager.register(
+                "tutor-engine",
+                ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
+                "/app/tutor-engine", 8003
+            )
+
+        if os.path.exists("/app/sport-engine/main.py"):
+            service_manager.register(
+                "sport-engine",
+                ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
+                "/app/sport-engine", 8004
+            )
+
+        service_manager.start_all()
+        await service_manager.start_monitoring()
+
+        # Wait and verify services
+        await asyncio.sleep(3)
+        for name, status in service_manager.status().items():
+            if status["running"]:
+                logger.info(f"[service-manager] {name} RUNNING on port {status['port']} (pid {status['pid']})")
+            else:
+                logger.warning(f"[service-manager] {name} FAILED to start on port {status['port']}")
+
+        # Check Sport Engine and enable proxy
+        from modules.sport_proxy import check_engine
+        await asyncio.sleep(2)
+        if await check_engine():
+            logger.info("[sport-proxy] Sport Engine detected on port 8004 — proxying enabled")
+        else:
+            logger.info("[sport-proxy] Sport Engine not available — using direct routes")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
@@ -515,6 +537,13 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("ChiPi Link API shutting down...")
+    # Stop child services
+    try:
+        from core.service_manager import service_manager
+        service_manager.stop_all()
+        logger.info("Child services stopped")
+    except Exception as e:
+        logger.warning(f"Service manager shutdown: {e}")
     try:
         from modules.showcase.scheduler import banner_sync_scheduler
         banner_sync_scheduler.stop()
