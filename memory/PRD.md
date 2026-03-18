@@ -1,23 +1,36 @@
 # ChiPi Link - Super App
 
-## Architecture
-- **Main App** (port 8001): Auth, Users, Wallet, Community, Admin, Landing, Store
-- **Integration Hub** (port 8002): Monday.com, Telegram, Gmail, webhooks
-- **Tutor Engine** (port 8003): AI tutoring, worksheets, school reader
-- **Sport Engine** (port 8004): Table tennis scoring, live matches, TV broadcast, tournaments ← EXTRACTED
+## Architecture (5 Services)
+| Service | Port | Description |
+|---------|------|-------------|
+| Main App | 8001 | Auth, Users, Wallet, Community, Admin, Landing |
+| Integration Hub | 8002 | Monday.com, Telegram, Gmail, webhooks |
+| Tutor Engine | 8003 | AI tutoring, worksheets, school reader |
+| Sport Engine | 8004 | Table tennis scoring, live matches, TV, tournaments |
+| Commerce Engine | 8005 | Store (Unatienda), Sysbook (Textbooks), Platform Store |
 
-## Sport Engine Extraction (Completed)
-The Sport module was extracted from `/app/backend/modules/sport/` into a standalone service.
+## Extracted Services
 
-### How It Works
-1. `sport-engine/main.py` — Standalone FastAPI app on port 8004
-   - Connects to same MongoDB (chipilink_prod)
-   - Validates JWT with same secret as main app
-   - Patches core.database/core.auth so sport module imports work unchanged
-2. `sport-engine/bootstrap.sh` — Creates supervisor config and starts the service
-3. `backend/modules/sport_proxy.py` — Proxies /api/sport/* from port 8001 → 8004
-4. `backend/main.py` — Bootstraps sport-engine on startup, uses proxy instead of direct routes
-5. Frontend code unchanged — calls /api/sport/* which gets proxied transparently
+### Sport Engine (port 8004) ✅
+- `/app/sport-engine/main.py` — Standalone FastAPI service
+- `/app/sport-engine/bootstrap.sh` — Creates supervisor config
+- `/app/backend/modules/sport_proxy.py` — Proxies /api/sport/* from 8001 → 8004
+- Source: `/app/backend/modules/sport/`
+
+### Commerce Engine (port 8005) ✅
+- `/app/commerce-engine/main.py` — Standalone FastAPI service
+- `/app/commerce-engine/bootstrap.sh` — Creates supervisor config  
+- `/app/backend/modules/commerce_proxy.py` — Proxies /api/store/*, /api/sysbook/*, /api/platform-store/* from 8001 → 8005
+- Source: `/app/backend/modules/store/`, `/app/backend/modules/sysbook/`, `/app/backend/routes/platform_store.py`
+
+### Pattern Used
+All extractions follow the Tutor Engine pattern:
+1. Standalone FastAPI app imports modules from `/app/backend/modules/`
+2. Patches `core.*` modules (database, auth) with own implementations
+3. Stubs optional cross-module deps (ably, notifications, Monday)
+4. Bootstrap script creates supervisor config and starts service
+5. Main app proxy forwards API calls transparently
+6. Frontend code unchanged — calls /api/* which gets proxied
 
 ## Test Accounts
 - Super Admin: teck@koh.one / Acdb##0897
