@@ -1,6 +1,10 @@
 """
 ChiPi Commerce Engine — Standalone service on port 8005
 Store (Unatienda), Sysbook (School Textbooks), Platform Store
+
+KEY INSIGHT: We DON'T create our own db connection. We let core.database
+handle it (it has the same production URL logic). We only patch core.auth
+to use our own JWT validation, and stub optional cross-module deps.
 """
 import os
 import sys
@@ -11,8 +15,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Depends, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-from typing import Optional, List
+from typing import Optional
 import jwt as pyjwt
 
 # ────────── Environment ──────────
@@ -23,27 +26,55 @@ if backend_env.exists():
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("commerce-engine")
 
-# ────────── Database (same as main app) ──────────
-_PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
-_PROD_DB_NAME = "backend-cleanup-10-chipilink_prod"
+# ────────── Add backend to path FIRST ──────────
+backend_path = str(Path(__file__).parent.parent / "backend")
+sys.path.insert(0, backend_path)
 
-_env_mongo = os.environ.get("MONGO_URL", "")
-if "localhost" in _env_mongo or "127.0.0.1" in _env_mongo:
-    MONGO_URL = _env_mongo
-    DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
-else:
-    MONGO_URL = _PROD_MONGO_URL
-    DB_NAME = _PROD_DB_NAME
+# ────────── Import REAL core package (creates db connection automatically) ──────────
+import core
+import core.database  # This creates the db connection using same prod URL logic
+import core.base
+import core.base.repository
+import core.base.service
+import core.constants
+import core.config
 
-client = AsyncIOMotorClient(
-    MONGO_URL,
-    maxPoolSize=20, minPoolSize=2,
-    maxIdleTimeMS=45000, retryWrites=True, retryReads=True,
-)
-db = client[DB_NAME]
+# Get the db that core.database created — this is what store/sysbook will use
+db = core.database.db
+DB_NAME = getattr(core.database, 'db_name', getattr(core.database, 'DB_NAME', 'chipilink_prod'))
+
+# Import events
+try:
+    import core.events
+    import core.events.event_bus
+except Exception as e:
+    logger.warning(f"core.events import: {e}")
+    core_events = types.ModuleType("core.events")
+    class _EventPriority:
+        LOW = 1; NORMAL = 2; HIGH = 3; CRITICAL = 4
+    class _Event:
+        def __init__(self, **kw):
+            for k, v in kw.items():
+                setattr(self, k, v)
+    class _StoreEvents:
+        PRODUCT_CREATED = "store.product.created"
+        PRODUCT_UPDATED = "store.product.updated"
+        ORDER_CREATED = "store.order.created"
+        ORDER_UPDATED = "store.order.updated"
+    class _EventBus:
+        def subscribe(self, *a, **kw): pass
+        async def publish(self, *a, **kw): pass
+    core_events.EventPriority = _EventPriority
+    core_events.Event = _Event
+    core_events.StoreEvents = _StoreEvents
+    core_events.event_bus = _EventBus()
+    sys.modules["core.events"] = core_events
+    evbus_stub = types.ModuleType("core.events.event_bus")
+    evbus_stub.EventBus = type(_EventBus)
+    sys.modules["core.events.event_bus"] = evbus_stub
 
 # ────────── JWT Auth (same secret as main app) ──────────
-JWT_SECRET = os.environ.get("JWT_SECRET", "libros-textbook-store-secret-key-2024")
+JWT_SECRET = core.config.JWT_SECRET
 JWT_ALGORITHM = "HS256"
 _bearer = HTTPBearer(auto_error=False)
 
@@ -101,62 +132,16 @@ def get_database():
     return db
 
 
-# ────────── Patch core.* so module imports work unchanged ──────────
-backend_path = str(Path(__file__).parent.parent / "backend")
-sys.path.insert(0, backend_path)
-
-# Import the REAL core package first, then patch specific submodules
-import core  # real package from /app/backend/core/
-import core.base
-import core.base.repository
-import core.base.service
-import core.constants
-import core.config
-
-# Now try importing events (may fail if deps missing)
-try:
-    import core.events
-    import core.events.event_bus
-except Exception as e:
-    logger.warning(f"core.events import: {e}")
-    # Stub minimal event bus
-    core_events = types.ModuleType("core.events")
-    class _EventPriority:
-        LOW = 1; NORMAL = 2; HIGH = 3; CRITICAL = 4
-    class _Event:
-        def __init__(self, **kw):
-            for k, v in kw.items():
-                setattr(self, k, v)
-    class _StoreEvents:
-        PRODUCT_CREATED = "store.product.created"
-        PRODUCT_UPDATED = "store.product.updated"
-        ORDER_CREATED = "store.order.created"
-        ORDER_UPDATED = "store.order.updated"
-    class _EventBus:
-        def subscribe(self, *a, **kw): pass
-        async def publish(self, *a, **kw): pass
-    core_events.EventPriority = _EventPriority
-    core_events.Event = _Event
-    core_events.StoreEvents = _StoreEvents
-    core_events.event_bus = _EventBus()
-    sys.modules["core.events"] = core_events
-    evbus_stub = types.ModuleType("core.events.event_bus")
-    evbus_stub.EventBus = type(_EventBus)
-    sys.modules["core.events.event_bus"] = evbus_stub
-
-# Patch core.database — override with OUR db connection
-core.database.db = db
-core.database.get_database = get_database
-
-# Patch core.auth — override with OUR JWT validation
+# ────────── Patch core.auth with OUR JWT validation ──────────
+core.auth = types.ModuleType("core.auth")
 core.auth.get_current_user = get_current_user
 core.auth.get_admin_user = get_admin_user
 core.auth.get_optional_user = get_optional_user
 core.auth.require_permission = require_permission
+sys.modules["core.auth"] = core.auth
 
-# Patch core.config
-core.config.JWT_SECRET = JWT_SECRET
-core.config.JWT_ALGORITHM = JWT_ALGORITHM
+# Patch core.database.get_database
+core.database.get_database = get_database
 
 # Stub core.hub_jobs
 try:
@@ -178,7 +163,7 @@ sys.modules["modules.ably_integration"] = ably_stub
 # modules.notifications.push_helpers
 notif_mod = types.ModuleType("modules.notifications")
 notif_push = types.ModuleType("modules.notifications.push_helpers")
-async def _noop_notify(**kw): logger.debug(f"Notification skipped")
+async def _noop_notify(**kw): logger.debug("Notification skipped")
 notif_push.notify_order_status = _noop_notify
 notif_push.notify_new_message = _noop_notify
 sys.modules["modules.notifications"] = notif_mod
@@ -227,16 +212,16 @@ config_mgr = types.ModuleType("modules.integrations.monday.config_manager")
 class _MondayConfig:
     async def get(self, *a, **kw): return {}
 config_mgr.monday_config = _MondayConfig()
-core_client = types.ModuleType("modules.integrations.monday.core_client")
+core_client_mod = types.ModuleType("modules.integrations.monday.core_client")
 class _MondayClient:
     async def query(self, *a, **kw): return {}
     async def mutate(self, *a, **kw): return {}
-core_client.monday_client = _MondayClient()
+core_client_mod.monday_client = _MondayClient()
 sys.modules["modules.integrations"] = integ_mod
 sys.modules["modules.integrations.monday"] = monday_mod
 sys.modules["modules.integrations.monday.base_adapter"] = base_adapter
 sys.modules["modules.integrations.monday.config_manager"] = config_mgr
-sys.modules["modules.integrations.monday.core_client"] = core_client
+sys.modules["modules.integrations.monday.core_client"] = core_client_mod
 
 # services.yappy_service (used by platform_store)
 svc_mod = types.ModuleType("services")
@@ -269,7 +254,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "commerce-engine", "port": 8005, "db": DB_NAME}
+    return {"status": "ok", "service": "commerce-engine", "port": 8005, "db": str(DB_NAME)}
 
 
 # ────────── Import & Register Commerce Routes ──────────
@@ -279,14 +264,14 @@ try:
     init_store()
     logger.info("Store module loaded")
 except Exception as e:
-    logger.error(f"Store module failed: {e}")
+    logger.error(f"Store module failed: {e}", exc_info=True)
 
 try:
     from modules.sysbook import sysbook_router
     app.include_router(sysbook_router, prefix="/api")
     logger.info("Sysbook module loaded")
 except Exception as e:
-    logger.error(f"Sysbook module failed: {e}")
+    logger.error(f"Sysbook module failed: {e}", exc_info=True)
 
 try:
     from routes.platform_store import router as platform_store_router, init_routes
@@ -294,6 +279,6 @@ try:
     app.include_router(platform_store_router, prefix="/api")
     logger.info("Platform Store module loaded")
 except Exception as e:
-    logger.error(f"Platform Store module failed: {e}")
+    logger.error(f"Platform Store module failed: {e}", exc_info=True)
 
 logger.info(f"Commerce Engine starting — DB: {DB_NAME}")

@@ -494,10 +494,22 @@ async def startup_event():
             import subprocess
             commerce_script = "/app/commerce-engine/bootstrap.sh"
             if os.path.exists(commerce_script):
-                result = subprocess.run(["bash", commerce_script], capture_output=True, text=True, timeout=15)
+                result = subprocess.run(["bash", commerce_script], capture_output=True, text=True, timeout=20)
                 for line in result.stdout.strip().split("\n"):
                     if line.strip():
                         logger.info(line.strip())
+                # Wait for Commerce Engine to be healthy
+                import httpx as _hx
+                for _attempt in range(10):
+                    try:
+                        async with _hx.AsyncClient() as _hc:
+                            _r = await _hc.get("http://127.0.0.1:8005/health", timeout=3)
+                            if _r.status_code == 200:
+                                logger.info("[commerce-bootstrap] Health check passed ✓")
+                                break
+                    except Exception:
+                        pass
+                    await asyncio.sleep(1)
         except Exception as e:
             logger.warning(f"Commerce Engine bootstrap skipped: {e}")
 
