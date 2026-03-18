@@ -139,6 +139,7 @@ const DatabaseMigrationModule = lazy(() => import('@/modules/admin/DatabaseMigra
 const DataCleanupModule = lazy(() => import('@/modules/admin/DataCleanupModule'));
 const DataManagerModule = lazy(() => import('@/modules/admin/DataManagerModule'));
 const ModuleStatusModule = lazy(() => import('@/modules/admin/ModuleStatusModule'));
+const MenuManagerModule = lazy(() => import('@/modules/admin/MenuManagerModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
@@ -356,12 +357,21 @@ export default function AdminDashboard() {
     const source = effectiveNavGroups;
     if (authLoading) return source.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: i.label || (t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey)) })) }));
     
+    const userRole = role?.role_id || (isAdmin ? 'super_admin' : '');
+    
     return source.map(g => ({
       ...g,
       items: g.items
         .filter(item => {
+          // Super admin sees everything
           if (isAdmin) return true;
+          // Admin-only items
           if (item.adminOnly) return false;
+          // Per-role visibility (empty = all roles)
+          if (item.visible_roles && item.visible_roles.length > 0) {
+            if (!item.visible_roles.includes(userRole)) return false;
+          }
+          // Permission check
           if (!item.permission) return true;
           return hasPermission(item.permission);
         })
@@ -506,6 +516,8 @@ export default function AdminDashboard() {
         return <DatabaseMigrationModule />;
       case 'modules':
         return <ModuleStatusModule />;
+      case 'menu-manager':
+        return <MenuManagerModule />;
       case 'cleanup':
         return <DataCleanupModule />;
       // Management

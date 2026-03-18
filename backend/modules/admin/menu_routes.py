@@ -97,6 +97,7 @@ DEFAULT_MENU = {
                 {"id": "hub-dashboard", "label": {"en": "Integration Hub", "es": "Hub de Integraciones", "zh": "集成中心"}, "icon": "cpu", "permission": "admin.site_config", "admin_only": True, "enabled": True, "order": 14},
                 {"id": "demo-data", "label": {"en": "Demo Data", "es": "Datos Demo", "zh": "演示数据"}, "icon": "wand", "permission": "admin.site_config", "admin_only": True, "enabled": True, "order": 15},
                 {"id": "system-monitor", "label": {"en": "System Monitor", "es": "Monitor del Sistema", "zh": "系统监控"}, "icon": "activity", "permission": "admin.site_config", "admin_only": True, "enabled": True, "order": 16},
+                {"id": "menu-manager", "label": {"en": "Menu Manager", "es": "Gestor de Menú", "zh": "菜单管理"}, "icon": "settings", "permission": "admin.site_config", "admin_only": True, "enabled": True, "order": 17},
             ]
         },
     ]
@@ -108,10 +109,19 @@ async def get_menu(admin: dict = Depends(get_admin_user)):
     """Get admin menu configuration. Returns groups with items."""
     doc = await db[C_MENU].find_one({"_id": "admin_menu"})
     if not doc:
-        # Seed default
         await db[C_MENU].insert_one(DEFAULT_MENU)
         doc = DEFAULT_MENU
     doc.pop("_id", None)
+    
+    # Also fetch available roles for the menu manager UI
+    roles = await db.rbac_roles.find({}, {"_id": 0, "role_id": 1, "name": 1}).to_list(50)
+    doc["available_roles"] = roles or [
+        {"role_id": "super_admin", "name": "Super Admin"},
+        {"role_id": "admin", "name": "Admin"},
+        {"role_id": "moderator", "name": "Moderator"},
+        {"role_id": "store_manager", "name": "Store Manager"},
+        {"role_id": "teacher", "name": "Teacher"},
+    ]
     return doc
 
 
