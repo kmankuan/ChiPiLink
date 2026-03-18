@@ -196,9 +196,9 @@ async def create_live_session(data: dict) -> dict:
     session = {
         "session_id": session_id,
         "status": "live",
-        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": data.get("player_a_photo", "") or pa.get("avatar_url", "")},
-        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": data.get("player_b_photo", "") or pb.get("avatar_url", "")},
-        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": data.get("referee_photo", "") or ref.get("avatar_url", "")},
+        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": pa.get("photo_base64", "") or pa.get("avatar_url", "")},
+        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": pb.get("photo_base64", "") or pb.get("avatar_url", "")},
+        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": ref.get("photo_base64", "") or ref.get("avatar_url", "")},
         "league_id": data.get("league_id"),
         "stream_url": data.get("stream_url", ""),
         "settings": {
