@@ -65,20 +65,66 @@ async def deactivate_player(player_id: str, admin: dict = Depends(get_admin_user
 
 @router.put("/players/{player_id}/photo")
 async def update_photo(player_id: str, data: dict, user: dict = Depends(get_current_user)):
-    """Update player photo URL or base64 image."""
+    """Upload player photo — auto-resizes to 3 sizes server-side.
+    Stores: photo_thumb (80x80), photo_medium (300x300), photo_original.
+    Live sessions use photo_thumb. Profile pages use photo_medium.
+    """
+    from .image_utils import process_player_photo
     url = data.get("photo_url", "")
     b64 = data.get("photo_base64", "")
-    update = {}
+    
+    if not b64 and not url:
+        # Remove photo
+        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {
+            "$set": {"avatar_url": "", "photo_base64": "", "photo_thumb": "", "photo_medium": ""},
+        })
+        return {"success": True, "message": "Photo removed"}
+    
     if b64:
-        if len(b64) > 7_000_000:
-            raise HTTPException(400, "Image too large (max ~5MB)")
-        update["photo_base64"] = b64
+        if len(b64) > 15_000_000:
+            raise HTTPException(400, "Image too large (max ~10MB)")
+        sizes = process_player_photo(b64)
+        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": {
+            "photo_thumb": sizes["thumb"],       # 80x80 JPEG ~3-5KB
+            "photo_medium": sizes["medium"],     # 300x300 JPEG ~20-40KB
+            "photo_base64": sizes["medium"],     # keep medium as default (not original)
+            "avatar_url": "",                     # clear URL since we have base64
+        }})
+        return {"success": True, "sizes": {k: f"{len(v)//1024}KB" for k, v in sizes.items()}}
+    
     if url:
-        update["avatar_url"] = url
-    if not update:
-        raise HTTPException(400, "Provide photo_url or photo_base64")
-    await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": update})
-    return {"success": True}
+        await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": {"avatar_url": url}})
+        return {"success": True}
+
+
+@router.post("/players/migrate-photos")
+async def migrate_all_photos(admin: dict = Depends(get_admin_user)):
+    """Resize all existing player photos to thumb/medium sizes. Run once after deploying."""
+    from .image_utils import process_player_photo
+    players = await db[services.C_PLAYERS].find(
+        {"photo_base64": {"$exists": True, "$ne": ""}},
+        {"player_id": 1, "nickname": 1, "photo_base64": 1}
+    ).to_list(500)
+    
+    migrated = 0
+    errors = 0
+    for p in players:
+        try:
+            b64 = p.get("photo_base64", "")
+            if not b64 or len(b64) < 100:
+                continue
+            sizes = process_player_photo(b64)
+            await db[services.C_PLAYERS].update_one(
+                {"player_id": p["player_id"]},
+                {"$set": {"photo_thumb": sizes["thumb"], "photo_medium": sizes["medium"], "photo_base64": sizes["medium"]}}
+            )
+            migrated += 1
+        except Exception as e:
+            errors += 1
+            logger.warning(f"Photo migration failed for {p.get('nickname')}: {e}")
+    
+    return {"migrated": migrated, "errors": errors, "total": len(players)}
+
 
 @router.post("/players/{player_id}/link-request")
 async def request_link(player_id: str, user: dict = Depends(get_current_user)):
