@@ -65,6 +65,7 @@ from modules.integrations.sheets.routes import router as sheets_router
 
 # Admin Module (notifications, config, setup)
 from modules.admin.routes import router as admin_router
+from modules.admin.menu_routes import router as admin_menu_router
 from modules.admin.seed_demo import router as seed_demo_router
 from modules.admin.privacy_routes import router as privacy_router, public_router as privacy_public_router
 from modules.admin.cleanup_routes import router as cleanup_router
@@ -176,6 +177,7 @@ api_router.include_router(monday_webhook_router)  # Universal webhook endpoint
 api_router.include_router(monday_widget_router)  # Public board widget
 api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
+api_router.include_router(admin_menu_router)
 api_router.include_router(cleanup_router)
 api_router.include_router(seed_demo_router)  # Demo data seeding
 api_router.include_router(data_manager_router)  # Unified data manager

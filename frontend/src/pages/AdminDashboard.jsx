@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import RESOLVED_API_URL from '@/config/apiUrl';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -244,12 +245,6 @@ const navGroups = [
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
-  // Flatten all items with translated labels for lookups
-  const allNavItems = useMemo(() =>
-    navGroups.flatMap(g => g.items.map(item => ({ ...item, label: t(item.labelKey) === item.labelKey && item.fallbackLabel ? item.fallbackLabel : t(item.labelKey), group: g.group }))),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [i18n.language]
-  );
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme, setScope } = useTheme();
@@ -257,8 +252,81 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [openGroups, setOpenGroups] = useState({ Overview: true, Commerce: true, 'Sysbook': true, Community: true, Management: true, Configuration: false, Content: false, Integrations: false, Developer: false });
   const [sidebarSearch, setSidebarSearch] = useState('');
+
+  // ─── Backend-driven menu ───
+  const [dynamicMenu, setDynamicMenu] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    fetch(`${RESOLVED_API_URL}/api/admin/menu`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.groups) setDynamicMenu(data); })
+      .catch(() => {});
+  }, []);
+
+  // Icon name → component map (for backend-driven labels)
+  const ICON_MAP = {
+    'layout-dashboard': LayoutDashboard, 'shopping-bag': ShoppingBag, 'shopping-cart': ShoppingCart,
+    'message-square': MessageSquare, 'wallet': Wallet, 'bell-ring': BellRing, 'bar-chart-2': BarChart2,
+    'book-open': BookOpen, 'truck': Truck, 'alert-triangle': AlertTriangle, 'graduation-cap': GraduationCap,
+    'upload': Upload, 'clipboard-list': ClipboardList, 'trophy': Trophy, 'send': Send,
+    'users': Users, 'credit-card': CreditCard, 'shield': Shield, 'database': Database,
+    'settings': Settings, 'printer': Printer, 'eye-off': EyeOff, 'paintbrush': Paintbrush,
+    'palette': Palette, 'languages': Languages, 'layout': Layout, 'image': Megaphone,
+    'radio': Radio, 'plug': Plug, 'file-text': FileText, 'code': Code2,
+    'activity': BarChart2, 'cpu': Radio, 'wand': Database, 'puzzle': Layout, 'layers': Layers,
+  };
+
+  // Merge backend menu with static fallback
+  const effectiveNavGroups = useMemo(() => {
+    if (!dynamicMenu?.groups) return navGroups;
+
+    return dynamicMenu.groups
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map(g => ({
+        group: g.label?.[i18n.language] || g.label?.en || g.id,
+        groupId: g.id,
+        collapsed_default: g.collapsed_default,
+        items: (g.items || [])
+          .filter(item => item.enabled !== false)
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map(item => ({
+            id: item.id,
+            label: item.label?.[i18n.language] || item.label?.en || item.id,
+            labelKey: `nav.${item.id}`,
+            fallbackLabel: item.label?.en,
+            icon: ICON_MAP[item.icon] || Settings,
+            permission: item.permission,
+            adminOnly: item.admin_only,
+            isExternal: item.is_external,
+            path: item.path,
+          })),
+      }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dynamicMenu, i18n.language]);
+
+  // Init openGroups from backend collapsed_default
+  const [openGroups, setOpenGroups] = useState({});
+  useEffect(() => {
+    const defaults = {};
+    effectiveNavGroups.forEach(g => {
+      defaults[g.group] = g.collapsed_default === true ? false : true;
+    });
+    setOpenGroups(prev => Object.keys(prev).length === 0 ? defaults : prev);
+  }, [effectiveNavGroups]);
+
+  // Flatten all items with translated labels for lookups
+  const allNavItems = useMemo(() =>
+    effectiveNavGroups.flatMap(g => g.items.map(item => ({
+      ...item,
+      label: item.label || (t(item.labelKey) === item.labelKey && item.fallbackLabel ? item.fallbackLabel : t(item.labelKey)),
+      group: g.group
+    }))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveNavGroups, i18n.language]
+  );
 
   // Switch to admin theme scope on mount, restore on unmount
   useEffect(() => {
@@ -285,9 +353,10 @@ export default function AdminDashboard() {
    * The RBAC system is used for more granular permissions within modules.
    */
   const filteredNavGroups = useMemo(() => {
-    if (authLoading) return navGroups.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey) })) }));
+    const source = effectiveNavGroups;
+    if (authLoading) return source.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: i.label || (t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey)) })) }));
     
-    return navGroups.map(g => ({
+    return source.map(g => ({
       ...g,
       items: g.items
         .filter(item => {
@@ -296,7 +365,7 @@ export default function AdminDashboard() {
           if (!item.permission) return true;
           return hasPermission(item.permission);
         })
-        .map(i => ({ ...i, label: t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey) })),
+        .map(i => ({ ...i, label: i.label || (t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey)) })),
     })).filter(g => g.items.length > 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAdmin, hasPermission, i18n.language]);
