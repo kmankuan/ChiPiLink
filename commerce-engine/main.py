@@ -2,9 +2,8 @@
 ChiPi Commerce Engine — Standalone service on port 8005
 Store (Unatienda), Sysbook (School Textbooks), Platform Store
 
-KEY INSIGHT: We DON'T create our own db connection. We let core.database
-handle it (it has the same production URL logic). We only patch core.auth
-to use our own JWT validation, and stub optional cross-module deps.
+APPROACH: Import REAL core.* modules from /app/backend/ — no patching.
+Only stub optional cross-module dependencies (ably, notifications, etc.)
 """
 import os
 import sys
@@ -12,11 +11,8 @@ import types
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Depends, Security, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
-import jwt as pyjwt
 
 # ────────── Environment ──────────
 backend_env = Path(__file__).parent.parent / "backend" / ".env"
@@ -26,144 +22,50 @@ if backend_env.exists():
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("commerce-engine")
 
-# ────────── Add backend to path FIRST ──────────
+# ────────── Add backend to path — use REAL core.* modules ──────────
 backend_path = str(Path(__file__).parent.parent / "backend")
 sys.path.insert(0, backend_path)
 
-# ────────── Import REAL core package (creates db connection automatically) ──────────
-import core
-import core.database  # This creates the db connection using same prod URL logic
-import core.base
-import core.base.repository
-import core.base.service
-import core.constants
-import core.config
+# Import real core modules — database, auth, base, constants, config, events
+# These ALL work correctly with production MongoDB Atlas
+import core.database   # creates db connection (production-aware)
+import core.config     # JWT_SECRET, etc.
+import core.base       # BaseRepository, BaseService
+import core.constants  # StoreCollections
+try:
+    import core.auth   # REAL auth with full user lookup from DB
+except Exception as e:
+    logger.error(f"core.auth import failed: {e}")
 
-# Get the db that core.database created — this is what store/sysbook will use
-db = core.database.db
-DB_NAME = getattr(core.database, 'db_name', getattr(core.database, 'DB_NAME', 'chipilink_prod'))
-
-# Import events
 try:
     import core.events
     import core.events.event_bus
 except Exception as e:
     logger.warning(f"core.events import: {e}")
-    core_events = types.ModuleType("core.events")
-    class _EventPriority:
-        LOW = 1; NORMAL = 2; HIGH = 3; CRITICAL = 4
-    class _Event:
-        def __init__(self, **kw):
-            for k, v in kw.items():
-                setattr(self, k, v)
-    class _StoreEvents:
-        PRODUCT_CREATED = "store.product.created"
-        PRODUCT_UPDATED = "store.product.updated"
-        ORDER_CREATED = "store.order.created"
-        ORDER_UPDATED = "store.order.updated"
-    class _EventBus:
-        def subscribe(self, *a, **kw): pass
-        async def publish(self, *a, **kw): pass
-    core_events.EventPriority = _EventPriority
-    core_events.Event = _Event
-    core_events.StoreEvents = _StoreEvents
-    core_events.event_bus = _EventBus()
-    sys.modules["core.events"] = core_events
-    evbus_stub = types.ModuleType("core.events.event_bus")
-    evbus_stub.EventBus = type(_EventBus)
-    sys.modules["core.events.event_bus"] = evbus_stub
 
-# ────────── JWT Auth (same secret as main app) ──────────
-JWT_SECRET = core.config.JWT_SECRET
-JWT_ALGORITHM = "HS256"
-_bearer = HTTPBearer(auto_error=False)
-
-
-async def get_current_user(
-    request: Request = None,
-    credentials: HTTPAuthorizationCredentials = Security(_bearer),
-):
-    if not credentials:
-        raise HTTPException(401, "Not authenticated")
-    try:
-        payload = pyjwt.decode(
-            credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM]
-        )
-        return payload
-    except pyjwt.ExpiredSignatureError:
-        raise HTTPException(401, "Token expired")
-    except pyjwt.InvalidTokenError:
-        raise HTTPException(401, "Invalid token")
-
-
-async def get_admin_user(
-    request: Request = None,
-    credentials: HTTPAuthorizationCredentials = Security(_bearer),
-):
-    user = await get_current_user(request, credentials)
-    if not user.get("is_admin"):
-        raise HTTPException(403, "Admin access required")
-    return user
-
-
-async def get_optional_user(
-    request: Request = None,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
-) -> Optional[dict]:
-    try:
-        return await get_current_user(request, credentials)
-    except HTTPException:
-        return None
-
-
-def require_permission(permission: str):
-    async def permission_checker(
-        request: Request = None,
-        credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
-    ) -> dict:
-        user = await get_current_user(request, credentials)
-        if user.get("is_admin"):
-            return user
-        raise HTTPException(403, f"Permission {permission} required")
-    return permission_checker
-
-
-def get_database():
-    return db
-
-
-# ────────── Patch core.auth with OUR JWT validation ──────────
-core.auth = types.ModuleType("core.auth")
-core.auth.get_current_user = get_current_user
-core.auth.get_admin_user = get_admin_user
-core.auth.get_optional_user = get_optional_user
-core.auth.require_permission = require_permission
-sys.modules["core.auth"] = core.auth
-
-# Patch core.database.get_database
-core.database.get_database = get_database
-
-# Stub core.hub_jobs
 try:
     import core.hub_jobs
 except Exception:
-    core_hub = types.ModuleType("core.hub_jobs")
-    async def _noop_hub(*a, **kw): pass
-    core_hub.schedule_hub_job = _noop_hub
-    sys.modules["core.hub_jobs"] = core_hub
+    hub_stub = types.ModuleType("core.hub_jobs")
+    async def _noop(*a, **kw): pass
+    hub_stub.schedule_hub_job = _noop
+    sys.modules["core.hub_jobs"] = hub_stub
 
-# ─── Stub optional cross-module dependencies ───
+# Get db reference for health check
+db = core.database.db
+
+# ─── Stub ONLY optional cross-module dependencies ───
 
 # modules.ably_integration
 ably_stub = types.ModuleType("modules.ably_integration")
-async def _noop_pub(ch, ev, data): logger.debug(f"Ably skipped: {ch}/{ev}")
+async def _noop_pub(ch, ev, data): pass
 ably_stub.publish_to_channel = _noop_pub
 sys.modules["modules.ably_integration"] = ably_stub
 
 # modules.notifications.push_helpers
 notif_mod = types.ModuleType("modules.notifications")
 notif_push = types.ModuleType("modules.notifications.push_helpers")
-async def _noop_notify(**kw): logger.debug("Notification skipped")
+async def _noop_notify(**kw): pass
 notif_push.notify_order_status = _noop_notify
 notif_push.notify_new_message = _noop_notify
 sys.modules["modules.notifications"] = notif_mod
@@ -254,7 +156,8 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "commerce-engine", "port": 8005, "db": str(DB_NAME)}
+    db_name = getattr(core.database, 'db_name', '?')
+    return {"status": "ok", "service": "commerce-engine", "port": 8005, "db": str(db_name)}
 
 
 # ────────── Import & Register Commerce Routes ──────────
@@ -274,6 +177,7 @@ except Exception as e:
     logger.error(f"Sysbook module failed: {e}", exc_info=True)
 
 try:
+    from core.auth import get_admin_user, get_current_user
     from routes.platform_store import router as platform_store_router, init_routes
     init_routes(db, get_admin_user, get_current_user)
     app.include_router(platform_store_router, prefix="/api")
@@ -281,4 +185,4 @@ try:
 except Exception as e:
     logger.error(f"Platform Store module failed: {e}", exc_info=True)
 
-logger.info(f"Commerce Engine starting — DB: {DB_NAME}")
+logger.info(f"Commerce Engine ready — using REAL core.auth + core.database")
