@@ -254,9 +254,10 @@ api_router.include_router(showcase_admin_router)
 from modules.hub_proxy import router as hub_proxy_router
 api_router.include_router(hub_proxy_router)
 
-# Sport Engine Proxy (standalone service on port 8004)
-from modules.sport_proxy import router as sport_proxy_router
-api_router.include_router(sport_proxy_router)
+# Sport Module (Table Tennis — direct routes, no proxy)
+from modules.sport import router as sport_router, tournament_router as sport_tournament_router
+api_router.include_router(sport_router)
+api_router.include_router(sport_tournament_router)
 
 # Ably Real-time Integration
 from modules.ably_integration import router as ably_router
@@ -479,17 +480,7 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Tutor Engine bootstrap skipped: {e}")
 
-        # Bootstrap Sport Engine (port 8004)
-        try:
-            import subprocess
-            sport_script = "/app/sport-engine/bootstrap.sh"
-            if os.path.exists(sport_script):
-                result = subprocess.run(["bash", sport_script], capture_output=True, text=True, timeout=15)
-                for line in result.stdout.strip().split("\n"):
-                    if line.strip():
-                        logger.info(line.strip())
-        except Exception as e:
-            logger.warning(f"Sport Engine bootstrap skipped: {e}")
+        # Sport Engine — runs directly in main app (no separate service needed)
 
 
     # Self-check: verify the server can actually respond to HTTP requests
