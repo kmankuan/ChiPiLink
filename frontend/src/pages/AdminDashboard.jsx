@@ -181,7 +181,7 @@ const navGroups = [
   {
     group: 'Community',
     items: [
-      { id: 'sport', labelKey: 'nav.sport', fallbackLabel: 'Sport', icon: Trophy, permission: 'pinpanclub.admin_panel' },
+      { id: 'sport', labelKey: 'nav.sport', fallbackLabel: 'Sport', icon: Trophy, permission: 'sport.admin_panel' },
       { id: 'telegram-channel', labelKey: 'nav.telegramChannel', fallbackLabel: 'Telegram Channel', icon: Send, permission: 'admin.site_config' },
       { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
     ],
@@ -679,7 +679,7 @@ export default function AdminDashboard() {
                     {activeModule === 'orders' && t('admin.moduleDesc.orders', 'Manage your customer orders')}
                     {activeModule === 'customers' && t('admin.moduleDesc.users', 'Manage user accounts and connections')}
                     {activeModule === 'memberships' && t('admin.moduleDesc.memberships', 'Manage plans, memberships, visits and QR codes')}
-                    {activeModule === 'pinpanclub' && t('admin.moduleDesc.pinpanclub', 'Table Tennis Club - Matches, players and tournaments')}
+                    {activeModule === 'pinpanclub' && t('admin.moduleDesc.sport', 'Table Tennis Club - Matches, players and tournaments')}
                     {activeModule === 'roles' && t('admin.moduleDesc.roles', 'Manage user roles and system permissions')}
                     {activeModule === 'admin' && t('admin.moduleDesc.admin', 'Configure your site and customization')}
                     {activeModule === 'integrations' && t('admin.moduleDesc.integrations', 'Connect with external services')}

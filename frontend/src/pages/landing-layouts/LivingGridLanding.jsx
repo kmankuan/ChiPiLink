@@ -144,7 +144,7 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           {/* Sport tile — spans 2 cols */}
           <Tile
             onClick={() => navigate('/sport')}
-            testId="tile-pinpanclub"
+            testId="tile-sport"
             className="col-span-2 row-span-1"
           >
             <img src={landingImages.pinpanclub} alt="Sport" className="absolute inset-0 w-full h-full object-cover" />

@@ -124,8 +124,8 @@ export default function DashboardModule() {
       description: 'Plans and subscriptions'
     },
     { 
-      id: 'pinpanclub', 
-      label: 'PinpanClub', 
+      id: 'sport', 
+      label: 'Sport', 
       icon: Trophy, 
       color: 'bg-emerald-500',
       description: 'Tournaments and ranking'

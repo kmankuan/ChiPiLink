@@ -20,7 +20,7 @@ export const DEFAULT_MODULE_STATUS = {
   my_students: { status: 'live_beta', customLabel: 'Live Beta' },
   
   // PinPanClub modules
-  pinpanclub: { status: 'live_beta', customLabel: 'Live Beta' },
+  pinpanclub: { status: 'deprecated', customLabel: 'Live Beta' },
   super_pin: { status: 'live_beta', customLabel: 'Live Beta' },
   rapid_pin: { status: 'coming_soon' },
   

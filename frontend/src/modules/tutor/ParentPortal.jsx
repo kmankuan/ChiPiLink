@@ -11,8 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { GraduationCap, BookOpen, Bell, MessageCircle, Clock, FileText, Send, Bot, Loader2, TrendingUp } from 'lucide-react';
+import { GraduationCap, BookOpen, Bell, MessageCircle, Clock, FileText, Send, Bot, Loader2, TrendingUp, BarChart3, Calendar } from 'lucide-react';
 import { AblyChatProvider, useAblyChannel } from '@/modules/ably/AblyProvider';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -152,6 +153,187 @@ function AgentAsk({ studentId }) {
   );
 }
 
+const PERF_COLORS = { excellent: '#10b981', good: '#3b82f6', fair: '#f59e0b', needs_work: '#ef4444' };
+const PERF_LABELS = { excellent: 'Excellent', good: 'Good', fair: 'Fair', needs_work: 'Needs Work' };
+
+function ProgressCharts({ sessions = [], stats = {}, learningProfile = {} }) {
+  // Performance distribution pie chart
+  const perfCounts = {};
+  sessions.forEach(s => {
+    const p = s.student_performance || 'fair';
+    perfCounts[p] = (perfCounts[p] || 0) + 1;
+  });
+  const perfData = Object.entries(perfCounts).map(([key, val]) => ({
+    name: PERF_LABELS[key] || key,
+    value: val,
+    color: PERF_COLORS[key] || '#94a3b8',
+  }));
+
+  // Sessions per week (last 8 weeks)
+  const weeklyData = [];
+  const now = new Date();
+  for (let w = 7; w >= 0; w--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - w * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const count = sessions.filter(s => {
+      const d = new Date(s.created_at);
+      return d >= weekStart && d < weekEnd;
+    }).length;
+    const mins = sessions.filter(s => {
+      const d = new Date(s.created_at);
+      return d >= weekStart && d < weekEnd;
+    }).reduce((sum, s) => sum + (s.duration_minutes || 0), 0);
+    weeklyData.push({
+      week: `W${8 - w}`,
+      sessions: count,
+      minutes: mins,
+    });
+  }
+
+  // Subject breakdown
+  const subjectCounts = {};
+  sessions.forEach(s => {
+    const subj = s.subject || 'Other';
+    subjectCounts[subj] = (subjectCounts[subj] || 0) + 1;
+  });
+  const subjectData = Object.entries(subjectCounts)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6);
+  const SUBJ_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899'];
+
+  if (sessions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">No session data yet</p>
+          <p className="text-xs text-muted-foreground mt-1">Charts will appear after tutoring sessions</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Weekly Activity */}
+      <Card>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-sm flex items-center gap-1"><Calendar className="h-4 w-4" /> Weekly Activity</CardTitle>
+        </CardHeader>
+        <CardContent className="p-2">
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={weeklyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="week" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip contentStyle={{ fontSize: 11 }} />
+              <Bar dataKey="sessions" fill="#10b981" radius={[4, 4, 0, 0]} name="Sessions" />
+              <Bar dataKey="minutes" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Minutes" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-2 gap-3">
+        {/* Performance Distribution */}
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5" /> Performance</CardTitle>
+          </CardHeader>
+          <CardContent className="p-2">
+            {perfData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={130}>
+                <PieChart>
+                  <Pie data={perfData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={50} paddingAngle={3}>
+                    {perfData.map((d, i) => <Cell key={i} fill={d.color} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 10 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-center text-xs text-muted-foreground py-6">No data</p>
+            )}
+            <div className="flex flex-wrap gap-1 justify-center mt-1">
+              {perfData.map(d => (
+                <span key={d.name} className="text-[8px] flex items-center gap-0.5">
+                  <span className="w-2 h-2 rounded-full" style={{ background: d.color }} />
+                  {d.name} ({d.value})
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subject Breakdown */}
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> Subjects</CardTitle>
+          </CardHeader>
+          <CardContent className="p-2">
+            {subjectData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={130}>
+                <PieChart>
+                  <Pie data={subjectData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={50} paddingAngle={3}>
+                    {subjectData.map((d, i) => <Cell key={i} fill={SUBJ_COLORS[i % SUBJ_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 10 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-center text-xs text-muted-foreground py-6">No data</p>
+            )}
+            <div className="flex flex-wrap gap-1 justify-center mt-1">
+              {subjectData.map((d, i) => (
+                <span key={d.name} className="text-[8px] flex items-center gap-0.5">
+                  <span className="w-2 h-2 rounded-full" style={{ background: SUBJ_COLORS[i % SUBJ_COLORS.length] }} />
+                  {d.name} ({d.value})
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Learning Profile */}
+      {(learningProfile.strengths || learningProfile.weaknesses) && (
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-sm flex items-center gap-1"><BarChart3 className="h-4 w-4" /> Learning Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3">
+            {learningProfile.learning_style && (
+              <p className="text-xs mb-2"><span className="font-semibold">Style:</span> {learningProfile.learning_style}</p>
+            )}
+            {learningProfile.strengths?.length > 0 && (
+              <div className="mb-2">
+                <p className="text-[10px] font-bold text-green-700 mb-1">💪 Strengths</p>
+                <div className="flex flex-wrap gap-1">
+                  {learningProfile.strengths.map(s => (
+                    <Badge key={s} variant="outline" className="text-[9px] bg-green-50 text-green-700 border-green-200">{s}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {learningProfile.weaknesses?.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold text-amber-700 mb-1">🎯 Areas to Improve</p>
+                <div className="flex flex-wrap gap-1">
+                  {learningProfile.weaknesses.map(w => (
+                    <Badge key={w} variant="outline" className="text-[9px] bg-amber-50 text-amber-700 border-amber-200">{w}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 export default function ParentPortal() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -215,6 +397,7 @@ export default function ParentPortal() {
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="w-full mb-3">
             <TabsTrigger value="overview" className="flex-1 text-xs gap-1"><TrendingUp className="h-3 w-3" /> Overview</TabsTrigger>
+            <TabsTrigger value="progress" className="flex-1 text-xs gap-1"><BarChart3 className="h-3 w-3" /> Progress</TabsTrigger>
             <TabsTrigger value="chat" className="flex-1 text-xs gap-1"><MessageCircle className="h-3 w-3" /> Chat</TabsTrigger>
             <TabsTrigger value="agent" className="flex-1 text-xs gap-1"><Bot className="h-3 w-3" /> Ask AI</TabsTrigger>
           </TabsList>
@@ -284,6 +467,15 @@ export default function ParentPortal() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Progress Charts */}
+          <TabsContent value="progress">
+            <ProgressCharts
+              sessions={data.sessions || []}
+              stats={stats}
+              learningProfile={data.learning_profile || {}}
+            />
           </TabsContent>
 
           {/* Chat */}

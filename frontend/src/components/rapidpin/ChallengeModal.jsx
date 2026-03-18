@@ -79,7 +79,7 @@ export default function ChallengeModal({
   const fetchPlayers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/pinpanclub/players`);
+      const response = await fetch(`${API_BASE}/api/sport/players`);
       if (response.ok) {
         const data = await response.json();
         // Filter current user from the list
@@ -120,7 +120,7 @@ export default function ChallengeModal({
     setSending(true);
     try {
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge?` + 
+        `${API_BASE}/api/sport/rapidpin/challenge?` + 
         `season_id=${seasonId}&challenger_id=${currentUserId}&opponent_id=${selectedOpponent.player_id}`,
         { method: 'POST' }
       );

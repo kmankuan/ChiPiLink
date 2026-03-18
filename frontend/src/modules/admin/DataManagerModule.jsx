@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 
 const MODULE_ICONS = {
-  pinpanclub: Trophy,
+  sport: Trophy,
   sysbook: BookOpen,
   store: ShoppingCart,
   users: Users,
@@ -25,7 +25,7 @@ const MODULE_ICONS = {
 };
 
 const MODULE_COLORS = {
-  pinpanclub: 'from-orange-500 to-amber-500',
+  sport: 'from-orange-500 to-amber-500',
   sysbook: 'from-blue-500 to-indigo-500',
   store: 'from-emerald-500 to-green-500',
   users: 'from-violet-500 to-purple-500',

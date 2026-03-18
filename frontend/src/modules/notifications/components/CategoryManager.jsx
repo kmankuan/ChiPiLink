@@ -19,7 +19,7 @@ const API_URL = RESOLVED_API_URL;
 
 const EMOJI_OPTIONS = ['💳', '📍', '🎫', '🏆', '📊', '👥', '📢', '🎉', '🔔', '⚡', '🎮', '💬', '📧', '🎁', '🏅'];
 const COLOR_OPTIONS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6'];
-const MODULE_OPTIONS = ['wallet', 'membership', 'pinpanclub', 'social', 'admin', 'marketing', 'general'];
+const MODULE_OPTIONS = ['wallet', 'membership', 'sport', 'social', 'admin', 'marketing', 'general'];
 const PRIORITY_OPTIONS = ['low', 'normal', 'high', 'urgent'];
 
 export default function CategoryManager({ token }) {

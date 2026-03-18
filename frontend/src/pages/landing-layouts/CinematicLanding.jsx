@@ -149,7 +149,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
       </section>
 
       {/* ═══ PINPANCLUB: Side-by-side ═══ */}
-      <section className="relative py-16 sm:py-24 px-6 sm:px-12" data-testid="pinpanclub-section">
+      <section className="relative py-16 sm:py-24 px-6 sm:px-12" data-testid="sport-section">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
           <div>
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-amber-400/60 mb-2">Sport</p>

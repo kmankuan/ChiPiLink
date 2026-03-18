@@ -211,7 +211,7 @@ export default function HorizonLanding({ communityData }) {
       </section>
 
       {/* ═══ PINPANCLUB: Warm, playful — NOT dark ═══ */}
-      <section className="py-8 sm:py-12 px-4 sm:px-8" data-testid="pinpanclub-section">
+      <section className="py-8 sm:py-12 px-4 sm:px-8" data-testid="sport-section">
         <div className="max-w-7xl mx-auto">
           <div className="relative rounded-3xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 100%)' }}>
             <div className="grid md:grid-cols-5 gap-0">

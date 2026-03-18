@@ -180,7 +180,7 @@ export default function RapidPinPublicPage() {
   const fetchFeed = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/public/feed`);
+      const response = await fetch(`${API_BASE}/api/sport/rapidpin/public/feed`);
       if (response.ok) {
         const data = await response.json();
         setFeedData(data);
@@ -197,7 +197,7 @@ export default function RapidPinPublicPage() {
     
     try {
       setLoadingChallenges(true);
-      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/my-challenges/${currentPlayerId}`);
+      const response = await fetch(`${API_BASE}/api/sport/rapidpin/my-challenges/${currentPlayerId}`);
       if (response.ok) {
         const data = await response.json();
         setMyChallenges(data);
@@ -211,7 +211,7 @@ export default function RapidPinPublicPage() {
 
   const fetchCommentConfig = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/comment-config`);
+      const response = await fetch(`${API_BASE}/api/sport/rapidpin/comment-config`);
       if (response.ok) {
         const data = await response.json();
         setCommentConfig(data);
@@ -224,7 +224,7 @@ export default function RapidPinPublicPage() {
   const fetchComments = async (queueId) => {
     try {
       setLoadingComments(true);
-      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/comments`);
+      const response = await fetch(`${API_BASE}/api/sport/rapidpin/challenge/${queueId}/comments`);
       if (response.ok) {
         const data = await response.json();
         setComments(data);
@@ -239,7 +239,7 @@ export default function RapidPinPublicPage() {
   const checkIfLiked = async (queueId) => {
     if (!isAuthenticated || !currentPlayerId) return;
     try {
-      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/liked?user_id=${currentPlayerId}`);
+      const response = await fetch(`${API_BASE}/api/sport/rapidpin/challenge/${queueId}/liked?user_id=${currentPlayerId}`);
       if (response.ok) {
         const data = await response.json();
         setLikedChallenges(prev => ({ ...prev, [queueId]: data.liked }));
@@ -258,7 +258,7 @@ export default function RapidPinPublicPage() {
     try {
       const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}&user_name=${encodeURIComponent(userName)}`,
+        `${API_BASE}/api/sport/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}&user_name=${encodeURIComponent(userName)}`,
         { method: 'POST' }
       );
       
@@ -290,7 +290,7 @@ export default function RapidPinPublicPage() {
     try {
       const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${selectedChallengeForComments.queue_id}/comment?user_id=${currentPlayerId}&content=${encodeURIComponent(newComment)}&user_name=${encodeURIComponent(userName)}`,
+        `${API_BASE}/api/sport/rapidpin/challenge/${selectedChallengeForComments.queue_id}/comment?user_id=${currentPlayerId}&content=${encodeURIComponent(newComment)}&user_name=${encodeURIComponent(userName)}`,
         { method: 'POST' }
       );
       
@@ -319,8 +319,8 @@ export default function RapidPinPublicPage() {
     try {
       setLoadingPlayers(true);
       const url = search 
-        ? `${API_BASE}/api/pinpanclub/players?search=${encodeURIComponent(search)}&limit=50`
-        : `${API_BASE}/api/pinpanclub/players?limit=50`;
+        ? `${API_BASE}/api/sport/players?search=${encodeURIComponent(search)}&limit=50`
+        : `${API_BASE}/api/sport/players?limit=50`;
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
@@ -377,7 +377,7 @@ export default function RapidPinPublicPage() {
       }
       
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge-with-date?${params.toString()}`,
+        `${API_BASE}/api/sport/rapidpin/challenge-with-date?${params.toString()}`,
         { method: 'POST' }
       );
       
@@ -417,7 +417,7 @@ export default function RapidPinPublicPage() {
       }
       
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/respond-date?${params.toString()}`,
+        `${API_BASE}/api/sport/rapidpin/challenge/${queueId}/respond-date?${params.toString()}`,
         { method: 'POST' }
       );
       
@@ -456,7 +456,7 @@ export default function RapidPinPublicPage() {
     setProcessingChallengeId(queueId);
     try {
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/accept?user_id=${currentPlayerId}&user_role=player`,
+        `${API_BASE}/api/sport/rapidpin/challenge/${queueId}/accept?user_id=${currentPlayerId}&user_role=player`,
         { method: 'POST' }
       );
       
@@ -479,7 +479,7 @@ export default function RapidPinPublicPage() {
     setProcessingChallengeId(queueId);
     try {
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/decline?user_id=${currentPlayerId}`,
+        `${API_BASE}/api/sport/rapidpin/challenge/${queueId}/decline?user_id=${currentPlayerId}`,
         { method: 'POST' }
       );
       
@@ -513,7 +513,7 @@ export default function RapidPinPublicPage() {
     setAssigningId(queueId);
     try {
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/queue/${queueId}/assign?referee_id=${userId}`,
+        `${API_BASE}/api/sport/rapidpin/queue/${queueId}/assign?referee_id=${userId}`,
         { method: 'POST' }
       );
       
@@ -1166,7 +1166,7 @@ export default function RapidPinPublicPage() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate(`/pinpanclub/rapidpin/season/${active_season.season_id}`)}
+                    onClick={() => navigate(`/sport/${active_season.season_id}`)}
                   >
                     Ver detalles
                     <ChevronRight className="h-4 w-4 ml-1" />
@@ -1437,7 +1437,7 @@ export default function RapidPinPublicPage() {
                     <Button 
                       variant="ghost" 
                       className="w-full mt-4"
-                      onClick={() => navigate(`/pinpanclub/rapidpin/season/${active_season.season_id}`)}
+                      onClick={() => navigate(`/sport/${active_season.season_id}`)}
                     >
                       Ver ranking completo
                       <ArrowRight className="h-4 w-4 ml-2" />
@@ -1484,7 +1484,7 @@ export default function RapidPinPublicPage() {
                 <Button 
                   className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
                   size="lg"
-                  onClick={() => navigate('/pinpanclub/rapidpin')}
+                  onClick={() => navigate('/sport')}
                 >
                   <Zap className="h-5 w-5 mr-2" />
                   Ir a Rapid Pin Dashboard

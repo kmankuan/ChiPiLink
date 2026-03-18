@@ -378,9 +378,9 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
                   </div>
                 </section>
               );
-            case 'pinpanclub':
+            case 'sport':
               return (
-                <section key={block.id} data-block="pinpanclub">
+                <section key={block.id} data-block="sport">
                   <PinPanClubFeedBlock
                     config={{
                       titulo: { es: 'Actividad del Club', en: 'Club Activity', zh: '俱乐部动态' },

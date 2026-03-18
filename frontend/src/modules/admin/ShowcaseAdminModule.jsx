@@ -115,7 +115,7 @@ function BannerEditor({ banner, onSave, onDelete }) {
           </div>
           <div>
             <Label className="text-[10px]">Click Link (optional)</Label>
-            <Input value={data.link_url || ''} onChange={e => setData({ ...data, link_url: e.target.value })} className="h-8 text-xs" placeholder="/pinpanclub or https://..." />
+            <Input value={data.link_url || ''} onChange={e => setData({ ...data, link_url: e.target.value })} className="h-8 text-xs" placeholder="/sport or https://..." />
           </div>
           {data.image_url && (
             <img src={data.image_url} alt="Preview" className="w-full h-20 object-cover rounded-lg" />

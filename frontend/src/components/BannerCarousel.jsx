@@ -29,7 +29,7 @@ const DEFAULT_BANNERS = [
     banner_id: 'default_2',
     type: 'image',
     image_url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png',
-    link_url: '/pinpanclub',
+    link_url: '/sport',
     overlay_text: 'PinPanClub — New Season Starting!',
   },
   {

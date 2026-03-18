@@ -108,7 +108,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
         tournaments_limit: sections.upcoming_tournaments?.limit || 3
       });
 
-      const res = await fetch(`${API_URL}/api/pinpanclub/public/activity-feed?${params}`);
+      const res = await fetch(`${API_URL}/api/sport/public/activity-feed?${params}`);
       if (res.ok) {
         const data = await res.json();
         setFeedData(data);
@@ -341,7 +341,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                           variant="ghost" 
                           size="sm"
                           className="w-full mt-2"
-                          onClick={() => navigate('/pinpanclub/superpin/ranking')}
+                          onClick={() => navigate('/sport/rankings')}
                         >
                           {t('pinpanclub.viewAll')} League
                           <ChevronRight className="h-4 w-4 ml-1" />
@@ -394,7 +394,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                           variant="ghost" 
                           size="sm"
                           className="w-full mt-2"
-                          onClick={() => navigate('/pinpanclub/rapidpin')}
+                          onClick={() => navigate('/sport')}
                         >
                           {t('pinpanclub.viewAll')} Rapid Pin
                           <ChevronRight className="h-4 w-4 ml-1" />
@@ -421,7 +421,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => navigate('/pinpanclub/challenges')}
+                  onClick={() => navigate('/sport')}
                 >
                   {t('pinpanclub.viewAll')}
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -589,7 +589,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
         <div className="text-center mt-8">
           <Button 
             size="lg"
-            onClick={() => navigate(config?.style?.cta_url || '/pinpanclub/superpin/ranking')}
+            onClick={() => navigate(config?.style?.cta_url || '/sport/rankings')}
             className="rounded-full px-8"
           >
             {L(config?.style?.cta_text) || t('pinpanclub.viewAll')}

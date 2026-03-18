@@ -39,7 +39,7 @@ const BLOCK_ICONS = {
   testimonials: MessageSquare,
   spacer: Minus,
   divider: Minus,
-  pinpanclub_feed: Trophy
+  pinpanclub_feed: Trophy  // legacy block type
 };
 
 // Color classes for block types

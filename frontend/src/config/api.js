@@ -3,7 +3,7 @@
  * Centralizes all API endpoint definitions for easy migration to new microservices-ready endpoints
  * 
  * Migration Status:
- * - PinpanClub: ✅ Ready (new: /api/pinpanclub/*)
+ * - PinpanClub: ✅ Ready (new: /api/sport/*)
  * - Store: ✅ Ready (new: /api/store/*)
  * - Auth: ✅ Ready (new: /api/auth-v2/*)
  * - Community: ✅ Ready (new: /api/community-v2/*)
@@ -132,38 +132,38 @@ export const COMMUNITY_ENDPOINTS = {
 // ============== PINPANCLUB ENDPOINTS ==============
 export const PINPANCLUB_ENDPOINTS = {
   // Players
-  players: '/pinpanclub/players',
-  playerById: (id) => `/pinpanclub/players/${id}`,
-  rankings: '/pinpanclub/rankings',
+  players: '/sport/players',
+  playerById: (id) => `/sport/players/${id}`,
+  rankings: '/sport/rankings',
   
   // Matches
-  matches: '/pinpanclub/matches',
-  activeMatches: '/pinpanclub/matches/active',
-  activeMatchesAll: '/pinpanclub/matches/active/all',
-  matchById: (id) => `/pinpanclub/matches/${id}`,
-  matchLive: (id) => `/pinpanclub/matches/${id}/live`,
-  matchPoint: (id) => `/pinpanclub/matches/${id}/point`,
-  matchUndo: (id) => `/pinpanclub/matches/${id}/undo`,
-  matchStart: (id) => `/pinpanclub/matches/${id}/start`,
-  matchPause: (id) => `/pinpanclub/matches/${id}/pause`,
+  matches: '/sport/matches',
+  activeMatches: '/sport/matches/active',
+  activeMatchesAll: '/sport/matches/active/all',
+  matchById: (id) => `/sport/matches/${id}`,
+  matchLive: (id) => `/sport/matches/${id}/live`,
+  matchPoint: (id) => `/sport/matches/${id}/point`,
+  matchUndo: (id) => `/sport/matches/${id}/undo`,
+  matchStart: (id) => `/sport/matches/${id}/start`,
+  matchPause: (id) => `/sport/matches/${id}/pause`,
   
   // Tournaments
-  tournaments: '/pinpanclub/tournaments',
-  tournamentById: (id) => `/pinpanclub/tournaments/${id}`,
+  tournaments: '/sport/tournaments',
+  tournamentById: (id) => `/sport/tournaments/${id}`,
   
   // Sponsors
-  sponsors: '/pinpanclub/sponsors',
-  sponsorById: (id) => `/pinpanclub/sponsors/${id}`,
-  sponsorsTvDisplay: '/pinpanclub/sponsors/tv/display',
-  sponsorsConfigLayout: '/pinpanclub/sponsors/config/layout',
-  sponsorsConfigSpace: (id) => `/pinpanclub/sponsors/config/space/${id}`,
+  sponsors: '/sport/sponsors',
+  sponsorById: (id) => `/sport/sponsors/${id}`,
+  sponsorsTvDisplay: '/sport/sponsors/tv/display',
+  sponsorsConfigLayout: '/sport/sponsors/config/layout',
+  sponsorsConfigSpace: (id) => `/sport/sponsors/config/space/${id}`,
   
   // Canvas
-  canvasLayouts: '/pinpanclub/canvas/layouts',
+  canvasLayouts: '/sport/canvas/layouts',
   
   // Monday.com integration
-  mondayStatus: '/pinpanclub/monday/status',
-  mondaySync: '/pinpanclub/monday/sync',
+  mondayStatus: '/sport/monday/status',
+  mondaySync: '/sport/monday/sync',
 };
 
 // ============== HELPER FUNCTIONS ==============
