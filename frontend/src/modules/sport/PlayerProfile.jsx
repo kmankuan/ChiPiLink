@@ -143,11 +143,37 @@ export default function PlayerProfile() {
         <div className="max-w-lg mx-auto">
           <Button variant="ghost" size="sm" className="text-white mb-2" onClick={() => navigate('/sport')}><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
           <div className="flex items-center gap-4">
-            {player.avatar_url ? (
-              <img src={player.avatar_url} className="w-16 h-16 rounded-full object-cover border-3 border-white/20" alt="" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-2xl font-black text-white/40">{(player.nickname || '?')[0]}</div>
-            )}
+            <div className="relative group">
+              {(player.photo_base64 || player.avatar_url) ? (
+                <img src={player.photo_base64 || player.avatar_url} className="w-16 h-16 rounded-full object-cover border-3 border-white/20" alt="" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-2xl font-black text-white/40">{(player.nickname || '?')[0]}</div>
+              )}
+              {user?.is_admin && (
+                <label className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                  <span className="text-white text-xs">📷</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 5 * 1024 * 1024) { toast.error('Max 5MB'); return; }
+                    const reader = new FileReader();
+                    reader.onload = async (ev) => {
+                      try {
+                        const token = localStorage.getItem('auth_token');
+                        await fetch(`${API}/api/sport/players/${player.player_id}/photo`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+                          body: JSON.stringify({ photo_base64: ev.target.result })
+                        });
+                        setPlayer(p => ({ ...p, photo_base64: ev.target.result }));
+                        toast.success('Photo updated!');
+                      } catch { toast.error('Upload failed'); }
+                    };
+                    reader.readAsDataURL(file);
+                  }} />
+                </label>
+              )}
+            </div>
             <div>
               <h1 className="text-xl font-bold text-white">{player.nickname}</h1>
               <div className="flex items-center gap-2 mt-1">

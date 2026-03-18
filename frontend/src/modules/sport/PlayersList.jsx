@@ -81,8 +81,8 @@ export default function PlayersList() {
               </span>
 
               {/* Avatar */}
-              {player.avatar_url || player.photo_url ? (
-                <img src={player.avatar_url || player.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-border" alt="" />
+              {player.photo_base64 || player.avatar_url || player.photo_url ? (
+                <img src={player.photo_base64 || player.avatar_url || player.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-border" alt="" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                   {(player.nickname || '?')[0].toUpperCase()}

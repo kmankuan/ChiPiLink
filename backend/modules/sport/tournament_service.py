@@ -120,6 +120,8 @@ async def generate_brackets(tid: str) -> dict:
     fmt = t["format"]
     if fmt == "single_elimination":
         brackets = _gen_single_elim(parts, t.get("third_place_match", True))
+    elif fmt == "double_elimination":
+        brackets = _gen_double_elim(parts)
     elif fmt == "round_robin":
         brackets = _gen_round_robin(parts)
     elif fmt == "swiss":
@@ -189,6 +191,108 @@ def _auto_advance_byes(rounds):
                     nm[slot] = winner_info
                     if nm["player_a"] and nm["player_b"]: nm["status"] = "pending"
                     break
+
+
+
+def _gen_double_elim(participants):
+    """
+    Double elimination bracket.
+    Structure:
+    - Winners bracket (standard single-elim)
+    - Losers bracket (losers drop down; must lose twice)
+    - Grand Final (winners champ vs losers champ)
+    - Optional Grand Final Reset
+    """
+    n = len(participants)
+    size = _next_pow2(n)
+    total_w_rounds = int(math.log2(size))
+    padded = participants + [None] * (size - n)
+    order = _seed_order(size)
+    ordered = [padded[i] if i < len(padded) else None for i in order]
+
+    rounds = []
+
+    # ── Winners Bracket ──
+    # Round 1
+    r1 = []
+    for i in range(0, size, 2):
+        pa, pb = ordered[i], ordered[i + 1]
+        m = {
+            "match_id": f"tm_{uuid.uuid4().hex[:8]}", "round": 1, "position": len(r1) + 1,
+            "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "seed": pa["seed"]} if pa else None,
+            "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "seed": pb["seed"]} if pb else None,
+            "winner_id": None, "score": None, "status": "pending",
+        }
+        if not pa or not pb:
+            w = pa or pb
+            if w:
+                m["winner_id"] = w["player_id"]
+                m["status"] = "bye"
+        r1.append(m)
+    rounds.append({"round": 1, "name": "Winners R1", "bracket": "winners", "matches": r1})
+
+    for wr in range(2, total_w_rounds + 1):
+        mc = size // (2 ** wr)
+        rname = "Winners Final" if wr == total_w_rounds else f"Winners R{wr}"
+        rm = [{
+            "match_id": f"tm_{uuid.uuid4().hex[:8]}", "round": wr, "position": j + 1,
+            "player_a": None, "player_b": None, "winner_id": None, "score": None,
+            "status": "waiting", "feeds_from": [2 * j + 1, 2 * j + 2],
+        } for j in range(mc)]
+        rounds.append({"round": wr, "name": rname, "bracket": "winners", "matches": rm})
+
+    _auto_advance_byes(rounds)
+
+    # ── Losers Bracket ──
+    # Number of losers rounds = 2 * (total_w_rounds - 1)
+    num_lr = 2 * (total_w_rounds - 1)
+    lr_base = total_w_rounds + 1  # offset round numbers past winners
+
+    prev_count = size // 2  # matches in W R1 = losers who drop
+    for lr in range(1, num_lr + 1):
+        rnum = lr_base + lr - 1
+        if lr == 1:
+            # Losers from W R1 play each other
+            mc = prev_count // 2
+        elif lr % 2 == 0:
+            # Drop-down round: losers from next winners round join
+            mc = prev_count  # same count
+        else:
+            # Reduction round: winners of previous losers round play each other
+            mc = max(1, prev_count // 2)
+        prev_count = mc
+
+        rname = "Losers Final" if lr == num_lr else f"Losers R{lr}"
+        rm = [{
+            "match_id": f"tm_{uuid.uuid4().hex[:8]}", "round": rnum, "position": j + 1,
+            "player_a": None, "player_b": None, "winner_id": None, "score": None,
+            "status": "waiting",
+        } for j in range(max(1, mc))]
+        rounds.append({"round": rnum, "name": rname, "bracket": "losers", "matches": rm})
+
+    # ── Grand Final ──
+    gf_round = lr_base + num_lr
+    rounds.append({
+        "round": gf_round, "name": "Grand Final", "bracket": "final",
+        "matches": [{
+            "match_id": f"tm_{uuid.uuid4().hex[:8]}", "round": gf_round, "position": 1,
+            "player_a": None, "player_b": None, "winner_id": None, "score": None,
+            "status": "waiting", "is_grand_final": True,
+        }],
+    })
+
+    # Grand Final Reset (if losers champ wins GF)
+    rounds.append({
+        "round": gf_round + 1, "name": "Grand Final Reset", "bracket": "final",
+        "matches": [{
+            "match_id": f"tm_{uuid.uuid4().hex[:8]}", "round": gf_round + 1, "position": 1,
+            "player_a": None, "player_b": None, "winner_id": None, "score": None,
+            "status": "waiting", "is_grand_final": True,
+        }],
+    })
+
+    return rounds
+
 
 
 def _gen_round_robin(participants):

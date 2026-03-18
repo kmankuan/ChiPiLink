@@ -46,17 +46,18 @@ import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
 import PaymentStatus from '@/pages/PaymentStatus';
 
-// PinpanClub Module
-import PingPongDashboard from '@/modules/pinpanclub/pages/PingPongDashboard';
-import CompetitionsHub from '@/modules/pinpanclub/pages/CompetitionsHub';
-import PingPongMatch from '@/modules/pinpanclub/pages/PingPongMatch';
-import PingPongArbiter from '@/modules/pinpanclub/pages/PingPongArbiter';
-import PingPongSpectator from '@/modules/pinpanclub/pages/PingPongSpectator';
-import PingPongTV from '@/modules/pinpanclub/pages/PingPongTV';
-import PingPongMobileArbiter from '@/modules/pinpanclub/pages/PingPongMobileArbiter';
-import SponsorsAdmin from '@/modules/pinpanclub/pages/SponsorsAdmin';
-import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
-import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
+// PinpanClub Module — DEPRECATED (replaced by Sport module)
+// TV routes now redirect to Sport TV
+// import PingPongDashboard from '@/modules/pinpanclub/pages/PingPongDashboard';
+// import CompetitionsHub from '@/modules/pinpanclub/pages/CompetitionsHub';
+// import PingPongMatch from '@/modules/pinpanclub/pages/PingPongMatch';
+// import PingPongArbiter from '@/modules/pinpanclub/pages/PingPongArbiter';
+// import PingPongSpectator from '@/modules/pinpanclub/pages/PingPongSpectator';
+// import PingPongTV from '@/modules/pinpanclub/pages/PingPongTV';
+// import PingPongMobileArbiter from '@/modules/pinpanclub/pages/PingPongMobileArbiter';
+// import SponsorsAdmin from '@/modules/pinpanclub/pages/SponsorsAdmin';
+// import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
+// import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
 
 // Sport Module (new — replaces PinPanClub league system)
 import SportDashboard from '@/modules/sport/SportDashboard';
@@ -87,24 +88,23 @@ import WorksheetGenerator from '@/modules/tutor/WorksheetGenerator';
 import ParentPortal from '@/modules/tutor/ParentPortal';
 
 
-// Rapid Pin Module
-import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
+// Rapid Pin Module — DEPRECATED
+// import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
 
-// PinPan Arena Module
-import { ArenaHub, ArenaCreate, ArenaDetail, ArenaPublic } from '@/modules/pinpanclub/pages/arena';
+// PinPan Arena Module — DEPRECATED
+// import { ArenaHub, ArenaCreate, ArenaDetail, ArenaPublic } from '@/modules/pinpanclub/pages/arena';
 
-// Hall of Fame & Referee
-// import HallOfFame from '@/modules/pinpanclub/pages/HallOfFame'; // DEPRECATED
-import RefereeSettings from '@/modules/pinpanclub/pages/RefereeSettings';
+// Hall of Fame & Referee — DEPRECATED
+// import RefereeSettings from '@/modules/pinpanclub/pages/RefereeSettings';
 
-// Weekly Challenges Page
-import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
+// Weekly Challenges Page — DEPRECATED
+// import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
 
-// Analytics Dashboard
-import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
+// Analytics Dashboard — DEPRECATED
+// import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
 
-// Seasons Page
-import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
+// Seasons Page — DEPRECATED
+// import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
 
 // Account Module (User's personal portal)
 import AccountDashboard from '@/modules/account/pages/AccountDashboard';
@@ -196,17 +196,16 @@ function AppRouter() {
       <Route path="/eventos" element={<><Header /><SuperAppLanding /></>} />
       <Route path="/galeria" element={<><Header /><SuperAppLanding /></>} />
       
-      {/* PinpanClub Routes — DEPRECATED, redirecting to Sport module */}
-      {/* Keep TV and Canvas routes as they still work independently */}
-      <Route path="/tv/pinpanclub" element={<PingPongTV />} />
-      <Route path="/tv" element={<PingPongTV />} />
-      <Route path="/canvas" element={<PingPongCanvas />} />
-      <Route path="/tv/canvas" element={<PingPongCanvas />} />
+      {/* PinpanClub Routes — ALL DEPRECATED, redirect to Sport module */}
+      <Route path="/tv/pinpanclub" element={<Navigate to="/sport/tv" replace />} />
+      <Route path="/tv" element={<Navigate to="/sport/tv" replace />} />
+      <Route path="/canvas" element={<Navigate to="/sport/tv" replace />} />
+      <Route path="/tv/canvas" element={<Navigate to="/sport/tv" replace />} />
       
       {/* All pinpanclub routes redirect to sport */}
       <Route path="/pinpanclub/*" element={<Navigate to="/sport" replace />} />
       <Route path="/rapidpin" element={<Navigate to="/sport" replace />} />
-      <Route path="/arena/:tournamentId" element={<ArenaPublic />} />
+      <Route path="/arena/*" element={<Navigate to="/sport/tournaments" replace />} />
       
       {/* Account Module Routes (User's personal portal) */}
       <Route 

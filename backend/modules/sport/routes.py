@@ -65,9 +65,19 @@ async def deactivate_player(player_id: str, admin: dict = Depends(get_admin_user
 
 @router.put("/players/{player_id}/photo")
 async def update_photo(player_id: str, data: dict, user: dict = Depends(get_current_user)):
-    """Update player photo URL."""
+    """Update player photo URL or base64 image."""
     url = data.get("photo_url", "")
-    await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": {"avatar_url": url}})
+    b64 = data.get("photo_base64", "")
+    update = {}
+    if b64:
+        if len(b64) > 7_000_000:
+            raise HTTPException(400, "Image too large (max ~5MB)")
+        update["photo_base64"] = b64
+    if url:
+        update["avatar_url"] = url
+    if not update:
+        raise HTTPException(400, "Provide photo_url or photo_base64")
+    await db[services.C_PLAYERS].update_one({"player_id": player_id}, {"$set": update})
     return {"success": True}
 
 @router.post("/players/{player_id}/link-request")

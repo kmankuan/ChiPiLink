@@ -82,7 +82,8 @@ const TextbookOrdersAdminTab = lazy(() => import('@/modules/admin/store/Textbook
 const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const SportDashboardEmbed = lazy(() => import('@/modules/sport/SportDashboard'));
-const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
+// PinpanClub Module — DEPRECATED (replaced by Sport module)
+// const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
 const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
 const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
 const StoreAnalyticsModule = lazy(() => import('@/modules/admin/store/StoreAnalyticsModule'));
@@ -381,7 +382,7 @@ export default function AdminDashboard() {
       case 'sport':
         return <SportDashboardEmbed />;
       case 'pinpanclub':
-        return <PinpanClubModule />;
+        return <SportDashboardEmbed />; // DEPRECATED: redirected to Sport module
       case 'roles':
         return <RolesModule />;
       case 'community':
