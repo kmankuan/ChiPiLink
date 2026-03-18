@@ -1,0 +1,46 @@
+/**
+ * Weekly Challenges Page
+ * Página dedicada para mostrar todos los retos semanales
+ */
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import WeeklyChallenges from '../components/WeeklyChallenges';
+import { useTranslation } from 'react-i18next';
+
+export default function WeeklyChallengesPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const currentUserId = user?.user_id || null;
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/pinpanclub')}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+              <span className="text-2xl">🎯</span>
+              <h1 className="font-bold text-xl">Retos Semanales</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        <WeeklyChallenges playerId={currentUserId} />
+      </main>
+    </div>
+  );
+}

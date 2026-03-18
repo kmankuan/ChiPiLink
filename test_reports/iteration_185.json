@@ -1,0 +1,66 @@
+{
+  "summary": "Sysbook Dashboard and Unatienda cleanup fully tested. Dashboard displays all KPI cards (Products, Stock, Value, Alerts, Movements, Pending Orders), active alerts list, grade health bars, recent activity, and Quick Action buttons. Sidebar shows Dashboard as first item under SYSBOOK group. Unatienda StockOrdersTab cleanup verified - CatalogTypeSelector removed, public-only operations, subtitle mentions 'public store'. Backend stock-orders API uses catalog_type=sysbook (not pca).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: GET /api/sysbook/analytics/overview returns KPIs (products=25, stock=707, value=$22620)",
+    "Backend: GET /api/sysbook/alerts?status=active&limit=5 returns alerts with severity badges",
+    "Backend: GET /api/sysbook/analytics/grade-summary returns grade health data",
+    "Backend: GET /api/sysbook/inventory/dashboard returns recent movements",
+    "Backend: GET /api/sysbook/stock-orders/summary/pending returns pending orders count (total=7)",
+    "Backend: GET /api/sysbook/stock-orders returns orders with catalog_type=sysbook",
+    "Backend: POST /api/sysbook/stock-orders/shipment creates with catalog_type=sysbook",
+    "Backend: GET /api/store/stock-orders?catalog_type=public filters to public orders",
+    "Backend: POST /api/store/stock-orders/shipment accepts catalog_type=public",
+    "Backend: Sysbook Inventory dashboard still works",
+    "Backend: Sysbook Analytics overview still works",
+    "Backend: Sysbook Alerts endpoint still works",
+    "Frontend: Sysbook Dashboard loads with data-testid=sysbook-dashboard",
+    "Frontend: 6 KPI cards visible (Products, Total Stock, Value, Active Alerts, Movements 7d, Pending Orders)",
+    "Frontend: Stock Alerts section shows 3 active alerts with severity badges",
+    "Frontend: Grade Health bars show 5 grades (G3-G8) with low/out stock indicators",
+    "Frontend: Recent Activity shows stock movements with +/- indicators",
+    "Frontend: 4 Quick Action buttons work (Inventory, Stock Movements, Analytics, Stock Alerts)",
+    "Frontend: Quick Action navigation updates URL hash correctly (#sysbook-inventory)",
+    "Frontend: Refresh button present on dashboard",
+    "Frontend: Sidebar shows 'Dashboard' as first item under SYSBOOK group",
+    "Frontend: Unatienda StockOrdersTab no longer has CatalogTypeSelector",
+    "Frontend: Unatienda StockOrdersTab subtitle says 'Manage shipments...for public store'",
+    "Frontend: Unatienda StockOrdersTab orders show 'Public' badge only"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_sysbook_dashboard.py",
+    "/app/test_reports/pytest/pytest_results_sysbook_dashboard.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SysbookDashboardTab.jsx fetches 5 APIs in parallel (overview, alerts, grade-summary, dashboard, pending) - efficient",
+    "KPI cards clickable with data-testid for each (kpi-products, kpi-total-stock, etc.)",
+    "Quick Actions use onNavigate prop or fallback to window.location.hash",
+    "Unatienda StockOrdersTab hardcodes catalog_type='public' for all operations",
+    "Backend stock_orders.py uses CATALOG_TYPE='sysbook' constant consistently",
+    "AdminDashboard.jsx correctly places Dashboard as first in SYSBOOK group items array"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_sysbook_dashboard.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {"email": "admin@chipi.co", "password": "admin"},
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+  "seed_data_creation": "Created TEST_SUPPLIER_DASHBOARD and TEST_PUBLIC_SUPPLIER shipments during backend tests",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Sysbook Dashboard is the admin landing page at /admin#sysbook-dashboard. It combines KPIs from inventory, alerts, stock movements. Dashboard is first item under SYSBOOK sidebar group. Unatienda StockOrdersTab (at /admin#unatienda Stock Mov. tab) is now public-only with no CatalogTypeSelector. Backend /api/sysbook/stock-orders uses catalog_type=sysbook."
+}

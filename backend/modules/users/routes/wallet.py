@@ -1,0 +1,999 @@
+"""
+Wallet API Routes - ChipiWallet y transactions
+"""
+from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import Optional
+from datetime import datetime, timezone
+from pydantic import BaseModel
+import asyncio
+import logging
+
+from core.auth import get_current_user, get_admin_user
+from core.database import db
+from modules.users.services.wallet_service import wallet_service
+from modules.users.models.wallet_models import (
+    Currency, PaymentMethod, PointsEarnType
+)
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/wallet", tags=["Wallet"])
+
+
+DEFAULTS = {
+    "topup": "Wallet top-up",
+    "deduct": "Wallet deduction",
+    "monday_topup": "Wallet top-up (Monday.com)",
+    "monday_deduct": "Wallet deduction (Monday.com)",
+    "purchase": "Purchase",
+    "transfer_sent": "Transfer sent",
+    "transfer_received": "Transfer received",
+}
+
+async def _get_default_description(action: str) -> str:
+    """Get the admin-configurable default description for wallet transactions."""
+    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
+    if doc and doc.get("descriptions", {}).get(action):
+        return doc["descriptions"][action]
+    return DEFAULTS.get(action, "Wallet transaction")
+
+async def _get_all_descriptions() -> dict:
+    """Get all configurable descriptions with defaults."""
+    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
+    saved = doc.get("descriptions", {}) if doc else {}
+    return {k: saved.get(k, v) for k, v in DEFAULTS.items()}
+
+
+async def _monday_sync_tx(user_id: str, amount: float, action: str, description: str = "", reference: str = ""):
+    """Fire-and-forget sync of a wallet transaction to Monday.com."""
+    try:
+        from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+        await wallet_monday_adapter.sync_transaction_if_not_from_monday(
+            user_id, amount, action, description, reference
+        )
+    except Exception:
+        pass  # Non-critical: Monday sync failure should never block wallet operations
+
+
+
+# ============== PYDANTIC MODELS ==============
+
+class DepositRequest(BaseModel):
+    amount: float
+    currency: str = "USD"
+    payment_method: str
+    reference: Optional[str] = None
+    description: Optional[str] = None
+
+
+class ChargeRequest(BaseModel):
+    amount: float
+    currency: str = "USD"
+    description: str
+    reference_type: Optional[str] = None
+    reference_id: Optional[str] = None
+
+
+class TransferRequest(BaseModel):
+    to_user_id: str
+    amount: float
+    currency: str = "USD"
+    description: Optional[str] = None
+
+
+class EarnPointsRequest(BaseModel):
+    user_id: str
+    points: int
+    earn_type: str
+    description: Optional[str] = None
+    reference_type: Optional[str] = None
+    reference_id: Optional[str] = None
+
+
+class ConvertPointsRequest(BaseModel):
+    points: int
+
+
+class UpdateConfigRequest(BaseModel):
+    points_per_dollar: Optional[float] = None
+    conversion_rate: Optional[float] = None
+    allow_points_to_usd: Optional[bool] = None
+    allow_usd_to_points: Optional[bool] = None
+    min_points_to_convert: Optional[int] = None
+    points_per_dollar_spent: Optional[int] = None
+
+
+# ============== WALLET ==============
+
+@router.get("/me")
+async def get_my_wallet(user=Depends(get_current_user)):
+    """Get mi billetera"""
+    wallet = await wallet_service.get_wallet(user["user_id"])
+    
+    if not wallet:
+        # Create billetera automaticmente
+        wallet = await wallet_service.create_wallet(user["user_id"])
+    
+    return {
+        "success": True,
+        "wallet": wallet
+    }
+
+
+@router.get("/summary")
+async def get_wallet_summary(user=Depends(get_current_user)):
+    """Get resumen de mi billetera con statistics"""
+    wallet = await wallet_service.get_or_create_wallet(user["user_id"])
+    config = await wallet_service.get_config()
+    
+    # Get lasts transactions
+    transactions = await wallet_service.get_transactions(
+        user["user_id"],
+        limit=10
+    )
+    
+    # Calculate valor de puntos en USD
+    points_value = wallet.get("balance_points", 0) * config.get("conversion_rate", 0.008)
+    
+    return {
+        "success": True,
+        "summary": {
+            "wallet_id": wallet["wallet_id"],
+            "balance_usd": wallet.get("balance_usd", 0),
+            "balance_points": wallet.get("balance_points", 0),
+            "points_value_usd": round(points_value, 2),
+            "total_balance": round(wallet.get("balance_usd", 0) + points_value, 2),
+            "is_locked": wallet.get("is_locked", False),
+            "stats": {
+                "total_deposited": wallet.get("total_deposited", 0),
+                "total_spent": wallet.get("total_spent", 0),
+                "total_points_earned": wallet.get("total_points_earned", 0),
+                "total_points_spent": wallet.get("total_points_spent", 0)
+            },
+            "recent_transactions": transactions[:5],
+            "points_config": {
+                "conversion_rate": config.get("conversion_rate"),
+                "points_per_dollar_spent": config.get("points_per_dollar_spent"),
+                "allow_conversion": config.get("allow_points_to_usd")
+            }
+        }
+    }
+
+
+@router.get("/user/{user_id}")
+async def get_user_wallet(
+    user_id: str,
+    admin=Depends(get_admin_user)
+):
+    """Get billetera de un usuario (admin)"""
+    wallet = await wallet_service.get_wallet(user_id)
+    
+    if not wallet:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    
+    return {"success": True, "wallet": wallet}
+
+
+# ============== TRANSACTIONS ==============
+
+@router.get("/transactions")
+async def get_my_transactions(
+    limit: int = Query(50, le=100),
+    offset: int = Query(0, ge=0),
+    transaction_type: Optional[str] = None,
+    currency: Optional[str] = None,
+    user=Depends(get_current_user)
+):
+    """Get mis transactions"""
+    transactions = await wallet_service.get_transactions(
+        user_id=user["user_id"],
+        limit=limit,
+        offset=offset,
+        transaction_type=transaction_type,
+        currency=currency
+    )
+    
+    return {
+        "success": True,
+        "transactions": transactions,
+        "count": len(transactions)
+    }
+
+
+@router.get("/transactions/{transaction_id}")
+async def get_transaction(
+    transaction_id: str,
+    user=Depends(get_current_user)
+):
+    """Get detalle de una transaction"""
+    from core.database import db
+    
+    transaction = await db.chipi_transactions.find_one(
+        {"transaction_id": transaction_id, "user_id": user["user_id"]},
+        {"_id": 0}
+    )
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    return {"success": True, "transaction": transaction}
+
+
+# ============== DEPOSITS ==============
+
+@router.post("/deposit")
+async def deposit(
+    data: DepositRequest,
+    user=Depends(get_current_user)
+):
+    """Request a wallet deposit (creates a pending top-up for admin approval)."""
+    try:
+        currency = Currency(data.currency)
+        payment_method = PaymentMethod(data.payment_method)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid value: {e}")
+    
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    import uuid
+    topup_id = f"topup_{uuid.uuid4().hex[:12]}"
+    now = datetime.now(timezone.utc).isoformat()
+    
+    pending_doc = {
+        "id": topup_id,
+        "user_id": user["user_id"],
+        "user_email": user.get("email", ""),
+        "user_name": user.get("name", ""),
+        "amount": data.amount,
+        "currency": currency.value,
+        "payment_method": payment_method.value,
+        "reference": data.reference or "",
+        "description": data.description or "Wallet top-up request",
+        "status": "pending",
+        "source": "user_request",
+        "created_at": now,
+        "updated_at": now,
+    }
+    
+    await db["wallet_pending_topups"].insert_one(pending_doc)
+    del pending_doc["_id"]
+    
+    return {"success": True, "status": "pending", "topup_id": topup_id, "message": "Deposit request submitted for approval"}
+
+
+# ============== DEPOSIT METHODS CONFIG ==============
+
+DEFAULT_DEPOSIT_METHODS = {
+    "yappy": {
+        "id": "yappy",
+        "label": "Yappy",
+        "enabled": True,
+        "status": "active",
+        "icon": "smartphone",
+        "description": "Pay instantly with Yappy",
+        "instructions": "",
+        "config": {
+            "use_platform_yappy": True,
+        }
+    },
+    "cash": {
+        "id": "cash",
+        "label": "Cash",
+        "enabled": True,
+        "status": "active",
+        "icon": "banknote",
+        "description": "Pay with cash at our register",
+        "instructions": "<p>Please visit our <strong>cash register</strong> at the school office to complete your deposit.</p><p>Bring your deposit reference number and the exact amount.</p><p>Operating hours: <strong>Mon-Fri 8:00 AM - 3:00 PM</strong></p>",
+        "config": {}
+    },
+    "card": {
+        "id": "card",
+        "label": "Credit / Debit Card",
+        "enabled": True,
+        "status": "under_construction",
+        "icon": "credit-card",
+        "description": "Pay with credit or debit card",
+        "instructions": "",
+        "config": {
+            "under_construction_label": "Coming Soon — Card payments are under development"
+        }
+    },
+    "transfer": {
+        "id": "transfer",
+        "label": "Bank Transfer",
+        "enabled": True,
+        "status": "active",
+        "icon": "building-2",
+        "description": "Transfer via online banking",
+        "instructions": "<p>Use your <strong>online banking</strong> to make a transfer with the details below.</p><p>Once completed, we will receive an alert at <strong>chipiwallet@gmail.com</strong> and process your deposit as soon as possible.</p>",
+        "config": {
+            "bank_name": "",
+            "account_holder": "",
+            "account_number": "",
+            "account_type": "",
+            "alert_email": "chipiwallet@gmail.com",
+            "additional_notes": "Include your full name in the transfer description for faster processing."
+        }
+    }
+}
+
+
+@router.get("/deposit-methods")
+async def get_deposit_methods():
+    """Get available deposit methods — public endpoint (config only, no sensitive data)"""
+    config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
+    methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
+
+    # Return ALL methods — disabled ones shown grayed out so users know they exist
+    result = []
+    for method_id in ["yappy", "cash", "card", "transfer"]:
+        m = methods.get(method_id)
+        if m:
+            enabled = m.get("enabled", False)
+            result.append({
+                "id": m["id"],
+                "label": m.get("label", method_id),
+                "status": "disabled" if not enabled else m.get("status", "active"),
+                "enabled": enabled,
+                "icon": m.get("icon", ""),
+                "description": m.get("description", ""),
+                "instructions": m.get("instructions", ""),
+                "config": {k: v for k, v in m.get("config", {}).items() if k not in ["secret", "api_key"]}
+            })
+    return {"methods": result}
+
+
+@router.get("/admin/deposit-methods")
+async def admin_get_deposit_methods(admin=Depends(get_admin_user)):
+    """Get all deposit methods config (admin)"""
+    config = await db.app_config.find_one({"config_key": "wallet_deposit_methods"}, {"_id": 0})
+    methods = config["value"] if config else DEFAULT_DEPOSIT_METHODS
+    return {"methods": methods}
+
+
+@router.put("/admin/deposit-methods")
+async def admin_update_deposit_methods(data: dict, admin=Depends(get_admin_user)):
+    """Update deposit methods config (admin)"""
+    methods = data.get("methods", {})
+    if not methods:
+        raise HTTPException(status_code=400, detail="No methods provided")
+
+    # Merge with defaults to ensure all fields exist
+    merged = dict(DEFAULT_DEPOSIT_METHODS)
+    for method_id, method_data in methods.items():
+        if method_id in merged:
+            merged[method_id].update(method_data)
+            merged[method_id]["id"] = method_id
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.app_config.update_one(
+        {"config_key": "wallet_deposit_methods"},
+        {"$set": {"config_key": "wallet_deposit_methods", "value": merged, "updated_at": now, "updated_by": admin.get("email", "")}},
+        upsert=True
+    )
+    return {"success": True, "methods": merged}
+
+
+
+@router.post("/admin/deposit/{user_id}")
+async def admin_deposit(
+    user_id: str,
+    data: DepositRequest,
+    admin=Depends(get_admin_user)
+):
+    """Depositar en la billetera de un usuario (admin)"""
+    try:
+        currency = Currency(data.currency)
+        payment_method = PaymentMethod(data.payment_method)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid value: {e}")
+    
+    try:
+        transaction = await wallet_service.deposit(
+            user_id=user_id,
+            amount=data.amount,
+            currency=currency,
+            payment_method=payment_method,
+            reference=data.reference,
+            description=data.description
+        )
+        
+        asyncio.create_task(_monday_sync_tx(
+            user_id, data.amount, "topup", data.description or "", data.reference or ""
+        ))
+        
+        return {"success": True, "transaction": transaction}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== CHARGES ==============
+
+@router.post("/charge")
+async def charge(
+    data: ChargeRequest,
+    user=Depends(get_current_user)
+):
+    """Realizar un cobro/pago"""
+    try:
+        currency = Currency(data.currency)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid currency: {data.currency}")
+    
+    try:
+        transaction = await wallet_service.charge(
+            user_id=user["user_id"],
+            amount=data.amount,
+            currency=currency,
+            description=data.description,
+            reference_type=data.reference_type,
+            reference_id=data.reference_id
+        )
+        
+        asyncio.create_task(_monday_sync_tx(
+            user["user_id"], data.amount, "deduct", data.description or "",
+            data.reference_id or ""
+        ))
+        
+        return {"success": True, "transaction": transaction}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== TRANSFERS ==============
+
+@router.post("/transfer")
+async def transfer(
+    data: TransferRequest,
+    user=Depends(get_current_user)
+):
+    """Transferir fondos a otro usuario"""
+    try:
+        currency = Currency(data.currency)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid currency: {data.currency}")
+    
+    if data.to_user_id == user["user_id"]:
+        raise HTTPException(status_code=400, detail="Cannot transfer to yourself")
+    
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    try:
+        out_txn, in_txn = await wallet_service.transfer(
+            from_user_id=user["user_id"],
+            to_user_id=data.to_user_id,
+            amount=data.amount,
+            currency=currency,
+            description=data.description
+        )
+        
+        return {
+            "success": True,
+            "out_transaction": out_txn,
+            "in_transaction": in_txn
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== CHIPIPOINTS ==============
+
+@router.post("/points/earn")
+async def earn_points(
+    data: EarnPointsRequest,
+    admin=Depends(get_admin_user)
+):
+    """Otorgar ChipiPoints a un usuario (admin)"""
+    try:
+        earn_type = PointsEarnType(data.earn_type)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid earn type: {data.earn_type}")
+    
+    if data.points <= 0:
+        raise HTTPException(status_code=400, detail="Points must be positive")
+    
+    try:
+        transaction = await wallet_service.earn_points(
+            user_id=data.user_id,
+            points=data.points,
+            earn_type=earn_type,
+            description=data.description,
+            reference_type=data.reference_type,
+            reference_id=data.reference_id
+        )
+        
+        return {"success": True, "transaction": transaction}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/points/convert")
+async def convert_points(
+    data: ConvertPointsRequest,
+    user=Depends(get_current_user)
+):
+    """Convertir ChipiPoints a USD"""
+    if data.points <= 0:
+        raise HTTPException(status_code=400, detail="Points must be positive")
+    
+    try:
+        result = await wallet_service.convert_points_to_usd(
+            user_id=user["user_id"],
+            points=data.points
+        )
+        
+        return {"success": True, "conversion": result}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/points/history")
+async def get_points_history(
+    limit: int = Query(50, le=100),
+    offset: int = Query(0, ge=0),
+    user=Depends(get_current_user)
+):
+    """Get historial de ChipiPoints"""
+    from core.database import db
+    
+    cursor = db.chipi_points_history.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(offset).limit(limit)
+    
+    history = await cursor.to_list(length=limit)
+    
+    return {
+        "success": True,
+        "history": history,
+        "count": len(history)
+    }
+
+
+# ============== CONFIGURATION ==============
+
+@router.get("/config")
+async def get_points_config():
+    """Get configuration de ChipiPoints"""
+    config = await wallet_service.get_config()
+    return {"success": True, "config": config}
+
+
+@router.put("/config")
+async def update_points_config(
+    data: UpdateConfigRequest,
+    admin=Depends(get_admin_user)
+):
+    """Update configuration de ChipiPoints (admin)"""
+    updates = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if not updates:
+        raise HTTPException(status_code=400, detail="No updates provided")
+    
+    config = await wallet_service.update_config(updates)
+    return {"success": True, "config": config}
+
+
+@router.post("/config/initialize")
+async def initialize_config(admin=Depends(get_admin_user)):
+    """Inicializar configuration de ChipiPoints (admin)"""
+    config = await wallet_service.initialize_config()
+    rules_count = await wallet_service.initialize_earn_rules()
+    
+    return {
+        "success": True,
+        "config": config,
+        "earn_rules_initialized": rules_count
+    }
+
+
+# ============== PENDING BALANCES ==============
+
+@router.get("/pending")
+async def get_pending_balances(user=Depends(get_current_user)):
+    """Get saldos pendientes de mis dependientes"""
+    balances = await wallet_service.get_pending_balances(user["user_id"])
+    
+    total = sum(b.get("amount", 0) for b in balances)
+    
+    return {
+        "success": True,
+        "pending_balances": balances,
+        "total": total,
+        "count": len(balances)
+    }
+
+
+@router.post("/pending/{pending_id}/pay")
+async def pay_pending_balance(
+    pending_id: str,
+    payment_method: str = Query(...),
+    user=Depends(get_current_user)
+):
+    """Pagar un saldo pendiente"""
+    try:
+        pm = PaymentMethod(payment_method)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid payment method: {payment_method}")
+    
+    try:
+        transaction = await wallet_service.pay_pending_balance(
+            pending_id=pending_id,
+            payment_method=pm
+        )
+        
+        return {"success": True, "transaction": transaction}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== ADMIN ==============
+
+@router.post("/admin/lock/{user_id}")
+async def lock_wallet(
+    user_id: str,
+    reason: str = Query(...),
+    admin=Depends(get_admin_user)
+):
+    """Bloquear billetera de un usuario (admin)"""
+    from core.database import db
+    
+    result = await db.chipi_wallets.update_one(
+        {"user_id": user_id},
+        {"$set": {"is_locked": True, "lock_reason": reason}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    
+    return {"success": True, "message": "Wallet locked"}
+
+
+@router.post("/admin/unlock/{user_id}")
+async def unlock_wallet(
+    user_id: str,
+    admin=Depends(get_admin_user)
+):
+    """Desbloquear billetera de un usuario (admin)"""
+    from core.database import db
+    
+    result = await db.chipi_wallets.update_one(
+        {"user_id": user_id},
+        {"$set": {"is_locked": False, "lock_reason": None}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    
+    return {"success": True, "message": "Wallet unlocked"}
+
+
+
+class AdminAdjustRequest(BaseModel):
+    amount: float
+    action: str  # "topup" or "deduct"
+    description: Optional[str] = None
+
+
+@router.post("/admin/adjust/{user_id}")
+async def admin_adjust_wallet(
+    user_id: str,
+    data: AdminAdjustRequest,
+    admin=Depends(get_admin_user)
+):
+    """Top up or deduct from a user's wallet (admin).
+    action: 'topup' adds funds, 'deduct' removes funds.
+    """
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    if data.action not in ("topup", "deduct"):
+        raise HTTPException(status_code=400, detail="Action must be 'topup' or 'deduct'")
+    
+    try:
+        # Ensure wallet exists
+        await wallet_service.get_or_create_wallet(user_id)
+        
+        if data.action == "topup":
+            desc = data.description or await _get_default_description("topup")
+            transaction = await wallet_service.deposit(
+                user_id=user_id,
+                amount=data.amount,
+                currency=Currency.USD,
+                payment_method=PaymentMethod.WALLET,
+                description=desc
+            )
+        else:
+            desc = data.description or await _get_default_description("deduct")
+            transaction = await wallet_service.charge(
+                user_id=user_id,
+                amount=data.amount,
+                currency=Currency("USD"),
+                description=desc,
+                reference_type="admin_adjustment"
+            )
+        
+        asyncio.create_task(_monday_sync_tx(user_id, data.amount, data.action, desc))
+        
+        # Get updated wallet
+        wallet = await wallet_service.get_wallet(user_id)
+        
+        return {
+            "success": True,
+            "transaction": transaction,
+            "new_balance": wallet.get("balance_usd", 0) if wallet else 0
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@router.get("/admin/default-descriptions")
+async def get_default_descriptions(admin=Depends(get_admin_user)):
+    """Get configurable default descriptions for wallet transactions"""
+    descriptions = await _get_all_descriptions()
+    return {"descriptions": descriptions}
+
+
+@router.put("/admin/default-descriptions")
+async def update_default_descriptions(data: dict, admin=Depends(get_admin_user)):
+    """Update default descriptions shown to users for wallet transactions"""
+    descriptions = data.get("descriptions", {})
+    await db.wallet_settings.update_one(
+        {"key": "default_descriptions"},
+        {"$set": {"descriptions": descriptions}},
+        upsert=True
+    )
+    return {"status": "updated", "descriptions": descriptions}
+
+
+
+@router.get("/admin/all-users")
+async def get_all_users_with_wallets(
+    admin=Depends(get_admin_user)
+):
+    """Get all non-admin users with their wallet info (admin)"""
+    # Fetch non-admin users
+    users_cursor = db.auth_users.find(
+        {"is_admin": {"$ne": True}},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    users = await users_cursor.to_list(length=500)
+    
+    # Fetch all wallets
+    wallets_cursor = db.chipi_wallets.find({}, {"_id": 0})
+    wallets = await wallets_cursor.to_list(length=500)
+    wallet_map = {w["user_id"]: w for w in wallets}
+    
+    # Merge
+    result = []
+    for u in users:
+        if not u.get("email"):
+            continue
+        w = wallet_map.get(u["user_id"])
+        result.append({
+            "user_id": u["user_id"],
+            "email": u.get("email", ""),
+            "name": u.get("name", ""),
+            "wallet": {
+                "balance_usd": w.get("balance_usd", 0) if w else 0,
+                "total_deposited": w.get("total_deposited", 0) if w else 0,
+                "total_spent": w.get("total_spent", 0) if w else 0,
+                "is_locked": w.get("is_locked", False) if w else False,
+            } if w else None
+        })
+    
+    return {"users": result}
+
+
+
+@router.delete("/admin/user/{user_id}")
+async def delete_user(user_id: str, admin=Depends(get_admin_user)):
+    """Delete a user and their wallet data (admin only)"""
+    user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0, "email": 1, "is_admin": 1})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Cannot delete admin users")
+
+    await db.auth_users.delete_one({"user_id": user_id})
+    await db.chipi_wallets.delete_one({"user_id": user_id})
+    await db.wallet_transactions.delete_many({"user_id": user_id})
+
+    return {"status": "deleted", "user_id": user_id, "email": user.get("email")}
+
+
+@router.post("/admin/users/bulk-delete")
+async def bulk_delete_users(data: dict, admin=Depends(get_admin_user)):
+    """Bulk delete non-admin users and their wallet data"""
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+
+    # Exclude admins
+    admins = await db.auth_users.find(
+        {"user_id": {"$in": user_ids}, "is_admin": True}, {"_id": 0, "user_id": 1}
+    ).to_list(100)
+    admin_ids = {a["user_id"] for a in admins}
+    safe_ids = [uid for uid in user_ids if uid not in admin_ids]
+
+    if not safe_ids:
+        raise HTTPException(status_code=403, detail="All selected users are admins")
+
+    r = await db.auth_users.delete_many({"user_id": {"$in": safe_ids}})
+    await db.chipi_wallets.delete_many({"user_id": {"$in": safe_ids}})
+    await db.wallet_transactions.delete_many({"user_id": {"$in": safe_ids}})
+
+    return {"status": "deleted", "count": r.deleted_count, "skipped_admins": len(admin_ids)}
+
+
+@router.post("/admin/users/bulk-archive")
+async def bulk_archive_users(data: dict, admin=Depends(get_admin_user)):
+    """Archive users (soft-delete: marks as archived, preserves data)"""
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+
+    r = await db.auth_users.update_many(
+        {"user_id": {"$in": user_ids}, "is_admin": {"$ne": True}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-archive")
+async def bulk_archive_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Archive transactions (soft-delete)"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    r = await db.chipi_transactions.update_many(
+        {"transaction_id": {"$in": transaction_ids}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-unarchive")
+async def bulk_unarchive_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Unarchive transactions"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    r = await db.chipi_transactions.update_many(
+        {"transaction_id": {"$in": transaction_ids}},
+        {"$unset": {"archived": "", "archived_at": ""}}
+    )
+    return {"status": "unarchived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-delete")
+async def bulk_delete_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Permanently delete transactions (admin only)"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    try:
+        r = await db.chipi_transactions.delete_many(
+            {"transaction_id": {"$in": transaction_ids}}
+        )
+        return {"status": "deleted", "count": r.deleted_count}
+    except Exception as e:
+        logger.error(f"[wallet] bulk-delete error: {e}")
+        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+
+
+@router.delete("/admin/transactions/{transaction_id}")
+async def delete_single_transaction(transaction_id: str, admin=Depends(get_admin_user)):
+    """Permanently delete a single transaction (admin only)"""
+    r = await db.chipi_transactions.delete_one({"transaction_id": transaction_id})
+    if r.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return {"status": "deleted", "transaction_id": transaction_id}
+
+
+
+# ============== BANK INFO ==============
+
+
+class BankInfoRequest(BaseModel):
+    context: str  # e.g. "wallet_general", "pca_private"
+    label: str  # Display name, e.g. "Wallet Recharge", "PCA Private Textbooks"
+    bank_name: str
+    account_holder: str
+    account_number: str
+    account_type: Optional[str] = None
+    routing_number: Optional[str] = None
+    reference_instructions: Optional[str] = None
+    notes: Optional[str] = None
+    is_active: bool = True
+
+
+@router.get("/admin/bank-info")
+async def get_all_bank_info(admin=Depends(get_admin_user)):
+    """Get all bank info configurations (admin)"""
+    cursor = db.wallet_bank_info.find({}, {"_id": 0}).sort("context", 1)
+    items = await cursor.to_list(length=100)
+    return {"bank_info": items}
+
+
+@router.get("/bank-info/{context}")
+async def get_bank_info_by_context(context: str):
+    """Get bank info for a specific context (public — used by widget)"""
+    item = await db.wallet_bank_info.find_one(
+        {"context": context, "is_active": True},
+        {"_id": 0}
+    )
+    return {"bank_info": item}
+
+
+@router.post("/admin/bank-info")
+async def create_bank_info(
+    data: BankInfoRequest,
+    admin=Depends(get_admin_user)
+):
+    """Create or update bank info for a context (admin)"""
+    doc = data.model_dump()
+    doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+    doc["updated_by"] = admin.get("user_id", "")
+
+    await db.wallet_bank_info.update_one(
+        {"context": data.context},
+        {"$set": doc},
+        upsert=True
+    )
+    return {"success": True, "bank_info": doc}
+
+
+@router.delete("/admin/bank-info/{context}")
+async def delete_bank_info(context: str, admin=Depends(get_admin_user)):
+    """Delete bank info for a context (admin)"""
+    result = await db.wallet_bank_info.delete_one({"context": context})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Bank info not found")
+    return {"success": True}
+
+
+# ============== ADMIN TRANSACTIONS ==============
+
+
+@router.get("/admin/transactions")
+async def get_all_transactions(
+    limit: int = 50,
+    offset: int = 0,
+    user_id: Optional[str] = None,
+    admin=Depends(get_admin_user)
+):
+    """Get all wallet transactions (admin)"""
+    query = {}
+    if user_id:
+        query["user_id"] = user_id
+
+    cursor = db.chipi_transactions.find(
+        query, {"_id": 0}
+    ).sort("created_at", -1).skip(offset).limit(limit)
+    transactions = await cursor.to_list(length=limit)
+
+    total = await db.chipi_transactions.count_documents(query)
+
+    # Enrich with user info
+    user_ids = list(set(t.get("user_id") for t in transactions if t.get("user_id")))
+    if user_ids:
+        users_cursor = db.auth_users.find(
+            {"user_id": {"$in": user_ids}},
+            {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+        )
+        users_list = await users_cursor.to_list(length=len(user_ids))
+        user_map = {u["user_id"]: u for u in users_list}
+        for t in transactions:
+            u = user_map.get(t.get("user_id"))
+            if u:
+                t["user_name"] = u.get("name", "")
+                t["user_email"] = u.get("email", "")
+
+    return {"transactions": transactions, "total": total}

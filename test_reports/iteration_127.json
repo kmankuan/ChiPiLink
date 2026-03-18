@@ -1,0 +1,61 @@
+{
+  "summary": "Completed frontend-only testing for Telegram Feed configurable button visibility. All 6 requested features verified successfully. Landing page correctly hides 'Auto' and 'See all' buttons by default. Admin panel (INTEGRATIONS > Telegram) has the new 'Show Autoplay Button' and 'Show See All Button' toggles in the Toggles section, plus a fully functional 'Header Links' section with add/remove capability.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Landing page: 'Auto' button is NOT visible on ChiPi Community feed (hidden by default via show_autoplay_btn=false)",
+    "Landing page: 'See all' button is NOT visible on ChiPi Community feed (hidden by default via show_see_all_btn=false)",
+    "Landing page: ChiPi Community section header shows title ('ChiPi Community') and post count ('9 posts') normally",
+    "Admin panel: Telegram feed config has 'Show Autoplay Button' toggle in Toggles section (default OFF/gray)",
+    "Admin panel: Telegram feed config has 'Show See All Button' toggle in Toggles section (default OFF/gray)",
+    "Admin panel: Telegram feed config has 'Header Links' section with description text",
+    "Admin panel: 'Add Link Button' button works to add new header link rows",
+    "Admin panel: Header link rows show Label and URL input fields with data-testid attributes",
+    "Admin panel: Header link remove button (trash icon) works to delete links",
+    "Admin panel: Multiple header links can be added (tested with 2 links)",
+    "Admin panel: External URLs (https://...) and internal paths (/store) both supported"
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "Code quality is good - TelegramFeedCard.jsx properly reads show_autoplay_btn, show_see_all_btn, and header_links from container config",
+    "HorizontalFeedContainer and VerticalFeedContainer both respect the new flags with proper conditional rendering",
+    "Header links correctly detect external vs internal URLs via url?.startsWith('http') check",
+    "TelegramAdminModule.jsx properly implements the Toggles section with all new toggles",
+    "Header Links editor has proper add/remove functionality with array manipulation",
+    "All interactive elements have appropriate data-testid attributes for testing"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A - frontend-only testing requested",
+    "frontend": "100% - All 6 features verified"
+  },
+
+  "test_credentials": {
+    "admin_email": "admin@chipi.co",
+    "admin_password": "admin",
+    "auth_endpoint": "POST /api/auth-v2/login"
+  },
+
+  "seed_data_creation": "None - used existing data",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Telegram feed button visibility feature is complete. Key data-testid attributes: autoplay-toggle-btn, telegram-see-all, toggle-show_autoplay_btn, toggle-show_see_all_btn, add-header-link-btn, header-link-label-{idx}, header-link-url-{idx}, header-link-remove-{idx}. Default values: show_autoplay_btn=false, show_see_all_btn=false, header_links=[]. Admin path: /admin/login → INTEGRATIONS → Telegram → Add/expand container → scroll to Toggles and Header Links sections."
+}

@@ -1,0 +1,49 @@
+"""
+Achievements - API Routes
+Endpoints for logros automatics
+"""
+from fastapi import APIRouter, HTTPException
+from typing import List
+
+from ..services.achievements_service import achievements_service
+
+router = APIRouter(prefix="/achievements", tags=["Achievements"])
+
+
+@router.get("/")
+async def get_all_achievements():
+    """Get all achievements disponibles"""
+    achievements = await achievements_service.get_all_achievements()
+    return {"achievements": achievements, "total": len(achievements)}
+
+
+@router.get("/player/{player_id}")
+async def get_player_achievements(player_id: str):
+    """Get logros de a player"""
+    achievements = await achievements_service.get_player_achievements(player_id)
+    return {
+        "player_id": player_id,
+        "achievements": achievements,
+        "total": len(achievements)
+    }
+
+
+@router.post("/check/{player_id}")
+async def check_achievements(player_id: str):
+    """
+    Verificar y otorgar logros pendientes para a player.
+    Llamar after de completar retos.
+    """
+    awarded = await achievements_service.check_and_award_achievements(player_id)
+    return {
+        "player_id": player_id,
+        "awarded": awarded,
+        "count": len(awarded)
+    }
+
+
+@router.post("/initialize")
+async def initialize_achievements():
+    """Inicializar logros en la base de datos (admin)"""
+    created = await achievements_service.initialize_achievements()
+    return {"message": f"{created} logros inicializados", "created": created}

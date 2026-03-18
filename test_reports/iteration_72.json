@@ -1,0 +1,96 @@
+{
+  "summary": "Iteration 72: Tested EmbedWidget fixes - (1) textbook display with fuzzy grade matching, (2) logout button in widget header, (3) Orders tab. All features verified working correctly. Backend API returns _debug field with grade_searched and catalog_books_found. Frontend widget has all 3 tabs (Textbooks, Orders, Wallet) and logout button works correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Backend: GET /api/store/textbook-orders/student/{sid} returns _debug field with grade_searched and catalog_books_found",
+    "Backend: Fuzzy grade matching works - student grade '3' finds books with grade 'G3'",
+    "Backend: Diagnostic endpoints working (/admin/diagnostic/textbooks, /admin/diagnostic/order-flow/{sid})",
+    "Backend: Widget embed-config returns all display settings correctly",
+    "Frontend: Widget loads correctly and shows login prompt when not authenticated",
+    "Frontend: Widget header visible when hide_navbar=false in config (contains ChiPi Link logo)",
+    "Frontend: Logout button (data-testid='widget-logout-btn') present in header and functional",
+    "Frontend: Logout clears auth_token from localStorage and shows login prompt",
+    "Frontend: Three tabs present: Textbooks, Orders, Wallet (all with correct data-testid)",
+    "Frontend: Orders tab (data-testid='widget-tab-orders') shows OrdersView component",
+    "Frontend: OrdersView displays order cards with status badges (Submitted status visible)",
+    "Frontend: Textbooks displayed correctly after fuzzy grade matching (4 books found for grade 3 student)"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_widget_embed_fixes.py"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "EmbedWidget.jsx: WidgetHeader component correctly implements logout button at line 1024 with data-testid='widget-logout-btn'",
+    "EmbedWidget.jsx: OrdersView component (lines 505-602) correctly displays order cards with status badges",
+    "EmbedWidget.jsx: Widget nav has all 3 tabs (Textbooks, Orders, Wallet) with correct data-testids at lines 906-936",
+    "textbook_order_service.py: _refresh_order_items correctly adds _debug field at lines 286-291",
+    "textbook_order_service.py: get_books_for_grade has fuzzy regex fallback at lines 102-119 for grade mismatches",
+    "Note: Widget header visibility is controlled by config.display.hide_navbar (default true in production)"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_widget_embed_fixes.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (6/6 tests passed)",
+    "frontend": "100% (all widget features verified working)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "testadmin@chipi.com",
+      "password": "TestPass123!",
+      "login_endpoint": "POST /api/auth-v2/login"
+    },
+    "test_student_id": "std_e32ae7fae07a",
+    "note": "Student user_id temporarily changed for testing, restored to original"
+  },
+
+  "seed_data_creation": "Temporarily updated student std_e32ae7fae07a user_id to match test admin for API testing. Also temporarily set hide_navbar=false to test logout button. Both restored to original values.",
+
+  "mocked_apis": {
+    "has_mocked_apis": false
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Iteration 72 tested EmbedWidget fixes. Widget at /embed/widget. Widget header (with logout button) is hidden by default due to config.display.hide_navbar=true. To test logout button, temporarily set hide_navbar=false in app_config collection. OrdersView component fetches orders for all students linked to the user. Fuzzy grade matching in textbook_order_service.py handles grade format variations ('3' -> 'G3', etc.). Test student std_e32ae7fae07a has grade '3' enrollment for 2026.",
+
+  "verified_features": {
+    "backend_debug_field": {
+      "endpoint": "GET /api/store/textbook-orders/student/{student_id}",
+      "response_includes": "_debug with grade_searched, catalog_books_found, existing_items_preserved, final_items"
+    },
+    "fuzzy_grade_matching": {
+      "student_grade": "3",
+      "books_found_grade": "G3",
+      "total_books_found": 4,
+      "fallback_method": "regex pattern matching on grade number"
+    },
+    "widget_tabs": {
+      "textbooks": "data-testid='widget-tab-textbooks'",
+      "orders": "data-testid='widget-tab-orders'",
+      "wallet": "data-testid='widget-tab-wallet'"
+    },
+    "widget_logout": {
+      "button_testid": "widget-logout-btn",
+      "behavior": "Clears auth_token from localStorage, shows login prompt, displays toast notification"
+    }
+  }
+}

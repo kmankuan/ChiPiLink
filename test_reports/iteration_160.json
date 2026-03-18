@@ -1,0 +1,89 @@
+{
+  "summary": "Completed testing of ElevenLabs dual-provider TTS feature. All 16 backend API tests passed (100%). Frontend UI shows Provider dropdown with OpenAI and ElevenLabs options, ElevenLabs correctly disabled with '(no key)' label, hint text visible, and OpenAI-specific controls (voice, speed slider) displayed correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "GET /api/admin/tts/providers returns both openai (available=true) and elevenlabs (available=false)",
+    "GET /api/admin/tts/providers requires authentication",
+    "GET /api/admin/tts/settings returns provider field (default=openai)",
+    "GET /api/admin/tts/settings returns elevenlabs_voice_id, elevenlabs_stability, elevenlabs_similarity fields",
+    "PUT /api/admin/tts/settings can update provider to 'elevenlabs'",
+    "PUT /api/admin/tts/settings can update provider back to 'openai'",
+    "PUT /api/admin/tts/settings can update ElevenLabs-specific settings (voice_id, stability, similarity)",
+    "GET /api/admin/tts/elevenlabs/voices returns default voices list when no API key",
+    "GET /api/admin/tts/elevenlabs/voices returns expected default voices (Rachel, Domi, Bella, Antoni, Josh, Adam)",
+    "GET /api/admin/tts/elevenlabs/voices requires authentication",
+    "POST /api/admin/tts/speak with provider=openai works correctly (returns audio base64)",
+    "POST /api/admin/tts/speak with provider=elevenlabs returns 5xx error gracefully (no API key)",
+    "POST /api/admin/tts/speak uses provider from settings when not specified",
+    "POST /api/admin/tts/speak requires text parameter (returns 400)",
+    "POST /api/admin/tts/speak requires authentication",
+    "Frontend: Provider dropdown shows 'OpenAI TTS' and 'ElevenLabs (no key)' options",
+    "Frontend: ElevenLabs option is disabled when no API key",
+    "Frontend: Hint text 'Add ELEVENLABS_API_KEY to enable ElevenLabs' visible",
+    "Frontend: OpenAI voice selector visible when OpenAI selected",
+    "Frontend: Speed slider visible when OpenAI selected",
+    "Frontend: Test Voice button works with OpenAI"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_tts_elevenlabs_provider.py",
+    "/app/test_reports/pytest/pytest_results_tts_elevenlabs_provider.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "TTSService correctly lazy-initializes ElevenLabs client with _get_elevenlabs_client()",
+    "Provider status endpoint properly checks for ELEVENLABS_API_KEY environment variable",
+    "Default ElevenLabs voices defined in ELEVENLABS_DEFAULT_VOICES constant (9 voices)",
+    "Settings correctly include new fields: provider, elevenlabs_voice_id, elevenlabs_stability, elevenlabs_similarity",
+    "Frontend conditionally renders ElevenLabs controls only when provider='elevenlabs'",
+    "ElevenLabs option correctly disabled in dropdown when elAvailable=false",
+    "Hint text conditionally shown when ElevenLabs unavailable and OpenAI selected"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_tts_elevenlabs_provider.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (16/16 tests passed)",
+    "frontend": "100%"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "admin@chipi.co",
+      "password": "admin"
+    }
+  },
+
+  "seed_data_creation": "None",
+
+  "verified_features": {
+    "providers_endpoint": "Returns both openai (available=true) and elevenlabs (available=false)",
+    "settings_fields": ["provider (default: openai)", "elevenlabs_voice_id", "elevenlabs_stability", "elevenlabs_similarity"],
+    "elevenlabs_voices": ["Rachel", "Domi", "Bella", "Antoni", "Elli", "Josh", "Arnold", "Adam", "Sam"],
+    "openai_tts": "Working correctly",
+    "elevenlabs_tts": "Fails gracefully with 5xx when no API key",
+    "frontend_provider_dropdown": "Shows OpenAI TTS and ElevenLabs (no key) - ElevenLabs disabled",
+    "frontend_hint_text": "Add ELEVENLABS_API_KEY to enable ElevenLabs",
+    "frontend_conditional_controls": "Speed slider for OpenAI, Stability/Similarity sliders for ElevenLabs"
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "ElevenLabs dual-provider feature fully tested. No ELEVENLABS_API_KEY is configured, so ElevenLabs shows as unavailable. When API key is added, the elevenlabs option will become enabled in the dropdown, and ElevenLabs-specific controls (voice selector, stability slider, similarity slider) will appear when ElevenLabs is selected as provider. Test file: /app/backend/tests/test_tts_elevenlabs_provider.py"
+}

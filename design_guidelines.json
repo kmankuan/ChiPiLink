@@ -1,0 +1,148 @@
+{
+  "brand_identity": {
+    "name": "ChiPi Link",
+    "archetype": "SuperApp (WeChat/Alipay style)",
+    "audience": "Chinese-Panamanian Community",
+    "tone": "Functional, Community-Centric, Dense, Vibrant",
+    "theme_preference": "Light Mode (Primary), Dark Mode (Secondary)",
+    "key_principles": [
+      "Density over Whitespace: Use compact rows and grids.",
+      "Separators over Borders: Use 8-12px gray gaps to separate sections instead of 1px borders.",
+      "Native Feel: Sticky headers, edge-to-edge content on mobile.",
+      "Visual Hierarchy: Color > Size. Use color to denote status and category."
+    ]
+  },
+  "typography": {
+    "primary_font": "DM Sans, system-ui, sans-serif",
+    "secondary_font": "Libre Baskerville, serif",
+    "scale": {
+      "xs": "text-[10px] leading-tight",
+      "sm": "text-xs font-medium",
+      "base": "text-sm font-normal leading-relaxed",
+      "lg": "text-base font-semibold",
+      "xl": "text-lg font-bold tracking-tight",
+      "2xl": "text-xl font-bold tracking-tight",
+      "3xl": "text-2xl font-extrabold tracking-tight"
+    },
+    "usage": {
+      "headings": "DM Sans (Bold/ExtraBold), reduce letter spacing (-0.02em)",
+      "body": "DM Sans (Regular/Medium)",
+      "editorial": "Libre Baskerville (for News/Article titles only)"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Imperial Red",
+        "hex": "#C8102E",
+        "tailwind": "bg-red-700 text-white"
+      },
+      "secondary": {
+        "name": "Peacock Blue",
+        "hex": "#006994",
+        "tailwind": "bg-sky-700 text-white"
+      },
+      "accent": {
+        "name": "Imperial Gold",
+        "hex": "#F0D895",
+        "tailwind": "bg-amber-300 text-amber-950"
+      },
+      "background": {
+        "page": "#FFFFFF",
+        "page_secondary": "#F2F4F6",
+        "surface": "#FFFFFF"
+      },
+      "text": {
+        "primary": "#1A1A1A",
+        "secondary": "#666666",
+        "muted": "#999999"
+      }
+    },
+    "functional": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#3B82F6",
+      "separator": "#F2F4F6"
+    }
+  },
+  "layout": {
+    "container": {
+      "mobile": "w-full px-0",
+      "desktop": "max-w-md mx-auto shadow-2xl min-h-screen border-x border-border/50"
+    },
+    "spacing": {
+      "section_gap": "h-2 bg-muted/30",
+      "item_gap": "gap-0",
+      "internal_padding": "p-4"
+    },
+    "grid": {
+      "quick_access": "grid grid-cols-4 gap-y-4 gap-x-2 p-4 bg-background",
+      "bento": "grid grid-cols-2 md:grid-cols-4 gap-2 p-2"
+    }
+  },
+  "components": {
+    "HeroCarousel": {
+      "style": "Full width (edge-to-edge), 16:9 aspect ratio.",
+      "overlay": "Gradient from bottom-black/80 to transparent.",
+      "text_position": "Bottom left, white text.",
+      "pagination": "Dots at bottom center."
+    },
+    "QuickAccess": {
+      "style": "Icon + Label. Icon in a colored 'squircle' (rounded-2xl) background.",
+      "layout": "4 columns. Dense.",
+      "interaction": "Tap effect (scale down)."
+    },
+    "NewsCard": {
+      "style": "Horizontal list item (Left: Text, Right: Image).",
+      "image_size": "w-24 h-24 rounded-lg object-cover",
+      "separator": "border-b border-border/50 last:border-0"
+    },
+    "EventCard": {
+      "style": "Calendar leaf style (Left: Date Box, Right: Details).",
+      "date_box": "bg-red-50 text-red-700 rounded-lg flex-col center p-2 w-16"
+    },
+    "SectionHeader": {
+      "style": "Sticky top, bg-background/95 backdrop-blur-sm, border-b border-border/50.",
+      "typography": "text-lg font-bold flex justify-between items-center px-4 py-3",
+      "action": "text-sm text-primary font-medium"
+    }
+  },
+  "images": {
+    "fallbacks": {
+      "community": "https://images.unsplash.com/photo-1767858900678-bfb848b3032f?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "store": "https://images.unsplash.com/photo-1755742319966-f9414dab1234?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "sports": "https://images.unsplash.com/photo-1708268418738-4863baa9cf72?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "events": "https://images.unsplash.com/photo-1764522917137-97616b62d013?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "hero_default": "https://images.unsplash.com/photo-1766974889855-3f7f125f48cd?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure WCAG AA compliance.",
+    "touch_targets": "Min 44x44px for all interactive elements.",
+    "text_scaling": "Support dynamic type."
+  },
+  "instructions_to_main_agent": [
+    "TRANSFORM the 'SuperAppLanding.jsx' to look like a mobile app feed.",
+    "REMOVE generic shadcn Cards. Use 'List Item' styling with separators.",
+    "IMPLEMENT a 'WeChat-style' header: Minimal, functional.",
+    "USE the color palette: Imperial Red (#C8102E) for primary actions.",
+    "ENSURE the Quick Access grid uses colorful icon backgrounds (Squircle shape).",
+    "ADD 'Section Separators': 8px-12px height blocks of color #F2F4F6 between sections.",
+    "KEEP all existing functionality (Edit Mode, API calls). ONLY change the UI/JSX structure.",
+    "USE 'lucide-react' icons as they are already installed.",
+    "APPLY 'data-testid' to all interactive elements."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not get biased or lean towards generic AI designs.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable (except for SuperApp dense lists).",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN"
+  ]
+}

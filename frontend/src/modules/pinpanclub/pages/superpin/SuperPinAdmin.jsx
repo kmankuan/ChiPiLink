@@ -1,0 +1,409 @@
+/**
+ * Super Pin Admin Dashboard
+ * Panel de administración para gestionar ligas, rankings y torneos
+ */
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+  Trophy, Users, Calendar, Settings, Plus, Play, Pause,
+  ChevronRight, Medal, Target, Award, TrendingUp, ArrowLeft, Trash2
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
+import { Button } from '../../../../components/ui/button';
+import { toast } from 'sonner';
+import { Badge } from '../../../../components/ui/badge';
+import PINPANCLUB_API from '../../config/api';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API_URL = RESOLVED_API_URL;
+
+export default function SuperPinAdmin() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [leagues, setLeagues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newLeague, setNewLeague] = useState({
+    name: '',
+    season: new Date().getFullYear().toString(),
+    description: '',
+    scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
+    checkin_config: { methods: ['manual'], require_all: false }
+  });
+
+  useEffect(() => {
+    fetchLeagues();
+  }, []);
+
+  const fetchLeagues = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`);
+      const data = await response.json();
+      setLeagues(data);
+    } catch (error) {
+      console.error('Error fetching leagues:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createLeague = async () => {
+    if (!newLeague.name || newLeague.name.trim() === '') {
+      toast.error(t('superpin.leagues.name') + ' es requerido');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      if (!token) {
+        toast.error('Sesión expirada. Por favor inicie sesión como administrador.');
+        return;
+      }
+
+      // Map frontend field names to backend expected names
+      const payload = {
+        name: newLeague.name.trim(),
+        season: newLeague.season || new Date().getFullYear().toString(),
+        description: newLeague.description || null,
+        scoring_config: newLeague.scoring_config,
+        checkin_config: newLeague.checkin_config,
+      };
+
+      let response;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(payload),
+          });
+          break;
+        } catch (e) {
+          if (attempt < 2) { await new Promise(r => setTimeout(r, 2000)); continue; }
+          throw e;
+        }
+      }
+      
+      if (response.ok) {
+        toast.success('Liga creada exitosamente');
+        setShowCreateModal(false);
+        setNewLeague({
+          name: '',
+          season: new Date().getFullYear().toString(),
+          description: '',
+          scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
+          checkin_config: { methods: ['manual'] }
+        });
+        fetchLeagues();
+      } else {
+        const error = await response.json();
+        if (response.status === 403) {
+          toast.error('Acceso denegado — se requiere cuenta de administrador');
+        } else if (response.status === 401) {
+          toast.error('Sesión expirada — inicie sesión nuevamente');
+        } else {
+          toast.error('Error: ' + (error.detail || 'No se pudo crear la liga'));
+        }
+      }
+    } catch (error) {
+      console.error('Error creating league:', error);
+      toast.error('Error de conexión. Intente nuevamente.');
+    }
+  };
+
+  const activateLeague = async (leagueId) => {
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}/activate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchLeagues();
+    } catch (error) {
+      console.error('Error activating league:', error);
+    }
+  };
+
+  const deleteLeague = async (leagueId, leagueName) => {
+    if (!confirm(`Delete "${leagueName || 'this league'}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${leagueId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('League deleted');
+        fetchLeagues();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Cannot delete league');
+      }
+    } catch (error) {
+      toast.error('Error deleting league');
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const styles = {
+      draft: 'bg-gray-100 text-gray-800',
+      active: 'bg-green-100 text-green-800',
+      paused: 'bg-yellow-100 text-yellow-800',
+      finished: 'bg-blue-100 text-blue-800'
+    };
+    const labels = { draft: 'Borrador', active: 'Activa', paused: 'Pausada', finished: 'Terminada' };
+    const label = t(`superpin.leagues.status.${status}`, labels[status] || status || 'Draft');
+    return <Badge className={`text-xs shrink-0 ${styles[status] || 'bg-gray-100 text-gray-800'}`}>{label}</Badge>;
+  };
+
+  const getScoringLabel = (system) => {
+    return system === 'elo' ? 'ELO' : 'Simple';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen overflow-x-hidden max-w-2xl mx-auto px-4 py-4" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }}>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Trophy className="h-6 w-6 text-yellow-500 shrink-0" />
+              {t('superpin.admin')}
+            </h1>
+            <p className="text-gray-600 text-sm mt-1">{t('superpin.adminDesc')}</p>
+          </div>
+          <Button onClick={() => setShowCreateModal(true)} className="text-white rounded-full shrink-0 text-sm" style={{ background: "#B8860B" }}>
+            <Plus className="h-4 w-4 mr-1" /> {t('superpin.leagues.new')}
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <Card>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Trophy className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">{t('superpin.leagues.total')}</p>
+              <p className="text-2xl font-bold">{leagues.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Play className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">{t('superpin.leagues.active')}</p>
+              <p className="text-2xl font-bold">{leagues.filter(l => l.status === 'active').length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <Users className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">{t('superpin.players.total')}</p>
+              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_players || 0), 0)}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 bg-orange-100 rounded-lg">
+              <Target className="h-6 w-6 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">{t('superpin.matches.total')}</p>
+              <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_matches || 0), 0)}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Leagues List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Medal className="h-5 w-5" /> {t('superpin.leagues.title')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {leagues.length === 0 ? (
+            <div className="text-center py-12">
+              <Trophy className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">{t('superpin.leagues.noLeagues')}</p>
+              <Button onClick={() => setShowCreateModal(true)} className="mt-4">
+                {t('superpin.leagues.createFirst')}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {leagues.map((league) => {
+                const lid = league.league_id || league.liga_id || '';
+                const canDelete = league.status === 'draft' && (league.total_matches || 0) === 0;
+                return (
+                <div
+                  key={lid || Math.random()}
+                  className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg shadow-sm shrink-0">
+                      <Trophy className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-gray-900 truncate text-sm">{league.name || '(sin nombre)'}</h3>
+                      <p className="text-[11px] text-gray-500">{league.season || league.temporada || '—'} · {getScoringLabel(league.scoring_config?.system)}</p>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {getStatusBadge(league.status)}
+                      {canDelete && (
+                        <button
+                          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          onClick={(e) => { e.stopPropagation(); deleteLeague(lid, league.name); }}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                      <span>{league.total_players || 0} jugadores</span>
+                      <span>·</span>
+                      <span>{league.total_matches || 0} partidos</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {league.status === 'draft' && (
+                        <Button size="sm" variant="outline" className="h-6 text-[11px] px-2"
+                          onClick={() => activateLeague(lid)}>
+                          <Play className="h-3 w-3 mr-1" /> Activar
+                        </Button>
+                      )}
+                      <Button size="sm" variant="ghost" className="h-6 px-1"
+                        onClick={() => navigate(`/pinpanclub/superpin/league/${lid}`)}>
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create League Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Plus className="h-5 w-5" /> {t('superpin.leagues.new')}
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.name')}</label>
+                <input
+                  type="text"
+                  value={newLeague.name}
+                  onChange={(e) => setNewLeague({ ...newLeague, name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                  placeholder="Liga Primavera 2025"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.tournaments.season')}</label>
+                <input
+                  type="text"
+                  value={newLeague.season}
+                  onChange={(e) => setNewLeague({ ...newLeague, season: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                  placeholder="2025"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.description')}</label>
+                <textarea
+                  value={newLeague.description}
+                  onChange={(e) => setNewLeague({ ...newLeague, description: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                  rows={2}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.scoring')}</label>
+                <select
+                  value={newLeague.scoring_config.system}
+                  onChange={(e) => setNewLeague({
+                    ...newLeague,
+                    scoring_config: { ...newLeague.scoring_config, system: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="simple">{t('superpin.leagues.scoringSimple')}</option>
+                  <option value="elo">{t('superpin.leagues.scoringElo')}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('superpin.leagues.checkin')}</label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'manual', label: t('superpin.leagues.checkinManual'), icon: '✋' },
+                    { value: 'qr_code', label: t('superpin.leagues.checkinQr'), icon: '📱' },
+                    { value: 'geolocation', label: t('superpin.leagues.checkinGeo'), icon: '📍' }
+                  ].map((method) => (
+                    <label key={method.value} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={newLeague.checkin_config.methods?.includes(method.value)}
+                        onChange={(e) => {
+                          const methods = newLeague.checkin_config.methods || [];
+                          if (e.target.checked) {
+                            setNewLeague({
+                              ...newLeague,
+                              checkin_config: { ...newLeague.checkin_config, methods: [...methods, method.value] }
+                            });
+                          } else {
+                            setNewLeague({
+                              ...newLeague,
+                              checkin_config: { ...newLeague.checkin_config, methods: methods.filter(m => m !== method.value) }
+                            });
+                          }
+                        }}
+                        className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                      />
+                      <span className="text-xl">{method.icon}</span>
+                      <span className="text-gray-700">{method.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button type="button" onClick={createLeague} className="text-white rounded-full" style={{ background: "#B8860B" }}>
+                {t('superpin.leagues.create')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

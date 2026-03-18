@@ -1,0 +1,131 @@
+{
+  "summary": "Iteration 87: Complete testing of Gmail-to-Wallet Pipeline Steps 2-3. Gmail IMAP integration with toolskoh@gmail.com is fully working. AI email parsing with GPT-4o correctly extracts bank transfer details (amount, currency, sender, reference, confidence). Email filter rules engine (sender whitelist, keywords, amount thresholds) all function correctly. 17/17 backend tests passed, frontend UI fully verified.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Backend: GET /api/wallet-topups/gmail/status returns connected=true for toolskoh@gmail.com",
+    "Backend: GET /api/wallet-topups/gmail/status returns total_emails=199",
+    "Backend: GET /api/wallet-topups/gmail/emails returns actual emails from inbox",
+    "Backend: POST /api/wallet-topups/gmail/process-single requires body (400 without)",
+    "Backend: POST /api/wallet-topups/gmail/process-single parses Spanish bank email - extracts $200 USD from Maria Lopez, ref TRX-99887",
+    "Backend: AI parsing correctly rejects non-bank emails (Google security alert) with confidence=0 or amount=0",
+    "Backend: AI parsing extracts correct values from English bank email ($1500 from John Smith)",
+    "Backend: Rules engine - sender whitelist correctly rejects non-whitelisted senders",
+    "Backend: Rules engine - must-not-contain keywords correctly rejects emails with 'reversal'",
+    "Backend: Rules engine - amount max threshold correctly rejects amounts above limit",
+    "Backend: POST /api/wallet-topups/gmail/process scans inbox and processes emails",
+    "Backend: GET /api/wallet-topups/gmail/processed returns processing log with 20 items",
+    "Backend: Stats show gmail_connected=true after status check",
+    "Backend: All auth requirements properly enforced (401/403 without token)",
+    "Frontend: Payment Alerts module loads with stats banner",
+    "Frontend: All 4 tabs present (Cola Pendientes, Reglas de Email, Configuracion, Registro de Procesamiento)",
+    "Frontend: Settings tab shows Gmail Connected: toolskoh@gmail.com with 199 emails",
+    "Frontend: Test Connection button triggers gmail status check, shows toast",
+    "Frontend: Scan Gmail Inbox button triggers scan, shows Scanning... state",
+    "Frontend: Processing Log tab shows 20 processed emails (all skipped_not_transaction)",
+    "Frontend: Rules tab shows all rule options (whitelist, keywords, thresholds)",
+    "Frontend: Pending Queue tab shows search, filter, and create button"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_gmail_integration.py",
+    "/app/test_reports/pytest/pytest_results_gmail_integration.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [],
+
+  "updated_files": [
+    "/app/backend/tests/test_gmail_integration.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (17/17 tests passed)",
+    "frontend": "100% (all UI features working)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "admin",
+      "admin_login_url": "/admin/login"
+    },
+    "gmail": {
+      "email": "toolskoh@gmail.com",
+      "total_emails_in_inbox": 199
+    }
+  },
+
+  "seed_data_creation": "Previous test data from iteration_86 still present. Gmail scan created 20 processed email records in wallet_processed_emails collection (all skipped_not_transaction as inbox contains security alerts and promotional emails, no actual bank transfers).",
+
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Monday.com sync for pending topups (logs but doesn't create Monday items)"
+    ],
+    "note": "Monday.com integration is placeholder - logs only. Gmail IMAP and AI parsing are REAL integrations."
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+
+  "context_for_next_testing_agent": "Iteration 87 tested Gmail-to-Wallet pipeline Steps 2-3. Gmail IMAP is connected to toolskoh@gmail.com with 199 emails in inbox. The inbox contains Google security alerts and Yappy (Panama bank) promotional emails - NO actual bank transfer alerts, so all scanned emails are skipped as non-transactions (correct behavior). To test AI parsing accuracy, use POST /api/wallet-topups/gmail/process-single with a simulated bank email body (tested with Spanish and English examples, both work correctly). The EMERGENT_LLM_KEY is configured for GPT-4o. Rules engine tested: sender_whitelist, must_not_contain_keywords, amount_max_threshold all work correctly. Processing log at wallet_processed_emails collection. All data-testid attributes verified on frontend.",
+
+  "features_verified": {
+    "gmail_integration": {
+      "imap_connection": "Connected to toolskoh@gmail.com",
+      "fetch_emails": "Returns emails from inbox",
+      "scan_inbox": "Processes emails through AI + rules pipeline"
+    },
+    "ai_parsing": {
+      "spanish_bank_email": "Extracts amount, currency, sender_name, bank_reference, confidence",
+      "english_bank_email": "Extracts correct values",
+      "non_bank_rejection": "Correctly identifies non-bank emails (confidence=0 or amount=0)"
+    },
+    "rules_engine": {
+      "sender_whitelist": "Rejects non-whitelisted senders",
+      "must_not_contain": "Rejects emails with rejected keywords",
+      "amount_max_threshold": "Rejects amounts above threshold"
+    },
+    "processing_log": {
+      "stores_processed_emails": true,
+      "result_types": ["skipped_not_transaction", "created_pending", "rejected_by_rules"]
+    }
+  },
+
+  "api_endpoints_tested": [
+    "GET /api/wallet-topups/gmail/status",
+    "GET /api/wallet-topups/gmail/emails",
+    "POST /api/wallet-topups/gmail/process",
+    "POST /api/wallet-topups/gmail/process-single",
+    "GET /api/wallet-topups/gmail/processed"
+  ],
+
+  "data_testid_verified": [
+    "payment-alerts-module",
+    "tab-pending",
+    "tab-rules",
+    "tab-settings",
+    "tab-log",
+    "topup-search",
+    "topup-status-filter",
+    "create-topup-btn",
+    "check-gmail-btn",
+    "scan-now-btn",
+    "rules-config",
+    "save-rules-btn",
+    "save-settings-btn",
+    "processing-log"
+  ]
+}

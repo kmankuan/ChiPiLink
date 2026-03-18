@@ -1,0 +1,310 @@
+"""
+PinpanClub - Match Service
+Business logic for matches
+"""
+from typing import List, Optional, Dict, Set
+from datetime import datetime, timezone
+import asyncio
+
+from core.base import BaseService
+from core.events import PinpanClubEvents, EventPriority
+from ..repositories import MatchRepository, PlayerRepository
+from ..models import MatchCreate, Match, MatchState
+
+
+class MatchService(BaseService):
+    """
+    Service for match management.
+    Contains all business logic related to matches.
+    """
+    
+    MODULE_NAME = "pinpanclub"
+    
+    def __init__(self):
+        super().__init__()
+        self.repository = MatchRepository()
+        self.player_repository = PlayerRepository()
+        self._websocket_connections: Dict[str, Set] = {}  # match_id -> set of websockets
+    
+    async def create_match(self, data: MatchCreate) -> Match:
+        """
+        Create new match.
+        Emits event: pinpanclub.match.created
+        """
+        match_dict = data.model_dump()
+        
+        # Get player info
+        player_a = await self.player_repository.get_by_id(data.player_a_id)
+        player_b = await self.player_repository.get_by_id(data.player_b_id)
+        
+        if player_a:
+            match_dict["player_a_info"] = {
+                "name": player_a.get("name"),
+                "last_name": player_a.get("last_name"),
+                "nickname": player_a.get("nickname"),
+                "elo_rating": player_a.get("elo_rating")
+            }
+        
+        if player_b:
+            match_dict["player_b_info"] = {
+                "name": player_b.get("name"),
+                "last_name": player_b.get("last_name"),
+                "nickname": player_b.get("nickname"),
+                "elo_rating": player_b.get("elo_rating")
+            }
+        
+        result = await self.repository.create(match_dict)
+        
+        # Emit event
+        await self.emit_event(
+            PinpanClubEvents.MATCH_CREATED,
+            {
+                "match_id": result["match_id"],
+                "player_a_id": data.player_a_id,
+                "player_b_id": data.player_b_id,
+                "best_of": data.best_of
+            }
+        )
+        
+        self.log_info(f"Match created: {result['match_id']}")
+        return Match(**result)
+    
+    async def get_match(self, match_id: str) -> Optional[Match]:
+        """Get match by ID"""
+        result = await self.repository.get_by_id(match_id)
+        return Match(**result) if result else None
+    
+    async def get_active_matches(self) -> List[Match]:
+        """Get active matches"""
+        results = await self.repository.get_active_matches()
+        return [Match(**r) for r in results]
+    
+    async def get_matches_by_state(
+        self,
+        status: MatchState,
+        limit: int = 50
+    ) -> List[Match]:
+        """Get matches by status"""
+        results = await self.repository.get_by_state(status.value, limit)
+        return [Match(**r) for r in results]
+    
+    async def start_match(self, match_id: str) -> Optional[Match]:
+        """
+        Start match.
+        Emits event: pinpanclub.match.started
+        """
+        match = await self.get_match(match_id)
+        if not match or match.status != MatchState.PENDING:
+            return None
+        
+        start_date = datetime.now(timezone.utc).isoformat()
+        await self.repository.start_match(match_id, start_date)
+        
+        await self.emit_event(
+            PinpanClubEvents.MATCH_STARTED,
+            {"match_id": match_id, "start_date": start_date},
+            priority=EventPriority.HIGH
+        )
+        
+        return await self.get_match(match_id)
+    
+    async def update_score(
+        self,
+        match_id: str,
+        action: str
+    ) -> Optional[Match]:
+        """
+        Update match score.
+        Handles set logic and determines winner.
+        Emits events: score_updated, set_completed, match_finished
+        """
+        match = await self.get_match(match_id)
+        if not match or match.status not in [MatchState.PENDING, MatchState.IN_PROGRESS, MatchState.PAUSED]:
+            return None
+        
+        # If first point, start the match
+        if match.status == MatchState.PENDING:
+            await self.start_match(match_id)
+            match = await self.get_match(match_id)
+        
+        points_a = match.points_player_a
+        points_b = match.points_player_b
+        sets_a = match.sets_player_a
+        sets_b = match.sets_player_b
+        current_set = match.current_set
+        history = match.sets_history.copy() if match.sets_history else []
+        
+        # Process action
+        if action == "point_a":
+            points_a += 1
+        elif action == "point_b":
+            points_b += 1
+        elif action == "undo":
+            # Implement undo if necessary
+            pass
+        elif action == "reset_set":
+            points_a = 0
+            points_b = 0
+        
+        # Check if set was completed
+        points_to_win = match.points_per_set
+        set_completed = False
+        set_winner = None
+        
+        if points_a >= points_to_win or points_b >= points_to_win:
+            if abs(points_a - points_b) >= 2:
+                set_completed = True
+                if points_a > points_b:
+                    sets_a += 1
+                    set_winner = "a"
+                else:
+                    sets_b += 1
+                    set_winner = "b"
+                
+                # Save to history
+                history.append({
+                    "set": current_set,
+                    "points_a": points_a,
+                    "points_b": points_b,
+                    "winner": set_winner
+                })
+                
+                # Reset points for new set
+                points_a = 0
+                points_b = 0
+                current_set += 1
+        
+        # Update in repository
+        await self.repository.update_score(
+            match_id, points_a, points_b,
+            sets_a, sets_b, current_set, history
+        )
+        
+        # Emit score updated event
+        await self.emit_event(
+            PinpanClubEvents.MATCH_SCORE_UPDATED,
+            {
+                "match_id": match_id,
+                "points_a": points_a,
+                "points_b": points_b,
+                "sets_a": sets_a,
+                "sets_b": sets_b,
+                "current_set": current_set
+            },
+            priority=EventPriority.HIGH
+        )
+        
+        # If set completed, emit event
+        if set_completed:
+            await self.emit_event(
+                PinpanClubEvents.MATCH_SET_COMPLETED,
+                {
+                    "match_id": match_id,
+                    "set_number": current_set - 1,
+                    "set_winner": set_winner,
+                    "sets_a": sets_a,
+                    "sets_b": sets_b
+                }
+            )
+        
+        # Verify si ended the match
+        sets_to_win = (match.best_of // 2) + 1
+        if sets_a >= sets_to_win or sets_b >= sets_to_win:
+            winner_id = match.player_a_id if sets_a > sets_b else match.player_b_id
+            await self._finish_match(match_id, winner_id, match)
+        
+        # Notify WebSockets
+        await self._broadcast_to_match(match_id)
+        
+        return await self.get_match(match_id)
+    
+    async def _finish_match(
+        self,
+        match_id: str,
+        winner_id: str,
+        match: Match
+    ) -> None:
+        """Finalizar partido y actualizar ELOs"""
+        end_date = datetime.now(timezone.utc).isoformat()
+        await self.repository.finish_match(match_id, winner_id, end_date)
+        
+        # Emit match finished event
+        await self.emit_event(
+            PinpanClubEvents.MATCH_FINISHED,
+            {
+                "match_id": match_id,
+                "winner_id": winner_id,
+                "end_date": end_date,
+                "player_a_id": match.player_a_id,
+                "player_b_id": match.player_b_id
+            },
+            priority=EventPriority.CRITICAL
+        )
+        
+        self.log_info(f"Match finished: {match_id}, winner: {winner_id}")
+    
+    async def cancel_match(self, match_id: str) -> bool:
+        """
+        Cancelar partido.
+        Emite evento: pinpanclub.match.cancelled
+        """
+        success = await self.repository.cancel_match(match_id)
+        
+        if success:
+            await self.emit_event(
+                PinpanClubEvents.MATCH_CANCELLED,
+                {"match_id": match_id}
+            )
+        
+        return success
+    
+    # WebSocket management
+    def register_websocket(self, match_id: str, websocket) -> None:
+        """Register connection WebSocket para un partido"""
+        if match_id not in self._websocket_connections:
+            self._websocket_connections[match_id] = set()
+        self._websocket_connections[match_id].add(websocket)
+    
+    def unregister_websocket(self, match_id: str, websocket) -> None:
+        """Desregistrar connection WebSocket"""
+        if match_id in self._websocket_connections:
+            self._websocket_connections[match_id].discard(websocket)
+    
+    async def _broadcast_to_match(self, match_id: str) -> None:
+        """Send update a todos los WebSockets de un partido"""
+        if match_id not in self._websocket_connections:
+            return
+        
+        match = await self.get_match(match_id)
+        if not match:
+            return
+        
+        message = match.model_dump()
+        dead_connections = set()
+        
+        for ws in self._websocket_connections[match_id]:
+            try:
+                await ws.send_json(message)
+            except Exception:
+                dead_connections.add(ws)
+        
+        # Clean connections muertas
+        for ws in dead_connections:
+            self._websocket_connections[match_id].discard(ws)
+    
+    async def get_stats(self) -> Dict:
+        """Get statistics de partidos"""
+        by_state = await self.repository.count_by_state()
+        total = sum(by_state.values())
+        
+        return {
+            "total": total,
+            "by_state": by_state,
+            "active_websockets": sum(
+                len(conns) for conns in self._websocket_connections.values()
+            )
+        }
+
+
+# Service singleton instance
+match_service = MatchService()

@@ -1,0 +1,1363 @@
+/**
+ * Textbook Orders Admin Tab
+ * Admin view for managing textbook orders, statistics, and reorder requests
+ */
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
+import { useRealtimeEvent } from '@/contexts/RealtimeContext';
+import {
+  Package,
+  DollarSign,
+  TrendingUp,
+  BookOpen,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Search,
+  Eye,
+  Users,
+  BarChart3,
+  Archive,
+  MessageCircle,
+  Printer,
+  Link2,
+  PrinterCheck,
+  Check,
+  X,
+  Trash2,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquareText,
+  Pencil
+} from 'lucide-react';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { usePagination } from '@/hooks/usePagination';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { TablePagination } from '@/components/shared/TablePagination';
+import { BoardHeader } from '@/components/shared/BoardHeader';
+import { useTranslation } from 'react-i18next';
+import CrmChat from '@/components/chat/CrmChat';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import PrintDialog from '@/modules/print/PrintDialog';
+import ArchiveTab from '@/components/shared/ArchiveTab';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API = RESOLVED_API_URL;
+
+const ORDER_STATUSES = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'submitted', label: 'Submitted' },
+  { value: 'awaiting_link', label: 'Awaiting Link' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'ready', label: 'Ready' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
+const STATUS_COLORS = {
+  draft: 'bg-gray-500 text-white',
+  submitted: 'bg-blue-600 text-white',
+  awaiting_link: 'bg-orange-500 text-white',
+  processing: 'bg-amber-500 text-white',
+  ready: 'bg-green-600 text-white',
+  delivered: 'bg-emerald-600 text-white',
+  cancelled: 'bg-red-600 text-white',
+};
+
+
+// Inline editable print count
+function EditablePrintCount({ orderId, printCount, printedAt, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(printCount || 0);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < 0) return;
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/print-count`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ print_count: num }),
+      });
+      if (res.ok) {
+        toast.success('Print count updated');
+        onUpdate?.();
+      }
+    } catch {} finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <Input
+          type="number" min="0" value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+          className="h-6 w-12 text-center text-[11px] px-1"
+          autoFocus
+          data-testid={`print-count-input-${orderId}`}
+        />
+        <button onClick={save} disabled={saving} className="text-green-600 hover:text-green-800"><Check className="h-3 w-3" /></button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X className="h-3 w-3" /></button>
+      </div>
+    );
+  }
+
+  const count = printCount || 0;
+  const hasBeenPrinted = count > 0 || printedAt;
+  return (
+    <button
+      onClick={() => { setValue(count); setEditing(true); }}
+      title={`${hasBeenPrinted ? `Printed ${count}x` : 'Not printed'} — click to edit`}
+      className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full text-[11px] font-bold cursor-pointer hover:ring-2 hover:ring-offset-1 transition-all ${
+        hasBeenPrinted ? 'bg-green-100 text-green-700 hover:ring-green-300' : 'bg-gray-100 text-gray-400 hover:ring-gray-300'
+      }`}
+      data-testid={`print-count-${orderId}`}
+    >
+      {count}
+    </button>
+  );
+}
+
+// Inline editable admin note
+function EditableNote({ orderId, note, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(note || '');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/note`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: value.trim() }),
+      });
+      if (res.ok) {
+        toast.success('Note saved');
+        onUpdate?.();
+      }
+    } catch {} finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <Popover open={true} onOpenChange={(open) => { if (!open) setEditing(false); }}>
+        <PopoverTrigger asChild>
+          <span />
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-2" align="start">
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Add a note..."
+            className="w-full h-20 text-xs border rounded p-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary bg-background text-foreground"
+            autoFocus
+            data-testid={`note-input-${orderId}`}
+          />
+          <div className="flex justify-end gap-1 mt-1">
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)} className="h-6 text-xs px-2">Cancel</Button>
+            <Button size="sm" onClick={save} disabled={saving} className="h-6 text-xs px-2">Save</Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  if (note) {
+    return (
+      <button
+        onClick={() => { setValue(note); setEditing(true); }}
+        title={note}
+        className="max-w-[120px] truncate text-[11px] text-left text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer hover:bg-amber-100 transition-colors"
+        data-testid={`note-display-${orderId}`}
+      >
+        {note}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => { setValue(''); setEditing(true); }}
+      title="Add note"
+      className="text-gray-300 hover:text-gray-500 cursor-pointer transition-colors"
+      data-testid={`note-add-${orderId}`}
+    >
+      <MessageSquareText className="h-3.5 w-3.5" />
+    </button>
+  );
+}
+
+function AddItemToOrder({ order, onAdded }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [adding, setAdding] = useState(null);
+  const debounceRef = useRef(null);
+
+  const doSearch = async (q) => {
+    if (q.length < 2) { setResults([]); return; }
+    setSearching(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const params = new URLSearchParams({ search: q, limit: '20' });
+      if (order.grade) params.set('grade', order.grade);
+      const res = await fetch(`${API}/api/sysbook/inventory/products?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const existingIds = new Set((order.items || []).map(i => i.book_id));
+        setResults((data.products || []).filter(p => !existingIds.has(p.book_id)));
+      }
+    } catch {} finally { setSearching(false); }
+  };
+
+  const handleSearch = (val) => {
+    setSearch(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => doSearch(val), 300);
+  };
+
+  const handleAdd = async (product) => {
+    setAdding(product.book_id);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${order.order_id}/items`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ book_id: product.book_id, quantity: 1 }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Added "${product.name}" to order`);
+        onAdded(data.order);
+        setOpen(false);
+        setSearch('');
+        setResults([]);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to add item');
+      }
+    } catch { toast.error('Error adding item'); }
+    finally { setAdding(null); }
+  };
+
+  return (
+    <>
+      <Button variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setOpen(true)} data-testid="add-item-btn">
+        <Plus className="h-3 w-3" /> Add Item
+      </Button>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSearch(''); setResults([]); } }}>
+        <DialogContent className="max-w-md max-h-[70vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Add Item to Order</DialogTitle>
+            <DialogDescription className="text-xs">
+              Search inventory{order.grade ? ` (Grade ${order.grade})` : ''} — type code or book name
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input value={search} onChange={e => handleSearch(e.target.value)} placeholder="e.g. G6-3 or Math"
+              className="pl-8 h-8 text-sm" autoFocus data-testid="add-item-search" />
+          </div>
+          <div className="flex-1 overflow-y-auto" style={{ maxHeight: 300 }}>
+            {searching ? (
+              <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin" /></div>
+            ) : results.length > 0 ? (
+              <div className="space-y-1">
+                {results.map(p => (
+                  <div key={p.book_id} className="grid grid-cols-[1fr_36px] items-center gap-2 p-2 rounded hover:bg-muted/50 border-b cursor-pointer" onClick={() => !adding && handleAdd(p)} data-testid={`search-result-${p.book_id}`}>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium truncate">{p.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{p.code || '—'} · ${(p.price || 0).toFixed(2)}</p>
+                    </div>
+                    <Button size="sm" className="h-8 w-8 p-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onClick={(e) => { e.stopPropagation(); handleAdd(p); }}
+                      disabled={adding === p.book_id} data-testid={`add-btn-${p.book_id}`}>
+                      {adding === p.book_id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : search.length >= 2 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No products found</p>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-4">Type at least 2 characters to search</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function RemoveItemButton({ orderId, item, onRemoved }) {
+  const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState(false);
+
+  const handleRemove = async () => {
+    setRemoving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/items/${encodeURIComponent(item.book_id)}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Removed "${item.book_name}" from order. Presale qty updated.`);
+        onRemoved(data.order);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to remove item');
+      }
+    } catch { toast.error('Error removing item'); }
+    finally { setRemoving(false); setConfirming(false); }
+  };
+
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-red-600 hover:text-red-800" onClick={handleRemove} disabled={removing}
+          title="Confirm remove" data-testid={`confirm-remove-${item.book_id}`}>
+          {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground" onClick={() => setConfirming(false)} title="Cancel">
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-muted-foreground hover:text-red-600"
+      onClick={() => setConfirming(true)} title="Remove item"
+      data-testid={`remove-item-${item.book_id}`}>
+      <Trash2 className="h-3 w-3" />
+    </Button>
+  );
+}
+
+function EditableGradeField({ order, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(order.grade || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    const newGrade = value.trim();
+    if (!newGrade || newGrade === order.grade) { setEditing(false); return; }
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${order.order_id}/grade`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade: newGrade }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Grade updated to ${newGrade}. ${data.products_relinked || 0} items re-linked to inventory.`);
+        onUpdate({ ...order, grade: newGrade });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || 'Failed to update grade');
+      }
+    } catch { toast.error('Error updating grade'); }
+    finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <Input value={value} onChange={e => setValue(e.target.value)} className="h-7 w-20 text-sm"
+          autoFocus onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false); }}
+          data-testid={`grade-input-${order.order_id}`} />
+        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-green-600" onClick={handleSave} disabled={saving}
+          data-testid={`grade-save-${order.order_id}`}>
+          {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground" onClick={() => setEditing(false)}>
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <span onClick={() => { setValue(order.grade || ''); setEditing(true); }}
+      className="font-medium cursor-pointer rounded px-1.5 py-0.5 hover:bg-accent hover:ring-1 hover:ring-primary/30 transition-colors"
+      title="Click to edit grade"
+      data-testid={`grade-display-${order.order_id}`}>
+      {order.grade || '—'}
+    </span>
+  );
+}
+
+function PaidDateCell({ orderId, paidDate, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(paidDate ? paidDate.slice(0, 10) : '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async (dateVal) => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/paid-date`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paid_date: dateVal || null }),
+      });
+      if (res.ok) {
+        toast.success(dateVal ? 'Paid date updated' : 'Paid date cleared');
+        onUpdate();
+      } else toast.error('Failed to update');
+    } catch { toast.error('Error updating paid date'); }
+    finally { setSaving(false); setEditing(false); }
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <input type="date" value={value} onChange={(e) => setValue(e.target.value)}
+          className="h-6 text-xs border rounded px-1 w-28" autoFocus
+          data-testid={`paid-date-input-${orderId}`}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleSave(value); if (e.key === 'Escape') setEditing(false); }} />
+        <button onClick={() => handleSave(value)} disabled={saving}
+          className="text-green-600 hover:text-green-800 text-xs font-bold" data-testid={`paid-date-save-${orderId}`}>
+          {saving ? '...' : '✓'}
+        </button>
+        <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+      </div>
+    );
+  }
+
+  return (
+    <span onClick={() => { setValue(paidDate ? paidDate.slice(0, 10) : ''); setEditing(true); }}
+      className={`cursor-pointer rounded px-1.5 py-0.5 transition-colors hover:ring-1 hover:ring-primary/40
+        ${paidDate ? 'text-green-700 font-medium bg-green-50' : 'text-muted-foreground hover:text-foreground'}`}
+      title="Click to set paid date"
+      data-testid={`paid-date-display-${orderId}`}>
+      {paidDate ? (() => { const [y,m,d] = (paidDate.slice(0,10)).split('-'); return new Date(y, m-1, d).toLocaleDateString('en', { month: 'short', day: 'numeric' }); })() : '—'}
+    </span>
+  );
+}
+
+export default function TextbookOrdersAdminTab() {
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [pendingReorders, setPendingReorders] = useState([]);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterGrade, setFilterGrade] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [showReorderDialog, setShowReorderDialog] = useState(false);
+  const [selectedReorder, setSelectedReorder] = useState(null);
+  const [maxQuantity, setMaxQuantity] = useState(2);
+  const [adminNotes, setAdminNotes] = useState('');
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [printOrderIds, setPrintOrderIds] = useState([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [chatStudent, setChatStudent] = useState(null);
+  const [singlePrintOpen, setSinglePrintOpen] = useState(false);
+  const [archiveCount, setArchiveCount] = useState(0);
+  const [sortField, setSortField] = useState(null); // 'paid_date', 'date', etc.
+  const [sortDir, setSortDir] = useState('desc');
+  const [recentlyAdded, setRecentlyAdded] = useState(new Set());
+
+  useEffect(() => {
+    fetchData();
+  }, [filterStatus, filterGrade]);
+
+  // Debounced search — refetch when search term changes (after 400ms)
+  useEffect(() => {
+    if (!searchTerm) { fetchData(); return; }
+    const timer = setTimeout(() => fetchData(), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Auto-refresh on real-time order events
+  useRealtimeEvent('order_submitted', useCallback(() => fetchData(), []));
+  useRealtimeEvent('order_status_changed', useCallback(() => fetchData(), []));
+
+  const fetchData = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('auth_token');
+    
+    try {
+      // Build query params
+      const params = new URLSearchParams();
+      if (filterStatus !== 'all') params.append('status', filterStatus);
+      if (filterGrade !== 'all') params.append('grade', filterGrade);
+      if (searchTerm && searchTerm.length >= 2) params.append('search', searchTerm);
+
+      const [ordersRes, statsRes, reordersRes] = await Promise.all([
+        fetch(`${API}/api/sysbook/orders/admin/all?${params}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API}/api/sysbook/orders/admin/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API}/api/sysbook/orders/admin/pending-reorders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+
+      if (ordersRes.ok) {
+        const data = await ordersRes.json();
+        setOrders(data.orders || []);
+      }
+      
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data);
+      }
+      
+      if (reordersRes.ok) {
+        const data = await reordersRes.json();
+        setPendingReorders(data.reorders || []);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Error loading orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    const token = localStorage.getItem('auth_token');
+    
+    try {
+      const res = await fetch(`${API}/api/sysbook/orders/admin/${orderId}/status?status=${newStatus}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        toast.success('Order status updated');
+        fetchData();
+        if (selectedOrder?.order_id === orderId) {
+          setSelectedOrder({ ...selectedOrder, status: newStatus });
+        }
+      } else {
+        toast.error('Error updating status');
+      }
+    } catch (error) {
+      toast.error('Error updating status');
+    }
+  };
+
+  const handleApproveReorder = async () => {
+    if (!selectedReorder) return;
+    
+    const token = localStorage.getItem('auth_token');
+    
+    try {
+      const res = await fetch(
+        `${API}/api/sysbook/orders/admin/${selectedReorder.order_id}/items/${selectedReorder.item.book_id}/approve-reorder`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            max_quantity: maxQuantity,
+            admin_notes: adminNotes
+          })
+        }
+      );
+
+      if (res.ok) {
+        toast.success('Reorder approved');
+        setShowReorderDialog(false);
+        setSelectedReorder(null);
+        setMaxQuantity(2);
+        setAdminNotes('');
+        fetchData();
+      } else {
+        toast.error('Error approving reorder');
+      }
+    } catch (error) {
+      toast.error('Error approving reorder');
+    }
+  };
+
+  const filteredOrders = orders.filter(order => {
+    if (order.archived) return false;
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      return (
+        order.student_name?.toLowerCase().includes(search) ||
+        order.user_name?.toLowerCase().includes(search) ||
+        order.user_email?.toLowerCase().includes(search) ||
+        order.order_id?.toLowerCase().includes(search)
+      );
+    }
+    return true;
+  });
+
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (!sortField) return 0;
+    const fieldMap = { paid_date: 'paid_date', date: 'submitted_at' };
+    const key = fieldMap[sortField] || sortField;
+    const aVal = a[key] || '';
+    const bVal = b[key] || '';
+    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('desc');
+    }
+  };
+
+  const orderPagination = usePagination(sortedOrders, 25);
+  const pageOrders = orderPagination.paginated;
+  const orderSelection = useTableSelection(pageOrders, 'order_id');
+
+  const handleBulkArchiveOrders = async () => {
+    setBulkLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      await fetch(`${API}/api/sysbook/orders/admin/bulk-archive`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order_ids: Array.from(orderSelection.selected) }),
+      });
+      toast.success(`${orderSelection.count} order(s) archived`);
+      orderSelection.clear();
+      setConfirmArchive(false);
+      fetchData();
+    } catch { toast.error('Archive failed'); }
+    finally { setBulkLoading(false); }
+  };
+
+  const handleBulkDeleteOrders = async () => {
+    setBulkLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/sysbook/orders/admin/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order_ids: Array.from(orderSelection.selected) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`${data.count} order(s) permanently deleted`);
+      } else {
+        toast.error('Delete failed');
+      }
+      orderSelection.clear();
+      setConfirmDelete(false);
+      fetchData();
+    } catch { toast.error('Delete failed'); }
+    finally { setBulkLoading(false); }
+  };
+
+  // Get unique grades from orders
+  const grades = [...new Set(orders.map(o => o.grade).filter(Boolean))].sort();
+
+  const [subTab, setSubTab] = useState('orders');
+
+  return (
+    <div className="space-y-3" data-testid="textbook-orders-admin">
+      <BoardHeader
+        title="Textbook Orders"
+        icon={Package}
+        subtitle="Manage orders, statistics, and reorder requests"
+        tabs={[
+          { value: 'orders', label: 'Orders', icon: Package },
+          { value: 'stats', label: 'Statistics', icon: BarChart3 },
+          { value: 'reorders', label: 'Reorders', icon: RefreshCw },
+          { value: 'archived', label: 'Archived', icon: Archive, count: archiveCount || undefined },
+        ]}
+        activeTab={subTab}
+        onTabChange={setSubTab}
+        search={subTab === 'orders' ? searchTerm : undefined}
+        onSearchChange={subTab === 'orders' ? setSearchTerm : undefined}
+        searchPlaceholder="Search by student, user, or order ID..."
+        filters={subTab === 'orders' ? [
+          {
+            value: filterStatus, onChange: setFilterStatus, placeholder: 'All Status', testId: 'txo-filter-status',
+            options: ORDER_STATUSES.map(s => ({ value: s.value, label: s.label })),
+          },
+          {
+            value: filterGrade, onChange: setFilterGrade, placeholder: 'All Grades', testId: 'txo-filter-grade',
+            options: grades.map(g => ({ value: g, label: `Grade ${g}` })),
+          },
+        ] : []}
+        hasActiveFilters={!!(searchTerm || filterStatus !== 'all' || filterGrade !== 'all')}
+        onClearFilters={() => { setSearchTerm(''); setFilterStatus('all'); setFilterGrade('all'); }}
+        stats={stats ? [
+          { label: 'total', value: stats.total || orders.length, color: 'blue' },
+          ...(stats.by_status?.submitted > 0 ? [{ label: 'submitted', value: stats.by_status.submitted, color: 'amber', highlight: true }] : []),
+          ...(stats.by_status?.processing > 0 ? [{ label: 'processing', value: stats.by_status.processing, color: 'purple' }] : []),
+          ...(stats.by_status?.delivered > 0 ? [{ label: 'delivered', value: stats.by_status.delivered, color: 'green' }] : []),
+          ...(pendingReorders.length > 0 ? [{ label: 'reorders', value: pendingReorders.length, color: 'red', highlight: true }] : []),
+        ] : [{ label: 'orders', value: orders.length, color: 'blue' }]}
+        loading={loading}
+        onRefresh={fetchData}
+      />
+
+      {/* Orders Tab */}
+      {subTab === 'orders' && (
+        <div className="space-y-3">
+          <Card>
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  No orders found
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                {/* Top pagination */}
+                <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/30 text-xs text-muted-foreground">
+                  <span>{orderPagination.totalItems} orders</span>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!orderPagination.canPrev}
+                      onClick={() => orderPagination.setPage(orderPagination.page - 1)}>
+                      <ChevronLeft className="h-3 w-3" />
+                    </Button>
+                    <span className="font-medium px-1">{orderPagination.page + 1} / {orderPagination.totalPages}</span>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={!orderPagination.canNext}
+                      onClick={() => orderPagination.setPage(orderPagination.page + 1)}>
+                      <ChevronRight className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox checked={orderSelection.allSelected} onCheckedChange={orderSelection.toggleAll} />
+                      </TableHead>
+                      <TableHead>Student</TableHead>
+                      <TableHead className="hidden sm:table-cell">User</TableHead>
+                      <TableHead className="hidden md:table-cell">Grade</TableHead>
+                      <TableHead className="hidden md:table-cell">Items</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" onClick={() => handleSort('date')} data-testid="sort-date">
+                        Date {sortField === 'date' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      </TableHead>
+                      <TableHead className="hidden lg:table-cell cursor-pointer select-none" onClick={() => handleSort('paid_date')} data-testid="sort-paid-date">
+                        Paid {sortField === 'paid_date' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      </TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-[60px] text-center">Print</TableHead>
+                      <TableHead className="w-[100px]">Note</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pageOrders.map((order) => (
+                      <TableRow key={order.order_id}>
+                        <TableCell>
+                          <Checkbox checked={orderSelection.isSelected(order.order_id)}
+                            onCheckedChange={() => orderSelection.toggle(order.order_id)} />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {order.student_name}
+                          <div className="text-xs text-muted-foreground sm:hidden">{order.user_email}</div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          <div>
+                            <p className="font-medium">{order.user_name}</p>
+                            <p className="text-xs text-muted-foreground">{order.user_email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{order.grade}</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {order.items?.filter(i => i.quantity_ordered > 0).length || 0}
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          ${order.total_amount?.toFixed(2) || '0.00'}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
+                          {order.submitted_at ? new Date(order.submitted_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : order.created_at ? new Date(order.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs" data-testid={`paid-date-${order.order_id}`}>
+                          <PaidDateCell orderId={order.order_id} paidDate={order.paid_date} onUpdate={fetchData} />
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={order.status}
+                            onValueChange={(value) => handleUpdateStatus(order.order_id, value)}
+                          >
+                            <SelectTrigger className={`w-[110px] text-xs ${STATUS_COLORS[order.status]}`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ORDER_STATUSES.map(s => (
+                                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center gap-1" data-testid={`order-activity-${order.order_id}`}>
+                            <EditablePrintCount
+                              orderId={order.order_id}
+                              printCount={order.print_count}
+                              printedAt={order.printed_at}
+                              onUpdate={fetchData}
+                            />
+                            {order.link_status === 'linked' ? (
+                              <span title="Linked to user">
+                                <Link2 className="h-3.5 w-3.5 text-blue-500" />
+                              </span>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <EditableNote
+                            orderId={order.order_id}
+                            note={order.admin_note}
+                            onUpdate={fetchData}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setSinglePrintOpen(true);
+                              }}
+                              title="Print"
+                              data-testid={`quick-print-${order.order_id}`}
+                            >
+                              <Printer className="h-4 w-4 text-amber-600" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setChatStudent({ id: order.student_id, name: order.student_name, orderId: order.order_id })}
+                              title="Messages"
+                              data-testid={`admin-chat-order-${order.order_id}`}
+                            >
+                              <MessageCircle className="h-4 w-4 text-purple-600" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setShowOrderDialog(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                </div>
+              )}
+              <TablePagination
+                page={orderPagination.page} totalPages={orderPagination.totalPages} totalItems={orderPagination.totalItems}
+                pageSize={orderPagination.pageSize} onPageChange={orderPagination.setPage} onPageSizeChange={orderPagination.setPageSize}
+                canPrev={orderPagination.canPrev} canNext={orderPagination.canNext}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Statistics Tab */}
+      {subTab === 'stats' && (
+        <div className="space-y-3">
+          {stats && (
+            <>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Package className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Orders</p>
+                        <p className="text-2xl font-bold">{stats.total_orders}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Clock className="h-6 w-6 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Pending</p>
+                        <p className="text-2xl font-bold">
+                          {(stats.orders_by_status?.submitted || 0) + (stats.orders_by_status?.processing || 0)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <RefreshCw className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Reorder Requests</p>
+                        <p className="text-2xl font-bold">{stats.pending_reorder_requests}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Orders by Grade */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Orders by Grade</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>Orders</TableHead>
+                        <TableHead>Revenue</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Object.entries(stats.orders_by_grade || {}).map(([grade, data]) => (
+                        <TableRow key={grade}>
+                          <TableCell className="font-medium">Grade {grade}</TableCell>
+                          <TableCell>{data.count}</TableCell>
+                          <TableCell className="font-semibold">${data.revenue?.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Top Books */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Top Selling Books</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Book</TableHead>
+                        <TableHead>Quantity Sold</TableHead>
+                        <TableHead>Revenue</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {(stats.top_books || []).map((book, idx) => (
+                        <TableRow key={book._id || idx}>
+                          <TableCell className="font-medium">{book.book_name}</TableCell>
+                          <TableCell>{book.total_ordered}</TableCell>
+                          <TableCell className="font-semibold">${book.revenue?.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Reorder Requests Tab */}
+      {subTab === 'reorders' && (
+        <div className="space-y-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Reorder Requests</CardTitle>
+              <CardDescription>
+                Review and approve requests from users who need to order additional copies
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingReorders.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  <p>No pending reorder requests</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Book</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingReorders.map((reorder, idx) => (
+                      <TableRow key={`${reorder.order_id}-${reorder.item?.book_id}-${idx}`}>
+                        <TableCell className="font-medium">{reorder.student_name}</TableCell>
+                        <TableCell>{reorder.item?.book_name}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {reorder.item?.reorder_reason}
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{reorder.user_name}</p>
+                            <p className="text-xs text-muted-foreground">{reorder.user_email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedReorder(reorder);
+                              setShowReorderDialog(true);
+                            }}
+                          >
+                            Review
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Archived Orders Tab */}
+      {subTab === 'archived' && (
+        <ArchiveTab
+          entityType="orders"
+          token={localStorage.getItem('auth_token')}
+          columns={[
+            { key: 'student_name', label: 'Student' },
+            { key: 'grade', label: 'Grade' },
+            { key: 'total_amount', label: 'Total', render: (item) => `$${(item.total_amount || 0).toFixed(2)}` },
+            { key: 'status', label: 'Status' },
+          ]}
+          idField="order_id"
+          onCountChange={setArchiveCount}
+          searchFields={['student_name', 'order_id']}
+        />
+      )}
+
+      {/* Order Details Dialog */}
+      <Dialog open={showOrderDialog} onOpenChange={(v) => { setShowOrderDialog(v); if (!v) setRecentlyAdded(new Set()); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Order Details</DialogTitle>
+            <DialogDescription>
+              Order ID: {selectedOrder?.order_id}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Student</p>
+                  <p className="font-medium">{selectedOrder.student_name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Grade</p>
+                  <EditableGradeField order={selectedOrder} onUpdate={(updated) => { setSelectedOrder(updated); fetchData(); }} />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">User</p>
+                  <p className="font-medium">{selectedOrder.user_name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedOrder.user_email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="font-bold text-lg">${selectedOrder.total_amount?.toFixed(2)}</p>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-muted-foreground">Selected Items</p>
+                  <AddItemToOrder order={selectedOrder} onAdded={(updatedOrder) => {
+                    const oldIds = new Set((selectedOrder.items || []).map(i => i.book_id));
+                    const newItem = (updatedOrder.items || []).find(i => !oldIds.has(i.book_id));
+                    if (newItem) setRecentlyAdded(prev => new Set([...prev, newItem.book_id]));
+                    setSelectedOrder(updatedOrder); fetchData();
+                  }} />
+                </div>
+                <ScrollArea className="h-[200px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Code</TableHead>
+                        <TableHead className="text-xs">Book</TableHead>
+                        <TableHead className="text-xs text-right">Price</TableHead>
+                        <TableHead className="text-xs text-right">Qty</TableHead>
+                        <TableHead className="text-xs w-8"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedOrder.items?.filter(i => i.quantity_ordered > 0).map((item) => (
+                        <TableRow key={item.book_id} className={recentlyAdded.has(item.book_id) ? 'bg-emerald-50/70 animate-in fade-in duration-500' : ''}>
+                          <TableCell className="text-xs font-mono text-muted-foreground" data-testid={`item-code-${item.book_id}`}>
+                            {item.book_code || '-'}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            <span className="flex items-center gap-1.5">
+                              {item.book_name}
+                              {recentlyAdded.has(item.book_id) && (
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 bg-emerald-100 text-emerald-700 border-emerald-300 font-semibold shrink-0" data-testid={`new-badge-${item.book_id}`}>NEW</Badge>
+                              )}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm text-right font-medium">${item.price?.toFixed(2)}</TableCell>
+                          <TableCell className="text-sm text-right">x{item.quantity_ordered}</TableCell>
+                          <TableCell className="p-0">
+                            <RemoveItemButton orderId={selectedOrder.order_id} item={item} onRemoved={(updatedOrder) => { setSelectedOrder(updatedOrder); fetchData(); }} />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </div>
+
+              {selectedOrder.monday_item_id && (
+                <p className="text-xs text-muted-foreground">
+                  Monday.com Item ID: {selectedOrder.monday_item_id}
+                </p>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => {
+                setSinglePrintOpen(true);
+              }}
+              data-testid="order-detail-print-btn"
+            >
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Single Order Print Dialog */}
+      <PrintDialog
+        open={singlePrintOpen}
+        onOpenChange={setSinglePrintOpen}
+        orderIds={selectedOrder ? [selectedOrder.order_id] : []}
+        token={localStorage.getItem('auth_token')}
+        onPrintComplete={() => {
+          if (selectedOrder) {
+            setOrders(prev => prev.map(o =>
+              o.order_id === selectedOrder.order_id
+                ? { ...o, printed_at: new Date().toISOString(), print_count: (o.print_count || 0) + 1 }
+                : o
+            ));
+          }
+        }}
+      />
+
+      {/* Approve Reorder Dialog */}
+      <Dialog open={showReorderDialog} onOpenChange={setShowReorderDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Approve Reorder Request</DialogTitle>
+            <DialogDescription>
+              Set the maximum quantity this user can order for this book
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedReorder && (
+            <div className="space-y-4 py-4">
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="font-medium">{selectedReorder.item?.book_name}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Student: {selectedReorder.student_name}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Reason: {selectedReorder.item?.reorder_reason}
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">New Max Quantity</label>
+                <Select value={String(maxQuantity)} onValueChange={(v) => setMaxQuantity(Number(v))}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[2, 3, 4, 5].map(n => (
+                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Admin Notes (optional)</label>
+                <Textarea
+                  placeholder="Add any notes about this approval..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReorderDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApproveReorder}>
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Approve Reorder
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Action Bar — Archive + Delete + Print */}
+      <BulkActionBar count={orderSelection.count} onClear={orderSelection.clear}
+        onArchive={() => setConfirmArchive(true)}
+        onDelete={() => setConfirmDelete(true)}
+        loading={bulkLoading}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { setPrintOrderIds([...orderSelection.ids]); orderSelection.clear(); setPrintDialogOpen(true); }}
+          className="gap-1.5 bg-background"
+          data-testid="bulk-print-btn"
+        >
+          <Printer className="h-3.5 w-3.5" />
+          {t('print.packageList', 'Package List')}
+        </Button>
+      </BulkActionBar>
+
+      <ConfirmDialog
+        open={confirmArchive}
+        onClose={() => setConfirmArchive(false)}
+        onConfirm={handleBulkArchiveOrders}
+        title={`Archive ${orderSelection.count} order(s)?`}
+        description="Archived orders are hidden from view but preserved for records. This can be reversed."
+        variant="warning"
+        confirmLabel="Archive"
+        loading={bulkLoading}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleBulkDeleteOrders}
+        title={`Permanently delete ${orderSelection.count} order(s)?`}
+        description="This will permanently remove the selected orders from the database. This action CANNOT be undone."
+        variant="destructive"
+        confirmLabel="Delete Forever"
+        loading={bulkLoading}
+      />
+
+
+      {/* Print Dialog */}
+      <PrintDialog
+        open={printDialogOpen}
+        onOpenChange={(v) => { setPrintDialogOpen(v); if (!v) setPrintOrderIds([]); }}
+        orderIds={printOrderIds}
+        token={localStorage.getItem('auth_token')}
+        onPrintComplete={() => {
+          const printedIds = new Set(printOrderIds);
+          setOrders(prev => prev.map(o =>
+            printedIds.has(o.order_id)
+              ? { ...o, printed_at: new Date().toISOString(), print_count: (o.print_count || 0) + 1 }
+              : o
+          ));
+        }}
+      />
+
+      {/* CRM Chat */}
+      {chatStudent && (
+        <CrmChat
+          studentId={chatStudent.id}
+          studentName={chatStudent.name}
+          orderId={chatStudent.orderId}
+          isOpen={!!chatStudent}
+          onClose={() => setChatStudent(null)}
+          isAdmin={true}
+        />
+      )}
+    </div>
+  );
+}

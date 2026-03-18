@@ -1,0 +1,459 @@
+/**
+ * Unatienda — Store Main Page (Orchestrator)
+ * Slim coordinator that delegates to focused sub-components:
+ *   - PublicCatalog: categories, search, product grid
+ *   - SchoolTextbooksView: student selection + textbook status
+ *   - TextbookOrderView: textbook order flow for a student
+ *
+ * Refactored from 1,927 lines → ~320 lines.
+ */
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
+import axios from 'axios';
+import { buildUrl, STORE_ENDPOINTS } from '@/config/api';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  ChevronLeft, GraduationCap, Home, Loader2, Lock, Search, Store
+} from 'lucide-react';
+import FloatingStoreNav from '@/components/store/FloatingStoreNav';
+import SchoolTextbooksView from '@/modules/unatienda/components/SchoolTextbooksView';
+import TextbookOrderView from '@/modules/unatienda/components/TextbookOrderView';
+import ProductCard from '@/modules/unatienda/components/ProductCard';
+import { categoryIcons } from '@/modules/unatienda/constants/translations';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API_URL = RESOLVED_API_URL;
+
+export default function Unatienda() {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { user, token, isAuthenticated } = useAuth();
+  const { addItem, items, openCart } = useCart();
+
+  // Helper: read initial view from URL
+  const getInitialView = () => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view === 'textbooks' || view === 'textbook-order') return view;
+    const category = params.get('category');
+    const tab = params.get('tab');
+    if (category === 'textbooks' || tab === 'textbooks') return 'textbooks';
+    return 'public';
+  };
+
+  const getInitialStudentId = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('student') || null;
+  };
+
+  // Main state
+  const [activeView, setActiveView] = useState(getInitialView);
+  const [products, setProducts] = useState([]);
+  const [storeInfo, setStoreInfo] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [grades, setGrades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [storeConfig, setStoreConfig] = useState(null);
+  const [sysbookAccess, setTextbookAccess] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [pendingStudentId] = useState(getInitialStudentId);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [showLandingView, setShowLandingView] = useState(() => getInitialView() === 'public');
+  const [addedItems, setAddedItems] = useState({});
+
+  // Sync activeView to URL so refresh preserves the current view
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (activeView === 'public') {
+      url.searchParams.delete('view');
+      url.searchParams.delete('student');
+    } else {
+      url.searchParams.set('view', activeView);
+      if (activeView === 'textbook-order' && selectedStudent) {
+        url.searchParams.set('student', selectedStudent.student_id || selectedStudent.sync_id);
+      } else {
+        url.searchParams.delete('student');
+      }
+    }
+    // Clean legacy params
+    url.searchParams.delete('category');
+    url.searchParams.delete('tab');
+    url.searchParams.delete('categoria');
+    url.searchParams.delete('search');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }, [activeView, selectedStudent]);
+
+  // Restore student selection from URL on initial load (once access data is ready)
+  useEffect(() => {
+    if (!pendingStudentId || !sysbookAccess) return;
+    const student = sysbookAccess.students?.find(
+      s => s.student_id === pendingStudentId || s.sync_id === pendingStudentId
+    );
+    if (student && sysbookAccess.has_access) {
+      setSelectedStudent(student);
+      setActiveView('textbook-order');
+    } else {
+      setActiveView('textbooks');
+    }
+  }, [pendingStudentId, sysbookAccess]);
+
+  // ---- Data Loading ----
+
+  useEffect(() => { fetchData(); }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      checkTextbookAccess();
+    } else {
+      setTextbookAccess(null);
+    }
+  }, [isAuthenticated, token]);
+
+  const fetchData = async () => {
+    try {
+      const [productsRes, storeRes, categoriesRes, gradesRes, configRes] = await Promise.all([
+        axios.get(`${API_URL}/api/store/products`),
+        axios.get(`${API_URL}/api/platform-store`),
+        axios.get(buildUrl(STORE_ENDPOINTS.categories)),
+        axios.get(`${API_URL}/api/store/products/grades`),
+        axios.get(`${API_URL}/api/store/store-config/public`)
+      ]);
+
+      const allProducts = productsRes.data || [];
+      setProducts(allProducts.filter(p => !p.is_sysbook));
+      setStoreInfo(storeRes.data);
+      setCategories(categoriesRes.data || []);
+      setGrades(gradesRes.data.grades || []);
+      setStoreConfig(configRes.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkTextbookAccess = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/sysbook/browse/access`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTextbookAccess(response.data);
+    } catch (error) {
+      console.error('Error checking sysbook catalog access:', error);
+      setTextbookAccess({ has_access: false, students: [], grades: [] });
+    }
+  };
+
+  // ---- Product Filtering ----
+
+  const filteredProducts = products.filter(product => {
+    const matchesSearch =
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!selectedCategory) return matchesSearch;
+    const matchesCategory = product.categoria === selectedCategory;
+
+    if (selectedSubcategory && (selectedCategory === 'books' || selectedCategory === 'books')) {
+      const matchesGrade = product.grade === selectedSubcategory || product.grades?.includes(selectedSubcategory);
+      return matchesSearch && matchesCategory && matchesGrade;
+    }
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // ---- Navigation Helpers ----
+
+  const handleSelectCategory = (categoryId) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory(null);
+    setShowLandingView(true);
+  };
+
+  const handleSelectSubcategoria = (subcategoryId) => {
+    setSelectedSubcategory(subcategoryId);
+    setShowLandingView(false);
+  };
+
+  const handleGoBack = () => {
+    if (!showLandingView && selectedCategory && !selectedSubcategory) {
+      setShowLandingView(true);
+    } else if (selectedSubcategory) {
+      setSelectedSubcategory(null);
+      setShowLandingView(true);
+    } else {
+      setSelectedCategory(null);
+      setShowLandingView(true);
+    }
+  };
+
+  const handleGoHome = () => {
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
+    setShowLandingView(true);
+  };
+
+  // ---- Cart Helpers ----
+
+  const handleAddToCart = (product) => {
+    if (product.inventory_quantity <= 0 && !product.is_sysbook) {
+      toast.error('Producto sin stock');
+      return;
+    }
+    addItem(product, 1);
+    setAddedItems(prev => ({ ...prev, [product.book_id]: true }));
+    setTimeout(() => {
+      setAddedItems(prev => ({ ...prev, [product.book_id]: false }));
+    }, 1500);
+    toast.success('Producto agregado al carrito');
+  };
+
+  const isInCart = (id) => items.some(item => item.book_id === id);
+  const getCartQuantity = (id) => {
+    const item = items.find(item => item.book_id === id);
+    return item ? item.quantity : 0;
+  };
+
+  const getStockStatus = (qty) => {
+    if (qty <= 0) return { label: 'Agotado', color: 'destructive', canBuy: false };
+    if (qty < 10) return { label: `Solo ${qty}`, color: 'warning', canBuy: true };
+    return { label: 'Disponible', color: 'success', canBuy: true };
+  };
+
+  const getCategoryInfo = (categoryId) => {
+    const cat = categories.find(c => c.category_id === categoryId);
+    return cat || { name: categoryId, icono: categoryIcons[categoryId] || '📦' };
+  };
+
+  // ---- Render ----
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      {/* Adaptive Hero Section */}
+      <div className={`relative py-3 sm:py-6 px-4 ${
+        activeView === 'public' 
+          ? 'bg-gradient-to-br from-primary/10 via-background to-secondary/10' 
+          : 'bg-gradient-to-br from-purple-500/10 via-background to-indigo-500/10'
+      }`}>
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              {activeView !== 'public' && (
+                <button
+                  onClick={() => { setActiveView('public'); setShowLandingView(true); setSelectedStudent(null); }}
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/80 transition-colors shrink-0"
+                  data-testid="back-to-store-btn"
+                >
+                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                </button>
+              )}
+              <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${
+                activeView === 'public' ? 'bg-primary/10' : 'bg-purple-500/10'
+              }`}>
+                {activeView === 'public' ? (
+                  <Store className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
+                ) : (
+                  <GraduationCap className="h-5 w-5 sm:h-7 sm:w-7 text-purple-600 dark:text-purple-400" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-serif text-lg sm:text-2xl md:text-3xl font-bold truncate">
+                  {activeView === 'public' 
+                    ? (storeInfo?.name || 'Unatienda')
+                    : (activeView === 'textbook-order' && selectedStudent
+                      ? `${selectedStudent.first_name || selectedStudent.full_name?.split(' ')[0] || ''}`
+                      : (storeConfig?.textbooks_category_label?.[i18n?.language] || 'School Textbooks')
+                    )
+                  }
+                </h1>
+                <p className="text-[11px] sm:text-sm text-muted-foreground truncate">
+                  {activeView === 'public'
+                    ? (storeInfo?.description || 'Tu tienda de confianza')
+                    : (activeView === 'textbook-order' && selectedStudent
+                      ? `${selectedStudent.school_name || ''} ${selectedStudent.grade ? `• ${selectedStudent.grade}°` : ''}`
+                      : 'Textos escolares exclusivos'
+                    )
+                  }
+                </p>
+              </div>
+            </div>
+            {activeView !== 'public' && (
+              <Badge variant="outline" className="shrink-0 text-[10px] border-purple-300 text-purple-600 dark:border-purple-700 dark:text-purple-400 hidden sm:flex">
+                <Lock className="h-3 w-3 mr-1" />
+                Privado
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl">
+        {/* Search Bar - public view only */}
+        {activeView === 'public' && (
+          <div className="mb-4 sm:mb-6">
+            <div className="relative max-w-xl">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("common.searchProducts")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-10 sm:h-11 text-sm"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Category Navigation - public view */}
+        {activeView === 'public' && (
+          <div className="mb-4 sm:mb-6" data-category-nav>
+            <div className="flex gap-1.5 sm:gap-2 flex-wrap items-center">
+              <Button
+                variant={!selectedCategory ? 'default' : 'outline'}
+                size="icon"
+                onClick={handleGoHome}
+                className="h-9 w-9 rounded-full"
+                title="Inicio - Todas las categorías"
+              >
+                <Home className="h-4 w-4" />
+              </Button>
+
+              {(selectedCategory || selectedSubcategory) && (
+                <Button variant="ghost" size="sm" onClick={handleGoBack} className="rounded-full gap-1 text-muted-foreground hover:text-foreground">
+                  <ChevronLeft className="h-4 w-4" />
+                  Regresar
+                </Button>
+              )}
+
+              {selectedCategory && <span className="text-muted-foreground/50 mx-1">|</span>}
+
+              {!selectedCategory ? (
+                <>
+                  {categories.map((cat) => (
+                    <Button key={cat.category_id} variant="outline" size="sm" onClick={() => handleSelectCategory(cat.category_id)} className="rounded-full">
+                      <span className="mr-1.5">{cat.icono}</span>
+                      {cat.name}
+                    </Button>
+                  ))}
+
+                  {storeConfig?.textbooks_category_enabled !== false && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setActiveView('textbooks'); setShowLandingView(false); }}
+                      className="rounded-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400 gap-1.5"
+                      data-testid="textbooks-category-btn"
+                    >
+                      <Lock className="h-3 w-3" />
+                      <GraduationCap className="h-4 w-4" />
+                      {storeConfig?.textbooks_category_label?.[i18n?.language] || 'School Textbooks'}
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold text-sm flex items-center gap-1">
+                    {getCategoryInfo(selectedCategory).icono} {getCategoryInfo(selectedCategory).name}
+                  </span>
+                  {!showLandingView && (
+                    <Badge variant="secondary" className="text-xs">
+                      {filteredProducts.length} productos
+                    </Badge>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Content Router */}
+        {activeView === 'textbooks' ? (
+          <SchoolTextbooksView
+            isAuthenticated={isAuthenticated}
+            sysbookAccess={sysbookAccess}
+            storeConfig={storeConfig}
+            onSelectStudent={(student) => {
+              setSelectedStudent(student);
+              setActiveView('textbook-order');
+            }}
+            onLinkStudent={() => navigate('/my-account?tab=students')}
+            onBack={() => {
+              setActiveView('public');
+              setShowLandingView(true);
+            }}
+          />
+        ) : activeView === 'textbook-order' && selectedStudent ? (
+          <TextbookOrderView
+            sysbookAccess={sysbookAccess}
+            selectedStudentId={selectedStudent.student_id}
+            onBack={() => {
+              setSelectedStudent(null);
+              setActiveView('textbooks');
+            }}
+            onRefreshAccess={checkTextbookAccess}
+          />
+        ) : (
+          <>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                <Store className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">No se encontraron productos</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product) => {
+                  const stockStatus = getStockStatus(product.inventory_quantity);
+                  const catInfo = getCategoryInfo(product.categoria);
+                  return (
+                    <ProductCard
+                      key={product.book_id}
+                      product={product}
+                      stockStatus={stockStatus}
+                      inCart={isInCart(product.book_id)}
+                      cartQty={getCartQuantity(product.book_id)}
+                      justAdded={addedItems[product.book_id]}
+                      categoryInfo={catInfo}
+                      canBuy={stockStatus.canBuy}
+                      onCardClick={(p) => navigate(`/unatienda/producto/${p.book_id}`)}
+                      onAddToCart={handleAddToCart}
+                      onOpenCart={openCart}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <FloatingStoreNav
+        categories={categories}
+        grades={grades.map(g => ({ id: g, name: g }))}
+        selectedCategory={selectedCategory}
+        selectedSubcategory={selectedSubcategory}
+        onSelectCategoria={handleSelectCategory}
+        onSelectSubcategoria={handleSelectSubcategoria}
+        onGoHome={handleGoHome}
+        onGoBack={handleGoBack}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
+    </div>
+  );
+}

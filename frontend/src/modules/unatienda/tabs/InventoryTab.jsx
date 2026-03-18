@@ -1,0 +1,429 @@
+/**
+ * InventoryTab — Retail e-commerce inventory management for Unatienda
+ * Features: stock dashboard, product list with search/filter, stock adjustments,
+ * movement history, low-stock alerts
+ */
+import { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
+import {
+  Package, AlertTriangle, TrendingUp, DollarSign, Search,
+  Plus, Minus, History, Loader2, ArrowUpDown, Filter, BarChart3, Archive, Trash2
+} from 'lucide-react';
+import axios from 'axios';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { usePagination } from '@/hooks/usePagination';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { TablePagination } from '@/components/shared/TablePagination';
+import { BoardHeader } from '@/components/shared/BoardHeader';
+import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API_URL = RESOLVED_API_URL;
+
+function StatsCard({ icon: Icon, label, value, color, sub }) {
+  return (
+    <Card>
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${color}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{value}</p>
+            <p className="text-xs text-muted-foreground">{label}</p>
+            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AdjustStockDialog({ product, open, onClose, onSaved, token }) {
+  const [qty, setQty] = useState('');
+  const [type, setType] = useState('add');
+  const [reason, setReason] = useState('restock');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const reasons = [
+    { value: 'restock', label: 'Restock / New shipment' },
+    { value: 'manual_adjustment', label: 'Manual correction' },
+    { value: 'damaged', label: 'Damaged / Defective' },
+    { value: 'returned', label: 'Customer return' },
+    { value: 'sold_offline', label: 'Sold offline' },
+    { value: 'other', label: 'Other' },
+  ];
+
+  const handleSave = async () => {
+    const num = parseInt(qty);
+    if (!num || num <= 0) { toast.error('Enter a valid quantity'); return; }
+
+    setSaving(true);
+    try {
+      const change = type === 'add' ? num : -num;
+      await axios.post(`${API_URL}/api/store/inventory/adjust`, {
+        book_id: product.book_id,
+        quantity_change: change,
+        reason,
+        notes: notes || null,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+
+      toast.success(`Stock ${type === 'add' ? 'added' : 'removed'}: ${num} units`);
+      onSaved();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to adjust stock');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Adjust Stock</DialogTitle>
+          <DialogDescription>{product?.name}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="text-center p-3 rounded-lg bg-muted">
+            <p className="text-xs text-muted-foreground">Current Stock</p>
+            <p className="text-3xl font-bold">{product?.inventory_quantity ?? 0}</p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant={type === 'add' ? 'default' : 'outline'} className="flex-1" onClick={() => setType('add')}>
+              <Plus className="h-4 w-4 mr-1" /> Add Stock
+            </Button>
+            <Button variant={type === 'remove' ? 'destructive' : 'outline'} className="flex-1" onClick={() => setType('remove')}>
+              <Minus className="h-4 w-4 mr-1" /> Remove
+            </Button>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Quantity</Label>
+            <Input type="number" min="1" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="Enter quantity" />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Reason</Label>
+            <select value={reason} onChange={(e) => setReason(e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
+              {reasons.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Notes (optional)</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add details..." rows={2} />
+          </div>
+
+          {qty && parseInt(qty) > 0 && (
+            <div className="text-center p-2 rounded bg-muted text-sm">
+              New stock: <strong>{Math.max(0, (product?.inventory_quantity ?? 0) + (type === 'add' ? parseInt(qty) : -parseInt(qty)))}</strong>
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />} Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function MovementHistory({ movements }) {
+  if (!movements?.length) return <p className="text-sm text-muted-foreground text-center py-4">No stock movements yet</p>;
+
+  return (
+    <div className="space-y-2 max-h-64 overflow-y-auto">
+      {movements.map((m, i) => (
+        <div key={m.movement_id || i} className="flex items-center gap-3 p-2 rounded border text-sm">
+          <div className={`p-1 rounded ${m.type === 'addition' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            {m.type === 'addition' ? <Plus className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-xs truncate">{m.product_name}</p>
+            <p className="text-[10px] text-muted-foreground">{m.reason} • by {m.admin_name}</p>
+          </div>
+          <div className="text-right">
+            <p className={`font-mono text-xs font-bold ${m.type === 'addition' ? 'text-green-600' : 'text-red-600'}`}>
+              {m.type === 'addition' ? '+' : ''}{m.quantity_change}
+            </p>
+            <p className="text-[10px] text-muted-foreground">{m.old_quantity} → {m.new_quantity}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function InventoryTab({ token }) {
+  const { t } = useTranslation();
+  const [dashboard, setDashboard] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortDir, setSortDir] = useState('asc');
+  const [adjustProduct, setAdjustProduct] = useState(null);
+  const [confirmBulk, setConfirmBulk] = useState(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const productPagination = usePagination(products, 25);
+  const pageProducts = productPagination.paginated;
+  const productSelection = useTableSelection(pageProducts, 'book_id');
+  const [view, setView] = useState('overview'); // overview | history
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/api/store/inventory/dashboard`, { headers });
+      setDashboard(data);
+    } catch { /* ignore */ }
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/api/store/inventory/products`, {
+        headers,
+        params: { search: search || undefined, stock_filter: stockFilter, sort_by: sortBy, sort_dir: sortDir, limit: 100 },
+      });
+      setProducts(data.products);
+      setTotal(data.total);
+    } catch { /* ignore */ }
+  }, [token, search, stockFilter, sortBy, sortDir]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    Promise.all([fetchDashboard(), fetchProducts()]).then(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { fetchProducts(); }, [search, stockFilter, sortBy, sortDir]);
+
+  const onAdjusted = () => {
+    fetchDashboard();
+    fetchProducts();
+  };
+
+  const toggleSort = (field) => {
+    if (sortBy === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(field); setSortDir('asc'); }
+  };
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+
+  return (
+    <div className="space-y-3">
+      <BoardHeader
+        title="Stock Dashboard"
+        icon={Package}
+        subtitle="Quick stock overview and adjustments"
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search products..."
+        filters={[
+          {
+            value: stockFilter, onChange: setStockFilter, placeholder: 'All Stock', testId: 'inv-stock-filter',
+            options: [
+              { value: 'in', label: 'In Stock (>10)' },
+              { value: 'low', label: 'Low Stock (1-10)' },
+              { value: 'out', label: 'Out of Stock' },
+            ],
+          },
+        ]}
+        hasActiveFilters={!!(search || stockFilter !== 'all')}
+        onClearFilters={() => { setSearch(''); setStockFilter('all'); }}
+        stats={[
+          { label: 'products', value: dashboard?.total_products ?? 0, color: 'blue' },
+          { label: 'stock', value: dashboard?.total_stock ?? 0, color: 'green' },
+          { label: 'value', value: `$${(dashboard?.total_value ?? 0).toLocaleString('en', { minimumFractionDigits: 2 })}`, color: 'purple' },
+          ...(dashboard?.low_stock > 0 ? [{ label: 'low stock', value: dashboard.low_stock, color: 'amber', highlight: true }] : []),
+          ...(dashboard?.out_of_stock > 0 ? [{ label: 'out of stock', value: dashboard.out_of_stock, color: 'red', highlight: true }] : []),
+        ]}
+        viewModes={[
+          { value: 'overview', label: 'Products', icon: Package },
+          { value: 'history', label: 'History', icon: History },
+        ]}
+        activeView={view}
+        onViewChange={setView}
+        loading={loading}
+        onRefresh={() => { fetchDashboard(); fetchProducts(); }}
+      />
+
+      {/* Product List or History */}
+      {view === 'overview' ? (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="p-3 w-10">
+                      <Checkbox checked={productSelection.allSelected} onCheckedChange={productSelection.toggleAll} />
+                    </th>
+                    <th className="text-left p-3 font-medium text-xs">
+                      <button onClick={() => toggleSort('name')} className="flex items-center gap-1 hover:text-primary">
+                        Product <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
+                    <th className="text-left p-3 font-medium text-xs hidden sm:table-cell">Category</th>
+                    <th className="text-right p-3 font-medium text-xs">
+                      <button onClick={() => toggleSort('price')} className="flex items-center gap-1 ml-auto hover:text-primary">
+                        Price <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
+                    <th className="text-right p-3 font-medium text-xs">
+                      <button onClick={() => toggleSort('stock')} className="flex items-center gap-1 ml-auto hover:text-primary">
+                        Stock <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
+                    <th className="text-right p-3 font-medium text-xs hidden sm:table-cell">Reserved</th>
+                    <th className="text-right p-3 font-medium text-xs hidden sm:table-cell">Awaiting Pay</th>
+                    <th className="text-center p-3 font-medium text-xs hidden sm:table-cell">Status</th>
+                    <th className="text-center p-3 font-medium text-xs">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pageProducts.map((p) => {
+                    const qty = p.inventory_quantity ?? 0;
+                    const reserved = p.reserved_quantity ?? 0;
+                    const awaitingPay = p.awaiting_payment_quantity ?? 0;
+                    const available = qty - reserved;
+                    const name = p.name || p.nombre || 'Unnamed';
+                    const cat = p.category || p.categoria || '\u2014';
+                    const price = p.price ?? p.precio ?? 0;
+                    const statusColor = qty <= 0 ? 'bg-red-100 text-red-700' : qty <= 10 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+                    const statusLabel = qty <= 0 ? 'Out' : qty <= 10 ? 'Low' : 'OK';
+
+                    return (
+                      <tr key={p.book_id || p.book_id} className="border-b hover:bg-muted/30">
+                        <td className="p-3">
+                          <Checkbox checked={productSelection.isSelected(p.book_id)}
+                            onCheckedChange={() => productSelection.toggle(p.book_id)} />
+                        </td>
+                        <td className="p-3">
+                          <p className="font-medium text-xs truncate max-w-[200px]">{name}</p>
+                          <p className="text-[10px] text-muted-foreground">{p.code || p.isbn || p.book_id || p.book_id}</p>
+                          <p className="text-[10px] text-muted-foreground sm:hidden">{cat}</p>
+                        </td>
+                        <td className="p-3 text-xs text-muted-foreground hidden sm:table-cell">{cat}</td>
+                        <td className="p-3 text-right text-xs font-mono">${price.toFixed(2)}</td>
+                        <td className="p-3 text-right text-xs font-mono font-bold">{qty}</td>
+                        <td className="p-3 text-right text-xs font-mono hidden sm:table-cell">{reserved}</td>
+                        <td className="p-3 text-right text-xs font-mono hidden sm:table-cell">
+                          {awaitingPay > 0 ? <span className="text-amber-600">{awaitingPay}</span> : <span className="text-muted-foreground">0</span>}
+                        </td>
+                        <td className="p-3 text-center hidden sm:table-cell">
+                          <Badge variant="outline" className={`text-[10px] ${statusColor}`}>{statusLabel}</Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAdjustProduct({ ...p, inventory_quantity: qty, name, book_id: p.book_id || p.book_id })}>
+                            <ArrowUpDown className="h-3 w-3 mr-1" /> <span className="hidden sm:inline">Adjust</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {pageProducts.length === 0 && (
+                    <tr><td colSpan={7} className="text-center text-muted-foreground text-sm py-8">No products found</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-3 border-t">
+              <TablePagination
+                page={productPagination.page} totalPages={productPagination.totalPages} totalItems={productPagination.totalItems}
+                pageSize={productPagination.pageSize} onPageChange={productPagination.setPage} onPageSizeChange={productPagination.setPageSize}
+                canPrev={productPagination.canPrev} canNext={productPagination.canNext}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Stock Movement History</CardTitle>
+            <CardDescription className="text-xs">Recent inventory changes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MovementHistory movements={dashboard?.recent_movements} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Adjust Dialog */}
+      {adjustProduct && (
+        <AdjustStockDialog product={adjustProduct} open={!!adjustProduct}
+          onClose={() => setAdjustProduct(null)} onSaved={onAdjusted} token={token} />
+      )}
+
+      {/* Bulk Action Bar */}
+      {productSelection.count > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-background border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3" data-testid="bulk-action-bar">
+          <span className="text-sm font-medium">{productSelection.count} selected</span>
+          <div className="h-5 w-px bg-border" />
+          <Button size="sm" variant="outline" onClick={() => setConfirmBulk('archive')} data-testid="bulk-archive-products-btn">
+            <Archive className="h-4 w-4 mr-1.5" /> Archive
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setConfirmBulk('unarchive')} data-testid="bulk-unarchive-products-btn">
+            Restore
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => setConfirmBulk('delete')} data-testid="bulk-delete-products-btn">
+            <Trash2 className="h-4 w-4 mr-1.5" /> Delete
+          </Button>
+          <Button size="sm" variant="ghost" onClick={productSelection.clear}>Cancel</Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!confirmBulk}
+        onClose={() => setConfirmBulk(null)}
+        onConfirm={async () => {
+          setBulkLoading(true);
+          try {
+            const ids = Array.from(productSelection.selected);
+            const endpointMap = { archive: 'bulk-archive', unarchive: 'bulk-unarchive', delete: 'bulk-delete' };
+            const endpoint = endpointMap[confirmBulk] || 'bulk-delete';
+            await axios.post(`${API_URL}/api/store/inventory/products/${endpoint}`,
+              { product_ids: ids }, { headers: { Authorization: `Bearer ${token}` } });
+            const labels = { archive: 'archived', unarchive: 'restored', delete: 'deleted' };
+            toast.success(`${ids.length} product(s) ${labels[confirmBulk] || 'processed'}`);
+            productSelection.clear();
+            setConfirmBulk(null);
+            fetchDashboard(); fetchProducts();
+          } catch (e) { toast.error(e.response?.data?.detail || 'Operation failed'); }
+          finally { setBulkLoading(false); }
+        }}
+        title={confirmBulk === 'archive'
+          ? `Archive ${productSelection.count} product(s)?`
+          : confirmBulk === 'unarchive'
+          ? `Restore ${productSelection.count} product(s)?`
+          : `Delete ${productSelection.count} product(s)?`}
+        description={confirmBulk === 'archive'
+          ? 'Products will be hidden from the store but data is preserved.'
+          : confirmBulk === 'unarchive'
+          ? 'Products will be restored and visible in the store again.'
+          : 'This will permanently remove the selected products. This cannot be undone.'}
+        variant={confirmBulk === 'delete' ? 'destructive' : confirmBulk === 'archive' ? 'warning' : 'default'}
+        confirmLabel={confirmBulk === 'archive' ? 'Archive' : confirmBulk === 'unarchive' ? 'Restore' : 'Delete Permanently'}
+        loading={bulkLoading}
+      />
+    </div>
+  );
+}

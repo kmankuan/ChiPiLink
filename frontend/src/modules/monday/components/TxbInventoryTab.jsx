@@ -1,0 +1,929 @@
+/**
+ * TXB (Textbook) Inventory Board — Enhanced Configuration
+ * Full bidirectional sync with Monday.com:
+ * - Board config + column mappings (items + subitems)
+ * - Full sync: push all textbooks to Monday.com
+ * - Stock column sync (app → Monday and Monday → app via webhook)
+ * - Grade-based grouping option
+ * - Webhook management for stock changes
+ */
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import {
+  Save, Package, RefreshCw, Users, Upload, Webhook, ArrowLeftRight,
+  CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine, Search,
+  Square, History
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API = RESOLVED_API_URL;
+
+const COLUMN_FIELDS = [
+  { key: 'code', label: 'Book Code', description: 'Text column for ISBN/code (used to find textbook)', required: true },
+  { key: 'name', label: 'Book Name', description: 'Text column for the book title' },
+  { key: 'grade', label: 'Grade', description: 'Text/dropdown for grade level' },
+  { key: 'publisher', label: 'Publisher', description: 'Text column for publisher name' },
+  { key: 'subject', label: 'Subject', description: 'Text column for subject/materia' },
+  { key: 'unit_price', label: 'Unit Price', description: 'Number column for price' },
+  { key: 'stock_quantity', label: 'Stock Quantity', description: 'Number column for current stock. Changes create pending approvals instead of direct updates.', required: true },
+  { key: 'status', label: 'Status', description: 'Status column (auto-set: In Stock / Low Stock / Out of Stock)' },
+];
+
+const SUBITEM_FIELDS = [
+  { key: 'quantity', label: 'Quantity Column', description: 'Number column for quantity ordered' },
+  { key: 'date', label: 'Date Column', description: 'Date column for order date' },
+];
+
+export default function TxbInventoryTab() {
+  const { t } = useTranslation();
+  const token = localStorage.getItem('auth_token');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [registeringWebhook, setRegisteringWebhook] = useState(false);
+  const [registeringCreateWh, setRegisteringCreateWh] = useState(false);
+  const [settingUpApproval, setSettingUpApproval] = useState(false);
+  const [syncingColumn, setSyncingColumn] = useState(null);
+  const [boardColumns, setBoardColumns] = useState([]);
+  const [subitemColumns, setSubitemColumns] = useState([]);
+  const [loadingColumns, setLoadingColumns] = useState(false);
+  const [config, setConfig] = useState({
+    board_id: '',
+    enabled: false,
+    group_id: '',
+    use_grade_groups: false,
+    column_mapping: {},
+    subitem_column_mapping: {},
+    webhook_config: {},
+    create_item_webhook_config: {},
+    last_full_sync: null,
+    sync_stats: {},
+    stock_approval_column_id: null,
+  });
+  const [syncHistory, setSyncHistory] = useState([]);
+
+  const fetchSyncHistory = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/sync-history?limit=20`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSyncHistory(data.history || []);
+      }
+    } catch { /* ignore */ }
+  }, [token]);
+
+  const fetchConfig = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory-config`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setConfig({
+          board_id: data.board_id || '',
+          enabled: data.enabled || false,
+          group_id: data.group_id || '',
+          use_grade_groups: data.use_grade_groups || false,
+          column_mapping: data.column_mapping || {},
+          subitem_column_mapping: data.subitem_column_mapping || {},
+          webhook_config: data.webhook_config || {},
+          create_item_webhook_config: data.create_item_webhook_config || {},
+          last_full_sync: data.last_full_sync || null,
+          sync_stats: data.sync_stats || {},
+          stock_approval_column_id: data.stock_approval_column_id || null,
+        });
+      }
+    } catch (e) {
+      console.error('Failed to fetch TXB inventory config:', e);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => { fetchConfig(); fetchSyncHistory(); }, [fetchConfig, fetchSyncHistory]);
+
+  const fetchBoardColumns = useCallback(async (boardId) => {
+    if (!boardId) return;
+    setLoadingColumns(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/boards/${boardId}/columns`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBoardColumns(data.columns || []);
+        setSubitemColumns(data.subitem_columns || []);
+      } else {
+        toast.error('Failed to load board columns');
+      }
+    } catch {
+      toast.error('Network error loading columns');
+    } finally {
+      setLoadingColumns(false);
+    }
+  }, [token]);
+
+  // Auto-load columns when board_id is set
+  useEffect(() => {
+    if (config.board_id && !loading) fetchBoardColumns(config.board_id);
+  }, [config.board_id, loading, fetchBoardColumns]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory-config`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      });
+      if (res.ok) {
+        toast.success('Configuration saved');
+      } else {
+        toast.error('Failed to save configuration');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const [syncProgress, setSyncProgress] = useState(null);
+
+  const handleFullSync = async () => {
+    setSyncing(true);
+    setSyncProgress(null);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/full-sync`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.detail || 'Sync failed');
+        setSyncing(false);
+        return;
+      }
+      if (data.status === 'already_running') {
+        toast.info('Full sync is already running');
+      } else {
+        toast.info('Full sync started...');
+      }
+      // Start polling
+      const poll = async () => {
+        try {
+          const sr = await fetch(`${API}/api/store/monday/txb-inventory/full-sync/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!sr.ok) { setSyncing(false); return; }
+          const status = await sr.json();
+          setSyncProgress(status);
+          if (status.status === 'completed') {
+            toast.success(`Synced! Created: ${status.created}, Updated: ${status.updated}, Failed: ${status.failed}`);
+            setSyncing(false);
+            fetchConfig();
+            fetchSyncHistory();
+          } else if (status.status === 'cancelled') {
+            toast.info(`Sync stopped. Processed ${status.processed}/${status.total} (Created: ${status.created}, Updated: ${status.updated})`);
+            setSyncing(false);
+            fetchConfig();
+            fetchSyncHistory();
+          } else if (status.status === 'error') {
+            toast.error(`Sync failed: ${status.error || 'Unknown error'}`);
+            setSyncing(false);
+            fetchSyncHistory();
+          } else {
+            setTimeout(poll, 1500);
+          }
+        } catch {
+          setSyncing(false);
+        }
+      };
+      setTimeout(poll, 1500);
+    } catch {
+      toast.error('Network error during sync');
+      setSyncing(false);
+    }
+  };
+
+  const handleCancelSync = async () => {
+    try {
+      await fetch(`${API}/api/store/monday/txb-inventory/full-sync/cancel`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.info('Cancelling sync...');
+    } catch {
+      toast.error('Failed to cancel sync');
+    }
+  };
+
+  const handleRegisterWebhook = async () => {
+    const webhookUrl = `${API}/api/store/monday/txb-inventory/webhook`;
+    setRegisteringWebhook(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/webhook/register`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook_url: webhookUrl }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Webhook registered successfully');
+        fetchConfig();
+      } else {
+        toast.error(data.detail || data.error || 'Failed to register webhook');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setRegisteringWebhook(false);
+    }
+  };
+
+  const handleUnregisterWebhook = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/webhook`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('Webhook removed');
+        fetchConfig();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  };
+
+  const handleRegisterCreateItemWebhook = async () => {
+    const webhookUrl = `${API}/api/store/monday/txb-inventory/webhook`;
+    setRegisteringCreateWh(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/create-item-webhook/register`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook_url: webhookUrl }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Create-item webhook registered');
+        fetchConfig();
+      } else {
+        toast.error(data.detail || data.error || 'Failed to register webhook');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setRegisteringCreateWh(false);
+    }
+  };
+
+  const handleUnregisterCreateItemWebhook = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/create-item-webhook`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('Create-item webhook removed');
+        fetchConfig();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  };
+
+  const handleSetupStockApproval = async () => {
+    setSettingUpApproval(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/setup-stock-approval`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.status === 'already_exists'
+          ? 'Stock Approval column already exists'
+          : 'Stock Approval column created on Monday.com');
+        fetchConfig();
+      } else {
+        toast.error(data.detail || 'Failed to create column');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setSettingUpApproval(false);
+    }
+  };
+
+  const handleSyncColumn = async (columnKey, label) => {
+    setSyncingColumn(columnKey);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/sync-column/${columnKey}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text().catch(() => '');
+        data = { detail: `Server returned non-JSON (${res.status}): ${text.slice(0, 100) || 'empty body'}` };
+      }
+
+      if (!res.ok) {
+        toast.error(data.detail || `Failed to sync ${label} (${res.status})`);
+        setSyncingColumn(null);
+        return;
+      }
+
+      if (data.status === 'already_running') {
+        toast.info(`${label} sync is already running`);
+      } else {
+        toast.info(`${label} sync started...`);
+      }
+
+      // Poll for completion
+      const poll = async () => {
+        try {
+          const sr = await fetch(`${API}/api/store/monday/txb-inventory/sync-column-status/${columnKey}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!sr.ok) { setSyncingColumn(null); return; }
+          const status = await sr.json();
+          if (status.status === 'completed') {
+            toast.success(`${label} synced! Updated: ${status.updated}, Skipped: ${status.skipped}, Failed: ${status.failed}`);
+            setSyncingColumn(null);
+          } else if (status.status === 'error') {
+            toast.error(`${label} sync failed: ${status.error || 'Unknown error'}`);
+            setSyncingColumn(null);
+          } else {
+            setTimeout(poll, 2000);
+          }
+        } catch {
+          setSyncingColumn(null);
+        }
+      };
+      setTimeout(poll, 2000);
+    } catch (err) {
+      toast.error(`Column sync error: ${err.message || 'Network error'}`);
+      setSyncingColumn(null);
+    }
+  };
+
+  const updateMapping = (key, value) => {
+    setConfig(prev => ({
+      ...prev,
+      column_mapping: { ...prev.column_mapping, [key]: value || null },
+    }));
+  };
+
+  const updateSubitemMapping = (key, value) => {
+    setConfig(prev => ({
+      ...prev,
+      subitem_column_mapping: { ...prev.subitem_column_mapping, [key]: value || null },
+    }));
+  };
+
+  if (loading) return <div className="animate-pulse h-40 bg-muted rounded-lg" />;
+
+  const hasWebhook = !!config.webhook_config?.webhook_id;
+  const hasCreateItemWh = !!config.create_item_webhook_config?.webhook_id;
+  const stats = config.sync_stats || {};
+
+  return (
+    <div className="space-y-4">
+      {/* Main Config */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base" data-testid="txb-title">
+                <Package className="h-4 w-4" />
+                Textbooks Inventory Board
+              </CardTitle>
+              <CardDescription className="text-xs mt-1">
+                Full bidirectional sync between your textbook inventory and Monday.com.
+                Stock changes propagate both ways.
+              </CardDescription>
+            </div>
+            <Badge variant={config.enabled ? 'default' : 'secondary'} className="text-[10px]" data-testid="txb-status-badge">
+              {config.enabled ? 'Enabled' : 'Disabled'}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Enable Textbooks Sync</Label>
+            <Switch
+              checked={config.enabled}
+              onCheckedChange={(v) => setConfig(prev => ({ ...prev, enabled: v }))}
+              data-testid="txb-enable-switch"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Textbooks Board ID</Label>
+            <Input
+              placeholder="e.g., 18397140920"
+              value={config.board_id || ''}
+              onChange={(e) => setConfig(prev => ({ ...prev, board_id: e.target.value }))}
+              data-testid="txb-board-id"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Default Group ID <span className="text-muted-foreground text-xs">(optional)</span></Label>
+            <Input
+              placeholder="e.g., topics"
+              value={config.group_id || ''}
+              onChange={(e) => setConfig(prev => ({ ...prev, group_id: e.target.value }))}
+              data-testid="txb-group-id"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Auto-create Grade Groups</Label>
+              <p className="text-[10px] text-muted-foreground">
+                Automatically create groups by grade (e.g., "Grade G5", "Grade G6")
+              </p>
+            </div>
+            <Switch
+              checked={config.use_grade_groups}
+              onCheckedChange={(v) => setConfig(prev => ({ ...prev, use_grade_groups: v }))}
+              data-testid="txb-grade-groups"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Full Sync */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Upload className="h-4 w-4" />
+            Full Sync
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Push all active textbooks to Monday.com. Creates new items or updates existing ones.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {config.last_full_sync && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="last-sync-info">
+              <Clock className="h-3 w-3" />
+              Last sync: {new Date(config.last_full_sync).toLocaleString()}
+              {stats.created !== undefined && (
+                <span className="ml-2">
+                  (Created: {stats.created}, Updated: {stats.updated}, Failed: {stats.failed})
+                </span>
+              )}
+            </div>
+          )}
+          {syncing && syncProgress && syncProgress.total > 0 && (
+            <div className="space-y-2" data-testid="sync-progress">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">
+                  Syncing {syncProgress.processed || 0}/{syncProgress.total} textbooks...
+                </span>
+                <span className="font-mono text-muted-foreground">
+                  {Math.round(((syncProgress.processed || 0) / syncProgress.total) * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 rounded-full overflow-hidden bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${((syncProgress.processed || 0) / syncProgress.total) * 100}%` }}
+                />
+              </div>
+              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                <span className="text-green-600">Created: {syncProgress.created || 0}</span>
+                <span className="text-blue-600">Updated: {syncProgress.updated || 0}</span>
+                {syncProgress.failed > 0 && <span className="text-red-600">Failed: {syncProgress.failed}</span>}
+              </div>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button
+              onClick={handleFullSync}
+              disabled={syncing || !config.enabled || !config.board_id}
+              className="flex-1 gap-2"
+              variant="outline"
+              data-testid="full-sync-btn"
+            >
+              {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {syncing ? 'Syncing all textbooks...' : 'Sync All Textbooks to Monday.com'}
+            </Button>
+            {syncing && (
+              <Button
+                onClick={handleCancelSync}
+                variant="destructive"
+                size="icon"
+                className="shrink-0"
+                data-testid="stop-sync-btn"
+                title="Stop sync"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          {(!config.enabled || !config.board_id) && (
+            <p className="text-[10px] text-amber-600 flex items-center gap-1">
+              <AlertCircle className="h-3 w-3" />
+              Enable the integration and set a board ID first
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Sync History */}
+      {syncHistory.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <History className="h-4 w-4" />
+              Sync History
+              <span className="text-[10px] text-muted-foreground ml-auto font-normal">{syncHistory.length} recent</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5 max-h-[240px] overflow-y-auto" data-testid="sync-history-panel">
+              {syncHistory.map((entry, i) => (
+                <div key={i} className="flex items-center gap-2 text-[11px] py-1.5 px-2.5 rounded-lg bg-muted/30" data-testid={`sync-history-entry-${i}`}>
+                  {entry.status === 'completed' ? (
+                    <CheckCircle className="h-3 w-3 text-green-600 shrink-0" />
+                  ) : entry.status === 'cancelled' ? (
+                    <Square className="h-3 w-3 text-amber-500 shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-3 w-3 text-red-500 shrink-0" />
+                  )}
+                  <span className="text-muted-foreground shrink-0">
+                    {new Date(entry.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}{' '}
+                    {new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className="font-medium capitalize">{entry.status}</span>
+                  {entry.total > 0 && (
+                    <span className="text-muted-foreground">
+                      {entry.processed || entry.total}/{entry.total}
+                      {entry.created > 0 && <span className="text-green-600 ml-1">+{entry.created}</span>}
+                      {entry.updated > 0 && <span className="text-blue-600 ml-1">~{entry.updated}</span>}
+                      {entry.failed > 0 && <span className="text-red-500 ml-1">!{entry.failed}</span>}
+                    </span>
+                  )}
+                  {entry.duration_s != null && (
+                    <span className="text-muted-foreground ml-auto shrink-0">{entry.duration_s}s</span>
+                  )}
+                  {entry.error && (
+                    <span className="text-red-500 truncate max-w-[200px]" title={entry.error}>{entry.error}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bidirectional Stock Sync */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ArrowLeftRight className="h-4 w-4" />
+            Bidirectional Stock Sync
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Stock changes in the app auto-update Monday.com. Register a webhook so Monday.com changes update the app too.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-lg p-3 flex items-center justify-between" style={{
+            background: hasWebhook ? '#ecfdf5' : '#fef3c7',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            <div className="flex items-center gap-2">
+              {hasWebhook ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <Webhook className="h-4 w-4 text-amber-600" />
+              )}
+              <div>
+                <p className="text-xs font-medium" style={{ color: hasWebhook ? '#065f46' : '#92400e' }}>
+                  {hasWebhook ? 'Webhook Active' : 'Webhook Not Registered'}
+                </p>
+                <p className="text-[10px]" style={{ color: hasWebhook ? '#047857' : '#b45309' }}>
+                  {hasWebhook
+                    ? `Monday.com → App sync enabled (ID: ${config.webhook_config.webhook_id})`
+                    : 'App → Monday.com works, but Monday.com → App requires a webhook'}
+                </p>
+              </div>
+            </div>
+            {hasWebhook ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleUnregisterWebhook}
+                className="text-xs text-red-500 hover:text-red-700"
+                data-testid="unregister-webhook-btn"
+              >
+                Remove
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={handleRegisterWebhook}
+                disabled={registeringWebhook || !config.enabled || !config.board_id}
+                className="text-xs gap-1"
+                data-testid="register-webhook-btn"
+              >
+                {registeringWebhook ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3" />}
+                Register
+              </Button>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            The webhook URL will be: <code className="bg-muted px-1 rounded text-[9px]">{API}/api/store/monday/txb-inventory/webhook</code>
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Monday.com → App: New Item Import */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Package className="h-4 w-4" />
+            Auto-Import New Items
+          </CardTitle>
+          <CardDescription className="text-xs">
+            When a new textbook is added directly on Monday.com, it will be automatically imported into the Sysbook catalog.
+            Column mappings above are used to extract name, code, grade, price, and stock.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-lg p-3 flex items-center justify-between" style={{
+            background: hasCreateItemWh ? '#ecfdf5' : '#fef3c7',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            <div className="flex items-center gap-2">
+              {hasCreateItemWh ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <Webhook className="h-4 w-4 text-amber-600" />
+              )}
+              <div>
+                <p className="text-xs font-medium" style={{ color: hasCreateItemWh ? '#065f46' : '#92400e' }}>
+                  {hasCreateItemWh ? 'Auto-Import Active' : 'Auto-Import Not Active'}
+                </p>
+                <p className="text-[10px]" style={{ color: hasCreateItemWh ? '#047857' : '#b45309' }}>
+                  {hasCreateItemWh
+                    ? `New items on Monday.com will be imported (ID: ${config.create_item_webhook_config.webhook_id})`
+                    : 'Register webhook to auto-import new items from Monday.com'}
+                </p>
+              </div>
+            </div>
+            {hasCreateItemWh ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleUnregisterCreateItemWebhook}
+                className="text-xs text-red-500 hover:text-red-700"
+                data-testid="unregister-create-wh-btn"
+              >
+                Remove
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={handleRegisterCreateItemWebhook}
+                disabled={registeringCreateWh || !config.enabled || !config.board_id}
+                className="text-xs gap-1"
+                data-testid="register-create-wh-btn"
+              >
+                {registeringCreateWh ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3" />}
+                Register
+              </Button>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Uses the same webhook endpoint. Imported items will use the column mappings above to extract product details.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Stock Approval Column */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CheckCircle className="h-4 w-4" />
+            Stock Approval Control
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Stock changes from Monday.com are now routed through Stock Movements for approval.
+            When stock is changed on the board, a pending adjustment is created. Approve or reject directly from Monday.com or the admin panel.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-lg p-3 flex items-center justify-between" style={{
+            background: config.stock_approval_column_id ? '#ecfdf5' : '#f0f4f8',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            <div className="flex items-center gap-2">
+              {config.stock_approval_column_id ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-slate-500" />
+              )}
+              <div>
+                <p className="text-xs font-medium" style={{ color: config.stock_approval_column_id ? '#065f46' : '#334155' }}>
+                  {config.stock_approval_column_id ? 'Stock Approval Column Active' : 'Stock Approval Not Configured'}
+                </p>
+                <p className="text-[10px]" style={{ color: config.stock_approval_column_id ? '#047857' : '#64748b' }}>
+                  {config.stock_approval_column_id
+                    ? `Column ID: ${config.stock_approval_column_id} — Statuses: Pending / Approved / Rejected`
+                    : 'Create a "Stock Approval" status column on Monday.com to enable approval workflow'}
+                </p>
+              </div>
+            </div>
+            {!config.stock_approval_column_id && (
+              <Button
+                size="sm"
+                onClick={handleSetupStockApproval}
+                disabled={settingUpApproval || !config.enabled || !config.board_id}
+                className="text-xs gap-1"
+                data-testid="setup-stock-approval-btn"
+              >
+                {settingUpApproval ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3" />}
+                Create Column
+              </Button>
+            )}
+          </div>
+          <div className="text-[10px] text-muted-foreground space-y-1">
+            <p><strong>How it works:</strong></p>
+            <p>1. Someone changes stock on Monday.com → A Stock Adjustment is created (status: Pending)</p>
+            <p>2. "Stock Approval" column on Monday.com is set to "Pending"</p>
+            <p>3. Set to "Approved" → inventory updates. Set to "Rejected" → stock reverts.</p>
+            <p>You can also approve/reject from the Stock Movements tab in the admin panel.</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Item Column Mapping */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Textbook Item Columns</CardTitle>
+              <CardDescription className="text-xs">
+                Match Monday.com board columns to textbook fields. Use the sync button to push a specific column.
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs gap-1 h-7"
+              disabled={!config.board_id || loadingColumns}
+              onClick={() => fetchBoardColumns(config.board_id)}
+              data-testid="refresh-columns-btn"
+            >
+              {loadingColumns ? <Loader2 className="h-3 w-3 animate-spin" /> : <Search className="h-3 w-3" />}
+              {boardColumns.length ? 'Refresh' : 'Load'} Columns
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {COLUMN_FIELDS.map(({ key, label, description, required }) => (
+            <div key={key} className="space-y-1">
+              <Label className="text-sm flex items-center gap-1">
+                {label}
+                {required && <span className="text-red-500 text-xs">*</span>}
+              </Label>
+              <div className="flex gap-2">
+                {boardColumns.length > 0 ? (
+                  <Select
+                    value={config.column_mapping[key] || ''}
+                    onValueChange={(v) => updateMapping(key, v === '__none__' ? null : v)}
+                    data-testid={`col-${key}`}
+                  >
+                    <SelectTrigger className="text-sm flex-1 h-9" data-testid={`col-${key}`}>
+                      <SelectValue placeholder="Select column..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">
+                        <span className="text-muted-foreground">— None —</span>
+                      </SelectItem>
+                      {boardColumns.map((col) => (
+                        <SelectItem key={col.id} value={col.id}>
+                          <span className="flex items-center gap-2">
+                            {col.title}
+                            <span className="text-[10px] text-muted-foreground">({col.type})</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    placeholder={`Monday.com column ID for ${key}`}
+                    value={config.column_mapping[key] || ''}
+                    onChange={(e) => updateMapping(key, e.target.value)}
+                    className="text-sm flex-1"
+                    data-testid={`col-${key}`}
+                  />
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 px-2.5 gap-1 text-xs shrink-0"
+                  disabled={!config.column_mapping[key] || !config.enabled || !config.board_id || syncingColumn === key}
+                  onClick={() => handleSyncColumn(key, label)}
+                  title={`Sync ${label} column to Monday.com`}
+                  data-testid={`sync-col-${key}`}
+                >
+                  {syncingColumn === key
+                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    : <ArrowUpFromLine className="h-3.5 w-3.5" />}
+                  Sync
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground">{description}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Subitem Column Mapping */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4" />
+            Subitem Columns (Student Orders)
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Each student order creates a subitem under the textbook. Name = "Student Name - Order Reference".
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {SUBITEM_FIELDS.map(({ key, label, description }) => (
+            <div key={key} className="space-y-1">
+              <Label className="text-sm">{label}</Label>
+              {subitemColumns.length > 0 ? (
+                <Select
+                  value={config.subitem_column_mapping[key] || ''}
+                  onValueChange={(v) => updateSubitemMapping(key, v === '__none__' ? null : v)}
+                >
+                  <SelectTrigger className="text-sm h-9" data-testid={`subcol-${key}`}>
+                    <SelectValue placeholder="Select subitem column..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">
+                      <span className="text-muted-foreground">-- None --</span>
+                    </SelectItem>
+                    {subitemColumns.map((col) => (
+                      <SelectItem key={col.id} value={col.id}>
+                        <span className="flex items-center gap-2">
+                          {col.title}
+                          <span className="text-[10px] text-muted-foreground">({col.type})</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  placeholder={`Monday.com subitem column ID for ${key}`}
+                  value={config.subitem_column_mapping[key] || ''}
+                  onChange={(e) => updateSubitemMapping(key, e.target.value)}
+                  className="text-sm"
+                  data-testid={`subcol-${key}`}
+                />
+              )}
+              <p className="text-[10px] text-muted-foreground">{description}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Button onClick={handleSave} disabled={saving} className="w-full gap-2" data-testid="txb-save-btn">
+        {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+        Save Configuration
+      </Button>
+    </div>
+  );
+}

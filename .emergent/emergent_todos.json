@@ -1,0 +1,26 @@
+[
+  {
+    "content": "A) TV Settings tab in Sport Admin (colors, trophy, bar style, messages, display toggles)",
+    "status": "completed"
+  },
+  {
+    "content": "A) Live Settings tab in Sport Admin (service tracking, technique tagging, reactions, timeouts)",
+    "status": "completed"
+  },
+  {
+    "content": "B) League Matrix H2H — already implemented and working in LeagueDetail.jsx",
+    "status": "completed"
+  },
+  {
+    "content": "B) Backend bug: approve_link function was split by analytics decorator — FIXED",
+    "status": "completed"
+  },
+  {
+    "content": "C) Player Link Request — UI already existed in PlayerProfile, backend fixed",
+    "status": "completed"
+  },
+  {
+    "content": "C) Admin approval UI for link requests added to Players tab",
+    "status": "completed"
+  }
+]

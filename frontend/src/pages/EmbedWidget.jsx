@@ -1,0 +1,1048 @@
+/**
+ * EmbedWidget — Standalone mini-dashboard rendered inside an iframe.
+ * Supports streamlined textbook ordering flow:
+ *   LaoPan Login → Link Student → Textbook Orders → Wallet
+ * Respects admin display config (hide URL, hide nav/footer, streamlined mode).
+ */
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { toast, Toaster } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+/* Force the widget to never exceed the iframe viewport */
+const widgetShellClass = "h-dvh w-full flex flex-col bg-background text-foreground overflow-hidden";
+import {
+  BookOpen, Users, Package, Bell, ChevronRight, ChevronLeft,
+  Loader2, LogIn, X, ShoppingCart, CheckCircle, Clock, AlertCircle,
+  Wallet, UserPlus, GraduationCap, LogOut, ClipboardList
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API_URL = RESOLVED_API_URL;
+
+/* ── Status helpers ── */
+const STATUS_MAP = {
+  draft: { label: 'Draft', color: 'bg-gray-100 text-gray-600', icon: Clock },
+  submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Package },
+  processing: { label: 'Processing', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
+  ready: { label: 'Ready', color: 'bg-green-100 text-green-700', icon: CheckCircle },
+  delivered: { label: 'Delivered', color: 'bg-green-200 text-green-800', icon: CheckCircle },
+  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: AlertCircle },
+};
+
+function StatusBadge({ status }) {
+  const s = STATUS_MAP[status] || STATUS_MAP.draft;
+  const Icon = s.icon;
+  return (
+    <Badge className={`${s.color} gap-1 text-[10px] font-medium`} data-testid={`status-${status}`}>
+      <Icon className="h-3 w-3" /> {s.label}
+    </Badge>
+  );
+}
+
+/* ── Loading Spinner ── */
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center py-6">
+      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+    </div>
+  );
+}
+
+const WIDGET_STATE_KEY = 'chipi_widget_state';
+
+/* ── State persistence helpers ── */
+function saveWidgetState(state) {
+  try { sessionStorage.setItem(WIDGET_STATE_KEY, JSON.stringify(state)); } catch {}
+}
+function loadWidgetState() {
+  try { return JSON.parse(sessionStorage.getItem(WIDGET_STATE_KEY) || '{}'); } catch { return {}; }
+}
+
+/* ── Login Prompt (LaoPan — new tab + server-side token relay) ── */
+function LoginPrompt() {
+  const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+
+  // Poll server for token once we have a session
+  useEffect(() => {
+    if (!sessionId) return;
+    let active = true;
+    const poll = setInterval(async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/api/widget/auth-session/${sessionId}/poll`);
+        if (!active) return;
+        if (data.status === 'ready' && data.token) {
+          clearInterval(poll);
+          localStorage.setItem('auth_token', data.token);
+          window.location.reload();
+        } else if (data.status === 'expired') {
+          clearInterval(poll);
+          setLoading(false);
+          setSessionId(null);
+        }
+      } catch { /* keep polling */ }
+    }, 2000);
+    return () => { active = false; clearInterval(poll); };
+  }, [sessionId]);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const { data: session } = await axios.post(`${API_URL}/api/widget/auth-session`);
+      const sid = session.session_id;
+      setSessionId(sid);
+
+      const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`, {
+        params: { redirect: `/auth/widget-complete?ws=${sid}` }
+      });
+      if (!data.auth_url) {
+        toast.error('OAuth not configured');
+        setLoading(false);
+        return;
+      }
+      window.open(data.auth_url, '_blank');
+    } catch (err) {
+      console.error('OAuth login error:', err);
+      toast.error('Error starting login');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-4 p-6 text-center" data-testid="widget-login-prompt">
+      <div className="p-4 rounded-full bg-primary/10">
+        <LogIn className="h-8 w-8 text-primary" />
+      </div>
+      <div>
+        <h3 className="text-base font-semibold">Welcome</h3>
+        <p className="text-xs text-muted-foreground mt-1">Log in with your LaoPan account to continue</p>
+      </div>
+      <Button onClick={handleLogin} disabled={loading} data-testid="widget-login-btn" className="gap-2">
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+        Log in with LaoPan
+      </Button>
+      {loading && (
+        <p className="text-xs text-muted-foreground animate-pulse">
+          Complete login in the new tab, then return here...
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ── Link Student View ── */
+function LinkStudentView({ token, onStudentLinked }) {
+  const [loading, setLoading] = useState(false);
+  const saved = loadWidgetState();
+  const [form, setForm] = useState(saved.linkStudentForm || { first_name: '', last_name: '', grade: '', school_id: '' });
+
+  // Persist form changes
+  const updateForm = (updates) => {
+    const next = { ...form, ...updates };
+    setForm(next);
+    saveWidgetState({ ...loadWidgetState(), linkStudentForm: next });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.first_name.trim() || !form.last_name.trim()) {
+      toast.error('Please enter the student name');
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/sysbook/access/students`, form, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Student linked successfully!');
+      // Clear saved form state on success
+      const ws = loadWidgetState();
+      delete ws.linkStudentForm;
+      saveWidgetState(ws);
+      onStudentLinked();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to link student');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-4 space-y-4" data-testid="widget-link-student">
+      <div className="text-center mb-2">
+        <div className="inline-flex p-3 rounded-full bg-primary/10 mb-2">
+          <UserPlus className="h-6 w-6 text-primary" />
+        </div>
+        <h3 className="text-sm font-semibold">Link Your Student</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Add your child's information to access textbook ordering
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">First Name</Label>
+            <Input
+              value={form.first_name}
+              onChange={(e) => updateForm({ first_name: e.target.value })}
+              className="h-8 text-xs"
+              placeholder="First name"
+              data-testid="widget-student-first-name"
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Last Name</Label>
+            <Input
+              value={form.last_name}
+              onChange={(e) => updateForm({ last_name: e.target.value })}
+              className="h-8 text-xs"
+              placeholder="Last name"
+              data-testid="widget-student-last-name"
+            />
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Grade</Label>
+          <Input
+            value={form.grade}
+            onChange={(e) => updateForm({ grade: e.target.value })}
+            className="h-8 text-xs"
+            placeholder="e.g. 3, K5"
+            data-testid="widget-student-grade"
+          />
+        </div>
+        <Button type="submit" className="w-full gap-2" disabled={loading} data-testid="widget-link-submit">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+          Link Student
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+/* ── Textbook Orders View (streamlined — full ordering inside widget) ── */
+function TextbookOrdersView({ token, students }) {
+  const savedState = loadWidgetState();
+  const [selectedStudent, setSelectedStudentRaw] = useState(() => {
+    if (savedState.selectedStudentId) {
+      return students.find(s =>
+        (s.student_id || s._id || s.id) === savedState.selectedStudentId
+      ) || null;
+    }
+    return null;
+  });
+  const [order, setOrder] = useState(null);
+  const [loadingOrder, setLoadingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(null);
+  const [cart, setCart] = useState({}); // {book_id: quantity}
+  const [submitting, setSubmitting] = useState(false);
+
+  const setSelectedStudent = (student) => {
+    setSelectedStudentRaw(student);
+    const sid = student ? (student.student_id || student._id || student.id) : null;
+    saveWidgetState({ ...loadWidgetState(), selectedStudentId: sid });
+  };
+
+  const selectStudent = useCallback(async (student) => {
+    setSelectedStudent(student);
+    setLoadingOrder(true);
+    setOrderError(null);
+    setCart({});
+    try {
+      const sid = student.student_id || student._id || student.id;
+      const { data } = await axios.get(`${API_URL}/api/sysbook/orders/student/${sid}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setOrder(data);
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || 'Failed to load textbooks';
+      console.error('[Widget] Failed to load textbooks:', msg, err);
+      setOrderError(msg);
+      toast.error(msg);
+    } finally {
+      setLoadingOrder(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    const approved = students.filter(s =>
+      s.enrollments?.some(e => e.status === 'approved')
+    );
+    if (approved.length === 1 && !selectedStudent) {
+      selectStudent(approved[0]);
+    }
+  }, [students, selectedStudent, selectStudent]);
+
+  const toggleBook = (bookId) => {
+    setCart(prev => {
+      const next = { ...prev };
+      if (next[bookId]) { delete next[bookId]; } else { next[bookId] = 1; }
+      return next;
+    });
+  };
+
+  const handleSubmitOrder = async () => {
+    const selectedItems = Object.entries(cart).filter(([_, q]) => q > 0);
+    if (selectedItems.length === 0) {
+      toast.error('Please select at least one textbook');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const sid = selectedStudent.student_id || selectedStudent._id || selectedStudent.id;
+      await axios.post(`${API_URL}/api/sysbook/orders/submit`, {
+        student_id: sid,
+        items: selectedItems.map(([book_id, quantity]) => ({ book_id, quantity }))
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Order submitted successfully!');
+      setCart({});
+      // Reload to show updated status
+      selectStudent(selectedStudent);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to submit order');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Student selection
+  if (!selectedStudent) {
+    const approved = students.filter(s =>
+      s.enrollments?.some(e => e.status === 'approved')
+    );
+    if (approved.length === 0) {
+      return (
+        <div className="text-center py-6 px-4" data-testid="widget-no-approved">
+          <Clock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm font-medium">Enrollment Pending</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Your student's enrollment is awaiting approval. Textbooks will be available once approved.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2 p-1" data-testid="widget-student-select">
+        <p className="text-xs text-muted-foreground px-1">Select a student:</p>
+        {approved.map((s, i) => {
+          const enrollment = s.enrollments?.find(e => e.status === 'approved');
+          return (
+            <button
+              key={i}
+              onClick={() => selectStudent(s)}
+              data-testid={`widget-student-${i}`}
+              className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors text-left"
+            >
+              <div>
+                <p className="text-xs font-medium">{s.full_name || `${s.first_name} ${s.last_name}`}</p>
+                <p className="text-[10px] text-muted-foreground">Grade {enrollment?.grade || '—'}</p>
+              </div>
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (loadingOrder) return <LoadingSpinner />;
+
+  const items = order?.items || [];
+  const orderedItems = items.filter(i => i.status === 'ordered');
+  const availableItems = items.filter(i => i.status === 'available');
+  const outOfStockItems = items.filter(i => i.status === 'out_of_stock');
+  const totalOrdered = orderedItems.reduce((s, i) => s + (i.price || 0) * (i.quantity_ordered || 0), 0);
+  const cartTotal = availableItems
+    .filter(i => cart[i.book_id])
+    .reduce((s, i) => s + (i.price || 0) * (cart[i.book_id] || 0), 0);
+  const cartCount = Object.values(cart).filter(q => q > 0).length;
+
+  return (
+    <div className="space-y-3 min-w-0" data-testid="widget-textbook-list">
+      <div className="flex items-center justify-between min-w-0">
+        {students.filter(s => s.enrollments?.some(e => e.status === 'approved')).length > 1 && (
+          <button onClick={() => { setSelectedStudent(null); setOrder(null); setCart({}); }}
+            className="flex items-center gap-1 text-xs text-primary hover:underline" data-testid="widget-back-btn">
+            <ChevronLeft className="h-3 w-3" /> Back
+          </button>
+        )}
+        <div className="flex-1 text-center">
+          <p className="text-xs font-semibold truncate px-2">
+            {selectedStudent.full_name || `${selectedStudent.first_name} ${selectedStudent.last_name}`}
+          </p>
+        </div>
+      </div>
+
+      {/* Submitted order summary */}
+      {order?.status === 'submitted' && orderedItems.length > 0 && (
+        <Card className="bg-green-50 border-green-200 p-2.5 overflow-hidden">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+            <div>
+              <p className="text-xs font-medium text-green-800">Order Submitted</p>
+              <p className="text-[10px] text-green-700">{orderedItems.length} books — ${totalOrdered.toFixed(2)}</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Available textbooks — selectable */}
+      {availableItems.length > 0 && (
+        <>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+            Select textbooks to order
+          </p>
+          {availableItems.map((item) => {
+            const isInCart = !!cart[item.book_id];
+            return (
+              <button
+                key={item.book_id}
+                onClick={() => toggleBook(item.book_id)}
+                data-testid={`widget-book-${item.book_id}`}
+                className={`w-full text-left p-2.5 rounded-lg border transition-all ${
+                  isInCart
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                    : 'border-border hover:border-primary/30 hover:bg-accent/30'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    isInCart ? 'bg-primary border-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {isInCart && <CheckCircle className="h-3.5 w-3.5 text-primary-foreground" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
+                    {item.book_code && <p className="text-[10px] text-muted-foreground">{item.book_code}</p>}
+                  </div>
+                  <span className="text-xs font-semibold text-primary ml-1 shrink-0">${item.price?.toFixed(2)}</span>
+                </div>
+              </button>
+            );
+          })}
+        </>
+      )}
+
+      {/* Already ordered */}
+      {orderedItems.length > 0 && (
+        <>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-2">Already Ordered</p>
+          {orderedItems.map((item) => (
+            <Card key={item.book_id} className="p-2.5 opacity-60" data-testid={`widget-ordered-${item.book_id}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.book_code}</p>
+                </div>
+                <Badge className="text-[9px] bg-green-100 text-green-700">Ordered</Badge>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+
+      {/* Out of stock items */}
+      {outOfStockItems.length > 0 && (
+        <>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-2">Out of Stock</p>
+          {outOfStockItems.map((item) => (
+            <Card key={item.book_id} className="p-2.5 opacity-40" data-testid={`widget-oos-${item.book_id}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium line-clamp-2">{item.book_name}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.book_code}</p>
+                </div>
+                <Badge className="text-[9px] bg-red-100 text-red-700">Out of Stock</Badge>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+
+      {items.length === 0 && !orderError && (
+        <div className="text-center py-6">
+          <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-xs text-muted-foreground">No textbooks available for this grade yet.</p>
+          {order?._debug && (
+            <p className="text-[9px] text-muted-foreground mt-2">
+              Grade: {order._debug.grade_searched} • Products found: {order._debug.catalog_books_found}
+            </p>
+          )}
+          <button onClick={() => selectedStudent && selectStudent(selectedStudent)}
+            className="text-[10px] text-primary hover:underline mt-2">
+            Refresh
+          </button>
+        </div>
+      )}
+
+      {orderError && (
+        <div className="text-center py-6" data-testid="widget-order-error">
+          <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-xs text-destructive font-medium mb-2">{orderError}</p>
+          <button onClick={() => selectStudent(selectedStudent)}
+            className="text-xs text-primary hover:underline">
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Submit Order Button */}
+      {cartCount > 0 && (
+        <div className="sticky bottom-0 bg-background pt-2 pb-1 border-t mt-2">
+          <Button className="w-full gap-2" onClick={handleSubmitOrder} disabled={submitting} data-testid="widget-submit-order">
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+            Order {cartCount} {cartCount === 1 ? 'book' : 'books'} — ${cartTotal.toFixed(2)}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Orders View ── */
+function OrdersView({ token, students }) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token || !students?.length) return;
+    const fetchOrders = async () => {
+      try {
+        const allOrders = [];
+        for (const s of students) {
+          const sid = s.student_id || s._id;
+          try {
+            const { data } = await axios.get(`${API_URL}/api/sysbook/orders/student/${sid}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (data && data.items?.length > 0) {
+              allOrders.push({ ...data, student_name: s.full_name || s.name });
+            }
+          } catch {}
+        }
+        setOrders(allOrders);
+      } catch {} finally { setLoading(false); }
+    };
+    fetchOrders();
+  }, [token, students]);
+
+  if (loading) return <LoadingSpinner />;
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-8" data-testid="widget-no-orders">
+        <ClipboardList className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+        <p className="text-xs text-muted-foreground">No orders yet. Select textbooks first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3" data-testid="widget-orders-list">
+      {orders.map((order) => {
+        const statusInfo = STATUS_MAP[order.status] || STATUS_MAP.draft;
+        const StatusIcon = statusInfo.icon;
+        const orderedItems = order.items.filter(i => i.status === 'ordered');
+        const availableItems = order.items.filter(i => i.status === 'available');
+
+        return (
+          <Card key={order.order_id} className="overflow-hidden" data-testid={`widget-order-${order.order_id}`}>
+            <div className="px-3 py-2 border-b bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold">{order.student_name}</p>
+                  <p className="text-[10px] text-muted-foreground">Grade {order.grade} • {order.year}</p>
+                </div>
+                <Badge className={`text-[9px] gap-1 ${statusInfo.color}`}>
+                  <StatusIcon className="h-3 w-3" /> {statusInfo.label}
+                </Badge>
+              </div>
+            </div>
+            <div className="p-2 space-y-1">
+              {orderedItems.length > 0 && (
+                <>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Ordered</p>
+                  {orderedItems.map(item => (
+                    <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-green-50 dark:bg-green-900/10">
+                      <span className="text-[11px] line-clamp-2 flex-1">{item.book_name}</span>
+                      <span className="text-[10px] font-medium text-green-700">${item.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {availableItems.length > 0 && (
+                <>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-1">Pending Selection</p>
+                  {availableItems.map(item => (
+                    <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-muted/30">
+                      <span className="text-[11px] line-clamp-2 flex-1">{item.book_name}</span>
+                      <span className="text-[10px] font-medium">${item.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {order.total_amount > 0 && (
+                <div className="flex justify-between pt-1 mt-1 border-t">
+                  <span className="text-[10px] font-semibold">Total</span>
+                  <span className="text-[10px] font-semibold">${order.total_amount.toFixed(2)}</span>
+                </div>
+              )}
+              {order.submitted_at && (
+                <p className="text-[9px] text-muted-foreground mt-1">
+                  Submitted: {new Date(order.submitted_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Wallet View ── */
+function WalletView({ token }) {
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [walletRes, txRes] = await Promise.all([
+          axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_URL}/api/wallet/transactions?limit=10`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        setWallet(walletRes.data?.wallet || walletRes.data);
+        setTransactions(txRes.data?.transactions || txRes.data || []);
+      } catch {
+        // Wallet may not exist yet
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [token]);
+
+  if (loading) return <LoadingSpinner />;
+
+  const balance = wallet?.balance_usd ?? wallet?.balance ?? wallet?.saldo ?? 0;
+
+  return (
+    <div className="space-y-3" data-testid="widget-wallet">
+      <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+        <CardContent className="p-4 text-center">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Balance</p>
+          <p className="text-2xl font-bold text-primary" data-testid="widget-wallet-balance">
+            ${typeof balance === 'number' ? balance.toFixed(2) : '0.00'}
+          </p>
+        </CardContent>
+      </Card>
+
+      {transactions.length > 0 && (
+        <>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Recent Transactions</p>
+          {transactions.slice(0, 5).map((tx, i) => (
+            <div key={i} className="flex items-center justify-between p-2 rounded-lg border text-xs" data-testid={`widget-tx-${i}`}>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{tx.description || tx.descripcion || tx.type || 'Transaction'}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {tx.created_at ? new Date(tx.created_at).toLocaleDateString() : ''}
+                </p>
+              </div>
+              <span className={`font-semibold ml-2 ${(tx.amount || tx.monto || 0) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {(tx.amount || tx.monto || 0) >= 0 ? '+' : ''}${Math.abs(tx.amount || tx.monto || 0).toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {transactions.length === 0 && !loading && (
+        <p className="text-xs text-center py-4 text-muted-foreground">No transactions yet.</p>
+      )}
+    </div>
+  );
+}
+
+/* ── Notifications View ── */
+function NotificationsView({ token }) {
+  const [notifs, setNotifs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/api/notifications`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => setNotifs(r.data?.notifications || r.data || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  if (loading) return <LoadingSpinner />;
+
+  return (
+    <div className="space-y-2" data-testid="widget-notifications">
+      {notifs.length === 0 ? (
+        <p className="text-xs text-center py-4 text-muted-foreground">No notifications.</p>
+      ) : (
+        notifs.slice(0, 15).map((n, i) => (
+          <div key={i} className={`p-2.5 rounded-lg border text-xs ${n.read ? 'opacity-60' : ''}`} data-testid={`widget-notif-${i}`}>
+            <p className="font-medium">{n.title}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{n.message || n.body}</p>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+/* ── Nav items for non-streamlined mode ── */
+const NAV_ITEMS = [
+  { key: 'textbook_orders', label: 'Textbooks', icon: BookOpen },
+  { key: 'my_students', label: 'Students', icon: Users },
+  { key: 'order_status', label: 'Orders', icon: Package },
+  { key: 'notifications', label: 'Alerts', icon: Bell },
+  { key: 'wallet', label: 'Wallet', icon: Wallet },
+];
+
+/* ── Main Widget Shell ── */
+export default function EmbedWidget() {
+  const { t } = useTranslation();
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [config, setConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [students, setStudents] = useState(null); // null = not loaded
+
+  // Force viewport constraints for iframe embedding
+  useEffect(() => {
+    const s = document.createElement('style');
+    s.textContent = 'html,body,#root{width:100%!important;max-width:100%!important;overflow-x:hidden!important;margin:0!important;padding:0!important;}';
+    document.head.appendChild(s);
+    return () => s.remove();
+  }, []);
+
+  // Restore persisted tab
+  const saved = loadWidgetState();
+  const [activeTab, setActiveTabRaw] = useState(saved.activeTab || 'textbook_orders');
+
+  const setActiveTab = (tab) => {
+    setActiveTabRaw(tab);
+    saveWidgetState({ ...loadWidgetState(), activeTab: tab });
+  };
+
+  const display = config?.display || {};
+  const streamlined = display.streamlined_flow !== false;
+  const hideNavbar = display.hide_navbar !== false;
+  const hideUrlBar = display.hide_url_bar !== false;
+
+  // Fetch config + auth
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { data: cfg } = await axios.get(`${API_URL}/api/widget/embed-config`);
+        setConfig(cfg);
+
+        const storedToken = localStorage.getItem('auth_token');
+        if (storedToken) {
+          try {
+            const { data: userData } = await axios.get(`${API_URL}/api/auth-v2/me`, {
+              headers: { Authorization: `Bearer ${storedToken}` }
+            });
+            setToken(storedToken);
+            setUser(userData);
+          } catch {
+            localStorage.removeItem('auth_token');
+          }
+        }
+      } catch {} finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, []);
+
+  // Listen for auth from new tab via localStorage storage event (same origin)
+  // Also handles postMessage relay from loader.js for backward compatibility
+  useEffect(() => {
+    const handleAuth = (newToken) => {
+      setToken(newToken);
+      axios.get(`${API_URL}/api/auth-v2/me`, {
+        headers: { Authorization: `Bearer ${newToken}` }
+      }).then(r => setUser(r.data)).catch(() => {});
+    };
+
+    // Storage event fires when another tab/window changes localStorage (same origin)
+    const onStorage = (e) => {
+      if (e.key === 'auth_token' && e.newValue && !token) {
+        handleAuth(e.newValue);
+      }
+    };
+
+    // PostMessage for loader.js relay (desktop popup fallback)
+    const onMessage = (e) => {
+      if (e.data?.type === 'chipi-auth-token' && e.data?.token) {
+        localStorage.setItem('auth_token', e.data.token);
+        handleAuth(e.data.token);
+      }
+      if (e.data?.type === 'chipi-auth-error') {
+        toast.error(e.data.error || 'Authentication failed');
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('message', onMessage);
+
+    // Also poll localStorage as fallback (some mobile browsers don't fire storage in iframes)
+    const poll = setInterval(() => {
+      if (!token) {
+        const stored = localStorage.getItem('auth_token');
+        if (stored) {
+          handleAuth(stored);
+          clearInterval(poll);
+        }
+      }
+    }, 1500);
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('message', onMessage);
+      clearInterval(poll);
+    };
+  }, [token]);
+
+  // Load students after auth
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API_URL}/api/sysbook/access/my-students`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => setStudents(r.data?.students || r.data || []))
+      .catch(() => setStudents([]));
+  }, [token]);
+
+  const closeWidget = () => {
+    window.parent.postMessage({ type: 'chipi-widget-close' }, '*');
+  };
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+    setStudents(null);
+    toast.success('Logged out');
+  }, []);
+
+  const reloadStudents = () => {
+    if (!token) return;
+    axios.get(`${API_URL}/api/sysbook/access/my-students`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => setStudents(r.data?.students || r.data || []))
+      .catch(() => setStudents([]));
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!config?.enabled) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background p-6 text-center">
+        <p className="text-sm text-muted-foreground">Widget is currently disabled.</p>
+      </div>
+    );
+  }
+
+  // ── Maintenance mode ──
+  const maintenance = config?.maintenance || {};
+  if (maintenance.active) {
+    return (
+      <div className={widgetShellClass} data-testid="widget-maintenance">
+        <Toaster position="top-center" richColors />
+        {!hideNavbar && (
+          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
+        )}
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 text-center">
+          <div className="p-4 rounded-full bg-amber-100">
+            <AlertCircle className="h-8 w-8 text-amber-600" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold">Under Maintenance</h3>
+            <p className="text-xs text-muted-foreground mt-2 max-w-[260px]">
+              {maintenance.message || "We're currently performing maintenance. Please check back shortly."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Not logged in ──
+  if (!token) {
+    return (
+      <div className={widgetShellClass} data-testid="widget-shell">
+        <Toaster position="top-center" richColors />
+        {!hideNavbar && (
+          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
+        )}
+        <div className="flex-1 overflow-hidden">
+          <LoginPrompt />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Streamlined flow ──
+  if (streamlined) {
+    const hasStudents = students && students.length > 0;
+    const studentsLoaded = students !== null;
+
+    return (
+      <div className={widgetShellClass} data-testid="widget-shell">
+        <Toaster position="top-center" richColors />
+        {!hideNavbar && (
+          <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
+        )}
+
+        {/* Streamlined nav: Textbooks + Wallet */}
+        <div className="flex border-b bg-card shrink-0" data-testid="widget-nav">
+          <button
+            onClick={() => setActiveTab('textbook_orders')}
+            data-testid="widget-tab-textbooks"
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors border-b-2 ${
+              activeTab === 'textbook_orders' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <BookOpen className="h-4 w-4" /> Textbooks
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            data-testid="widget-tab-orders"
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors border-b-2 ${
+              activeTab === 'orders' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <ClipboardList className="h-4 w-4" /> Orders
+          </button>
+          {config.features?.wallet?.enabled !== false && (
+            <button
+              onClick={() => setActiveTab('wallet')}
+              data-testid="widget-tab-wallet"
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors border-b-2 ${
+                activeTab === 'wallet' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Wallet className="h-4 w-4" /> Wallet
+            </button>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+          {activeTab === 'wallet' ? (
+            <WalletView token={token} />
+          ) : activeTab === 'orders' ? (
+            <OrdersView token={token} students={students || []} />
+          ) : !studentsLoaded ? (
+            <LoadingSpinner />
+          ) : !hasStudents ? (
+            <LinkStudentView token={token} onStudentLinked={reloadStudents} />
+          ) : (
+            <TextbookOrdersView token={token} students={students} />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Full feature mode (non-streamlined) ──
+  const enabledNav = NAV_ITEMS.filter(
+    item => config.features?.[item.key]?.enabled !== false
+  ).sort((a, b) => (config.features?.[a.key]?.order || 0) - (config.features?.[b.key]?.order || 0));
+
+  if (!config.features?.[activeTab]?.enabled && enabledNav.length > 0) {
+    setActiveTab(enabledNav[0].key);
+  }
+
+  return (
+    <div className={widgetShellClass} data-testid="widget-shell">
+      <Toaster position="top-center" richColors />
+
+      {!hideNavbar && (
+        <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
+      )}
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Tab Navigation */}
+        <div className="flex border-b bg-card shrink-0" data-testid="widget-nav">
+          {enabledNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveTab(item.key)}
+                data-testid={`widget-tab-${item.key}`}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors border-b-2 ${
+                  isActive ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+          {activeTab === 'textbook_orders' && students && (
+            <TextbookOrdersView token={token} students={students} />
+          )}
+          {activeTab === 'wallet' && <WalletView token={token} />}
+          {activeTab === 'notifications' && <NotificationsView token={token} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Widget Header ── */
+function WidgetHeader({ user, hideUrl, onClose, onLogout }) {
+  return (
+    <div className="flex items-center justify-between px-3 py-2 border-b bg-card shrink-0 min-w-0" data-testid="widget-header">
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+          <BookOpen className="h-3.5 w-3.5 text-primary-foreground" />
+        </div>
+        <span className="text-sm font-bold">ChiPi Link</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {user && (
+          <span className="text-[10px] text-muted-foreground mr-1 truncate max-w-[120px]">
+            {user.display_name || user.nombre || user.email?.split('@')[0]}
+          </span>
+        )}
+        {user && onLogout && (
+          <button onClick={onLogout} className="p-1 rounded hover:bg-muted transition-colors" data-testid="widget-logout-btn" title="Logout">
+            <LogOut className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        )}
+        <button onClick={onClose} className="p-1 rounded hover:bg-muted transition-colors" data-testid="widget-close-btn">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,592 @@
+"""
+Store Module - Servicio de Import Masiva (Bulk Import)
+Permite importar estudiantes y productos desde datos copiados de Google Sheets
+"""
+from typing import List, Optional, Dict, Any
+from datetime import datetime, timezone
+import uuid
+import logging
+import re
+
+from core.database import db
+
+logger = logging.getLogger(__name__)
+
+
+class BulkImportService:
+    """
+    Service for importar datos desde texto pegado (copy/paste de Google Sheets).
+    Soporta formato TSV (tab-separated) that is el formato nativo de Google Sheets.
+    """
+    
+    def parse_tsv(self, raw_text: str, has_headers: bool = True) -> Dict:
+        """
+        Parsear texto en formato TSV (tab-separated values).
+        
+        Args:
+            raw_text: Texto pegado desde Google Sheets
+            has_headers: Si la primera fila contiene los encabezados
+        
+        Returns:
+            {
+                "headers": [...] o None,
+                "rows": [[...], [...], ...],
+                "total_rows": int,
+                "total_columns": int
+            }
+        """
+        if not raw_text or not raw_text.strip():
+            return {"headers": None, "rows": [], "total_rows": 0, "total_columns": 0}
+        
+        lines = raw_text.strip().split('\n')
+        rows = []
+        
+        for line in lines:
+            # Splitear por tab
+            cells = line.split('\t')
+            # Clean espacios extras
+            cells = [cell.strip() for cell in cells]
+            if any(cell for cell in cells):  # Si hay al menos una celda no empty
+                rows.append(cells)
+        
+        if not rows:
+            return {"headers": None, "rows": [], "total_rows": 0, "total_columns": 0}
+        
+        headers = None
+        data_rows = rows
+        
+        if has_headers and len(rows) > 0:
+            headers = rows[0]
+            data_rows = rows[1:]
+        
+        max_cols = max(len(row) for row in rows) if rows else 0
+        
+        return {
+            "headers": headers,
+            "rows": data_rows,
+            "total_rows": len(data_rows),
+            "total_columns": max_cols
+        }
+    
+    async def preview_estudiantes(
+        self,
+        raw_text: str,
+        column_mapping: Dict[str, int],
+        grado_default: str = None
+    ) -> Dict:
+        """
+        Previsualizar datos de estudiantes antes de importar.
+        
+        Args:
+            raw_text: Texto pegado desde Google Sheets
+            column_mapping: Mapeo de campos a indexs de columna
+                {
+                    "numero_estudiante": 0,  # Columna A
+                    "full_name": 1,    # Columna B
+                    "grade": 2,              # Columna C (opcional si hay grado_default)
+                    "seccion": 3             # Columna D (opcional)
+                }
+            grado_default: Grado by default si no is en los datos
+        
+        Returns:
+            Preview con validaciones
+        """
+        parsed = self.parse_tsv(raw_text, has_headers=True)
+        
+        if not parsed["rows"]:
+            return {
+                "success": False,
+                "error": "No se encontraron datos para importar",
+                "preview": []
+            }
+        
+        preview = []
+        errores = []
+        duplicados = []
+        numeros_vistos = set()
+        
+        for idx, row in enumerate(parsed["rows"]):
+            try:
+                # Extract datos according to mapeo
+                numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
+                full_name = self._get_cell(row, column_mapping.get("full_name"))
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                seccion = self._get_cell(row, column_mapping.get("seccion"))
+                
+                # Validaciones
+                if not numero:
+                    errores.append({"fila": idx + 2, "error": "Number de estudiante empty"})
+                    continue
+                
+                if not full_name:
+                    errores.append({"fila": idx + 2, "error": "Nombre empty"})
+                    continue
+                
+                if not grade:
+                    errores.append({"fila": idx + 2, "error": "Grado empty"})
+                    continue
+                
+                # Verify duplicados en esta import
+                if numero in numeros_vistos:
+                    duplicados.append({"fila": idx + 2, "numero": numero})
+                    continue
+                numeros_vistos.add(numero)
+                
+                # Verify si already exists en DB
+                existente = await db.synced_students.find_one(
+                    {"numero_estudiante": numero}
+                )
+                
+                # Separar nombre y apellido
+                partes = full_name.split(" ", 1)
+                nombre = partes[0]
+                apellido = partes[1] if len(partes) > 1 else ""
+                
+                preview.append({
+                    "fila": idx + 2,
+                    "numero_estudiante": numero,
+                    "full_name": full_name,
+                    "name": nombre,
+                    "apellido": apellido,
+                    "grade": str(grade),
+                    "seccion": seccion,
+                    "ya_existe": existente is not None,
+                    "accion": "actualizar" if existente else "crear"
+                })
+                
+            except Exception as e:
+                errores.append({"fila": idx + 2, "error": str(e)})
+        
+        return {
+            "success": True,
+            "headers_detectados": parsed["headers"],
+            "preview": preview,
+            "resumen": {
+                "total_filas": len(parsed["rows"]),
+                "validos": len(preview),
+                "nuevos": len([p for p in preview if not p["ya_existe"]]),
+                "actualizaciones": len([p for p in preview if p["ya_existe"]]),
+                "errores": len(errores),
+                "duplicados": len(duplicados)
+            },
+            "errores": errores,
+            "duplicados": duplicados
+        }
+    
+    async def importar_estudiantes(
+        self,
+        raw_text: str,
+        column_mapping: Dict[str, int],
+        grado_default: str = None,
+        hoja_name: str = "Import Manual",
+        actualizar_existentes: bool = True,
+        admin_id: str = None
+    ) -> Dict:
+        """
+        Importar estudiantes desde texto pegado.
+        """
+        parsed = self.parse_tsv(raw_text, has_headers=True)
+        
+        if not parsed["rows"]:
+            return {
+                "success": False,
+                "error": "No se encontraron datos para importar"
+            }
+        
+        now = datetime.now(timezone.utc).isoformat()
+        import_id = f"import_{uuid.uuid4().hex[:12]}"
+        
+        resultados = {
+            "success": True,
+            "import_id": import_id,
+            "creados": 0,
+            "actualizados": 0,
+            "omitidos": 0,
+            "errores": []
+        }
+        
+        numeros_procesados = set()
+        
+        for idx, row in enumerate(parsed["rows"]):
+            try:
+                numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
+                full_name = self._get_cell(row, column_mapping.get("full_name"))
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                seccion = self._get_cell(row, column_mapping.get("seccion"))
+                
+                if not numero or not full_name or not grade:
+                    resultados["errores"].append({
+                        "fila": idx + 2,
+                        "error": "Datos incompletos"
+                    })
+                    continue
+                
+                if numero in numeros_procesados:
+                    resultados["omitidos"] += 1
+                    continue
+                numeros_procesados.add(numero)
+                
+                # Separar nombre y apellido
+                partes = full_name.split(" ", 1)
+                nombre = partes[0]
+                apellido = partes[1] if len(partes) > 1 else ""
+                
+                existente = await db.synced_students.find_one(
+                    {"numero_estudiante": numero}
+                )
+                
+                estudiante_data = {
+                    "numero_estudiante": numero,
+                    "full_name": full_name,
+                    "name": nombre,
+                    "apellido": apellido,
+                    "grade": str(grade),
+                    "seccion": seccion,
+                    "sheet_name": sheet_name,
+                    "fila_numero": idx + 2,
+                    "estado": "active",
+                    "import_id": import_id,
+                    "fecha_sync": now,
+                    "updated_at": now
+                }
+                
+                if existente:
+                    if actualizar_existentes and not existente.get("override_local"):
+                        await db.synced_students.update_one(
+                            {"sync_id": existente["sync_id"]},
+                            {"$set": estudiante_data}
+                        )
+                        resultados["actualizados"] += 1
+                    else:
+                        resultados["omitidos"] += 1
+                else:
+                    estudiante_data["sync_id"] = f"sync_{uuid.uuid4().hex[:12]}"
+                    estudiante_data["sheet_id"] = "manual_import"
+                    estudiante_data["created_at"] = now
+                    estudiante_data["override_local"] = False
+                    
+                    await db.synced_students.insert_one(estudiante_data)
+                    resultados["creados"] += 1
+                    
+            except Exception as e:
+                resultados["errores"].append({
+                    "fila": idx + 2,
+                    "error": str(e)
+                })
+        
+        # Registrar la import
+        import_log = {
+            "import_id": import_id,
+            "tipo": "estudiantes",
+            "admin_id": admin_id,
+            "sheet_name": sheet_name,
+            "grado_default": grado_default,
+            "resultados": {
+                "creados": resultados["creados"],
+                "actualizados": resultados["actualizados"],
+                "omitidos": resultados["omitidos"],
+                "errores": len(resultados["errores"])
+            },
+            "fecha": now
+        }
+        await db.import_logs.insert_one(import_log)
+        
+        return resultados
+    
+    async def preview_books(
+        self,
+        raw_text: str,
+        column_mapping: Dict[str, int],
+        catalogo_id: str = None,
+        grado_default: str = None
+    ) -> Dict:
+        """
+        Preview book/product data before importing.
+        
+        Args:
+            raw_text: Texto pegado desde Google Sheets
+            column_mapping: Mapeo de campos a indexs de columna
+                {
+                    "code": 0,           # Product code
+                    "name": 1,           # Product name
+                    "price": 2,           # Precio
+                    "publisher": 3,        # Editorial (opcional)
+                    "isbn": 4,             # ISBN (opcional)
+                    "grade": 5,            # Grado (opcional si hay default)
+                    "subject": 6           # Materia (opcional)
+                }
+        """
+        parsed = self.parse_tsv(raw_text, has_headers=True)
+        
+        if not parsed["rows"]:
+            return {
+                "success": False,
+                "error": "No se encontraron datos para importar",
+                "preview": []
+            }
+        
+        preview = []
+        errores = []
+        codigos_vistos = set()
+        
+        for idx, row in enumerate(parsed["rows"]):
+            try:
+                codigo = self._get_cell(row, column_mapping.get("code"))
+                nombre = self._get_cell(row, column_mapping.get("name"))
+                precio_str = self._get_cell(row, column_mapping.get("price"))
+                editorial = self._get_cell(row, column_mapping.get("publisher"))
+                isbn = self._get_cell(row, column_mapping.get("isbn"))
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                materia = self._get_cell(row, column_mapping.get("subject"))
+                
+                # Validaciones
+                if not codigo:
+                    errores.append({"fila": idx + 2, "error": "Code empty"})
+                    continue
+                
+                if not nombre:
+                    errores.append({"fila": idx + 2, "error": "Nombre empty"})
+                    continue
+                
+                # Parseprecio
+                precio = self._parse_precio(precio_str)
+                if precio is None:
+                    errores.append({"fila": idx + 2, "error": f"Precio invalid: {precio_str}"})
+                    continue
+                
+                # Verify duplicados
+                if codigo in codigos_vistos:
+                    errores.append({"fila": idx + 2, "error": f"Code duplicado: {codigo}"})
+                    continue
+                codigos_vistos.add(codigo)
+                
+                # Verify si already exists
+                existente = await db.store_products.find_one({"code": codigo})
+                
+                preview.append({
+                    "fila": idx + 2,
+                    "code": codigo,
+                    "name": nombre,
+                    "price": precio,
+                    "publisher": editorial,
+                    "isbn": isbn,
+                    "grade": grade,
+                    "subject": materia,
+                    "ya_existe": existente is not None,
+                    "accion": "actualizar" if existente else "crear"
+                })
+                
+            except Exception as e:
+                errores.append({"fila": idx + 2, "error": str(e)})
+        
+        return {
+            "success": True,
+            "headers_detectados": parsed["headers"],
+            "preview": preview,
+            "resumen": {
+                "total_filas": len(parsed["rows"]),
+                "validos": len(preview),
+                "nuevos": len([p for p in preview if not p["ya_existe"]]),
+                "actualizaciones": len([p for p in preview if p["ya_existe"]]),
+                "errores": len(errores)
+            },
+            "errores": errores
+        }
+    
+    async def import_books(
+        self,
+        raw_text: str,
+        column_mapping: Dict[str, int],
+        catalogo_id: str = None,
+        grado_default: str = None,
+        actualizar_existentes: bool = True,
+        admin_id: str = None
+    ) -> Dict:
+        """
+        Import books/products from pasted text.
+        """
+        parsed = self.parse_tsv(raw_text, has_headers=True)
+        
+        if not parsed["rows"]:
+            return {
+                "success": False,
+                "error": "No se encontraron datos para importar"
+            }
+        
+        now = datetime.now(timezone.utc).isoformat()
+        import_id = f"import_{uuid.uuid4().hex[:12]}"
+        
+        resultados = {
+            "success": True,
+            "import_id": import_id,
+            "creados": 0,
+            "actualizados": 0,
+            "omitidos": 0,
+            "errores": []
+        }
+        
+        codigos_procesados = set()
+        
+        for idx, row in enumerate(parsed["rows"]):
+            try:
+                codigo = self._get_cell(row, column_mapping.get("code"))
+                nombre = self._get_cell(row, column_mapping.get("name"))
+                precio_str = self._get_cell(row, column_mapping.get("price"))
+                editorial = self._get_cell(row, column_mapping.get("publisher"))
+                isbn = self._get_cell(row, column_mapping.get("isbn"))
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                materia = self._get_cell(row, column_mapping.get("subject"))
+                
+                if not codigo or not nombre:
+                    resultados["errores"].append({
+                        "fila": idx + 2,
+                        "error": "Datos incompletos"
+                    })
+                    continue
+                
+                precio = self._parse_precio(precio_str)
+                if precio is None:
+                    resultados["errores"].append({
+                        "fila": idx + 2,
+                        "error": f"Precio invalid: {precio_str}"
+                    })
+                    continue
+                
+                if codigo in codigos_procesados:
+                    resultados["omitidos"] += 1
+                    continue
+                codigos_procesados.add(codigo)
+                
+                existente = await db.store_products.find_one({"code": codigo})
+                
+                book_data = {
+                    "code": codigo,
+                    "name": nombre,
+                    "price": precio,
+                    "publisher": editorial,
+                    "isbn": isbn,
+                    "subject": materia,
+                    "category": "texto_escolar",
+                    "active": True,
+                    "estado_disponibilidad": "disponible",
+                    "import_id": import_id,
+                    "updated_at": now
+                }
+                
+                # Handle grades (can be one or multiple)
+                if grade:
+                    if "," in str(grade):
+                        book_data["grades"] = [g.strip() for g in str(grade).split(",")]
+                    else:
+                        book_data["grade"] = str(grade)
+                        book_data["grades"] = [str(grade)]
+                
+                if catalogo_id:
+                    book_data["catalogo_id"] = catalogo_id
+                
+                if existente:
+                    if actualizar_existentes:
+                        await db.store_products.update_one(
+                            {"book_id": existente["book_id"]},
+                            {"$set": book_data}
+                        )
+                        resultados["actualizados"] += 1
+                    else:
+                        resultados["omitidos"] += 1
+                else:
+                    book_data["book_id"] = f"book_{uuid.uuid4().hex[:12]}"
+                    book_data["created_at"] = now
+                    book_data["inventory_quantity"] = 0
+                    book_data["cantidad_reservada"] = 0
+                    
+                    await db.store_products.insert_one(book_data)
+                    resultados["creados"] += 1
+                    
+            except Exception as e:
+                resultados["errores"].append({
+                    "fila": idx + 2,
+                    "error": str(e)
+                })
+        
+        # Registrar la import
+        import_log = {
+            "import_id": import_id,
+            "tipo": "books",
+            "admin_id": admin_id,
+            "catalogo_id": catalogo_id,
+            "grado_default": grado_default,
+            "resultados": {
+                "creados": resultados["creados"],
+                "actualizados": resultados["actualizados"],
+                "omitidos": resultados["omitidos"],
+                "errores": len(resultados["errores"])
+            },
+            "fecha": now
+        }
+        await db.import_logs.insert_one(import_log)
+        
+        return resultados
+    
+    async def get_import_history(self, tipo: str = None, limit: int = 20) -> List[Dict]:
+        """Get historial de importaciones"""
+        query = {}
+        if tipo:
+            query["tipo"] = tipo
+        
+        cursor = db.import_logs.find(
+            query,
+            {"_id": 0}
+        ).sort("fecha", -1).limit(limit)
+        
+        return await cursor.to_list(length=limit)
+    
+    async def get_available_grades(self) -> List[str]:
+        """Get lista de grados uniques de estudiantes importados"""
+        pipeline = [
+            {"$match": {"estado": "active"}},
+            {"$group": {"_id": "$grado"}},
+            {"$sort": {"_id": 1}}
+        ]
+        result = await db.synced_students.aggregate(pipeline).to_list(50)
+        return [r["_id"] for r in result if r["_id"]]
+    
+    def _get_cell(self, row: List[str], index: Optional[int]) -> Optional[str]:
+        """Get celda de una fila de forma segura"""
+        if index is None or index < 0:
+            return None
+        if index >= len(row):
+            return None
+        value = row[index]
+        return value if value else None
+    
+    def _parse_precio(self, precio_str: str) -> Optional[float]:
+        """Parsear string de precio a float"""
+        if not precio_str:
+            return 0.0
+        
+        # Remove symbols de moneda y espacios
+        clean = re.sub(r'[^\d.,]', '', str(precio_str))
+        
+        if not clean:
+            return 0.0
+        
+        # Manejar formato con coma como decimal (europeo)
+        if ',' in clean and '.' not in clean:
+            clean = clean.replace(',', '.')
+        elif ',' in clean and '.' in clean:
+            # Formato: 1,234.56 o 1.234,56
+            if clean.rfind(',') > clean.rfind('.'):
+                # Formato europeo: 1.234,56
+                clean = clean.replace('.', '').replace(',', '.')
+            else:
+                # Formato americano: 1,234.56
+                clean = clean.replace(',', '')
+        
+        try:
+            return float(clean)
+        except ValueError:
+            return None
+
+
+# Singleton
+bulk_import_service = BulkImportService()

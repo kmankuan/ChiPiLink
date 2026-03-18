@@ -1,0 +1,1260 @@
+/**
+ * Ping Pong TV Display - Live Scoreboard System
+ * Displays real-time match scores on TVs, with WebSocket synchronization
+ * 
+ * Modes:
+ * - single: Single match view (large scoreboard)
+ * - multi: Multiple matches grid view
+ * - dashboard: Full dashboard with rankings, upcoming matches, etc.
+ */
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
+import { 
+  Monitor, Grid3X3, LayoutDashboard, Maximize2, Minimize2, 
+  Volume2, VolumeX, Settings, Wifi, WifiOff, RefreshCw,
+  Trophy, Users, Clock, Zap
+} from 'lucide-react';
+import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
+import { useTranslation } from 'react-i18next';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API_URL = RESOLVED_API_URL || '';
+const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+
+// Sound effects URLs (can be customized)
+const SOUNDS = {
+  point: '/sounds/point.mp3',
+  setWin: '/sounds/set-win.mp3',
+  matchPoint: '/sounds/match-point.mp3',
+  deuce: '/sounds/deuce.mp3',
+  gameOver: '/sounds/game-over.mp3',
+};
+
+export default function PingPongTV() {
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  // Display mode: single, multi, dashboard, tournament
+  const [mode, setMode] = useState(searchParams.get('mode') || 'dashboard');
+  const [matchId, setMatchId] = useState(searchParams.get('match'));
+  const [tournamentId, setTournamentId] = useState(searchParams.get('tournament'));
+  
+  // WebSocket state
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  
+  // Data state
+  const [currentMatch, setCurrentMatch] = useState(null);
+  const [activeMatches, setActiveMatches] = useState([]);
+  const [rankings, setRankings] = useState([]);
+  const [recentResults, setRecentResults] = useState([]);
+  const [upcomingMatches, setUpcomingMatches] = useState([]);
+  
+  // Arena tournament state
+  const [arenaTournament, setArenaTournament] = useState(null);
+  const [arenaMatches, setArenaMatches] = useState([]);
+  
+  // Sponsors state
+  const [sponsors, setSponsors] = useState({
+    header_left: [],
+    header_right: [],
+    banner_top: [],
+    banner_bottom: [],
+    sidebar_left: [],
+    sidebar_right: []
+  });
+  const [sponsorLayout, setSponsorLayout] = useState(null);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  
+  // UI state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  
+  // Animation states
+  const [pointAnimation, setPointAnimation] = useState(null);
+  const [specialEvent, setSpecialEvent] = useState(null);
+  
+  // Audio refs
+  const audioRef = useRef(null);
+
+  // ============== WEBSOCKET CONNECTION ==============
+  
+  const connectWebSocket = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    
+    const wsUrl = PINPANCLUB_WS.liveTv(matchId);
+    
+    console.log('Connecting to WebSocket:', wsUrl);
+    
+    try {
+      wsRef.current = new WebSocket(wsUrl);
+      
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+        setWsConnected(true);
+        setConnectionAttempts(0);
+      };
+      
+      wsRef.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        handleWebSocketMessage(data);
+      };
+      
+      wsRef.current.onclose = () => {
+        console.log('WebSocket disconnected');
+        setWsConnected(false);
+        
+        // Attempt reconnection with exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
+        reconnectTimeoutRef.current = setTimeout(() => {
+          setConnectionAttempts(prev => prev + 1);
+          connectWebSocket();
+        }, delay);
+      };
+      
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    } catch (error) {
+      console.error('Failed to connect WebSocket:', error);
+    }
+  }, [matchId, connectionAttempts]);
+
+  const handleWebSocketMessage = useCallback((data) => {
+    console.log('WS Message:', data.type);
+    setLastUpdate(new Date());
+    
+    switch (data.type) {
+      case 'connected':
+        console.log('Connected as:', data.client_id);
+        break;
+        
+      case 'match_state':
+        setCurrentMatch(data.match);
+        break;
+        
+      case 'active_matches':
+        setActiveMatches(data.matches || []);
+        break;
+        
+      case 'point_scored':
+        handlePointScored(data);
+        break;
+        
+      case 'point_undone':
+        setCurrentMatch(data.match);
+        if (mode === 'single') {
+          triggerAnimation('undo');
+        }
+        break;
+        
+      case 'match_started':
+        setCurrentMatch(data.match);
+        triggerSpecialEvent('match_start');
+        break;
+        
+      case 'match_paused':
+        triggerSpecialEvent('pause');
+        break;
+        
+      case 'timeout':
+        triggerSpecialEvent('timeout', data);
+        break;
+        
+      case 'ping':
+        // Respond to keep connection alive
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({ type: 'pong' }));
+        }
+        break;
+      
+      case 'arena_update':
+        // Tournament update from Arena
+        if (data.tournament) setArenaTournament(data.tournament);
+        if (data.matches) setArenaMatches(data.matches);
+        break;
+        
+      default:
+        console.log('Unknown message type:', data.type);
+    }
+  }, [mode]);
+
+  const handlePointScored = (data) => {
+    setCurrentMatch(data.match);
+    
+    // Update in active matches list
+    setActiveMatches(prev => prev.map(m => 
+      m.match_id === data.match.match_id ? data.match : m
+    ));
+    
+    // Trigger point animation
+    triggerAnimation('point', data.point.player_side);
+    
+    // Play sound
+    if (soundEnabled) {
+      playSound('point');
+    }
+    
+    // Check for special situations
+    if (data.situacion?.length > 0) {
+      const situation = data.situacion[0];
+      
+      if (situation.tipo === 'match_point') {
+        triggerSpecialEvent('match_point', situation);
+        if (soundEnabled) playSound('matchPoint');
+      } else if (situation.tipo === 'deuce') {
+        triggerSpecialEvent('deuce');
+        if (soundEnabled) playSound('deuce');
+      } else if (situation.tipo === 'set_point') {
+        triggerSpecialEvent('set_point', situation);
+      }
+    }
+    
+    // Set won
+    if (data.set_ganado) {
+      triggerSpecialEvent('set_won', { winner: data.set_winner });
+      if (soundEnabled) playSound('setWin');
+    }
+    
+    // Match finished
+    if (data.match_finished) {
+      triggerSpecialEvent('match_won', { winner: data.match_winner });
+      if (soundEnabled) playSound('gameOver');
+    }
+  };
+
+  // ============== ANIMATIONS ==============
+  
+  const triggerAnimation = (type, player = null) => {
+    setPointAnimation({ type, player });
+    setTimeout(() => setPointAnimation(null), 1500);
+  };
+
+  const triggerSpecialEvent = (event, data = null) => {
+    setSpecialEvent({ event, data });
+    setTimeout(() => setSpecialEvent(null), 3000);
+  };
+
+  const playSound = (soundKey) => {
+    // For now, just log - actual sound implementation needs audio files
+    console.log('Playing sound:', soundKey);
+  };
+
+  // ============== EFFECTS ==============
+  
+  useEffect(() => {
+    connectWebSocket();
+    
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+    };
+  }, [connectWebSocket]);
+
+  useEffect(() => {
+    // Fetch initial data
+    fetchRankings();
+    fetchRecentResults();
+    fetchSponsors();
+    
+    // Refresh rankings periodically
+    const interval = setInterval(fetchRankings, 60000);
+    // Refresh sponsors every 5 minutes
+    const sponsorInterval = setInterval(fetchSponsors, 300000);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(sponsorInterval);
+    };
+  }, []);
+
+  // Banner rotation effect
+  useEffect(() => {
+    const bannerSponsors = sponsors.banner_bottom;
+    if (bannerSponsors.length <= 1) return;
+    
+    const rotationInterval = sponsorLayout?.espacios?.find(e => e.space_id === 'banner_bottom')?.intervalo_rotacion || 10;
+    
+    const interval = setInterval(() => {
+      setCurrentBannerIndex(prev => (prev + 1) % bannerSponsors.length);
+    }, rotationInterval * 1000);
+    
+    return () => clearInterval(interval);
+  }, [sponsors.banner_bottom, sponsorLayout]);
+
+  useEffect(() => {
+    // Update URL params when mode changes
+    const params = new URLSearchParams();
+    params.set('mode', mode);
+    if (matchId) params.set('match', matchId);
+    if (tournamentId) params.set('tournament', tournamentId);
+    setSearchParams(params, { replace: true });
+  }, [mode, matchId, tournamentId, setSearchParams]);
+
+  // Fetch arena tournament data when in tournament mode
+  useEffect(() => {
+    if (mode !== 'tournament') return;
+    
+    const fetchTournamentData = async () => {
+      try {
+        // If a specific tournament is selected, fetch it
+        if (tournamentId) {
+          const [tRes, mRes] = await Promise.all([
+            fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${tournamentId}`),
+            fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${tournamentId}/matches`),
+          ]);
+          if (tRes.ok) setArenaTournament(await tRes.json());
+          if (mRes.ok) setArenaMatches(await mRes.json());
+        } else {
+          // Fetch the most active tournament
+          const res = await fetch(`${API_URL}/api/pinpanclub/arena/tournaments/active`);
+          if (res.ok) {
+            const active = await res.json();
+            if (active.length > 0) {
+              setTournamentId(active[0].tournament_id);
+              setArenaTournament(active[0]);
+              const mRes = await fetch(`${API_URL}/api/pinpanclub/arena/tournaments/${active[0].tournament_id}/matches`);
+              if (mRes.ok) setArenaMatches(await mRes.json());
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching tournament data:', e);
+      }
+    };
+    
+    fetchTournamentData();
+    const interval = setInterval(fetchTournamentData, 15000);
+    return () => clearInterval(interval);
+  }, [mode, tournamentId]);
+
+  // Fullscreen handling
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // ============== DATA FETCHING ==============
+  
+  const fetchRankings = async () => {
+    try {
+      const response = await fetch(`${PINPANCLUB_API.rankings}?limit=10`);
+      const data = await response.json();
+      setRankings(data);
+    } catch (error) {
+      console.error('Error fetching rankings:', error);
+    }
+  };
+
+  const fetchRecentResults = async () => {
+    try {
+      const response = await fetch(`${PINPANCLUB_API.matches}?status=finished&limit=5`);
+      const data = await response.json();
+      setRecentResults(data);
+    } catch (error) {
+      console.error('Error fetching recent results:', error);
+    }
+  };
+
+  const fetchSponsors = async () => {
+    try {
+      const response = await fetch(PINPANCLUB_API.sponsorsTvDisplay);
+      const data = await response.json();
+      setSponsors(data.sponsors || {});
+      setSponsorLayout(data.layout || null);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+    }
+  };
+
+  // ============== UI HELPERS ==============
+  
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const currentUrl = window.location.href;
+
+  // ============== RENDER FUNCTIONS ==============
+  
+  const renderSingleMatch = () => {
+    if (!currentMatch) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center text-white/60">
+            <div className="text-6xl mb-4">🏓</div>
+            <p className="text-2xl">Esperando partido...</p>
+            <p className="mt-2">Selecciona un partido para mostrar</p>
+          </div>
+        </div>
+      );
+    }
+
+    const playerA = currentMatch.player_a_info || {};
+    const playerB = currentMatch.player_b_info || {};
+
+    return (
+      <div className="h-full flex flex-col p-8">
+        {/* Match Header */}
+        <div className="text-center mb-8">
+          {currentMatch.ronda && (
+            <div className="text-2xl text-yellow-400 font-bold mb-2">{currentMatch.ronda}</div>
+          )}
+          <div className="text-xl text-white/60">
+            {currentMatch.tipo_partido.replace('_', ' ').toUpperCase()}
+            {currentMatch.mesa && ` • Mesa ${currentMatch.mesa}`}
+          </div>
+        </div>
+
+        {/* Main Scoreboard */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-6xl">
+            <div className="grid grid-cols-3 gap-8 items-center">
+              {/* Player A */}
+              <div className={`text-center ${pointAnimation?.player === 'a' ? 'animate-pulse scale-110' : ''} transition-transform duration-300`}>
+                {playerA.foto_url ? (
+                  <img src={playerA.foto_url} alt={playerA.nombre} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white/20" />
+                ) : (
+                  <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-5xl text-white font-bold">
+                    {playerA.nombre?.[0] || 'A'}
+                  </div>
+                )}
+                <h2 className="text-3xl font-bold text-white mb-1">
+                  {playerA.nickname || playerA.nombre || 'Player A'}
+                </h2>
+                <p className="text-lg text-white/60">ELO: {playerA.elo_rating || 1000}</p>
+                
+                {/* Sets Won */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {Array.from({ length: currentMatch.sets_player_a }).map((_, i) => (
+                    <div key={i} className="w-6 h-6 rounded-full bg-green-500" />
+                  ))}
+                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_player_a) }).map((_, i) => (
+                    <div key={i} className="w-6 h-6 rounded-full bg-white/20" />
+                  ))}
+                </div>
+              </div>
+
+              {/* Score */}
+              <div className="text-center">
+                <div className="bg-black/50 rounded-3xl p-8 backdrop-blur">
+                  {/* Current Set Score */}
+                  <div className="flex items-center justify-center gap-8">
+                    <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'a' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
+                      {currentMatch.points_player_a}
+                    </span>
+                    <span className="text-6xl text-white/40">:</span>
+                    <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'b' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
+                      {currentMatch.points_player_b}
+                    </span>
+                  </div>
+
+                  {/* Sets Score */}
+                  <div className="flex items-center justify-center gap-4 mt-4">
+                    <span className="text-5xl font-bold text-blue-400">{currentMatch.sets_player_a}</span>
+                    <span className="text-2xl text-white/40">SETS</span>
+                    <span className="text-5xl font-bold text-red-400">{currentMatch.sets_player_b}</span>
+                  </div>
+
+                  {/* Serve Indicator */}
+                  <div className="mt-6 flex justify-center">
+                    {currentMatch.saque === 'a' ? (
+                      <div className="flex items-center gap-2 text-yellow-400">
+                        <span className="text-2xl">◀</span>
+                        <span className="text-xl">SAQUE</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-yellow-400">
+                        <span className="text-xl">SAQUE</span>
+                        <span className="text-2xl">▶</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Set History */}
+                {currentMatch.sets_detalle?.length > 0 && (
+                  <div className="mt-6 flex justify-center gap-4">
+                    {currentMatch.sets_detalle.map((set, i) => (
+                      <div key={i} className="bg-white/10 rounded-lg px-4 py-2">
+                        <div className="text-sm text-white/60">Set {set.set}</div>
+                        <div className="text-xl font-bold text-white">
+                          {set.points_a} - {set.points_b}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Player B */}
+              <div className={`text-center ${pointAnimation?.player === 'b' ? 'animate-pulse scale-110' : ''} transition-transform duration-300`}>
+                {playerB.foto_url ? (
+                  <img src={playerB.foto_url} alt={playerB.nombre} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white/20" />
+                ) : (
+                  <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-5xl text-white font-bold">
+                    {playerB.nombre?.[0] || 'B'}
+                  </div>
+                )}
+                <h2 className="text-3xl font-bold text-white mb-1">
+                  {playerB.nickname || playerB.nombre || 'Player B'}
+                </h2>
+                <p className="text-lg text-white/60">ELO: {playerB.elo_rating || 1000}</p>
+                
+                {/* Sets Won */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {Array.from({ length: currentMatch.sets_player_b }).map((_, i) => (
+                    <div key={i} className="w-6 h-6 rounded-full bg-green-500" />
+                  ))}
+                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_player_b) }).map((_, i) => (
+                    <div key={i} className="w-6 h-6 rounded-full bg-white/20" />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Special Event Overlay */}
+        {specialEvent && (
+          <SpecialEventOverlay event={specialEvent} />
+        )}
+      </div>
+    );
+  };
+
+  const renderMultiMatch = () => {
+    const matches = activeMatches.filter(m => m.status === 'en_curso');
+    
+    if (matches.length === 0) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center text-white/60">
+            <div className="text-6xl mb-4">🏓</div>
+            <p className="text-2xl">No hay partidos en curso</p>
+          </div>
+        </div>
+      );
+    }
+
+    const gridCols = matches.length <= 2 ? 'grid-cols-2' : matches.length <= 4 ? 'grid-cols-2' : 'grid-cols-3';
+
+    return (
+      <div className={`h-full grid ${gridCols} gap-4 p-4`}>
+        {matches.map(match => (
+          <MiniScoreboard 
+            key={match.match_id} 
+            match={match}
+            onClick={() => {
+              setMatchId(match.match_id);
+              setMode('single');
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const renderDashboard = () => {
+    const liveMatches = activeMatches.filter(m => m.status === 'en_curso');
+    
+    return (
+      <div className="h-full grid grid-cols-3 gap-4 p-4">
+        {/* Left Column - Live Matches */}
+        <div className="col-span-2 space-y-4">
+          <div className="bg-black/40 rounded-2xl p-4 backdrop-blur">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+              Partidos en Vivo
+            </h2>
+            
+            {liveMatches.length === 0 ? (
+              <div className="text-center py-8 text-white/60">
+                <div className="text-4xl mb-2">🏓</div>
+                <p>No hay partidos en curso</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {liveMatches.slice(0, 4).map(match => (
+                  <MiniScoreboard 
+                    key={match.match_id} 
+                    match={match}
+                    onClick={() => {
+                      setMatchId(match.match_id);
+                      setMode('single');
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Results */}
+          <div className="bg-black/40 rounded-2xl p-4 backdrop-blur">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Resultados Recientes
+            </h2>
+            <div className="space-y-2">
+              {recentResults.slice(0, 5).map(match => (
+                <div key={match.match_id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`font-bold ${match.winner_id === match.player_a_id ? 'text-green-400' : 'text-white/60'}`}>
+                      {match.player_a_info?.nombre || 'Player A'}
+                    </span>
+                    <span className="text-white/40">vs</span>
+                    <span className={`font-bold ${match.winner_id === match.player_b_id ? 'text-green-400' : 'text-white/60'}`}>
+                      {match.player_b_info?.nombre || 'Player B'}
+                    </span>
+                  </div>
+                  <div className="text-xl font-bold text-white">
+                    {match.sets_player_a} - {match.sets_player_b}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Rankings & QR */}
+        <div className="space-y-4">
+          {/* Rankings */}
+          <div className="bg-black/40 rounded-2xl p-4 backdrop-blur">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-400" />
+              Top 10 Ranking
+            </h2>
+            <div className="space-y-2">
+              {rankings.slice(0, 10).map((player, index) => (
+                <div key={player.player_id} className="flex items-center gap-3 bg-white/5 rounded-lg p-2">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    index === 0 ? 'bg-yellow-500 text-black' :
+                    index === 1 ? 'bg-gray-400 text-black' :
+                    index === 2 ? 'bg-orange-600 text-white' :
+                    'bg-white/20 text-white'
+                  }`}>
+                    {index + 1}
+                  </span>
+                  <div className="flex-1">
+                    <div className="font-semibold text-white">
+                      {player.nickname || player.name}
+                    </div>
+                    <div className="text-xs text-white/60">
+                      {player.matches_won}W - {player.matches_lost}L
+                    </div>
+                  </div>
+                  <div className="text-lg font-bold text-blue-400">
+                    {player.elo_rating}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* QR Code */}
+          <div className="bg-black/40 rounded-2xl p-4 backdrop-blur text-center">
+            <h2 className="text-lg font-bold text-white mb-3">📱 Escanea para ver en tu móvil</h2>
+            <div className="bg-white rounded-xl p-3 inline-block">
+              <QRCodeSVG value={currentUrl} size={150} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTournament = () => {
+    if (!arenaTournament) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center">
+            <Trophy className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white/60">No Active Tournament</h2>
+            <p className="text-white/40 mt-2">Start a tournament in PinPan Arena to display it here</p>
+          </div>
+        </div>
+      );
+    }
+
+    const t = arenaTournament;
+    const isCompleted = t.status === 'completed';
+    const FORMAT_LABELS = { single_elimination: 'Single Elimination', round_robin: 'Round Robin', group_knockout: 'Group + Knockout', rapidpin: 'RapidPin Mode' };
+
+    // Sort matches for display
+    const activeMatches = arenaMatches.filter(m => m.status === 'in_progress');
+    const pendingMatches = arenaMatches.filter(m => m.status === 'pending' && m.player_a_id && m.player_b_id);
+    const completedMatches = arenaMatches.filter(m => m.status === 'completed');
+
+    return (
+      <div className="p-6 space-y-6 overflow-auto max-h-[calc(100vh-80px)]">
+        {/* Tournament Title */}
+        <div className="text-center">
+          <h1 className="text-4xl font-black text-white tracking-tight">{t.name}</h1>
+          <div className="flex items-center justify-center gap-4 mt-2 text-white/60 text-sm">
+            <span className="px-3 py-1 rounded-full bg-white/10">{FORMAT_LABELS[t.format] || t.format}</span>
+            <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {t.total_participants} players</span>
+            <span className={`px-3 py-1 rounded-full ${isCompleted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'}`}>
+              {t.status?.replace(/_/g, ' ').toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* Champion */}
+        {isCompleted && t.champion_id && (
+          <div className="text-center bg-gradient-to-r from-amber-900/40 via-yellow-800/30 to-amber-900/40 rounded-2xl p-6 border border-amber-500/30">
+            <Trophy className="w-12 h-12 text-amber-400 mx-auto mb-2" />
+            <p className="text-amber-400 text-xs uppercase tracking-widest font-bold">Champion</p>
+            <p className="text-3xl font-black text-white mt-1">
+              {t.participants?.find(p => p.player_id === t.champion_id)?.player_name || 'Unknown'}
+            </p>
+            <div className="flex justify-center gap-8 mt-3">
+              {t.runner_up_id && (
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 uppercase">Runner-up</p>
+                  <p className="text-white font-semibold">{t.participants?.find(p => p.player_id === t.runner_up_id)?.player_name}</p>
+                </div>
+              )}
+              {t.third_place_id && (
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 uppercase">3rd Place</p>
+                  <p className="text-white font-semibold">{t.participants?.find(p => p.player_id === t.third_place_id)?.player_name}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Active Matches Highlight */}
+        {activeMatches.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold text-white/80 mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> Live Now
+            </h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {activeMatches.map(m => (
+                <div key={m.match_id} className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-semibold text-lg">{m.player_a_name || 'TBD'}</span>
+                    <span className="text-white/60 text-xs">vs</span>
+                    <span className="text-white font-semibold text-lg">{m.player_b_name || 'TBD'}</span>
+                  </div>
+                  <div className="text-center mt-1">
+                    <span className="text-3xl font-mono font-bold text-white">{m.score_a} - {m.score_b}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bracket / Match List */}
+        <div>
+          <h3 className="text-lg font-bold text-white/80 mb-3">Bracket</h3>
+          <div className="space-y-3">
+            {(t.brackets || []).map((bracket, bi) => {
+              const roundMatches = arenaMatches.filter(m => {
+                if (bracket.name === 'Third Place') return m.group === '__third_place__';
+                if (m.group === '__third_place__') return false;
+                return m.round_num === bracket.round;
+              });
+              if (roundMatches.length === 0) return null;
+              return (
+                <div key={bi}>
+                  <h4 className="text-sm font-semibold text-white/50 mb-2">{bracket.name}</h4>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {roundMatches.map(m => {
+                      const isDone = m.status === 'completed' || m.status === 'bye';
+                      return (
+                        <div key={m.match_id} className={`flex items-center gap-2 p-3 rounded-lg border ${isDone ? 'bg-white/5 border-white/5' : 'bg-white/10 border-white/10'}`}>
+                          <span className={`flex-1 text-right text-sm truncate ${m.winner_id === m.player_a_id ? 'text-green-400 font-bold' : 'text-white/80'}`}>
+                            {m.player_a_name || 'TBD'}
+                          </span>
+                          <span className="shrink-0 w-16 text-center text-xs font-mono text-white/60">
+                            {isDone ? `${m.score_a}-${m.score_b}` : 'vs'}
+                          </span>
+                          <span className={`flex-1 text-sm truncate ${m.winner_id === m.player_b_id ? 'text-green-400 font-bold' : 'text-white/80'}`}>
+                            {m.player_b_name || 'TBD'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Standings for RR / Group */}
+        {(t.format === 'round_robin' || t.format === 'rapidpin') && t.group_standings?.__rr__?.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold text-white/80 mb-3">Standings</h3>
+            <div className="bg-white/5 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-white/50 border-b border-white/10">
+                    <th className="p-3 text-left">#</th><th className="p-3 text-left">Player</th>
+                    <th className="p-3 text-center">P</th><th className="p-3 text-center">W</th>
+                    <th className="p-3 text-center">L</th><th className="p-3 text-center font-bold">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.group_standings.__rr__.map((s, i) => (
+                    <tr key={s.player_id} className="border-b border-white/5 text-white/80">
+                      <td className="p-3 font-bold text-white/40">{i + 1}</td>
+                      <td className="p-3 font-medium">{s.player_name}</td>
+                      <td className="p-3 text-center">{s.played}</td>
+                      <td className="p-3 text-center text-green-400">{s.won}</td>
+                      <td className="p-3 text-center text-red-400">{s.lost}</td>
+                      <td className="p-3 text-center font-bold text-white">{s.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 flex flex-col ${isFullscreen ? '' : ''}`}>
+      {/* Header with Sponsor Spaces */}
+      {!(isFullscreen && mode === 'single') && (
+        <header className="bg-black/50 backdrop-blur-md border-b border-white/10">
+          <div className="flex items-center justify-between px-4 py-3">
+            {/* Left Sponsor Space */}
+            <SponsorSpace 
+              sponsors={sponsors.header_left} 
+              position="header_left"
+              className="w-[140px] h-[55px] flex-shrink-0"
+            />
+
+            {/* Logo */}
+            <div className="flex items-center gap-3 mx-4">
+              <span className="text-3xl">🏓</span>
+              <div>
+                <h1 className="text-xl font-bold text-white">Club de Tenis de Mesa</h1>
+                <p className="text-xs text-white/60">Live Scoreboard</p>
+              </div>
+            </div>
+
+            {/* Mode Selector */}
+            <div className="flex items-center gap-2 bg-black/30 rounded-full p-1">
+              <button
+                onClick={() => setMode('single')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  mode === 'single' ? 'bg-white text-black' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <Monitor className="w-4 h-4" />
+                <span className="hidden md:inline">Partido</span>
+              </button>
+              <button
+                onClick={() => setMode('multi')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  mode === 'multi' ? 'bg-white text-black' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <Grid3X3 className="w-4 h-4" />
+                <span className="hidden md:inline">Multi</span>
+              </button>
+              <button
+                onClick={() => setMode('dashboard')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  mode === 'dashboard' ? 'bg-white text-black' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span className="hidden md:inline">Dashboard</span>
+              </button>
+              <button
+                onClick={() => setMode('tournament')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  mode === 'tournament' ? 'bg-white text-black' : 'text-white/60 hover:text-white'
+                }`}
+                data-testid="tv-tournament-mode-btn"
+              >
+                <Trophy className="w-4 h-4" />
+                <span className="hidden md:inline">Tournament</span>
+              </button>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-2">
+              {/* Connection Status */}
+              <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${
+                wsConnected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {wsConnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+                <span className="text-xs">{wsConnected ? 'LIVE' : 'Offline'}</span>
+              </div>
+
+              {/* Sound Toggle */}
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`p-2 rounded-full ${soundEnabled ? 'bg-white/20 text-white' : 'text-white/40'}`}
+              >
+                {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+              </button>
+
+              {/* QR Toggle */}
+              <button
+                onClick={() => setShowQR(!showQR)}
+                className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10"
+              >
+                <Users className="w-5 h-5" />
+              </button>
+
+              {/* Fullscreen */}
+              <button
+                onClick={toggleFullscreen}
+                className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10"
+              >
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* Right Sponsor Space */}
+            <SponsorSpace 
+              sponsors={sponsors.header_right} 
+              position="header_right"
+              className="w-[140px] h-[55px] flex-shrink-0"
+            />
+          </div>
+        </header>
+      )}
+
+      {/* Main Content */}
+      <main className={`flex-1 ${isFullscreen && mode === 'single' ? 'h-screen' : ''}`}>
+        {mode === 'single' && renderSingleMatch()}
+        {mode === 'multi' && renderMultiMatch()}
+        {mode === 'dashboard' && renderDashboard()}
+        {mode === 'tournament' && renderTournament()}
+      </main>
+
+      {/* QR Overlay */}
+      {showQR && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setShowQR(false)}>
+          <div className="bg-white rounded-2xl p-8 text-center" onClick={e => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold mb-4">📱 Escanea para ver en tu móvil</h2>
+            <QRCodeSVG value={currentUrl} size={250} />
+            <p className="mt-4 text-gray-600 text-sm max-w-xs">
+              Abre la cámara de tu teléfono y escanea el código para seguir los partidos en vivo
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Exit Fullscreen Button (when in fullscreen single mode) */}
+      {isFullscreen && mode === 'single' && (
+        <button
+          onClick={toggleFullscreen}
+          className="fixed top-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur rounded-full p-3 z-50"
+        >
+          <Minimize2 className="w-6 h-6 text-white" />
+        </button>
+      )}
+
+      {/* Bottom Banner - Primary Sponsors */}
+      {!(isFullscreen && mode === 'single') && sponsors.banner_bottom?.length > 0 && (
+        <SponsorBanner 
+          sponsors={sponsors.banner_bottom}
+          currentIndex={currentBannerIndex}
+          layout={sponsorLayout}
+        />
+      )}
+    </div>
+  );
+}
+
+// ============== SPONSOR COMPONENTS ==============
+
+function SponsorSpace({ sponsors, position, className = '' }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    if (sponsors.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % sponsors.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [sponsors.length]);
+
+  if (!sponsors || sponsors.length === 0) {
+    return (
+      <div className={`${className} rounded-lg bg-white/5 border border-dashed border-white/20 flex items-center justify-center`}>
+        <span className="text-white/30 text-xs">Patrocinador</span>
+      </div>
+    );
+  }
+
+  const sponsor = sponsors[currentIndex];
+  const logo = sponsor.logo_base64 || sponsor.logo_url;
+
+  return (
+    <div 
+      className={`${className} rounded-lg overflow-hidden transition-all duration-500`}
+      style={{
+        background: sponsor.gradiente 
+          ? `linear-gradient(to right, ${sponsor.color_fondo}, ${sponsor.color_acento || sponsor.color_fondo})`
+          : sponsor.color_fondo || 'transparent',
+        boxShadow: sponsor.sombra ? '0 4px 15px rgba(0,0,0,0.3)' : 'none'
+      }}
+    >
+      <a 
+        href={sponsor.website_url || '#'} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="w-full h-full flex items-center justify-center p-2"
+      >
+        {logo ? (
+          <img 
+            src={logo} 
+            alt={sponsor.nombre}
+            className={`object-contain max-h-full ${
+              sponsor.tamano_logo === 'small' ? 'max-w-[60%]' :
+              sponsor.tamano_logo === 'large' ? 'max-w-[95%]' :
+              'max-w-[80%]'
+            }`}
+          />
+        ) : (
+          <span 
+            className="font-bold text-sm truncate"
+            style={{ color: sponsor.color_texto || '#fff' }}
+          >
+            {sponsor.nombre}
+          </span>
+        )}
+      </a>
+    </div>
+  );
+}
+
+function SponsorBanner({ sponsors, currentIndex, layout }) {
+  const sponsor = sponsors[currentIndex % sponsors.length];
+  
+  if (!sponsor) return null;
+
+  const logo = sponsor.logo_base64 || sponsor.logo_url;
+  const spaceConfig = layout?.espacios?.find(e => e.space_id === 'banner_bottom');
+  
+  return (
+    <div 
+      className="w-full transition-all duration-700 ease-in-out"
+      style={{
+        height: spaceConfig?.alto || '100px',
+        background: sponsor.gradiente 
+          ? `linear-gradient(to right, ${sponsor.color_fondo}, ${sponsor.color_acento || sponsor.color_fondo})`
+          : sponsor.color_fondo || '#1a1a2e'
+      }}
+    >
+      <a 
+        href={sponsor.website_url || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="h-full flex items-center justify-center gap-6 px-8"
+      >
+        {/* Logo */}
+        {logo && (
+          <img 
+            src={logo}
+            alt={sponsor.nombre}
+            className={`object-contain h-[70%] ${
+              sponsor.tamano_logo === 'small' ? 'max-w-[150px]' :
+              sponsor.tamano_logo === 'large' ? 'max-w-[300px]' :
+              'max-w-[200px]'
+            } ${sponsor.animacion === 'pulse' ? 'animate-pulse' : ''}`}
+          />
+        )}
+        
+        {/* Text Content */}
+        <div className="flex flex-col items-start">
+          {sponsor.mostrar_nombre && (
+            <span 
+              className="text-2xl font-bold"
+              style={{ color: sponsor.color_texto || '#fff' }}
+            >
+              {sponsor.nombre}
+            </span>
+          )}
+          {sponsor.texto_promocional && (
+            <span 
+              className="text-lg opacity-80"
+              style={{ color: sponsor.color_texto || '#fff' }}
+            >
+              {sponsor.texto_promocional}
+            </span>
+          )}
+        </div>
+
+        {/* Multiple sponsors indicator */}
+        {sponsors.length > 1 && (
+          <div className="absolute bottom-2 right-4 flex gap-1">
+            {sponsors.map((_, i) => (
+              <div 
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === currentIndex % sponsors.length 
+                    ? 'bg-white' 
+                    : 'bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </a>
+    </div>
+  );
+}
+
+// ============== MINI SCOREBOARD COMPONENT ==============
+
+function MiniScoreboard({ match, onClick }) {
+  const playerA = match.player_a_info || {};
+  const playerB = match.player_b_info || {};
+  
+  return (
+    <button
+      onClick={onClick}
+      className="bg-gradient-to-br from-white/10 to-white/5 rounded-xl p-4 hover:from-white/20 hover:to-white/10 transition-all border border-white/10 w-full text-left"
+    >
+      {/* Match Info */}
+      <div className="flex items-center justify-between mb-3">
+        {match.mesa && <span className="text-xs bg-white/20 px-2 py-1 rounded text-white">Mesa {match.mesa}</span>}
+        {match.status === 'en_curso' && (
+          <span className="flex items-center gap-1 text-xs text-red-400">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            EN VIVO
+          </span>
+        )}
+      </div>
+
+      {/* Players & Score */}
+      <div className="space-y-2">
+        {/* Player A */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {playerA.foto_url ? (
+              <img src={playerA.foto_url} className="w-8 h-8 rounded-full" alt="" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-bold">
+                {playerA.nombre?.[0] || 'A'}
+              </div>
+            )}
+            <span className="text-white font-semibold">{playerA.nickname || playerA.nombre || 'Player A'}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-white">{match.points_player_a}</span>
+            <span className="text-lg text-blue-400">{match.sets_player_a}</span>
+          </div>
+        </div>
+
+        {/* Player B */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {playerB.foto_url ? (
+              <img src={playerB.foto_url} className="w-8 h-8 rounded-full" alt="" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-bold">
+                {playerB.nombre?.[0] || 'B'}
+              </div>
+            )}
+            <span className="text-white font-semibold">{playerB.nickname || playerB.nombre || 'Player B'}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-white">{match.points_player_b}</span>
+            <span className="text-lg text-red-400">{match.sets_player_b}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Set Progress */}
+      <div className="mt-3 text-xs text-white/40 text-center">
+        Set {match.set_actual} • {match.tipo_partido.replace('_', ' ')}
+      </div>
+    </button>
+  );
+}
+
+// ============== SPECIAL EVENT OVERLAY ==============
+
+function SpecialEventOverlay({ event }) {
+  const { event: eventType, data } = event;
+  
+  const overlayContent = {
+    match_point: {
+      bg: 'from-yellow-600 to-orange-600',
+      text: '⚡ MATCH POINT',
+      subtext: data?.player_side === 'a' ? 'Player A' : 'Player B'
+    },
+    set_point: {
+      bg: 'from-blue-600 to-purple-600',
+      text: '🎯 SET POINT',
+      subtext: data?.player_side === 'a' ? 'Player A' : 'Player B'
+    },
+    deuce: {
+      bg: 'from-purple-600 to-pink-600',
+      text: '🔥 DEUCE',
+      subtext: 'Empate a 10+'
+    },
+    set_won: {
+      bg: 'from-green-600 to-emerald-600',
+      text: '🏆 SET GANADO',
+      subtext: data?.winner === 'a' ? 'Player A' : 'Player B'
+    },
+    match_won: {
+      bg: 'from-yellow-500 to-yellow-600',
+      text: '🎉 PARTIDO TERMINADO',
+      subtext: data?.winner === 'a' ? '¡Jugador A GANA!' : '¡Jugador B GANA!'
+    },
+    timeout: {
+      bg: 'from-gray-600 to-gray-700',
+      text: '⏱️ TIEMPO FUERA',
+      subtext: `${data?.duracion || 60} segundos`
+    },
+    match_start: {
+      bg: 'from-green-500 to-green-600',
+      text: '🏓 ¡COMIENZA EL PARTIDO!',
+      subtext: ''
+    },
+    pause: {
+      bg: 'from-gray-600 to-gray-700',
+      text: '⏸️ PARTIDO PAUSADO',
+      subtext: ''
+    }
+  };
+
+  const content = overlayContent[eventType] || { bg: 'from-gray-600 to-gray-700', text: eventType, subtext: '' };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+      <div className={`bg-gradient-to-r ${content.bg} px-16 py-8 rounded-3xl animate-bounce shadow-2xl`}>
+        <div className="text-5xl font-black text-white text-center">{content.text}</div>
+        {content.subtext && (
+          <div className="text-2xl text-white/80 text-center mt-2">{content.subtext}</div>
+        )}
+      </div>
+    </div>
+  );
+}

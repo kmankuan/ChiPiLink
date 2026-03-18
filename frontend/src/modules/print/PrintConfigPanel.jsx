@@ -1,0 +1,947 @@
+/**
+ * PrintConfigPanel — Admin panel for configuring package list format and printer settings.
+ * Two modes: Simple (field toggles) and Advanced (template editor).
+ */
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Printer, Settings, FileText, Save, Loader2,
+  LayoutTemplate, SlidersHorizontal, Usb, RefreshCw, History,
+  Clock, User, Package, CheckCircle2, Zap, Plus, Trash2, Copy, Star,
+  Pencil, X, Check
+} from 'lucide-react';
+import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
+import axios from 'axios';
+
+const API_URL = RESOLVED_API_URL;
+
+export default function PrintConfigPanel() {
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [format, setFormat] = useState(null);
+  const [template, setTemplate] = useState('');
+  const [printerConfig, setPrinterConfig] = useState(null);
+  const [configTab, setConfigTab] = useState('simple');
+  const [mainTab, setMainTab] = useState('format');
+  const [history, setHistory] = useState([]);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [historyPage, setHistoryPage] = useState(0);
+
+  const token = localStorage.getItem('auth_token');
+  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+  useEffect(() => {
+    fetchConfig();
+  }, []);
+
+  useEffect(() => {
+    if (mainTab === 'history') fetchHistory();
+  }, [mainTab, historyPage]);
+
+  const fetchConfig = async (retries = 2) => {
+    setLoading(true);
+    try {
+      const [fmtRes, printerRes] = await Promise.all([
+        fetch(`${API_URL}/api/print/config/format`, { headers }),
+        fetch(`${API_URL}/api/print/config/printer`, { headers }),
+      ]);
+      if (fmtRes.ok) {
+        const data = await fmtRes.json();
+        setFormat(data.format);
+        setTemplate(data.template || '');
+      } else if (retries > 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchConfig(retries - 1);
+      }
+      if (printerRes.ok) {
+        const data = await printerRes.json();
+        setPrinterConfig(data);
+      }
+    } catch (err) {
+      console.error('Error fetching config:', err);
+      if (retries > 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        return fetchConfig(retries - 1);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/print/jobs?limit=20&skip=${historyPage * 20}`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data.jobs || []);
+        setHistoryTotal(data.total || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching print history:', err);
+    }
+  };
+
+  const saveFormat = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/api/print/config/format`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ format, template }),
+      });
+      if (res.ok) toast.success(t('print.configSaved', 'Configuration saved'));
+      else toast.error(t('print.configError', 'Error saving configuration'));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const savePrinter = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/api/print/config/printer`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(printerConfig),
+      });
+      if (res.ok) toast.success(t('print.printerSaved', 'Printer settings saved'));
+      else toast.error(t('print.printerError', 'Error saving printer settings'));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addPrinter = () => {
+    setPrinterConfig(prev => ({
+      ...prev,
+      printers: [...(prev?.printers || []), {
+        id: `printer-${Date.now()}`,
+        name: '',
+        brand: 'Logic Controls',
+        model: '',
+        connection: 'usb',
+        paper_size: '80mm',
+        enabled: true,
+      }],
+    }));
+  };
+
+  const updatePrinter = (idx, field, value) => {
+    setPrinterConfig(prev => {
+      const printers = [...(prev?.printers || [])];
+      printers[idx] = { ...printers[idx], [field]: value };
+      return { ...prev, printers };
+    });
+  };
+
+  const removePrinter = (idx) => {
+    setPrinterConfig(prev => ({
+      ...prev,
+      printers: prev.printers.filter((_, i) => i !== idx),
+    }));
+  };
+
+  const updateFormat = (section, field, value) => {
+    setFormat(prev => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value },
+    }));
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6" data-testid="print-config-panel">
+      <Tabs value={mainTab} onValueChange={setMainTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="format" className="gap-2">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('print.formatConfig', 'Package List Format')}</span>
+            <span className="sm:hidden">Format</span>
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="gap-2" data-testid="templates-tab">
+            <Copy className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('print.templates', 'Templates')}</span>
+            <span className="sm:hidden">Templates</span>
+          </TabsTrigger>
+          <TabsTrigger value="printer" className="gap-2">
+            <Printer className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('print.printerConfig', 'Printer Settings')}</span>
+            <span className="sm:hidden">Printer</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('print.history', 'Print History')}</span>
+            <span className="sm:hidden">History</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ─── Format Configuration ─── */}
+        <TabsContent value="format" className="space-y-4">
+          <Tabs value={configTab} onValueChange={setConfigTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="simple" className="gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                {t('print.simpleMode', 'Field Toggles')}
+              </TabsTrigger>
+              <TabsTrigger value="advanced" className="gap-2">
+                <LayoutTemplate className="h-4 w-4" />
+                {t('print.advancedMode', 'Template Editor')}
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Simple Mode: Field Toggles */}
+            <TabsContent value="simple" className="space-y-4">
+              {!format && !loading && (
+                <div className="text-center py-8 space-y-3">
+                  <p className="text-sm text-muted-foreground">{t('print.configLoadFailed', 'Could not load print configuration.')}</p>
+                  <Button variant="outline" size="sm" onClick={fetchConfig}>
+                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> {t('common.retry', 'Retry')}
+                  </Button>
+                </div>
+              )}
+              {loading && <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>}
+              {format && (
+                <>
+                  {/* Paper & Typography Settings */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">{t('print.paperSettings', 'Paper & Typography')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <Label className="w-24">{t('print.paperSize', 'Paper Size')}</Label>
+                        <Select value={format.paper_size} onValueChange={(v) => setFormat(p => ({ ...p, paper_size: v }))}>
+                          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="58mm">58mm</SelectItem>
+                            <SelectItem value="80mm">80mm</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Label className="w-24">{t('print.fontFamily', 'Font')}</Label>
+                        <Select value={format.style?.font_family || 'Verdana, Arial, Helvetica, sans-serif'} onValueChange={(v) => updateFormat('style', 'font_family', v)}>
+                          <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Verdana, Arial, Helvetica, sans-serif">Verdana (Recommended)</SelectItem>
+                            <SelectItem value="Arial, Helvetica, sans-serif">Arial</SelectItem>
+                            <SelectItem value="Tahoma, Geneva, sans-serif">Tahoma</SelectItem>
+                            <SelectItem value="'Trebuchet MS', sans-serif">Trebuchet MS</SelectItem>
+                            <SelectItem value="Georgia, serif">Georgia (Serif)</SelectItem>
+                            <SelectItem value="'Courier New', monospace">Courier New (Mono)</SelectItem>
+                            <SelectItem value="'Lucida Console', monospace">Lucida Console (Mono)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Label className="w-24">{t('print.fontSize', 'Font Size')}</Label>
+                        <Select value={format.style?.font_size || '12px'} onValueChange={(v) => updateFormat('style', 'font_size', v)}>
+                          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="8px">Extra Small (8px)</SelectItem>
+                            <SelectItem value="9px">Very Small (9px)</SelectItem>
+                            <SelectItem value="10px">Small (10px)</SelectItem>
+                            <SelectItem value="11px">Medium-Small (11px)</SelectItem>
+                            <SelectItem value="12px">Medium (12px)</SelectItem>
+                            <SelectItem value="13px">Medium-Large (13px)</SelectItem>
+                            <SelectItem value="14px">Large (14px)</SelectItem>
+                            <SelectItem value="16px">Extra Large (16px)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* Font Preview */}
+                      <div className="mt-2 p-3 border rounded-lg bg-white text-center">
+                        <span style={{ fontFamily: format.style?.font_family || 'Verdana', fontSize: format.style?.font_size || '12px', color: '#000' }}>
+                          The quick brown fox — 0123456789 — $49.99
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Header */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">{t('print.headerSection', 'Header')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <ToggleRow label={t('print.showLogo', 'Show Logo')} checked={format.header?.show_logo} onChange={(v) => updateFormat('header', 'show_logo', v)} />
+                      {format.header?.show_logo && (
+                        <div>
+                          <Label className="text-xs">{t('print.logoUrl', 'Logo URL')}</Label>
+                          <Input value={format.header?.logo_url || ''} onChange={(e) => updateFormat('header', 'logo_url', e.target.value)} placeholder="https://..." className="mt-1" />
+                        </div>
+                      )}
+                      <div>
+                        <Label className="text-xs">{t('print.title', 'Title')}</Label>
+                        <Input value={format.header?.title || ''} onChange={(e) => updateFormat('header', 'title', e.target.value)} className="mt-1" />
+                      </div>
+                      <div>
+                        <Label className="text-xs">{t('print.subtitle', 'Subtitle')}</Label>
+                        <Input value={format.header?.subtitle || ''} onChange={(e) => updateFormat('header', 'subtitle', e.target.value)} className="mt-1" />
+                      </div>
+                      <ToggleRow label={t('print.showDate', 'Show Date')} checked={format.header?.show_date} onChange={(v) => updateFormat('header', 'show_date', v)} />
+                      <ToggleRow label={t('print.showOrderId', 'Show Order ID')} checked={format.header?.show_order_id} onChange={(v) => updateFormat('header', 'show_order_id', v)} />
+                      <ToggleRow label="Show Paid Date" checked={format.header?.show_paid_date} onChange={(v) => updateFormat('header', 'show_paid_date', v)} />
+                    </CardContent>
+                  </Card>
+
+                  {/* Body */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">{t('print.bodySection', 'Item List')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <ToggleRow label={t('print.showStudentName', 'Show Student Name')} checked={format.body?.show_student_name} onChange={(v) => updateFormat('body', 'show_student_name', v)} />
+                      <ToggleRow label={t('print.showGrade', 'Show Grade')} checked={format.body?.show_grade} onChange={(v) => updateFormat('body', 'show_grade', v)} />
+                      <ToggleRow label={t('print.showCheckboxes', 'Show Checkboxes')} checked={format.body?.show_checkboxes} onChange={(v) => updateFormat('body', 'show_checkboxes', v)} />
+                      <ToggleRow label={t('print.showItemCode', 'Show Item Code')} checked={format.body?.show_item_code} onChange={(v) => updateFormat('body', 'show_item_code', v)} />
+                      <ToggleRow label={t('print.showItemName', 'Show Item Name')} checked={format.body?.show_item_name} onChange={(v) => updateFormat('body', 'show_item_name', v)} />
+                      <ToggleRow label={t('print.showItemPrice', 'Show Item Price')} checked={format.body?.show_item_price} onChange={(v) => updateFormat('body', 'show_item_price', v)} />
+                      <ToggleRow label={t('print.showItemQty', 'Show Quantity')} checked={format.body?.show_item_quantity} onChange={(v) => updateFormat('body', 'show_item_quantity', v)} />
+                      <ToggleRow label={t('print.showItemStatus', 'Show Status')} checked={format.body?.show_item_status} onChange={(v) => updateFormat('body', 'show_item_status', v)} />
+                    </CardContent>
+                  </Card>
+
+                  {/* Footer */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">{t('print.footerSection', 'Footer')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <ToggleRow label={t('print.showTotal', 'Show Total')} checked={format.footer?.show_total} onChange={(v) => updateFormat('footer', 'show_total', v)} />
+                      <ToggleRow label={t('print.showItemCount', 'Show Item Count')} checked={format.footer?.show_item_count} onChange={(v) => updateFormat('footer', 'show_item_count', v)} />
+                      <ToggleRow label={t('print.showSignature', 'Show Signature Line')} checked={format.footer?.show_signature_line} onChange={(v) => updateFormat('footer', 'show_signature_line', v)} />
+                      {format.footer?.show_signature_line && (
+                        <div>
+                          <Label className="text-xs">{t('print.signatureLabel', 'Signature Label')}</Label>
+                          <Input value={format.footer?.signature_label || ''} onChange={(e) => updateFormat('footer', 'signature_label', e.target.value)} className="mt-1" />
+                        </div>
+                      )}
+                      <div>
+                        <Label className="text-xs">{t('print.customText', 'Custom Footer Text')}</Label>
+                        <Textarea value={format.footer?.custom_text || ''} onChange={(e) => updateFormat('footer', 'custom_text', e.target.value)} rows={2} className="mt-1" />
+                      </div>
+                      <Separator />
+                      <ToggleRow label={t('print.showNotesSpace', 'Show Notes Space')} checked={format.footer?.show_notes_space} onChange={(v) => updateFormat('footer', 'show_notes_space', v)} />
+                      {format.footer?.show_notes_space && (
+                        <div className="space-y-3 pl-2 border-l-2 border-primary/20">
+                          <div>
+                            <Label className="text-xs">{t('print.notesLabel', 'Notes Label')}</Label>
+                            <Input value={format.footer?.notes_label || 'Notes'} onChange={(e) => updateFormat('footer', 'notes_label', e.target.value)} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">{t('print.notesLines', 'Number of Lines')}</Label>
+                            <div className="flex items-center gap-3 mt-1">
+                              <input
+                                type="range"
+                                min="1" max="10"
+                                value={format.footer?.notes_lines || 3}
+                                onChange={(e) => updateFormat('footer', 'notes_lines', parseInt(e.target.value))}
+                                className="flex-1"
+                              />
+                              <span className="text-sm font-mono w-6 text-center">{format.footer?.notes_lines || 3}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+
+              <Button onClick={saveFormat} disabled={saving} className="w-full gap-2" data-testid="save-format-btn">
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {t('print.saveConfig', 'Save Configuration')}
+              </Button>
+            </TabsContent>
+
+            {/* Advanced Mode: Template Editor */}
+            <TabsContent value="advanced" className="space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">{t('print.templateEditor', 'HTML Template')}</CardTitle>
+                  <CardDescription>{t('print.templateDesc', 'Edit the raw HTML template for the package list. Use {{variable}} for dynamic content.')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={template}
+                    onChange={(e) => setTemplate(e.target.value)}
+                    rows={20}
+                    className="font-mono text-xs"
+                    data-testid="template-editor"
+                  />
+                </CardContent>
+              </Card>
+              <Button onClick={saveFormat} disabled={saving} className="w-full gap-2" data-testid="save-template-btn">
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {t('print.saveTemplate', 'Save Template')}
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* ─── Templates ─── */}
+        <TabsContent value="templates" className="space-y-4">
+          <TemplatesSection />
+        </TabsContent>
+
+        {/* ─── Printer Settings (System Printer) ─── */}
+        <TabsContent value="printer" className="space-y-4">
+          {/* LR2000E Status Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Printer className="h-4 w-4" />
+                    {t('print.printerSetup', 'Thermal Printer Setup')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('print.systemPrinterDesc', 'Your LR2000E is configured as a Windows system printer')}
+                  </CardDescription>
+                </div>
+                <Badge variant="default" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> Installed
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-3 bg-green-50/70 rounded-lg border border-green-200 space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Logic Controls LR2000E — Ready</span>
+                </div>
+                <p className="text-xs text-green-700">
+                  The printer is installed as your default Windows printer. Print jobs are sent through the Windows print system — no additional browser setup required.
+                </p>
+              </div>
+
+              <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-200 space-y-2">
+                <p className="text-xs text-blue-700 font-medium">How it works:</p>
+                <ol className="text-xs text-blue-600 space-y-1 list-decimal pl-4">
+                  <li>Select orders from the Orders tab and click "Print"</li>
+                  <li>Click <strong>"Print to LR2000E"</strong> — this opens a thermal-formatted receipt</li>
+                  <li>The Windows print dialog appears with your LR2000E as default</li>
+                  <li>Click Print — the receipt prints on 72mm thermal paper</li>
+                </ol>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Quick Test:</p>
+                <Button variant="outline" size="sm" onClick={() => {
+                  const html = `<!DOCTYPE html><html><head><title>Test</title>
+<style>@page{size:72mm auto;margin:2mm 3mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;font-size:11px;width:72mm}
+.t{text-align:center;font-size:16px;font-weight:bold;padding:2mm 0}.s{border-top:1px dashed #000;margin:1.5mm 0}.r{display:flex;justify-content:space-between;padding:0.5mm 0;font-size:10px}.f{text-align:center;font-size:9px;color:#555;margin-top:3mm}
+</style></head><body>
+<div class="t">LR2000E TEST</div>
+<div class="s"></div>
+<div class="r"><span>Status:</span><span>Connected</span></div>
+<div class="r"><span>Time:</span><span>${new Date().toLocaleString()}</span></div>
+<div class="s"></div>
+<div class="f">If you see this on the receipt, the printer is working correctly.</div>
+</body></html>`;
+                  const w = window.open('', '_blank', 'width=320,height=400');
+                  if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 500); }
+                  else toast.error('Pop-up blocked. Please allow pop-ups.');
+                }} className="gap-1" data-testid="test-print-btn">
+                  <Zap className="h-3 w-3" /> Print Test Page
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Printer Registry */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">{t('print.printerRegistry', 'Printer Registry')}</CardTitle>
+              <CardDescription>{t('print.registryDesc', 'Save printer configurations for your team')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {(printerConfig?.printers || []).length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground py-4">
+                  {t('print.noPrinters', 'No printers registered. Add your first printer below.')}
+                </p>
+              ) : (
+                printerConfig.printers.map((p, idx) => (
+                  <Card key={p.id} className="p-3 space-y-2" data-testid={`printer-${idx}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={p.enabled ? 'default' : 'secondary'} className="text-[10px]">
+                          {p.enabled ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <span className="text-sm font-medium">{p.name || 'Unnamed Printer'}</span>
+                      </div>
+                      <Switch checked={p.enabled} onCheckedChange={(v) => updatePrinter(idx, 'enabled', v)} />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <Label className="text-[10px]">Name</Label>
+                        <Input value={p.name} onChange={(e) => updatePrinter(idx, 'name', e.target.value)} className="h-7 text-xs mt-0.5" />
+                      </div>
+                      <div>
+                        <Label className="text-[10px]">Model</Label>
+                        <Input value={p.model} onChange={(e) => updatePrinter(idx, 'model', e.target.value)} placeholder="LR2000E" className="h-7 text-xs mt-0.5" />
+                      </div>
+                      <div>
+                        <Label className="text-[10px]">Paper</Label>
+                        <Select value={p.paper_size} onValueChange={(v) => updatePrinter(idx, 'paper_size', v)}>
+                          <SelectTrigger className="h-7 text-xs mt-0.5"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="58mm">58mm</SelectItem>
+                            <SelectItem value="80mm">80mm</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-destructive text-xs h-6" onClick={() => removePrinter(idx)}>
+                      Remove
+                    </Button>
+                  </Card>
+                ))
+              )}
+              <Button variant="outline" size="sm" onClick={addPrinter} className="gap-1" data-testid="add-printer-btn">
+                <Printer className="h-3 w-3" /> Add Printer Entry
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">{t('print.autoSettings', 'Auto-Print Settings')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <ToggleRow
+                label={t('print.autoPrint', 'Auto-print from Monday.com triggers')}
+                checked={printerConfig?.auto_print}
+                onChange={(v) => setPrinterConfig(p => ({ ...p, auto_print: v }))}
+              />
+              <p className="text-[10px] text-muted-foreground">
+                When enabled, incoming Monday.com print triggers will automatically open a print window.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Button onClick={savePrinter} disabled={saving} className="w-full gap-2" data-testid="save-printer-btn">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {t('print.savePrinter', 'Save Printer Settings')}
+          </Button>
+        </TabsContent>
+
+        {/* ─── Print History ─── */}
+        <TabsContent value="history" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm">{t('print.printHistory', 'Print History')}</CardTitle>
+                  <CardDescription>{t('print.printHistoryDesc', 'Track which orders were printed, when, and by whom')}</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchHistory} data-testid="refresh-history-btn">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {history.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground py-6">
+                  {t('print.noHistory', 'No print jobs recorded yet')}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {history.map((job) => (
+                    <div key={job.job_id} className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg" data-testid={`history-${job.job_id}`}>
+                      <div className={`mt-0.5 p-1.5 rounded-full ${job.status === 'printed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
+                        {job.status === 'printed' ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs text-muted-foreground">{job.job_id}</span>
+                          <Badge variant={job.status === 'printed' ? 'default' : 'secondary'} className="text-[10px]">
+                            {job.status === 'printed' ? t('print.statusPrinted', 'Printed') : t('print.statusPending', 'Pending')}
+                          </Badge>
+                          {job.source === 'monday' && (
+                            <Badge variant="outline" className="text-[10px]">Monday.com</Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Package className="h-3 w-3" />
+                            {job.order_count || job.order_ids?.length || 0} {t('print.orders', 'orders')}
+                          </span>
+                          {job.student_names?.length > 0 && (
+                            <span className="truncate max-w-[200px]">{job.student_names.join(', ')}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(job.created_at).toLocaleString()}
+                          </span>
+                          {job.created_by && (
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              {job.created_by}
+                            </span>
+                          )}
+                        </div>
+                        {job.printed_at && (
+                          <p className="text-xs text-green-600 mt-1">
+                            {t('print.printedAt', 'Printed')}: {new Date(job.printed_at).toLocaleString()}
+                            {job.printed_by && ` ${t('print.by', 'by')} ${job.printed_by}`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {historyTotal > 20 && (
+                <div className="flex items-center justify-between mt-4 pt-3 border-t">
+                  <span className="text-xs text-muted-foreground">
+                    {t('print.showing', 'Showing')} {historyPage * 20 + 1}-{Math.min((historyPage + 1) * 20, historyTotal)} {t('print.of', 'of')} {historyTotal}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setHistoryPage(p => Math.max(0, p - 1))} disabled={historyPage === 0}>
+                      {t('common.back', 'Back')}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setHistoryPage(p => p + 1)} disabled={(historyPage + 1) * 20 >= historyTotal}>
+                      {t('common.next', 'Next')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+/* ─── Toggle Row helper ─── */
+function ToggleRow({ label, checked, onChange }) {
+  return (
+    <div className="flex items-center justify-between">
+      <Label className="text-sm">{label}</Label>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+/* ─── Templates Section ─── */
+const FONT_OPTIONS = [
+  { value: 'Verdana, Arial, Helvetica, sans-serif', label: 'Verdana (Recommended)' },
+  { value: 'Arial, Helvetica, sans-serif', label: 'Arial' },
+  { value: 'Tahoma, Geneva, sans-serif', label: 'Tahoma' },
+  { value: "'Trebuchet MS', sans-serif", label: 'Trebuchet MS' },
+  { value: 'Georgia, serif', label: 'Georgia (Serif)' },
+  { value: "'Courier New', monospace", label: 'Courier New (Mono)' },
+  { value: "'Lucida Console', monospace", label: 'Lucida Console (Mono)' },
+];
+const FONT_SIZES = ['8px','9px','10px','11px','12px','13px','14px','16px'];
+
+function TemplatesSection() {
+  const { t } = useTranslation();
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [cloneFrom, setCloneFrom] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const hdrs = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}` });
+
+  const fetchTemplates = async () => {
+    setLoading(true);
+    try {
+      const r = await axios.get(`${API_URL}/api/print/templates`, { headers: hdrs() });
+      setTemplates(r.data.templates || []);
+    } catch { toast.error('Failed to load templates'); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchTemplates(); }, []);
+
+  const startEdit = (tpl) => {
+    setEditingId(tpl.id);
+    setEditForm(JSON.parse(JSON.stringify(tpl.format_config)));
+  };
+  const cancelEdit = () => { setEditingId(null); setEditForm(null); };
+
+  const saveEdit = async (id) => {
+    setSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/print/templates/${id}`, { format_config: editForm }, { headers: hdrs() });
+      toast.success(t('print.templateSaved', 'Template saved'));
+      cancelEdit();
+      fetchTemplates();
+    } catch { toast.error('Save failed'); }
+    finally { setSaving(false); }
+  };
+
+  const activate = async (id) => {
+    try {
+      await axios.post(`${API_URL}/api/print/templates/${id}/activate`, {}, { headers: hdrs() });
+      toast.success(t('print.templateActivated', 'Template activated — print config updated'));
+      fetchTemplates();
+    } catch { toast.error('Activation failed'); }
+  };
+
+  const deleteTpl = async (id) => {
+    if (!window.confirm(t('print.deleteConfirm', 'Delete this template?'))) return;
+    try {
+      await axios.delete(`${API_URL}/api/print/templates/${id}`, { headers: hdrs() });
+      toast.success('Deleted');
+      fetchTemplates();
+    } catch (e) { toast.error(e.response?.data?.detail || 'Delete failed'); }
+  };
+
+  const createTemplate = async () => {
+    if (!newName.trim()) { toast.error('Name required'); return; }
+    try {
+      const body = { name: newName.trim() };
+      if (cloneFrom) body.clone_from = cloneFrom;
+      await axios.post(`${API_URL}/api/print/templates`, body, { headers: hdrs() });
+      toast.success(t('print.templateCreated', 'Template created'));
+      setCreating(false); setNewName(''); setCloneFrom('');
+      fetchTemplates();
+    } catch { toast.error('Create failed'); }
+  };
+
+  const updateEditStyle = (key, val) => setEditForm(f => ({ ...f, style: { ...f.style, [key]: val } }));
+  const updateEditHeader = (key, val) => setEditForm(f => ({ ...f, header: { ...f.header, [key]: val } }));
+  const updateEditFooter = (key, val) => setEditForm(f => ({ ...f, footer: { ...f.footer, [key]: val } }));
+  const updateEditBody = (key, val) => setEditForm(f => ({ ...f, body: { ...f.body, [key]: val } }));
+
+  if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
+
+  return (
+    <div className="space-y-4" data-testid="templates-section">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-sm">{t('print.savedTemplates', 'Saved Templates')}</CardTitle>
+              <CardDescription className="text-xs">
+                {t('print.templatesDesc', 'Create and manage reusable print configurations. Clone from existing templates to customize.')}
+              </CardDescription>
+            </div>
+            <Button size="sm" onClick={() => setCreating(true)} data-testid="create-template-btn">
+              <Plus className="h-3.5 w-3.5 mr-1" /> {t('print.newTemplate', 'New Template')}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {creating && (
+            <Card className="border-primary/30">
+              <CardContent className="p-4 space-y-3">
+                <Input placeholder={t('print.templateName', 'Template name')} value={newName} onChange={e => setNewName(e.target.value)} className="h-9 text-sm" data-testid="new-template-name" />
+                <div>
+                  <Label className="text-xs text-muted-foreground">{t('print.cloneFrom', 'Clone from (optional)')}</Label>
+                  <select value={cloneFrom} onChange={e => setCloneFrom(e.target.value)} className="h-9 w-full px-2 text-xs border rounded-md bg-background mt-1" data-testid="clone-from-select">
+                    <option value="">{t('print.fromScratch', 'Start from scratch (defaults)')}</option>
+                    {templates.map(tp => <option key={tp.id} value={tp.id}>{tp.name}</option>)}
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => { setCreating(false); setNewName(''); setCloneFrom(''); }}><X className="h-3.5 w-3.5 mr-1" /> {t('common.cancel', 'Cancel')}</Button>
+                  <Button size="sm" onClick={createTemplate} data-testid="confirm-create-btn"><Check className="h-3.5 w-3.5 mr-1" /> {t('common.create', 'Create')}</Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {templates.map(tpl => {
+            const isEditing = editingId === tpl.id;
+            const cfg = isEditing ? editForm : tpl.format_config;
+            const style = cfg?.style || {};
+
+            return (
+              <Card key={tpl.id} className={tpl.is_active ? 'border-primary/50 bg-primary/5' : ''} data-testid={`template-${tpl.id}`}>
+                <CardHeader className="py-3 px-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-sm">{tpl.name}</CardTitle>
+                      {tpl.is_active && <Badge className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400">Active</Badge>}
+                    </div>
+                    <div className="flex gap-1">
+                      {!tpl.is_active && <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => activate(tpl.id)} data-testid={`activate-${tpl.id}`}><Star className="h-3 w-3 mr-1" /> Activate</Button>}
+                      {!isEditing ? (
+                        <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => startEdit(tpl)} data-testid={`edit-${tpl.id}`}><Pencil className="h-3 w-3 mr-1" /> Edit</Button>
+                      ) : (
+                        <>
+                          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={cancelEdit}><X className="h-3 w-3 mr-1" /> Cancel</Button>
+                          <Button size="sm" className="h-7 text-xs" onClick={() => saveEdit(tpl.id)} disabled={saving} data-testid={`save-${tpl.id}`}>
+                            {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Save className="h-3 w-3 mr-1" />} Save
+                          </Button>
+                        </>
+                      )}
+                      {!tpl.is_active && <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive" onClick={() => deleteTpl(tpl.id)} data-testid={`delete-${tpl.id}`}><Trash2 className="h-3 w-3" /></Button>}
+                    </div>
+                  </div>
+                  {tpl.description && <p className="text-[10px] text-muted-foreground mt-1">{tpl.description}</p>}
+                </CardHeader>
+                <CardContent className="px-4 pb-4 space-y-4">
+                  {/* Typography */}
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Typography</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Font Family</Label>
+                        <select value={style.font_family || 'Verdana, Arial, Helvetica, sans-serif'} onChange={e => updateEditStyle('font_family', e.target.value)} disabled={!isEditing} className="h-8 w-full px-2 text-xs border rounded-md bg-background mt-1" data-testid={`font-family-${tpl.id}`}>
+                          {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Base Font Size</Label>
+                        <select value={style.font_size || '12px'} onChange={e => updateEditStyle('font_size', e.target.value)} disabled={!isEditing} className="h-8 w-full px-2 text-xs border rounded-md bg-background mt-1" data-testid={`font-size-${tpl.id}`}>
+                          {FONT_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mt-2 p-2 border rounded bg-white text-center">
+                      <span style={{ fontFamily: style.font_family || 'Verdana', fontSize: style.font_size || '12px', color: '#000' }}>The quick brown fox — 0123456789 — $49.99</span>
+                    </div>
+                  </div>
+                  <Separator />
+                  {/* Header */}
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Header</p>
+                    <div className="space-y-2">
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Title</Label>
+                        <Input value={cfg?.header?.title || ''} onChange={e => updateEditHeader('title', e.target.value)} disabled={!isEditing} className="h-8 text-xs mt-1" />
+                      </div>
+                      <div className="flex gap-4 flex-wrap">
+                        {[['show_date','Show Date'],['show_order_id','Show Order ID'],['show_paid_date','Show Paid Date'],['show_logo','Show Logo']].map(([key,label]) => (
+                          <label key={key} className="flex items-center gap-1.5 text-[10px] cursor-pointer">
+                            <input type="checkbox" checked={cfg?.header?.[key] ?? true} onChange={e => updateEditHeader(key, e.target.checked)} disabled={!isEditing} className="rounded" />{label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <Separator />
+                  {/* Body */}
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Body / Items</p>
+                    <div className="flex gap-4 flex-wrap">
+                      {[['show_checkboxes','Checkboxes'],['show_item_code','Code'],['show_item_name','Name'],['show_item_quantity','Quantity'],['show_item_price','Price'],['show_item_status','Status'],['show_student_name','Student Name'],['show_grade','Grade']].map(([key,label]) => (
+                        <label key={key} className="flex items-center gap-1.5 text-[10px] cursor-pointer">
+                          <input type="checkbox" checked={cfg?.body?.[key] ?? true} onChange={e => updateEditBody(key, e.target.checked)} disabled={!isEditing} className="rounded" />{label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <Separator />
+                  {/* Footer */}
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Footer</p>
+                    <div className="flex gap-4 flex-wrap mb-2">
+                      {[['show_total','Total'],['show_item_count','Item Count'],['show_signature_line','Signature Line'],['show_notes_space','Notes Space']].map(([key,label]) => (
+                        <label key={key} className="flex items-center gap-1.5 text-[10px] cursor-pointer">
+                          <input type="checkbox" checked={cfg?.footer?.[key] ?? true} onChange={e => updateEditFooter(key, e.target.checked)} disabled={!isEditing} className="rounded" />{label}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Signature Label</Label>
+                        <Input value={cfg?.footer?.signature_label || ''} onChange={e => updateEditFooter('signature_label', e.target.value)} disabled={!isEditing} className="h-8 text-xs mt-1" />
+                      </div>
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Custom Footer Text</Label>
+                        <Input value={cfg?.footer?.custom_text || ''} onChange={e => updateEditFooter('custom_text', e.target.value)} disabled={!isEditing} className="h-8 text-xs mt-1" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Metadata */}
+                  <div className="flex items-center gap-3 text-[9px] text-muted-foreground pt-2">
+                    {tpl.created_by && <span>by {tpl.created_by}</span>}
+                    {tpl.updated_at && <span>updated {new Date(tpl.updated_at).toLocaleDateString()}</span>}
+                  </div>
+
+                  {/* Available Fields Reference */}
+                  <Separator />
+                  <div>
+                    <p className="text-xs font-semibold mb-2">Available Fields Reference</p>
+                    <p className="text-[9px] text-muted-foreground mb-2">These fields are available from each order and can be toggled on/off above.</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-[10px]">
+                      <div className="font-semibold text-muted-foreground mt-1 mb-0.5 col-span-2">Order Fields</div>
+                      {[
+                        ['order_id', 'Order ID', 'ord_2c25f96fd214'],
+                        ['student_name', 'Student Name', 'Sergio Wang'],
+                        ['grade', 'Grade', 'G5'],
+                        ['year', 'Year', '2026'],
+                        ['total_amount', 'Total Amount', '$386.55'],
+                        ['paid_date', 'Paid Date', '2026-02-15'],
+                        ['status', 'Order Status', 'submitted'],
+                        ['parent_name', 'Parent Name', 'Ken Wang'],
+                        ['source', 'Source', 'monday_import'],
+                        ['created_at', 'Created Date', '2026-02-27'],
+                        ['printed_at', 'Last Printed', '2026-03-04'],
+                        ['print_count', 'Print Count', '2'],
+                      ].map(([field, label, example]) => (
+                        <div key={field} className="flex items-center justify-between py-0.5 border-b border-dashed border-muted">
+                          <span><code className="bg-muted px-1 rounded text-[9px]">{field}</code> {label}</span>
+                          <span className="text-muted-foreground text-[9px]">{example}</span>
+                        </div>
+                      ))}
+                      <div className="font-semibold text-muted-foreground mt-2 mb-0.5 col-span-2">Item Fields (per book)</div>
+                      {[
+                        ['book_id', 'Book ID', 'book_4fea5f97'],
+                        ['book_code', 'Code', 'G5-1'],
+                        ['book_name', 'Book Name', 'Science 5 Text'],
+                        ['price', 'Price', '$43.95'],
+                        ['quantity_ordered', 'Quantity', '1'],
+                        ['status', 'Item Status', 'ordered'],
+                      ].map(([field, label, example]) => (
+                        <div key={field} className="flex items-center justify-between py-0.5 border-b border-dashed border-muted">
+                          <span><code className="bg-muted px-1 rounded text-[9px]">{field}</code> {label}</span>
+                          <span className="text-muted-foreground text-[9px]">{example}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
