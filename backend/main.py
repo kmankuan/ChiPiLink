@@ -254,7 +254,7 @@ api_router.include_router(showcase_admin_router)
 from modules.hub_proxy import router as hub_proxy_router
 api_router.include_router(hub_proxy_router)
 
-# Sport Module — Direct routes (reliable, no external service dependency)
+# Sport Module — Direct routes (always works) + Sport Engine started as bonus service
 from modules.sport import router as sport_router, tournament_router as sport_tournament_router
 api_router.include_router(sport_router)
 api_router.include_router(sport_tournament_router)
@@ -480,7 +480,21 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"Tutor Engine bootstrap skipped: {e}")
 
-        # Sport Engine — runs directly in main app (no separate service needed)
+        # Bootstrap Sport Engine (port 8004) — as subprocess, no supervisor
+        try:
+            import subprocess
+            sport_script = "/app/sport-engine/bootstrap.sh"
+            if os.path.exists(sport_script):
+                result = subprocess.run(["bash", sport_script], capture_output=True, text=True, timeout=20)
+                for line in result.stdout.strip().split("\n"):
+                    if line.strip():
+                        logger.info(line.strip())
+                if result.stderr:
+                    for line in result.stderr.strip().split("\n"):
+                        if line.strip():
+                            logger.warning(f"[sport-bootstrap] {line.strip()}")
+        except Exception as e:
+            logger.warning(f"Sport Engine bootstrap skipped: {e}")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
