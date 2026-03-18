@@ -42,11 +42,12 @@ from core.auth import get_current_user, get_admin_user
 from modules.auth import init_module as init_auth
 from modules.auth import auth_refactored_router
 
-# Commerce Engine Proxy (store + sysbook + platform-store → port 8005)
-# Commerce Engine is bootstrapped on startup via /app/commerce-engine/bootstrap.sh
-from modules.commerce_proxy import store_router as store_proxy_router
-from modules.commerce_proxy import sysbook_router as sysbook_proxy_router
-from modules.commerce_proxy import platform_store_router as platform_store_proxy_router
+# Store Module (products, orders, inventory, categories, students)
+from modules.store import init_module as init_store
+from modules.store import store_refactored_router
+
+# Sysbook Module (School Textbook Management)
+from modules.sysbook import sysbook_router
 
 # Landing Page Builder Module
 from modules.landing.routes import router as landing_router
@@ -116,8 +117,7 @@ from modules.roles import router as roles_router, roles_service
 # ============== IMPORT EXISTING ROUTES ==============
 
 # Platform Store (Unatienda/Yappy) - Already modularized
-# Platform Store — now proxied through Commerce Engine (port 8005)
-# from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
+from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
 
 # Ping Pong Club - Refactored as Microservices-Ready Module
 # PinPanClub Module — DEPRECATED, replaced by Sport module
@@ -136,7 +136,7 @@ from modules.print import router as print_router, init_print_routes
 # ============== INITIALIZE ROUTES WITH DB ==============
 
 # Initialize routes that need db injection
-# init_platform_store_routes — handled by Commerce Engine on port 8005
+init_platform_store_routes(db, get_admin_user, get_current_user)
 init_membership_routes(db, get_admin_user, get_current_user)
 init_translations_routes(db, get_admin_user, get_current_user)
 
@@ -151,7 +151,7 @@ init_archive_routes(db, get_admin_user)
 # init_pinpanclub()  # DEPRECATED — replaced by Sport module
 
 # Initialize Store module — handled by Commerce Engine on port 8005
-# init_store()
+init_store()
 
 # Initialize Auth module (event handlers)
 init_auth()
@@ -167,8 +167,8 @@ api_router = APIRouter(prefix="/api")
 
 # Register module routers
 api_router.include_router(auth_refactored_router)  # Microservices-ready routes
-api_router.include_router(store_proxy_router)      # → Commerce Engine port 8005
-api_router.include_router(sysbook_proxy_router)    # → Commerce Engine port 8005
+api_router.include_router(store_refactored_router)
+api_router.include_router(sysbook_router)
 api_router.include_router(landing_router)
 api_router.include_router(community_refactored_router)  # Microservices-ready routes
 api_router.include_router(monday_router)
@@ -195,7 +195,7 @@ api_router.include_router(fusebase_router)
 api_router.include_router(task_supervisor_router)
 
 # Register existing modular routes
-api_router.include_router(platform_store_proxy_router)  # → Commerce Engine port 8005
+api_router.include_router(platform_store_router)
 
 # PinpanClub - Microservices-ready module (includes players, matches, sponsors, canvas, websocket)
 # api_router.include_router(pinpanclub_router)  # DEPRECATED — replaced by Sport module
@@ -488,30 +488,6 @@ async def startup_event():
                         logger.info(line.strip())
         except Exception as e:
             logger.warning(f"Sport Engine bootstrap skipped: {e}")
-
-        # Bootstrap Commerce Engine (port 8005)
-        try:
-            import subprocess
-            commerce_script = "/app/commerce-engine/bootstrap.sh"
-            if os.path.exists(commerce_script):
-                result = subprocess.run(["bash", commerce_script], capture_output=True, text=True, timeout=20)
-                for line in result.stdout.strip().split("\n"):
-                    if line.strip():
-                        logger.info(line.strip())
-                # Wait for Commerce Engine to be healthy
-                import httpx as _hx
-                for _attempt in range(10):
-                    try:
-                        async with _hx.AsyncClient() as _hc:
-                            _r = await _hc.get("http://127.0.0.1:8005/health", timeout=3)
-                            if _r.status_code == 200:
-                                logger.info("[commerce-bootstrap] Health check passed ✓")
-                                break
-                    except Exception:
-                        pass
-                    await asyncio.sleep(1)
-        except Exception as e:
-            logger.warning(f"Commerce Engine bootstrap skipped: {e}")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
