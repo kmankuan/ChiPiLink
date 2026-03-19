@@ -140,6 +140,7 @@ const DataCleanupModule = lazy(() => import('@/modules/admin/DataCleanupModule')
 const DataManagerModule = lazy(() => import('@/modules/admin/DataManagerModule'));
 const ModuleStatusModule = lazy(() => import('@/modules/admin/ModuleStatusModule'));
 const MenuManagerModule = lazy(() => import('@/modules/admin/MenuManagerModule'));
+const MergeDuplicates = lazy(() => import('@/modules/sysbook/MergeDuplicates'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
@@ -566,6 +567,8 @@ export default function AdminDashboard() {
         return <ModuleStatusModule />;
       case 'menu-manager':
         return <MenuManagerModule />;
+      case 'merge-duplicates':
+        return <MergeDuplicates />;
       case 'cleanup':
         return <DataCleanupModule />;
       // Management

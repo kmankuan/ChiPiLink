@@ -84,6 +84,7 @@ DEFAULT_MENU = {
                         {"id": "students-schools", "label": {"en": "Students & Schools", "es": "Estudiantes y Escuelas", "zh": "学生与学校"}, "icon": "graduation-cap", "permission": "unatienda.access", "enabled": True, "order": 6},
                         {"id": "presale-import", "label": {"en": "Pre-Sale Import", "es": "Importar Pre-venta", "zh": "预售导入"}, "icon": "upload", "permission": "unatienda.access", "enabled": True, "order": 7},
                         {"id": "textbook-form-settings", "label": {"en": "Form Settings", "es": "Config. Formulario", "zh": "表单设置"}, "icon": "clipboard-list", "permission": "unatienda.access", "enabled": True, "order": 8},
+                        {"id": "merge-duplicates", "label": {"en": "Merge Duplicates", "es": "Fusionar Duplicados", "zh": "合并重复"}, "icon": "merge", "permission": "unatienda.access", "enabled": True, "order": 9},
                     ]
                 },
             ]
