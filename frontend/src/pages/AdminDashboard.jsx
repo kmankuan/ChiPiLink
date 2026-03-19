@@ -354,7 +354,7 @@ export default function AdminDashboard() {
           })),
       }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dynamicMenu, i18n.language]);
+  }, [dynamicMenu, activeModuleTab, i18n.language]);
 
   // Init openGroups from backend collapsed_default
   const [openGroups, setOpenGroups] = useState({});
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
         .map(i => ({ ...i, label: i.label || (t(i.labelKey) === i.labelKey && i.fallbackLabel ? i.fallbackLabel : t(i.labelKey)) })),
     })).filter(g => g.items.length > 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isAdmin, hasPermission, i18n.language]);
+  }, [effectiveNavGroups, authLoading, isAdmin, hasPermission, i18n.language]);
 
   // Flat list for lookups
   const filteredNavItems = useMemo(() => filteredNavGroups.flatMap(g => g.items), [filteredNavGroups]);
@@ -688,9 +688,9 @@ export default function AdminDashboard() {
         {/* Sidebar - Desktop */}
         <aside
           className={cn(
-            "hidden lg:flex flex-col border-r bg-card/50 transition-all duration-300",
+            "hidden lg:flex flex-col border-r bg-card/50 transition-all duration-300 sticky",
             collapsed ? "w-16" : "w-56",
-            modulesTabs.length > 0 ? "h-[calc(100vh-96px)]" : "h-[calc(100vh-56px)]"
+            modulesTabs.length > 0 ? "top-24 h-[calc(100vh-96px)]" : "top-14 h-[calc(100vh-56px)]"
           )}
         >
           {!collapsed && (
