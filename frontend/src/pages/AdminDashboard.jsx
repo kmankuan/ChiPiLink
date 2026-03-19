@@ -738,7 +738,7 @@ export default function AdminDashboard() {
                           collapsed && "justify-center px-2"
                         )}
                         onClick={() => {
-                          if (item.isExternal && item.path) {
+                          if (item.path) {
                             navigate(item.path);
                           } else {
                             setActiveModule(item.id);
@@ -806,7 +806,7 @@ export default function AdminDashboard() {
                             className="w-full justify-start gap-3 h-9"
                             onClick={() => {
                               setMobileMenuOpen(false);
-                              if (item.isExternal && item.path) {
+                              if (item.path) {
                                 navigate(item.path);
                               } else {
                                 setActiveModule(item.id);
