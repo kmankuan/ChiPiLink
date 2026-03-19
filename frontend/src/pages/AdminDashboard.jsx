@@ -257,13 +257,14 @@ export default function AdminDashboard() {
 
   // ─── Backend-driven menu ───
   const [dynamicMenu, setDynamicMenu] = useState(null);
+  const [activeModuleTab, setActiveModuleTab] = useState(() => localStorage.getItem('admin_active_module') || 'main');
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
     fetch(`${RESOLVED_API_URL}/api/admin/menu`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.groups) setDynamicMenu(data); })
+      .then(data => { if (data?.modules || data?.groups) setDynamicMenu(data); })
       .catch(() => {});
   }, []);
 
@@ -280,10 +281,57 @@ export default function AdminDashboard() {
     'activity': BarChart2, 'cpu': Radio, 'wand': Database, 'puzzle': Layout, 'layers': Layers,
   };
 
-  // Merge backend menu with static fallback
-  const effectiveNavGroups = useMemo(() => {
-    if (!dynamicMenu?.groups) return navGroups;
+  // Module tabs (v2 menu format)
+  const modulesTabs = useMemo(() => {
+    if (!dynamicMenu?.modules) return [];
+    return dynamicMenu.modules
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map(mod => ({
+        id: mod.id,
+        label: mod.label?.[i18n.language] || mod.label?.en || mod.id,
+        icon: ICON_MAP[mod.icon] || Settings,
+        color: mod.color || '#6b7280',
+      }));
+  }, [dynamicMenu, i18n.language]);
 
+  const switchModule = (modId) => {
+    setActiveModuleTab(modId);
+    localStorage.setItem('admin_active_module', modId);
+  };
+
+  // Merge backend menu with static fallback — now supports v2 modules
+  const effectiveNavGroups = useMemo(() => {
+    if (!dynamicMenu) return navGroups;
+
+    // v2 format: modules → groups → items
+    if (dynamicMenu.modules) {
+      const currentMod = dynamicMenu.modules.find(m => m.id === activeModuleTab) || dynamicMenu.modules[0];
+      if (!currentMod) return navGroups;
+
+      return (currentMod.groups || [])
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
+        .map(g => ({
+          group: g.label?.[i18n.language] || g.label?.en || g.id,
+          groupId: g.id,
+          collapsed_default: g.collapsed_default,
+          items: (g.items || [])
+            .filter(item => item.enabled !== false)
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map(item => ({
+              id: item.id,
+              label: item.label?.[i18n.language] || item.label?.en || item.id,
+              labelKey: `nav.${item.id}`,
+              fallbackLabel: item.label?.en,
+              icon: ICON_MAP[item.icon] || Settings,
+              permission: item.permission,
+              adminOnly: item.admin_only,
+              isExternal: item.is_external,
+              path: item.path,
+            })),
+        }));
+    }
+
+    // v1 format fallback: flat groups
     return dynamicMenu.groups
       .sort((a, b) => (a.order || 0) - (b.order || 0))
       .map(g => ({
@@ -528,7 +576,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const currentNavItem = filteredNavItems.find(item => item.id === activeModule) || filteredNavItems[0];
+  const currentNavItem = filteredNavItems.find(item => item.id === activeModuleTab) || filteredNavItems[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -608,12 +656,41 @@ export default function AdminDashboard() {
         </div>
       </header>
 
+      {/* Module Tabs — Horizontal navigation between major modules */}
+      {modulesTabs.length > 0 && (
+        <div className="sticky top-14 z-40 bg-card border-b overflow-x-auto">
+          <div className="flex items-center px-2 gap-0.5 h-10">
+            {modulesTabs.map(mod => {
+              const Icon = mod.icon;
+              const isActive = activeModuleTab === mod.id;
+              return (
+                <button
+                  key={mod.id}
+                  data-testid={`module-tab-${mod.id}`}
+                  onClick={() => switchModule(mod.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
+                    isActive
+                      ? 'text-white shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  style={isActive ? { backgroundColor: mod.color } : {}}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{mod.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="flex">
         {/* Sidebar - Desktop */}
         <aside
           className={cn(
-            "hidden lg:flex flex-col h-[calc(100vh-56px)] border-r bg-card/50 transition-all duration-300",
-            collapsed ? "w-16" : "w-56"
+            "hidden lg:flex flex-col border-r bg-card/50 transition-all duration-300",
+            collapsed ? "w-16" : "w-56",
+            modulesTabs.length > 0 ? "h-[calc(100vh-96px)]" : "h-[calc(100vh-56px)]"
           )}
         >
           {!collapsed && (
