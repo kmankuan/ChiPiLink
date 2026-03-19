@@ -125,19 +125,34 @@ export default function LiveRefPanel() {
 
   const scorePoint = async (side, technique = null) => {
     setShowTechnique(null);
+    // Optimistic update — show score change immediately
+    setSession(prev => {
+      if (!prev) return prev;
+      const newScore = { ...prev.score };
+      newScore[side] = (newScore[side] || 0) + 1;
+      return { ...prev, score: newScore };
+    });
     try {
       const res = await fetch(`${API}/api/sport/live/${sessionId}/point`, { method: 'POST', headers, body: JSON.stringify({ scored_by: side, technique }) });
       if (res.ok) {
         const data = await res.json();
+        // Update with server response (authoritative)
+        setSession(prev => prev ? { ...prev, score: data.score, sets_won: data.sets_won, current_set: data.current_set, server: data.server, status: data.status } : prev);
         if (data.emotions?.length > 0) {
           const emoSide = side === leftSide ? 'left' : 'right';
           setEmotion({ ...data.emotions[0], side: emoSide });
           syncDisplay({ last_emotion: data.emotions[0].type, last_emotion_side: emoSide });
           setTimeout(() => setEmotion(null), 3000);
         }
+        // Full sync only if set changed or match ended
+        if (data.current_set !== session?.current_set || data.status === 'finished') {
+          fetchSession();
+        }
+      } else {
+        // Revert optimistic update on error
         fetchSession();
       }
-    } catch { toast.error('Error'); }
+    } catch { toast.error('Error'); fetchSession(); }
   };
 
   const undoPoint = () => fetch(`${API}/api/sport/live/${sessionId}/undo`, { method: 'POST', headers }).then(() => fetchSession()).catch(() => {});

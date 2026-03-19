@@ -3,6 +3,7 @@ Sport Module — Core Business Logic
 Player management, match recording, ELO calculation, momentum engine
 """
 import uuid
+import asyncio
 import math
 import logging
 from datetime import datetime, timezone
@@ -193,12 +194,34 @@ async def create_live_session(data: dict) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     session_id = f"live_{uuid.uuid4().hex[:8]}"
 
+    # Get player photos — auto-generate thumbnails if needed
+    def _get_photo(player):
+        thumb = player.get("photo_thumb", "")
+        if thumb:
+            return thumb
+        base64 = player.get("photo_base64", "")
+        if base64 and len(base64) > 100:
+            try:
+                from .image_utils import process_player_photo
+                sizes = process_player_photo(base64)
+                # Save generated thumbnail back to player record
+                asyncio.get_event_loop().create_task(
+                    db[C_PLAYERS].update_one(
+                        {"player_id": player["player_id"]},
+                        {"$set": {"photo_thumb": sizes["thumb"], "photo_medium": sizes["medium"]}}
+                    )
+                )
+                return sizes["thumb"]
+            except Exception:
+                pass
+        return player.get("avatar_url", "")
+
     session = {
         "session_id": session_id,
         "status": "live",
-        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": pa.get("photo_thumb", "") or pa.get("avatar_url", "")},
-        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": pb.get("photo_thumb", "") or pb.get("avatar_url", "")},
-        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": ref.get("photo_thumb", "") or ref.get("avatar_url", "")},
+        "player_a": {"player_id": pa["player_id"], "nickname": pa["nickname"], "elo": pa["elo"], "photo_url": _get_photo(pa)},
+        "player_b": {"player_id": pb["player_id"], "nickname": pb["nickname"], "elo": pb["elo"], "photo_url": _get_photo(pb)},
+        "referee": {"player_id": ref["player_id"], "nickname": ref["nickname"], "photo_url": _get_photo(ref)},
         "league_id": data.get("league_id"),
         "stream_url": data.get("stream_url", ""),
         "settings": {
