@@ -73,6 +73,10 @@ export default function SportTV() {
   const [rankings, setRankings] = useState([]);
   const [timer, setTimer] = useState('0:00');
   const [tvSettings, setTvSettings] = useState({});
+  const [wsConnected, setWsConnected] = useState(false);
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
+  const reconnectAttemptsRef = useRef(0);
   const prevEmoRef = useRef(null);
   const prevCardRef = useRef(null);
   const prevCallRef = useRef(null);
@@ -92,10 +96,13 @@ export default function SportTV() {
       const st = await sr.json();
       setState(st);
       const d = st.display || {};
-      // Emotion — use last_emotion_side directly (already 'left'/'right' from referee)
+      // Emotion — use last_emotion_side and account for swapped sides
       if (d.last_emotion_at && d.last_emotion_at !== prevEmoRef.current) {
         const side = d.last_emotion_side; // 'left', 'right', 'a', 'b'
-        const mappedSide = side === 'a' ? 'left' : side === 'b' ? 'right' : side || 'center';
+        const swapped = st.display?.swapped || false;
+        const mappedSide = swapped
+          ? (side === 'a' ? 'right' : side === 'b' ? 'left' : side || 'center')
+          : (side === 'a' ? 'left' : side === 'b' ? 'right' : side || 'center');
         setEmotion({ type: d.last_emotion, side: mappedSide });
         setTimeout(() => setEmotion(null), 3000);
         prevEmoRef.current = d.last_emotion_at;
@@ -103,6 +110,12 @@ export default function SportTV() {
       if (d.last_card?.time && d.last_card.time !== prevCardRef.current) { setCardOvl(d.last_card); setTimeout(()=>setCardOvl(null),4000); prevCardRef.current=d.last_card.time; }
       if (d.last_call?.time && d.last_call.time !== prevCallRef.current) { setCallOvl(d.last_call); setTimeout(()=>setCallOvl(null),4000); prevCallRef.current=d.last_call.time; }
       if (d.last_effect_at && d.last_effect_at !== prevEffectRef.current) { setEffectOvl(d.last_effect); setTimeout(()=>setEffectOvl(null),3000); prevEffectRef.current=d.last_effect_at; }
+      // Check broadcast data for sticker effects
+      if (d.broadcast_data?.sticker && d.broadcast_data.timestamp && d.broadcast_data.timestamp !== prevEffectRef.current) {
+        setEffectOvl(d.broadcast_data.sticker);
+        setTimeout(() => setEffectOvl(null), 3000);
+        prevEffectRef.current = d.broadcast_data.timestamp;
+      }
       // Set win detection
       const totalSets = (st.sets_won?.a||0) + (st.sets_won?.b||0);
       if (totalSets > prevSetsRef.current && prevSetsRef.current >= 0 && st.sets?.length > 0) {
@@ -122,19 +135,73 @@ export default function SportTV() {
     findLive();
     fetch(`${API}/api/sport/rankings?limit=10`).then(r=>r.ok?r.json():[]).then(setRankings).catch(()=>{});
     fetch(`${API}/api/sport/settings`).then(r=>r.ok?r.json():null).then(s=>setTvSettings(s?.tv||{})).catch(()=>{});
-    const iv = setInterval(findLive, 1500);
+    // Adjust polling interval based on WebSocket status
+    const iv = setInterval(findLive, wsConnected ? 1500 : 800);
     return () => clearInterval(iv);
-  }, [findLive]);
+  }, [findLive, wsConnected]);
 
   useEffect(() => {
     const iv = setInterval(()=>{ if(state?.timers?.match_start) setTimer(formatTimer(state.timers.match_start)); }, 1000);
     return ()=>clearInterval(iv);
   }, [state?.timers?.match_start]);
 
-  useEffect(() => {
-    if (!session?.session_id) return;
-    try { const ws = new WebSocket(`${API.replace('http','ws')}/api/sport/ws/live/${session.session_id}`); ws.onmessage=()=>findLive(); return ()=>ws.close(); } catch {}
+  const connectWebSocket = useCallback(() => {
+    if (!session?.session_id || wsRef.current) return;
+    
+    try {
+      const ws = new WebSocket(`${API.replace('http','ws')}/api/sport/ws/live/${session.session_id}`);
+      wsRef.current = ws;
+      
+      ws.onopen = () => {
+        setWsConnected(true);
+        reconnectAttemptsRef.current = 0;
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+          reconnectTimeoutRef.current = null;
+        }
+      };
+      
+      ws.onmessage = () => findLive();
+      
+      ws.onclose = ws.onerror = () => {
+        setWsConnected(false);
+        wsRef.current = null;
+        
+        // Exponential backoff reconnection
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
+        reconnectAttemptsRef.current++;
+        
+        reconnectTimeoutRef.current = setTimeout(() => {
+          if (session?.session_id) connectWebSocket();
+        }, delay);
+      };
+    } catch {}
   }, [session?.session_id, findLive]);
+
+  useEffect(() => {
+    if (!session?.session_id) {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+        setWsConnected(false);
+      }
+      return;
+    }
+    
+    connectWebSocket();
+    
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      setWsConnected(false);
+    };
+  }, [connectWebSocket]);
 
   const cfg = tvSettings;
   const colorA = cfg.accent_a || '#ef4444';
@@ -227,8 +294,8 @@ export default function SportTV() {
 
               {/* LEFT PLAYER */}
               <div className="flex flex-col items-center" style={{width: '180px'}}>
-                {lp?.photo_url ? (
-                  <img src={lp.photo_url} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
+                {(lp?.photo_url || lp?.photo_thumb || lp?.photo_base64) ? (
+                  <img src={lp.photo_url || lp.photo_thumb || lp.photo_base64} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
                 ) : (
                   <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
                 )}
@@ -241,7 +308,7 @@ export default function SportTV() {
                   ))}
                 </div>
                 <div className="mt-2 flex items-center gap-1">
-                  <span className="text-8xl font-black text-white" style={{textShadow:`0 0 30px ${colorA}50`}}>{sc[ls]}</span>
+                  <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorA}50`}}>{sc[ls]}</span>
                   {state.server === ls && <span className="text-yellow-400 text-lg">🏓</span>}
                 </div>
               </div>
@@ -312,8 +379,8 @@ export default function SportTV() {
 
               {/* RIGHT PLAYER */}
               <div className="flex flex-col items-center" style={{width: '180px'}}>
-                {rp?.photo_url ? (
-                  <img src={rp.photo_url} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
+                {(rp?.photo_url || rp?.photo_thumb || rp?.photo_base64) ? (
+                  <img src={rp.photo_url || rp.photo_thumb || rp.photo_base64} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
                 ) : (
                   <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
                 )}
@@ -327,7 +394,7 @@ export default function SportTV() {
                 </div>
                 <div className="mt-2 flex items-center gap-1">
                   {state.server === rs && <span className="text-yellow-400 text-lg">🏓</span>}
-                  <span className="text-8xl font-black text-white" style={{textShadow:`0 0 30px ${colorB}50`}}>{sc[rs]}</span>
+                  <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorB}50`}}>{sc[rs]}</span>
                 </div>
               </div>
             </div>
