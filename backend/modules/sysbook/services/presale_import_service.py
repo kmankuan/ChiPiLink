@@ -343,7 +343,22 @@ class PreSaleImportService:
                 name = item.get("book_name", "")
                 grade = parsed.get("grade", "")
                 existing = None
+                
+                # Normalize code: extract short code prefix (e.g., "G7-6" from "G7-6 El Arte del Lenguaje")
+                norm_code = code
                 if code:
+                    m = re.match(r'^([A-Za-z][A-Za-z0-9]*[\-/]?\d+)', code.strip())
+                    if m:
+                        norm_code = m.group(1)
+                
+                if norm_code:
+                    # Try exact code match first
+                    existing = await db.store_products.find_one(
+                        {"code": {"$regex": f"^{re.escape(norm_code)}$", "$options": "i"}, "is_sysbook": True},
+                        {"_id": 0, "book_id": 1}
+                    )
+                if not existing and code and code != norm_code:
+                    # Try full code match (original, unparsed)
                     existing = await db.store_products.find_one(
                         {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
                         {"_id": 0, "book_id": 1}
@@ -360,7 +375,7 @@ class PreSaleImportService:
                     new_product = {
                         "book_id": new_book_id,
                         "name": name,
-                        "code": code,
+                        "code": norm_code or code,  # Use normalized short code
                         "grade": grade,
                         "price": item.get("price", 0),
                         "inventory_quantity": 0,

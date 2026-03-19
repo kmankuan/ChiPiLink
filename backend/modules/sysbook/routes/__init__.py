@@ -15,6 +15,7 @@ from .orders import router as orders_router
 from .presale_import import router as presale_import_router
 from .school_year import router as school_year_router
 from .bulk_import import router as bulk_import_router
+from .merge import router as merge_router
 
 # Still shared from store (generic store infrastructure)
 from modules.store.routes.inventory_import import router as inventory_import_router
@@ -35,6 +36,7 @@ router.include_router(orders_router)
 router.include_router(presale_import_router)
 router.include_router(school_year_router)
 router.include_router(bulk_import_router)
+router.include_router(merge_router)
 
 # Shared store infrastructure routes
 router.include_router(inventory_import_router)
