@@ -15,56 +15,71 @@ router = APIRouter(prefix="/merge", tags=["Sysbook - Merge"])
 
 @router.get("/detect-duplicates")
 async def detect_duplicates(admin: dict = Depends(get_admin_user)):
-    """Detect potential duplicate products by normalized code matching.
-    Returns groups of products that likely refer to the same book."""
+    """Detect duplicate products where one code is a clean code and another
+    has the same code with extra text appended (from bad Monday.com import).
+    
+    Example duplicate: code "G7-6" vs code "G7-6 El Arte del Lenguaje"
+    NOT duplicate: code "K4/5-4" vs code "K4/5-9" (different item numbers)
+    """
     products = await db.store_products.find(
         {"is_sysbook": True, "archived": {"$ne": True}},
         {"_id": 0, "book_id": 1, "code": 1, "name": 1, "grade": 1, "price": 1,
          "inventory_quantity": 1, "reserved_quantity": 1}
     ).to_list(2000)
 
-    # Normalize codes: extract the SHORT code (e.g., "G7-6" from "G7-6 El Arte del Lenguaje")
-    def normalize_code(code_str):
-        if not code_str:
-            return ""
-        # Extract leading code pattern: letter(s) + digits + optional hyphen/slash + digits
-        m = re.match(r'^([A-Za-z][A-Za-z0-9]*[\-/]?\d+)', code_str.strip())
-        return m.group(1).upper() if m else code_str.strip().upper()
-
-    # Group products by normalized code + grade
-    groups = {}
+    # Build index of products by grade
+    by_grade = {}
     for p in products:
-        raw_code = p.get("code", "")
-        norm = normalize_code(raw_code)
         grade = p.get("grade", "")
-        key = f"{norm}|{grade}"
+        if grade not in by_grade:
+            by_grade[grade] = []
+        by_grade[grade].append(p)
 
-        if key not in groups:
-            groups[key] = []
-        groups[key].append({
-            "book_id": p["book_id"],
-            "code": raw_code,
-            "normalized_code": norm,
-            "name": p.get("name", ""),
-            "grade": grade,
-            "price": p.get("price", 0),
-            "stock": p.get("inventory_quantity", 0),
-            "reserved": p.get("reserved_quantity", 0),
-        })
-
-    # Filter to groups with 2+ items (actual duplicates)
     duplicates = []
-    for key, items in groups.items():
-        if len(items) >= 2:
-            # The item with the shortest code is likely the "correct" one
-            items.sort(key=lambda x: len(x["code"]))
-            duplicates.append({
-                "key": key,
-                "normalized_code": items[0]["normalized_code"],
-                "grade": items[0]["grade"],
-                "items": items,
-                "suggested_keep": items[0]["book_id"],  # shortest code = likely correct
-            })
+
+    # For each grade, find products where one code is prefix of another + space
+    for grade, items in by_grade.items():
+        # Sort by code length (short codes first = likely the "correct" ones)
+        items.sort(key=lambda x: len(x.get("code", "")))
+        used = set()
+
+        for i, item_a in enumerate(items):
+            code_a = (item_a.get("code") or "").strip()
+            if not code_a or item_a["book_id"] in used:
+                continue
+
+            group_items = [item_a]
+
+            for j, item_b in enumerate(items):
+                if i == j or item_b["book_id"] in used:
+                    continue
+                code_b = (item_b.get("code") or "").strip()
+                if not code_b:
+                    continue
+
+                # Check: is code_b = code_a + " " + some_text?
+                # This catches "G7-6 El Arte del Lenguaje" as duplicate of "G7-6"
+                if code_b.startswith(code_a + " ") or code_b.startswith(code_a + "\t"):
+                    group_items.append(item_b)
+                    used.add(item_b["book_id"])
+
+            if len(group_items) > 1:
+                used.add(item_a["book_id"])
+                duplicates.append({
+                    "key": f"{code_a}|{grade}",
+                    "normalized_code": code_a,
+                    "grade": grade,
+                    "items": [{
+                        "book_id": p["book_id"],
+                        "code": p.get("code", ""),
+                        "name": p.get("name", ""),
+                        "grade": grade,
+                        "price": p.get("price", 0),
+                        "stock": p.get("inventory_quantity", 0),
+                        "reserved": p.get("reserved_quantity", 0),
+                    } for p in group_items],
+                    "suggested_keep": item_a["book_id"],  # shortest code = correct
+                })
 
     return {"total_duplicates": len(duplicates), "groups": duplicates}
 
