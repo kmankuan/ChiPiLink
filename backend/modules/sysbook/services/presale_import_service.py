@@ -338,44 +338,28 @@ class PreSaleImportService:
         for item in parsed["items"]:
             qty = item.get("quantity_ordered", 1)
             if not item.get("matched") or item.get("book_id", "").startswith("unmatched_"):
-                # Check if a product with same code already exists (may have been created by a prior order in this batch)
+                # _match_book already normalizes codes, so just re-try matching
                 code = item.get("book_code", "")
                 name = item.get("book_name", "")
                 grade = parsed.get("grade", "")
-                existing = None
                 
-                # Normalize code: extract short code prefix (e.g., "G7-6" from "G7-6 El Arte del Lenguaje")
-                norm_code = code
-                if code:
-                    m = re.match(r'^([A-Za-z][A-Za-z0-9]*[\-/]?\d+)', code.strip())
-                    if m:
-                        norm_code = m.group(1)
-                
-                if norm_code:
-                    # Try exact code match first
-                    existing = await db.store_products.find_one(
-                        {"code": {"$regex": f"^{re.escape(norm_code)}$", "$options": "i"}, "is_sysbook": True},
-                        {"_id": 0, "book_id": 1}
-                    )
-                if not existing and code and code != norm_code:
-                    # Try full code match (original, unparsed)
-                    existing = await db.store_products.find_one(
-                        {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
-                        {"_id": 0, "book_id": 1}
-                    )
-                if not existing and name:
-                    existing = await db.store_products.find_one(
-                        {"name": {"$regex": f"^{re.escape(name[:40])}", "$options": "i"}, "is_sysbook": True, "grade": grade},
-                        {"_id": 0, "book_id": 1}
-                    )
-                if existing:
-                    new_book_id = existing["book_id"]
+                # Re-try matching (handles code normalization internally)
+                match = await self._match_book(code, name, grade)
+                if match:
+                    new_book_id = match.get("product_id", "") or match.get("book_id", "")
                 else:
+                    # Normalize code for new product
+                    norm_code = code
+                    if code:
+                        m = re.match(r'^([A-Za-z][A-Za-z0-9]*[\-/]?\d+)', code.strip())
+                        if m:
+                            norm_code = m.group(1)
+                    
                     new_book_id = f"book_{uuid.uuid4().hex[:12]}"
                     new_product = {
                         "book_id": new_book_id,
                         "name": name,
-                        "code": norm_code or code,  # Use normalized short code
+                        "code": norm_code or code,
                         "grade": grade,
                         "price": item.get("price", 0),
                         "inventory_quantity": 0,
@@ -386,7 +370,7 @@ class PreSaleImportService:
                         "source": "presale_import",
                     }
                     await db.store_products.insert_one(new_product)
-                    logger.info(f"[presale] Auto-created product {new_book_id}: {code} - {name} (grade {grade})")
+                    logger.info(f"[presale] Auto-created product {new_book_id}: {norm_code or code} - {name} (grade {grade})")
                 # Update the order item with the real book_id
                 item["book_id"] = new_book_id
                 item["matched"] = True
@@ -791,8 +775,24 @@ class PreSaleImportService:
         IMPORTANT: Name-based matching is always grade-scoped to prevent cross-grade mismatches."""
         PROJ = {"_id": 0, "product_id": 1, "book_id": 1, "code": 1, "name": 1, "price": 1, "grade": 1}
 
-        # 1. Exact code match (code is globally unique, so no grade filter needed)
+        # Normalize code: extract short prefix (e.g., "G7-6" from "G7-6 El Arte del Lenguaje")
+        norm_code = code
         if code:
+            m = re.match(r'^([A-Za-z][A-Za-z0-9]*[\-/]?\d+)', code.strip())
+            if m:
+                norm_code = m.group(1)
+
+        # 1. Exact normalized code match
+        if norm_code:
+            product = await db.store_products.find_one(
+                {"code": {"$regex": f"^{re.escape(norm_code)}$", "$options": "i"}, "is_sysbook": True},
+                PROJ
+            )
+            if product:
+                return product
+
+        # 1b. Full code match (if different from normalized)
+        if code and code != norm_code:
             product = await db.store_products.find_one(
                 {"code": {"$regex": f"^{re.escape(code)}$", "$options": "i"}, "is_sysbook": True},
                 PROJ
@@ -800,7 +800,7 @@ class PreSaleImportService:
             if product:
                 return product
 
-            # 1b. Partial code match — code contains "/" which might be stored differently
+            # 1c. Partial match — code contains "/" stored as "-"
             alt_code = code.replace("/", "-")
             if alt_code != code:
                 product = await db.store_products.find_one(
@@ -810,16 +810,8 @@ class PreSaleImportService:
                 if product:
                     return product
 
-            # 1c. Try code contained in inventory code (still exact code, no grade needed)
-            product = await db.store_products.find_one(
-                {"code": {"$regex": re.escape(code), "$options": "i"}, "is_sysbook": True},
-                PROJ
-            )
-            if product:
-                return product
-
-            # Code exists but no match found — DO NOT fall through to fuzzy name matching
-            # This prevents cross-grade mismatches. Caller will auto-create a new product.
+        # If code exists (even normalized), don't fall through to fuzzy name matching
+        if norm_code:
             return None
 
         # FALLBACK: Only used when no code is available
