@@ -334,17 +334,21 @@ async def score_point(session_id: str, scored_by: str, technique: str = None) ->
             session["server"] = "a" if session["current_set"] % 2 == 1 else "b"
 
     # Update DB — include display state for emotion sync + all_points
-    emotion_update = {}
+    display_updates = {}
+    if set_won and session["status"] != "finished":
+        # Auto-swap sides after set
+        current_swapped = session.get("display", {}).get("swapped", False)
+        display_updates["display.swapped"] = not current_swapped
     if emotions:
-        emotion_update["display.last_emotion"] = emotions[0]["type"]
-        emotion_update["display.last_emotion_side"] = scored_by
-        emotion_update["display.last_emotion_at"] = datetime.now(timezone.utc).isoformat()
+        display_updates["display.last_emotion"] = emotions[0]["type"]
+        display_updates["display.last_emotion_side"] = scored_by
+        display_updates["display.last_emotion_at"] = datetime.now(timezone.utc).isoformat()
     
     await db[C_LIVE].update_one(
         {"session_id": session_id},
         {"$set": {"score": session["score"], "sets": session["sets"], "sets_won": session["sets_won"],
                   "server": session["server"], "current_set": session["current_set"],
-                  "status": session["status"], **emotion_update},
+                  "status": session["status"], **display_updates},
          "$push": {"points": point, "all_points": point}}
     )
 
