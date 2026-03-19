@@ -183,8 +183,8 @@ DEFAULT_MENU = {
 async def get_menu(admin: dict = Depends(get_admin_user)):
     """Get admin menu configuration with module tabs."""
     doc = await db[C_MENU].find_one({"_id": "admin_menu"})
-    if not doc or doc.get("version", 1) < 2:
-        # Upgrade to v2 (module tabs)
+    # Auto-upgrade to v2 if missing modules (the v2 key structure)
+    if not doc or "modules" not in doc:
         await db[C_MENU].replace_one({"_id": "admin_menu"}, DEFAULT_MENU, upsert=True)
         doc = DEFAULT_MENU
     doc.pop("_id", None)
