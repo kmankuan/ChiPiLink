@@ -1,55 +1,56 @@
 """
-Tutor Engine Proxy — Routes tutor API calls through main app to port 8003.
-Frontend calls /api/tutor/* on port 8001, this forwards to the Tutor Engine.
+Tutor Proxy — Smart routing to port 8003 with direct fallback.
+Same architecture as Sport: proxy when engine is up, direct when down.
 """
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import Request
+from fastapi.responses import Response
 import httpx
 import logging
 
-from core.auth import get_current_user, get_admin_user
-
 logger = logging.getLogger("tutor_proxy")
-router = APIRouter(prefix="/tutor", tags=["Tutor Proxy"])
 
 TUTOR_URL = "http://127.0.0.1:8003"
 _client = None
+_engine_up = False
 
 
 def _get_client():
     global _client
     if _client is None or _client.is_closed:
-        _client = httpx.AsyncClient(base_url=TUTOR_URL, timeout=httpx.Timeout(60.0, connect=3.0))
+        _client = httpx.AsyncClient(base_url=TUTOR_URL, timeout=httpx.Timeout(30.0, connect=5.0))
     return _client
 
 
-@router.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def proxy_to_tutor(path: str, request: Request):
-    """Forward all /api/tutor/* requests to the Tutor Engine on port 8003."""
-    client = _get_client()
+async def check_engine():
+    """Check if Tutor Engine is alive."""
+    global _engine_up
     try:
-        # Forward the request with same method, headers, body
+        client = _get_client()
+        r = await client.get("/health")
+        _engine_up = r.status_code == 200
+    except Exception:
+        _engine_up = False
+    return _engine_up
+
+
+async def proxy_if_available(request: Request, path: str):
+    """Try to proxy to Tutor Engine. Returns Response or None."""
+    global _engine_up
+    if not _engine_up:
+        return None
+    try:
+        client = _get_client()
         body = await request.body()
         headers = {"Content-Type": request.headers.get("content-type", "application/json")}
-        # Forward auth header
         auth = request.headers.get("authorization")
         if auth:
             headers["Authorization"] = auth
-
         r = await client.request(
-            request.method,
-            f"/api/tutor/{path}",
-            content=body,
-            headers=headers,
-            params=dict(request.query_params),
+            request.method, f"/api/tutor/{path}",
+            content=body, headers=headers, params=dict(request.query_params),
         )
-        return r.json()
-    except httpx.ConnectError:
-        raise HTTPException(503, "Tutor Engine not reachable (port 8003)")
-    except httpx.ConnectTimeout:
-        raise HTTPException(504, "Tutor Engine timeout")
-    except Exception as e:
-        # If JSON parsing fails, return raw text
-        try:
-            return r.json()
-        except Exception:
-            raise HTTPException(r.status_code if 'r' in dir() else 502, str(e)[:200])
+        return Response(content=r.content, status_code=r.status_code,
+                       media_type=r.headers.get("content-type", "application/json"))
+    except Exception:
+        _engine_up = False
+        return None

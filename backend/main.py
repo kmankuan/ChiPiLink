@@ -268,8 +268,11 @@ from modules.dev_info import router as dev_info_router
 api_router.include_router(dev_info_router)
 
 # ChiPi Tutor — Proxy to Tutor Engine (port 8003)
-from modules.tutor_proxy import router as tutor_proxy_router
-api_router.include_router(tutor_proxy_router)
+# Tutor Module — Direct routes (always works) + proxy to port 8003 when available
+from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent
+api_router.include_router(tutor_router)
+api_router.include_router(tutor_router2)
+api_router.include_router(tutor_router_parent)
 
 
 # Include main router in app
@@ -322,18 +325,25 @@ async def track_requests_middleware(request, call_next):
 # Initialize monitor after app is defined
 _init_monitor()
 
-# Sport Engine proxy middleware — offloads /api/sport/* to port 8004 when available
+# Sport & Tutor proxy middleware — offloads to separate ports when available
 @app.middleware("http")
-async def sport_proxy_middleware(request, call_next):
-    """If Sport Engine (port 8004) is running, proxy sport requests there.
-    Otherwise, fall through to direct routes in the main app."""
-    if request.url.path.startswith("/api/sport/"):
-        from modules.sport_proxy import proxy_if_available
-        path = request.url.path[len("/api/sport/"):]
-        result = await proxy_if_available(request, path)
+async def service_proxy_middleware(request, call_next):
+    """If Sport Engine (8004) or Tutor Engine (8003) is running, proxy there.
+    Otherwise, fall through to direct routes."""
+    path = request.url.path
+    
+    if path.startswith("/api/sport/"):
+        from modules.sport_proxy import proxy_if_available as sport_proxy
+        result = await sport_proxy(request, path[len("/api/sport/"):])
         if result is not None:
             return result
-    # Fall through to direct routes
+    
+    elif path.startswith("/api/tutor/"):
+        from modules.tutor_proxy import proxy_if_available as tutor_proxy
+        result = await tutor_proxy(request, path[len("/api/tutor/"):])
+        if result is not None:
+            return result
+    
     return await call_next(request)
 
 # ============== LIFECYCLE EVENTS ==============
@@ -510,13 +520,18 @@ async def startup_event():
             else:
                 logger.warning(f"[service-manager] {name} FAILED to start on port {status['port']}")
 
-        # Check Sport Engine and enable proxy
-        from modules.sport_proxy import check_engine
+        # Check engines and enable proxies
+        from modules.sport_proxy import check_engine as check_sport
+        from modules.tutor_proxy import check_engine as check_tutor
         await asyncio.sleep(2)
-        if await check_engine():
-            logger.info("[sport-proxy] Sport Engine detected on port 8004 — proxying enabled")
+        if await check_sport():
+            logger.info("[proxy] Sport Engine on port 8004 — proxying enabled ✓")
         else:
-            logger.info("[sport-proxy] Sport Engine not available — using direct routes")
+            logger.info("[proxy] Sport Engine not available — using direct routes")
+        if await check_tutor():
+            logger.info("[proxy] Tutor Engine on port 8003 — proxying enabled ✓")
+        else:
+            logger.info("[proxy] Tutor Engine not available — using direct routes")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
