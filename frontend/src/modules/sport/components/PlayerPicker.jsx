@@ -164,9 +164,20 @@ export default function PlayerPicker({ label, value, photoValue, onChange, onPho
           currentInitial={(value || '?')[0]}
           size="sm"
           onUpload={async (base64) => {
-            // AvatarUpload already crops to 400x400 — resize to 200x200 for session payload
             const thumb = await resizeToThumbnail(base64, 200);
             onPhotoChange(thumb);
+            // ALSO save to player record so TV and future sessions have it
+            const player = players.find(p => p.nickname === value);
+            if (player?.player_id) {
+              try {
+                const token = localStorage.getItem('auth_token');
+                await fetch(`${API}/api/sport/players/${player.player_id}/photo`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ photo_base64: base64 }),
+                });
+              } catch {}
+            }
           }}
         />
       )}
