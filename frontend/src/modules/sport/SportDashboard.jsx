@@ -49,14 +49,9 @@ export default function SportDashboard() {
             </div>
             <div className="flex gap-2">
               {isAdmin && (
-                <>
-                  <Button size="sm" variant="ghost" className="text-white/80 hover:text-white text-xs" onClick={() => navigate('/admin')}>
-                    ← Admin
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-white/80 hover:text-white text-xs" onClick={() => navigate('/sport/admin')}>
-                    {t('sport.admin')}
-                  </Button>
-                </>
+                <Button size="sm" variant="ghost" className="text-white/80 hover:text-white text-xs" onClick={() => navigate('/admin')}>
+                  ← Admin
+                </Button>
               )}
             </div>
           </div>
