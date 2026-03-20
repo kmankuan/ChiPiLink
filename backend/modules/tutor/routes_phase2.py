@@ -99,6 +99,28 @@ async def read_school(student_id: str, data: dict = {}, user: dict = Depends(get
     except ValueError as e:
         raise HTTPException(400, str(e))
 
+@router.post("/scan-all-students")
+async def scan_all_students(admin: dict = Depends(get_admin_user)):
+    """Scan ALL active students' school platforms. Extracts content + pushes to Monday.com."""
+    from .school_reader import school_reader
+    students = await db["tutor_students"].find(
+        {"status": "active", "school_platform": {"$exists": True, "$ne": ""}},
+        {"_id": 0, "student_id": 1, "name": 1, "school_platform": 1}
+    ).to_list(100)
+    
+    results = {"scanned": 0, "items_found": 0, "errors": [], "students": []}
+    for s in students:
+        try:
+            r = await school_reader.read_platform(s["student_id"])
+            results["scanned"] += 1
+            results["items_found"] += len(r.get("items", []))
+            results["students"].append({"name": s["name"], "items": len(r.get("items", [])), "errors": r.get("errors", [])})
+        except Exception as e:
+            results["errors"].append(f"{s['name']}: {str(e)[:100]}")
+    
+    return results
+
+
 @router.post("/read-url")
 async def read_url(data: dict, user: dict = Depends(get_current_user)):
     """Read any URL with AI vision and extract educational content."""

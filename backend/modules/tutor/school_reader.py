@@ -385,6 +385,55 @@ ACTION_REQUIRED: what tutor/parent needs to do
             return  # Skip duplicate
         
         await db[C_SCHOOL_FEED].insert_one(feed_item)
+        
+        # Push to Monday.com board if configured
+        await self._push_to_monday(feed_item)
+    
+    async def _push_to_monday(self, feed_item: dict):
+        """Push a feed item to the Monday.com Tutor School Feed board."""
+        try:
+            config = await self._get_config()
+            monday_cfg = config.get("monday_board", {})
+            if not monday_cfg.get("enabled") or not monday_cfg.get("board_id"):
+                return
+            
+            from modules.integrations.monday.core_client import monday_client
+            board_id = monday_cfg["board_id"]
+            col_map = monday_cfg.get("column_map", {})
+            
+            # Build column values
+            col_values = {}
+            if col_map.get("student_name"):
+                student = await db[C_STUDENTS].find_one({"student_id": feed_item.get("student_id")}, {"name": 1})
+                col_values[col_map["student_name"]] = student.get("name", "") if student else ""
+            if col_map.get("feed_date") and feed_item.get("created_at"):
+                col_values[col_map["feed_date"]] = {"date": feed_item["created_at"][:10]}
+            if col_map.get("feed_type"):
+                type_label = (feed_item.get("type", "notification")).replace("_", " ").title()
+                col_values[col_map["feed_type"]] = {"label": type_label}
+            if col_map.get("subject"):
+                col_values[col_map["subject"]] = feed_item.get("subject", "")
+            if col_map.get("content"):
+                col_values[col_map["content"]] = {"text": feed_item.get("content", "")[:2000]}
+            if col_map.get("urgency"):
+                col_values[col_map["urgency"]] = {"label": (feed_item.get("urgency", "normal")).title()}
+            if col_map.get("due_date") and feed_item.get("due_date"):
+                col_values[col_map["due_date"]] = {"date": feed_item["due_date"][:10]}
+            if col_map.get("action_required"):
+                col_values[col_map["action_required"]] = feed_item.get("action_required", "")
+            if col_map.get("source"):
+                col_values[col_map["source"]] = feed_item.get("source", "")
+            if col_map.get("feed_status"):
+                col_values[col_map["feed_status"]] = {"label": "New"}
+            if col_map.get("parent_notified"):
+                col_values[col_map["parent_notified"]] = {"checked": "true" if feed_item.get("notify_parent") else "false"}
+            
+            import json
+            title = feed_item.get("title", "School Feed Item")[:100]
+            await monday_client.create_item(board_id, title, json.dumps(col_values))
+            logger.info(f"Pushed to Monday: {title}")
+        except Exception as e:
+            logger.warning(f"Monday push failed: {e}")
     
     async def _update_agent_memory(self, student_id: str, items: list):
         """Feed extracted school data into the student's agent memory."""

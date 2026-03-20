@@ -53,7 +53,7 @@ export default function TutorDashboard() {
               <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/schedule')}>
                 <Calendar className="h-3.5 w-3.5 mr-1" /> Schedule
               </Button>
-              <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/board-mapper')}>
+              <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/school-feed-config')}>
                 <Settings className="h-3.5 w-3.5 mr-1" /> Config
               </Button>
             </div>

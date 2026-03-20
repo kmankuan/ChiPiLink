@@ -139,8 +139,8 @@ Write in a clear, actionable format. Use bullet points.""",
 async def get_config(admin: dict = Depends(get_admin_user)):
     """Get school feed configuration."""
     doc = await db[C_CONFIG].find_one({"_id": "school_feed_config"})
-    if not doc:
-        await db[C_CONFIG].insert_one(DEFAULT_CONFIG)
+    if not doc or not doc.get("platforms"):
+        await db[C_CONFIG].replace_one({"_id": "school_feed_config"}, DEFAULT_CONFIG, upsert=True)
         doc = DEFAULT_CONFIG
     doc.pop("_id", None)
     return doc
