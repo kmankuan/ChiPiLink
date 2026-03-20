@@ -33,7 +33,7 @@ export default function Login() {
     setLaopanLoading(true);
     try {
       const params = new URLSearchParams(window.location.search);
-      const redirectTo = params.get('redirect');
+      const redirectTo = params.get('redirect') || '/';
       await loginWithLaoPan(redirectTo);
       // If loginWithLaoPan succeeds, it redirects — so we only reach here on failure
     } catch (err) {

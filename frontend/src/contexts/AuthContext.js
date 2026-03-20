@@ -123,8 +123,9 @@ export function AuthProvider({ children }) {
   // LaoPan OAuth login
   const loginWithLaoPan = async (redirectAfter = null) => {
     const CACHE_KEY = 'laopan_auth_url';
-    // Save current page so we can return after login
-    const returnTo = redirectAfter || window.location.pathname + window.location.search;
+    // Save current page so we can return after login (never save /login itself)
+    const currentPath = window.location.pathname + window.location.search;
+    const returnTo = redirectAfter || (currentPath.startsWith('/login') || currentPath.startsWith('/admin/login') ? '/' : currentPath);
     try { sessionStorage.setItem('chipi_return_to', returnTo); } catch {}
     const params = returnTo ? `?redirect=${encodeURIComponent(returnTo)}` : '';
     
