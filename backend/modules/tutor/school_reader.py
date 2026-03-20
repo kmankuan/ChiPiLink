@@ -34,10 +34,7 @@ class SchoolReader:
         return self._browser
     
     async def read_platform(self, student_id: str, credentials: dict = None) -> Dict:
-        """
-        Read a student's school platform and extract content.
-        Returns extracted items (homework, events, grades, messages).
-        """
+        """Read a student's school platform using configurable settings."""
         student = await db[C_STUDENTS].find_one({"student_id": student_id, "status": "active"}, {"_id": 0})
         if not student:
             raise ValueError("Student not found")
@@ -48,12 +45,82 @@ class SchoolReader:
         if not platform:
             raise ValueError("No school platform configured for this student")
         
-        if platform == "imereb":
+        # Load platform config from DB
+        config = await self._get_config()
+        platform_config = config.get("platforms", {}).get(platform)
+        
+        if platform_config:
+            return await self._read_configured_platform(student, creds, platform_config)
+        elif platform == "imereb":
             return await self._read_imereb(student, creds)
         elif platform == "smart_academy":
             return await self._read_smart_academy(student, creds)
         else:
             return await self._read_generic_url(student, creds)
+
+    async def _read_configured_platform(self, student: dict, creds: dict, platform_config: dict) -> Dict:
+        """Read any platform using admin-configured selectors and sections."""
+        browser = await self._get_browser()
+        page = await browser.new_page()
+        
+        results = {"platform": platform_config.get("name", "custom"), "student": student["name"], "items": [], "errors": []}
+        
+        try:
+            username = creds.get("username", "")
+            password = creds.get("password", "")
+            
+            if not username or not password:
+                results["errors"].append(f"Missing {platform_config.get('name', 'platform')} credentials")
+                return results
+            
+            login_url = platform_config.get("login_url", "")
+            selectors = platform_config.get("selectors", {})
+            
+            await page.goto(login_url, timeout=30000)
+            await page.wait_for_timeout(2000)
+            
+            # Login
+            await page.fill(selectors.get("username", "input[type='email']"), username)
+            await page.fill(selectors.get("password", "input[type='password']"), password)
+            await page.click(selectors.get("submit", "button[type='submit']"))
+            await page.wait_for_timeout(3000)
+            
+            # Read each configured section
+            for section in platform_config.get("sections", []):
+                try:
+                    nav = section.get("nav")
+                    if nav:
+                        link = page.locator(nav).first
+                        if await link.count() > 0:
+                            await link.click()
+                            await page.wait_for_timeout(2000)
+                    
+                    screenshot = await page.screenshot(type="jpeg", quality=60)
+                    screenshot_b64 = base64.b64encode(screenshot).decode()
+                    text = await page.evaluate("() => document.body.innerText")
+                    
+                    section_prompt = section.get("prompt", f"Extract {section.get('name', 'information')} for student {student['name']}")
+                    items = await self._ai_analyze_page(screenshot_b64, text[:5000], section_prompt)
+                    
+                    for item in items:
+                        item["student_id"] = student["student_id"]
+                        item["source"] = f"{platform_config.get('name', 'custom')}:{section.get('name', 'page')}"
+                        await self._save_feed_item(item)
+                    
+                    results["items"].extend(items)
+                except Exception as e:
+                    results["errors"].append(f"{section.get('name', '?')}: {str(e)[:100]}")
+            
+        except Exception as e:
+            results["errors"].append(f"Login/navigation error: {str(e)[:200]}")
+        finally:
+            await page.close()
+        
+        if results["items"]:
+            await self._update_agent_memory(student["student_id"], results["items"])
+        
+        logger.info(f"Read {platform_config.get('name')} for {student['name']}: {len(results['items'])} items, {len(results['errors'])} errors")
+        return results
     
     async def read_url(self, url: str, student_id: str = None, instruction: str = None) -> Dict:
         """Read any URL with AI vision and extract educational content."""
@@ -230,30 +297,37 @@ class SchoolReader:
             return {"error": "No URL configured", "items": []}
         return await self.read_url(url, student["student_id"])
     
+    async def _get_config(self):
+        """Load school feed configuration from DB."""
+        config = await db[C_SCHOOL_FEED + "_config"].find_one({"_id": "school_feed_config"})
+        if not config:
+            from .school_feed_config import DEFAULT_CONFIG
+            config = DEFAULT_CONFIG
+        return config
+
     async def _ai_analyze_page(self, screenshot_b64: str, text_content: str, instruction: str) -> List[Dict]:
         """Use AI to analyze a school page and extract structured items."""
         from .services import _ai_chat
         
-        prompt = f"""{instruction}
+        # Load custom AI instructions from config
+        config = await self._get_config()
+        base_prompt = config.get("ai_instructions", {}).get("extraction_prompt", "")
+        
+        prompt = f"""{base_prompt}
+
+SPECIFIC SECTION INSTRUCTION: {instruction}
 
 PAGE TEXT CONTENT:
 {text_content[:4000]}
 
 Return the extracted information as a list. For each item found, provide:
-- type: homework | event | grade | alert | notification
-- title: brief title
-- content: detailed description
-- due_date: if applicable (YYYY-MM-DD format)
-- urgency: low | normal | high | urgent
-- subject: the school subject if applicable
-
-Format your response as structured text with each item on separate lines:
-TYPE: homework
-TITLE: Math Quiz Chapter 5
-CONTENT: Students must complete Chapter 5 quiz by Friday
-DUE_DATE: 2026-03-20
-URGENCY: high
-SUBJECT: Math
+TYPE: homework | weekly_plan | alert | material_request | grade | event | message
+TITLE: brief title
+CONTENT: detailed description
+DUE_DATE: YYYY-MM-DD if applicable
+URGENCY: low | normal | high | urgent
+SUBJECT: school subject if applicable
+ACTION_REQUIRED: what tutor/parent needs to do
 ---
 (next item)"""
 
@@ -270,7 +344,7 @@ SUBJECT: Math
                     current = {}
                 continue
             
-            for prefix in ["TYPE:", "TITLE:", "CONTENT:", "DUE_DATE:", "URGENCY:", "SUBJECT:"]:
+            for prefix in ["TYPE:", "TITLE:", "CONTENT:", "DUE_DATE:", "URGENCY:", "SUBJECT:", "ACTION_REQUIRED:"]:
                 if line.upper().startswith(prefix):
                     key = prefix.rstrip(":").lower()
                     value = line[len(prefix):].strip()
@@ -295,6 +369,7 @@ SUBJECT: Math
             "urgency": item.get("urgency", "normal"),
             "due_date": item.get("due_date"),
             "subject": item.get("subject", ""),
+            "action_required": item.get("action_required", ""),
             "status": "new",
             "notify_parent": item.get("urgency") in ("high", "urgent"),
             "created_at": now,
