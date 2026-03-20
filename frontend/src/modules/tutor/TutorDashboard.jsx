@@ -19,6 +19,7 @@ export default function TutorDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isAdmin = user?.is_admin || (() => { try { const t = localStorage.getItem('auth_token'); return t && JSON.parse(atob(t.split('.')[1])).is_admin; } catch { return false; } })();
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -44,7 +45,7 @@ export default function TutorDashboard() {
               <h1 className="text-lg font-bold text-white">ChiPi Tutor</h1>
             </div>
             <div className="flex gap-2">
-              {user?.is_admin && (
+              {isAdmin && (
                 <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/admin')}>
                   ← Admin
                 </Button>
