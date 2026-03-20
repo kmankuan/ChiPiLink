@@ -19,14 +19,14 @@ import RESOLVED_API_URL from '@/config/apiUrl';
 const API = RESOLVED_API_URL;
 
 function ParentChat({ studentId, parentName }) {
-  const token = localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem('auth_token');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    fetch(`${API}/api/tutor/parent/messages`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API}/api/tutor/parent/messages`, { headers: { Authorization: `Bearer ${getToken()}` } })
       .then(r => r.ok ? r.json() : []).then(m => setMessages(m.reverse())).catch(() => {});
   }, []);
 
@@ -46,7 +46,7 @@ function ParentChat({ studentId, parentName }) {
     setSending(true);
     try {
       const r = await fetch(`${API}/api/tutor/parent/messages`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        method: 'POST', headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input.trim() }),
       });
       if (r.ok) {
@@ -86,7 +86,7 @@ function ParentChat({ studentId, parentName }) {
 }
 
 function AgentAsk({ studentId }) {
-  const token = localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem('auth_token');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [asking, setAsking] = useState(false);
@@ -104,7 +104,7 @@ function AgentAsk({ studentId }) {
     setAsking(true);
     try {
       const r = await fetch(`${API}/api/tutor/parent/ask-agent`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        method: 'POST', headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: q }),
       });
       if (r.ok) {
@@ -337,13 +337,13 @@ function ProgressCharts({ sessions = [], stats = {}, learningProfile = {} }) {
 export default function ParentPortal() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const token = localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem('auth_token');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('overview');
 
   useEffect(() => {
-    fetch(`${API}/api/tutor/parent/dashboard`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API}/api/tutor/parent/dashboard`, { headers: { Authorization: `Bearer ${getToken()}` } })
       .then(r => r.ok ? r.json() : null).then(setData).catch(() => {}).finally(() => setLoading(false));
   }, []);
 

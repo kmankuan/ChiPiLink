@@ -19,13 +19,12 @@ export default function TutorDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}` };
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const headers = { Authorization: `Bearer ${localStorage.getItem('auth_token')}` };
     fetch(`${API}/api/tutor/students`, { headers })
       .then(r => r.ok ? r.json() : []).then(setStudents).catch(() => []).finally(() => setLoading(false));
   }, []);
@@ -45,6 +44,11 @@ export default function TutorDashboard() {
               <h1 className="text-lg font-bold text-white">ChiPi Tutor</h1>
             </div>
             <div className="flex gap-2">
+              {user?.is_admin && (
+                <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/admin')}>
+                  ← Admin
+                </Button>
+              )}
               <Button size="sm" variant="ghost" className="text-white/80 text-xs" onClick={() => navigate('/tutor/schedule')}>
                 <Calendar className="h-3.5 w-3.5 mr-1" /> Schedule
               </Button>

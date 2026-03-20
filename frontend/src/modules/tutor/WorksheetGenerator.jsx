@@ -25,8 +25,8 @@ const TYPES = [
 export default function WorksheetGenerator() {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const getToken = () => localStorage.getItem('auth_token');
+  const getHeaders = () => ({ Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' });
   const [student, setStudent] = useState(null);
   const [worksheets, setWorksheets] = useState([]);
   const [form, setForm] = useState({ subject: '', topic: '', type: 'worksheet', difficulty: 'adaptive' });
@@ -34,15 +34,15 @@ export default function WorksheetGenerator() {
   const [viewing, setViewing] = useState(null);
 
   useEffect(() => {
-    fetch(`${API}/api/tutor/students/${studentId}`, { headers }).then(r => r.ok ? r.json() : null).then(setStudent).catch(() => {});
-    fetch(`${API}/api/tutor/students/${studentId}/worksheets`, { headers }).then(r => r.ok ? r.json() : []).then(setWorksheets).catch(() => {});
+    fetch(`${API}/api/tutor/students/${studentId}`, { headers: getHeaders() }).then(r => r.ok ? r.json() : null).then(setStudent).catch(() => {});
+    fetch(`${API}/api/tutor/students/${studentId}/worksheets`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []).then(setWorksheets).catch(() => {});
   }, [studentId]);
 
   const generate = async () => {
     if (!form.subject || !form.topic) { toast.error('Subject and topic required'); return; }
     setGenerating(true);
     try {
-      const r = await fetch(`${API}/api/tutor/students/${studentId}/worksheets`, { method: 'POST', headers, body: JSON.stringify(form) });
+      const r = await fetch(`${API}/api/tutor/students/${studentId}/worksheets`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(form) });
       if (r.ok) {
         const ws = await r.json();
         toast.success('Generated!');

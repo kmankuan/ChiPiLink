@@ -24,7 +24,7 @@ export default function AgentChat() {
   const { studentId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const token = localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem('auth_token');
   const [student, setStudent] = useState(null);
   const [mode, setMode] = useState('staff');
   const [messages, setMessages] = useState([]);
@@ -34,7 +34,7 @@ export default function AgentChat() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    const h = { Authorization: `Bearer ${token}` };
+    const h = { Authorization: `Bearer ${getToken()}` };
     fetch(`${API}/api/tutor/students/${studentId}`, { headers: h }).then(r => r.ok ? r.json() : null).then(setStudent).catch(() => {});
     fetch(`${API}/api/tutor/students/${studentId}/chat-history?limit=20`, { headers: h }).then(r => r.ok ? r.json() : []).then(hist => {
       setHistory(hist.reverse());
@@ -59,7 +59,7 @@ export default function AgentChat() {
     try {
       const r = await fetch(`${API}/api/tutor/students/${studentId}/chat`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, mode }),
       });
       if (r.ok) {

@@ -25,8 +25,8 @@ function formatDuration(startIso) {
 
 export default function ClubSchedule() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const getToken = () => localStorage.getItem('auth_token');
+  const getHeaders = () => ({ Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' });
   const [schedule, setSchedule] = useState([]);
   const [students, setStudents] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
@@ -39,9 +39,9 @@ export default function ClubSchedule() {
 
   const fetchAll = () => {
     Promise.all([
-      fetch(`${API}/api/tutor/schedule?date=${today}`, { headers }).then(r => r.ok ? r.json() : []),
-      fetch(`${API}/api/tutor/students`, { headers }).then(r => r.ok ? r.json() : []),
-      fetch(`${API}/api/tutor/sessions/active`, { headers }).then(r => r.ok ? r.json() : []),
+      fetch(`${API}/api/tutor/schedule?date=${today}`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []),
+      fetch(`${API}/api/tutor/students`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []),
+      fetch(`${API}/api/tutor/sessions/active`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []),
     ]).then(([s, st, a]) => { setSchedule(s); setStudents(st); setActiveSessions(a); }).catch(() => {});
   };
   useEffect(() => { fetchAll(); }, []);
@@ -58,19 +58,19 @@ export default function ClubSchedule() {
 
   const addItem = async () => {
     const student = students.find(s => s.student_id === newItem.student_id);
-    const r = await fetch(`${API}/api/tutor/schedule`, { method: 'POST', headers, body: JSON.stringify({ ...newItem, student_name: student?.name || '', date: today }) });
+    const r = await fetch(`${API}/api/tutor/schedule`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ ...newItem, student_name: student?.name || '', date: today }) });
     if (r.ok) { toast.success('Added to schedule'); setShowAdd(false); fetchAll(); }
   };
 
   const startSession = async (scheduleId) => {
-    const r = await fetch(`${API}/api/tutor/sessions/start/${scheduleId}`, { method: 'POST', headers, body: JSON.stringify({}) });
+    const r = await fetch(`${API}/api/tutor/sessions/start/${scheduleId}`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({}) });
     if (r.ok) { toast.success('Session started!'); fetchAll(); }
     else { const e = await r.json(); toast.error(e.detail || 'Error'); }
   };
 
   const endSession = async () => {
     if (!showEnd) return;
-    const r = await fetch(`${API}/api/tutor/sessions/${showEnd.session_id}/end`, { method: 'POST', headers, body: JSON.stringify(endNotes) });
+    const r = await fetch(`${API}/api/tutor/sessions/${showEnd.session_id}/end`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(endNotes) });
     if (r.ok) { toast.success('Session completed!'); setShowEnd(null); setEndNotes({ tutor_notes: '', student_performance: '' }); fetchAll(); }
   };
 

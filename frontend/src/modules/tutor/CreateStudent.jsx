@@ -16,7 +16,7 @@ const API = RESOLVED_API_URL;
 
 export default function CreateStudent() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem('auth_token');
   const [form, setForm] = useState({
     name: '', grade: '', school: '', school_platform: '',
     parent_name: '', parent_phone: '', parent_language: 'zh',
@@ -31,7 +31,7 @@ export default function CreateStudent() {
     try {
       const r = await fetch(`${API}/api/tutor/students`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       if (r.ok) {

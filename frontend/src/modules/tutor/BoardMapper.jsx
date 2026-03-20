@@ -27,8 +27,8 @@ const COLUMN_FIELDS = [
 
 export default function BoardMapper() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const getToken = () => localStorage.getItem('auth_token');
+  const getHeaders = () => ({ Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' });
   const [boardId, setBoardId] = useState('');
   const [columns, setColumns] = useState([]);
   const [columnMap, setColumnMap] = useState({});
@@ -37,7 +37,7 @@ export default function BoardMapper() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/api/tutor/board-mappings`, { headers }).then(r => r.ok ? r.json() : []).then(m => {
+    fetch(`${API}/api/tutor/board-mappings`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []).then(m => {
       setMappings(m);
       if (m.length > 0) { setBoardId(m[0].board_id); setColumnMap(m[0].column_map || {}); }
     }).catch(() => {});
@@ -47,13 +47,13 @@ export default function BoardMapper() {
     if (!boardId) return;
     setLoading(true);
     try {
-      const r = await fetch(`${API}/api/hub/monday/stats`, { headers });
+      const r = await fetch(`${API}/api/hub/monday/stats`, { headers: getHeaders() });
       // Fetch board columns via the Monday proxy
-      const cr = await fetch(`${API}/api/sysbook/monday-config/boards`, { headers });
+      const cr = await fetch(`${API}/api/sysbook/monday-config/boards`, { headers: getHeaders() });
       if (cr.ok) {
         const boards = await cr.json();
         // Try to get columns for specific board
-        const colR = await fetch(`${API}/api/hub/connections`, { headers });
+        const colR = await fetch(`${API}/api/hub/connections`, { headers: getHeaders() });
       }
     } catch {} finally { setLoading(false); }
     // For now, let admin type column IDs manually
@@ -73,7 +73,7 @@ export default function BoardMapper() {
     if (!boardId) { toast.error('Set board ID first'); return; }
     setSyncing(true);
     try {
-      const r = await fetch(`${API}/api/tutor/sync-from-monday/${boardId}`, { method: 'POST', headers });
+      const r = await fetch(`${API}/api/tutor/sync-from-monday/${boardId}`, { method: 'POST', headers: getHeaders() });
       if (r.ok) { const d = await r.json(); toast.success(`Synced ${d.synced} students from ${d.total_items} items`); }
       else { const e = await r.json(); toast.error(e.detail || 'Sync failed'); }
     } catch { toast.error('Error'); }
