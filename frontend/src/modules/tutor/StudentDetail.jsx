@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { ArrowLeft, Bot, GraduationCap, BookOpen, Brain, Globe, FileText, Plus, RefreshCw, Trash2, Send } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
+import SchoolLoginCard from './SchoolLoginCard';
 
 const API = RESOLVED_API_URL;
 
@@ -241,7 +242,7 @@ export default function StudentDetail() {
           </TabsContent>
 
           {/* Info Tab */}
-          <TabsContent value="info">
+          <TabsContent value="info" className="space-y-3">
             <Card><CardContent className="p-3 space-y-2 text-xs">
               <div className="grid grid-cols-2 gap-2">
                 <div><Label className="text-[10px]">Name</Label><p className="font-medium">{student.name}</p></div>
@@ -254,6 +255,7 @@ export default function StudentDetail() {
                 <div><Label className="text-[10px]">Status</Label><Badge className="bg-green-100 text-green-700 text-[9px]">{student.status}</Badge></div>
               </div>
             </CardContent></Card>
+            <SchoolLoginCard student={student} onUpdate={fetchAll} />
           </TabsContent>
         </Tabs>
       </div>

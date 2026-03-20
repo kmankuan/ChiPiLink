@@ -99,6 +99,18 @@ async def read_school(student_id: str, data: dict = {}, user: dict = Depends(get
     except ValueError as e:
         raise HTTPException(400, str(e))
 
+
+@router.post("/students/{student_id}/test-school-login")
+async def test_school_login(student_id: str, data: dict = {}, user: dict = Depends(get_current_user)):
+    """Test school platform login without extracting content. Returns success/fail + screenshot."""
+    from .school_reader import school_reader
+    try:
+        result = await school_reader.test_login(student_id, data.get("credentials"))
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
 @router.post("/scan-all-students")
 async def scan_all_students(admin: dict = Depends(get_admin_user)):
     """Scan ALL active students' school platforms. Extracts content + pushes to Monday.com."""

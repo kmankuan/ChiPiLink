@@ -33,17 +33,155 @@ class SchoolReader:
             self._browser = await pw.chromium.launch(headless=True, args=['--no-sandbox', '--disable-gpu'])
         return self._browser
     
+    async def test_login(self, student_id: str, credentials: dict = None) -> Dict:
+        """Test login to a school platform. Returns success/fail + screenshot."""
+        student = await db[C_STUDENTS].find_one({"student_id": student_id, "status": "active"}, {"_id": 0})
+        if not student:
+            raise ValueError("Student not found")
+        
+        creds = credentials or student.get("school_credentials", {})
+        url = creds.get("url", "") or student.get("school_url", "")
+        username = creds.get("username", "")
+        password = creds.get("password", "")
+        
+        if not url or not username or not password:
+            raise ValueError("Missing school URL, username, or password")
+        
+        browser = await self._get_browser()
+        page = await browser.new_page()
+        
+        try:
+            success, screenshot_b64 = await self._smart_login(page, url, username, password)
+            return {
+                "success": success,
+                "message": "Login successful!" if success else "Login may have failed — check screenshot",
+                "screenshot": screenshot_b64,
+                "url": page.url,
+            }
+        except Exception as e:
+            screenshot = await page.screenshot(type="jpeg", quality=50)
+            return {
+                "success": False,
+                "message": str(e)[:200],
+                "screenshot": base64.b64encode(screenshot).decode() if screenshot else "",
+                "url": page.url,
+            }
+        finally:
+            await page.close()
+
+    async def _smart_login(self, page, url: str, username: str, password: str) -> tuple:
+        """Intelligent login that handles direct forms, modals, and various platforms.
+        Returns (success: bool, screenshot_base64: str)."""
+        
+        await page.goto(url, timeout=30000, wait_until="networkidle")
+        await page.wait_for_timeout(2000)
+        
+        # Strategy 1: Direct visible login form
+        user_input = await self._find_input(page, [
+            'input[type="email"]:visible', 'input[name="username"]:visible',
+            'input[name="usuario"]:visible', 'input[name="user"]:visible',
+            'input[id*="user"]:visible', 'input[id*="email"]:visible',
+            'input[id*="login"]:visible', 'input[id*="Usuario"]:visible',
+        ])
+        
+        if not user_input:
+            # Strategy 2: Click login button to open modal
+            login_btn = await self._find_element(page, [
+                'button:has-text("Login")', 'button:has-text("Iniciar")',
+                'a:has-text("Login")', 'a:has-text("Iniciar")',
+                'button:has-text("Acceder")', 'a:has-text("Acceder")',
+                '.login-btn', '#loginBtn', '[data-target*="login"]',
+                'button:has-text("Entrar")', 'a:has-text("Entrar")',
+                '.btn-login', '#btn-login',
+            ])
+            if login_btn:
+                await login_btn.click()
+                await page.wait_for_timeout(2000)
+            
+            # Try finding input again (now in modal)
+            user_input = await self._find_input(page, [
+                'input[type="email"]', 'input[name="username"]',
+                'input[name="usuario"]', 'input[name="user"]',
+                'input[id*="user"]', 'input[id*="email"]',
+                'input[id*="login"]', 'input[id*="Usuario"]',
+                'input[id*="txtUsuario"]', 'input[name="txtUsuario"]',
+                '.modal input[type="text"]', '.modal input[type="email"]',
+                'dialog input[type="text"]', 'dialog input[type="email"]',
+            ])
+        
+        if not user_input:
+            screenshot = await page.screenshot(type="jpeg", quality=50)
+            raise ValueError("Could not find login form — check screenshot")
+        
+        # Fill username
+        await user_input.fill(username)
+        
+        # Find password field
+        pwd_input = await self._find_input(page, [
+            'input[type="password"]', 'input[name="password"]',
+            'input[name="clave"]', 'input[id*="pass"]',
+            'input[id*="clave"]', 'input[id*="Clave"]',
+            'input[name="txtClave"]',
+        ])
+        if pwd_input:
+            await pwd_input.fill(password)
+        
+        # Find and click submit
+        submit_btn = await self._find_element(page, [
+            'button[type="submit"]', 'input[type="submit"]',
+            '.modal button:has-text("Entrar")', '.modal button:has-text("Login")',
+            '.modal button:has-text("Iniciar")', '.modal button:has-text("Acceder")',
+            'button:has-text("Entrar")', 'button:has-text("Login")',
+            'button:has-text("Iniciar sesión")', 'button:has-text("Acceder")',
+            '#btnLogin', '#btn-login', '.btn-submit',
+            'input[value*="Login"]', 'input[value*="Entrar"]',
+        ])
+        if submit_btn:
+            await submit_btn.click()
+            await page.wait_for_timeout(4000)
+        
+        # Take screenshot after login attempt
+        screenshot = await page.screenshot(type="jpeg", quality=50)
+        screenshot_b64 = base64.b64encode(screenshot).decode()
+        
+        # Detect success: check if URL changed or if login form disappeared
+        current_url = page.url
+        login_form_gone = not await self._find_input(page, ['input[type="password"]:visible'])
+        url_changed = current_url != url
+        
+        return (login_form_gone or url_changed, screenshot_b64)
+    
+    async def _find_input(self, page, selectors: list):
+        """Try multiple selectors, return first visible match."""
+        for sel in selectors:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() > 0 and await loc.is_visible():
+                    return loc
+            except:
+                pass
+        return None
+    
+    async def _find_element(self, page, selectors: list):
+        """Try multiple selectors, return first visible match."""
+        for sel in selectors:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() > 0:
+                    return loc
+            except:
+                pass
+        return None
+
     async def read_platform(self, student_id: str, credentials: dict = None) -> Dict:
-        """Read a student's school platform using configurable settings."""
+        """Read a student's school platform using smart auto-login."""
         student = await db[C_STUDENTS].find_one({"student_id": student_id, "status": "active"}, {"_id": 0})
         if not student:
             raise ValueError("Student not found")
         
         platform = student.get("school_platform", "")
         creds = credentials or student.get("school_credentials", {})
-        
-        if not platform:
-            raise ValueError("No school platform configured for this student")
+        url = creds.get("url", "") or student.get("school_url", "")
         
         # Load platform config from DB
         config = await self._get_config()
@@ -51,12 +189,52 @@ class SchoolReader:
         
         if platform_config:
             return await self._read_configured_platform(student, creds, platform_config)
-        elif platform == "imereb":
-            return await self._read_imereb(student, creds)
-        elif platform == "smart_academy":
-            return await self._read_smart_academy(student, creds)
+        elif url:
+            # Smart auto-login for any URL
+            return await self._read_smart(student, creds, url)
         else:
-            return await self._read_generic_url(student, creds)
+            raise ValueError("No school platform or URL configured for this student")
+    
+    async def _read_smart(self, student: dict, creds: dict, url: str) -> Dict:
+        """Read any school platform using smart auto-login + AI extraction."""
+        browser = await self._get_browser()
+        page = await browser.new_page()
+        results = {"platform": "auto", "student": student["name"], "items": [], "errors": []}
+        
+        try:
+            username = creds.get("username", "")
+            password = creds.get("password", "")
+            if not username or not password:
+                results["errors"].append("Missing credentials")
+                return results
+            
+            success, _ = await self._smart_login(page, url, username, password)
+            if not success:
+                results["errors"].append("Login may have failed")
+            
+            # Extract content from the dashboard page
+            screenshot = await page.screenshot(type="jpeg", quality=60)
+            screenshot_b64 = base64.b64encode(screenshot).decode()
+            text = await page.evaluate("() => document.body.innerText")
+            
+            items = await self._ai_analyze_page(screenshot_b64, text[:5000], 
+                f"Extract ALL educational information for student {student['name']}: homework, weekly planner, alerts, grades, messages, material requests")
+            
+            for item in items:
+                item["student_id"] = student["student_id"]
+                item["source"] = f"auto:{url}"
+                await self._save_feed_item(item)
+            
+            results["items"] = items
+        except Exception as e:
+            results["errors"].append(str(e)[:200])
+        finally:
+            await page.close()
+        
+        if results["items"]:
+            await self._update_agent_memory(student["student_id"], results["items"])
+        
+        return results
 
     async def _read_configured_platform(self, student: dict, creds: dict, platform_config: dict) -> Dict:
         """Read any platform using admin-configured selectors and sections."""
