@@ -88,9 +88,9 @@ export default function SportTV() {
       if (!sessions.length) { setSession(null); setState(null); return; }
       const latest = sessions[0];
       setSession(latest);
-      const sr = await fetch(`${API}/api/sport/live/${latest.session_id}/state`);
-      if (!sr.ok) return;
-      const st = await sr.json();
+      // Use the session data directly — it already has score, sets, display
+      // Only fetch /state if we need extra fields
+      const st = latest;
       setState(st);
       const d = st.display || {};
       // Emotion — use last_emotion_side and account for swapped sides
@@ -117,9 +117,9 @@ export default function SportTV() {
       const totalSets = (st.sets_won?.a||0) + (st.sets_won?.b||0);
       if (totalSets > prevSetsRef.current && prevSetsRef.current >= 0 && st.sets?.length > 0) {
         const lastSet = st.sets[st.sets.length-1];
-        const winnerSide = lastSet.winner;
-        const swapped = st.display?.swapped || false;
-        const winnerName = winnerSide === (swapped?'b':'a') ? (st.player_a||latest.player_a)?.nickname : (st.player_b||latest.player_b)?.nickname;
+        const winnerSide = lastSet.winner; // 'a' or 'b'
+        // winner is always relative to the original player assignment (not swapped display)
+        const winnerName = winnerSide === 'a' ? (st.player_a||latest.player_a)?.nickname : (st.player_b||latest.player_b)?.nickname;
         const msg = tvSettings.set_win_messages?.en || `Congratulations ${winnerName}! This set is yours!`;
         setSetWinOvl({ winner: winnerName, message: msg.replace('{winner}', winnerName) });
         setTimeout(()=>setSetWinOvl(null), 5000);
@@ -132,8 +132,8 @@ export default function SportTV() {
     findLive();
     fetch(`${API}/api/sport/rankings?limit=10`).then(r=>r.ok?r.json():[]).then(setRankings).catch(()=>{});
     fetch(`${API}/api/sport/settings`).then(r=>r.ok?r.json():null).then(s=>setTvSettings(s?.tv||{})).catch(()=>{});
-    // Fallback polling every 2s (Ably handles real-time)
-    const iv = setInterval(findLive, 2000);
+    // Fast polling as reliable backup — ensures 100% sync even if Ably drops
+    const iv = setInterval(findLive, 1000);
     return () => clearInterval(iv);
   }, [findLive]);
 
