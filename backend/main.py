@@ -269,11 +269,12 @@ api_router.include_router(dev_info_router)
 
 # ChiPi Tutor — Proxy to Tutor Engine (port 8003)
 # Tutor Module — Direct routes (always works) + proxy to port 8003 when available
-from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent, router_school_config as tutor_school_config_router
+from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent, router_school_config as tutor_school_config_router, router_monday_setup as tutor_monday_setup_router
 api_router.include_router(tutor_router)
 api_router.include_router(tutor_router2)
 api_router.include_router(tutor_router_parent)
 api_router.include_router(tutor_school_config_router)
+api_router.include_router(tutor_monday_setup_router)
 
 
 # Include main router in app
