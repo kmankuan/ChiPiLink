@@ -52,24 +52,16 @@ class LaoPanOAuthService:
         """
         Get the OAuth callback URL.
         Automatically detects environment from request origin.
-        
-        Priority:
-        1. Request origin (from Referer/Origin header) - auto-detects environment
-        2. FRONTEND_URL environment variable - fallback
         """
-        # Use origin if provided (auto-detection)
         if origin:
-            # Clean the origin (remove trailing slashes)
             clean_origin = origin.rstrip('/')
             return f"{clean_origin}/auth/laopan/callback"
         
-        # Fallback to environment variable
         if FRONTEND_URL:
             return f"{FRONTEND_URL}/auth/laopan/callback"
         
-        # Last resort - will cause OAuth error but provides clear message
-        logger.warning("No FRONTEND_URL configured and no origin provided")
-        return "/auth/laopan/callback"
+        # Auto-detect from known production domains
+        return "https://chipilink.me/auth/laopan/callback"
     
     async def generate_auth_url(self, redirect_after: Optional[str] = None, origin: Optional[str] = None) -> Dict:
         """
