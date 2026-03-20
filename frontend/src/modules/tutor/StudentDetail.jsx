@@ -20,8 +20,7 @@ const API = RESOLVED_API_URL;
 export default function StudentDetail() {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem('auth_token');
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}`, 'Content-Type': 'application/json' });
   const [student, setStudent] = useState(null);
   const [agent, setAgent] = useState(null);
   const [knowledge, setKnowledge] = useState([]);
@@ -34,22 +33,22 @@ export default function StudentDetail() {
 
   const fetchAll = () => {
     Promise.all([
-      fetch(`${API}/api/tutor/students/${studentId}`, { headers }).then(r => r.ok ? r.json() : null),
-      fetch(`${API}/api/tutor/students/${studentId}/agent`, { headers }).then(r => r.ok ? r.json() : null),
-      fetch(`${API}/api/tutor/students/${studentId}/knowledge`, { headers }).then(r => r.ok ? r.json() : []),
+      fetch(`${API}/api/tutor/students/${studentId}`, { headers: getHeaders() }).then(r => r.ok ? r.json() : null),
+      fetch(`${API}/api/tutor/students/${studentId}/agent`, { headers: getHeaders() }).then(r => r.ok ? r.json() : null),
+      fetch(`${API}/api/tutor/students/${studentId}/knowledge`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []),
     ]).then(([s, a, k]) => { setStudent(s); setAgent(a); setKnowledge(k); }).catch(() => {}).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchAll(); }, [studentId]);
 
   const updateAgent = async (data) => {
-    const r = await fetch(`${API}/api/tutor/students/${studentId}/agent`, { method: 'PUT', headers, body: JSON.stringify(data) });
+    const r = await fetch(`${API}/api/tutor/students/${studentId}/agent`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(data) });
     if (r.ok) { const a = await r.json(); setAgent(a); toast.success('Agent updated'); }
   };
 
   const rebuildPrompt = async () => {
     setRebuilding(true);
-    const r = await fetch(`${API}/api/tutor/students/${studentId}/agent/rebuild`, { method: 'POST', headers });
+    const r = await fetch(`${API}/api/tutor/students/${studentId}/agent/rebuild`, { method: 'POST', headers: getHeaders() });
     if (r.ok) { const d = await r.json(); toast.success(`Prompt rebuilt: ${d.prompt_tokens} tokens, ${d.knowledge_items} sources`); fetchAll(); }
     setRebuilding(false);
   };
@@ -57,7 +56,7 @@ export default function StudentDetail() {
   const readSchool = async () => {
     setReadingSchool(true);
     try {
-      const r = await fetch(`${API}/api/tutor/students/${studentId}/read-school`, { method: 'POST', headers, body: JSON.stringify({}) });
+      const r = await fetch(`${API}/api/tutor/students/${studentId}/read-school`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({}) });
       if (r.ok) {
         const d = await r.json();
         const itemCount = d.items?.length || 0;
@@ -74,14 +73,14 @@ export default function StudentDetail() {
 
   const addUrl = async () => {
     if (!newUrl) return;
-    const r = await fetch(`${API}/api/tutor/students/${studentId}/knowledge/url`, { method: 'POST', headers, body: JSON.stringify({ url: newUrl }) });
+    const r = await fetch(`${API}/api/tutor/students/${studentId}/knowledge/url`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ url: newUrl }) });
     if (r.ok) { toast.success('URL added + AI processed'); setNewUrl(''); fetchAll(); }
     else toast.error('Failed to process URL');
   };
 
   const addNote = async () => {
     if (!newNote) return;
-    await fetch(`${API}/api/tutor/students/${studentId}/knowledge/note`, { method: 'POST', headers, body: JSON.stringify({ note: newNote }) });
+    await fetch(`${API}/api/tutor/students/${studentId}/knowledge/note`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ note: newNote }) });
     toast.success('Note added'); setNewNote(''); fetchAll();
   };
 
