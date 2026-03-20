@@ -143,10 +143,8 @@ export default function SportTV() {
   }, [state?.timers?.match_start]);
 
   // Ably real-time: instant updates when referee scores
-  useAblyChannel(
-    session?.session_id ? `sport:live:${session.session_id}` : null,
-    useCallback(() => { findLive(); }, [findLive])
-  );
+  // NOTE: This hook needs AblyChatProvider — handled by AblyScoreSync below
+  const ablyChannelName = session?.session_id ? `sport:live:${session.session_id}` : null;
 
   const cfg = tvSettings;
   const colorA = cfg.accent_a || '#ef4444';
@@ -372,15 +370,26 @@ export default function SportTV() {
           </div>
         </div>
 
-        {/* Chat sidebar */}
-        {showChat && session?.session_id && (
-          <div className="w-60 shrink-0 flex flex-col border-l border-white/5 bg-black/30">
-            <AblyChatProvider clientId={`tv_${session.session_id}`}>
-              <LiveChat roomId={`live:${session.session_id}`} userName="TV" compact={false} />
-            </AblyChatProvider>
-          </div>
+        {/* Chat sidebar + Ably score sync */}
+        {session?.session_id && (
+          <AblyChatProvider clientId={`tv_${session.session_id}`}>
+            {/* Ably score sync — triggers findLive on every score update */}
+            <AblyScoreSync channelName={ablyChannelName} onUpdate={findLive} />
+            {showChat && (
+              <div className="w-60 shrink-0 flex flex-col border-l border-white/5 bg-black/30">
+                <LiveChat roomId={`live:${session.session_id}`} userName="TV" compact={false} />
+              </div>
+            )}
+          </AblyChatProvider>
         )}
       </div>
     </div>
   );
+}
+
+// Inner component that subscribes to Ably — must be inside AblyChatProvider
+function AblyScoreSync({ channelName, onUpdate }) {
+  const cb = useCallback(() => { if (onUpdate) onUpdate(); }, [onUpdate]);
+  useAblyChannel(channelName, cb);
+  return null;
 }
