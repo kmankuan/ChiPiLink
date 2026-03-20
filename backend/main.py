@@ -269,14 +269,13 @@ api_router.include_router(dev_info_router)
 
 # ChiPi Tutor — Proxy to Tutor Engine (port 8003)
 # Tutor Module — Direct routes (always works) + proxy to port 8003 when available
-# Tutor Module — Direct routes + proxy to port 8003
+# Tutor Module — Direct routes (fallback) + proxy to port 8003 when available
 from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent
+from modules.tutor.school_feed_config import router as school_feed_config_router
+from modules.tutor.monday_board_setup import router as monday_board_setup_router
 api_router.include_router(tutor_router)
 api_router.include_router(tutor_router2)
 api_router.include_router(tutor_router_parent)
-# School Feed Config + Monday Setup — registered directly (bypass Tutor Engine proxy)
-from modules.tutor.school_feed_config import router as school_feed_config_router
-from modules.tutor.monday_board_setup import router as monday_board_setup_router
 api_router.include_router(school_feed_config_router)
 api_router.include_router(monday_board_setup_router)
 
@@ -345,12 +344,10 @@ async def service_proxy_middleware(request, call_next):
             return result
     
     elif path.startswith("/api/tutor/"):
-        # Don't proxy new config routes (not in Tutor Engine yet)
-        if not path.startswith("/api/tutor/school-feed-config") and not path.startswith("/api/tutor/setup-monday-board"):
-            from modules.tutor_proxy import proxy_if_available as tutor_proxy
-            result = await tutor_proxy(request, path[len("/api/tutor/"):])
-            if result is not None:
-                return result
+        from modules.tutor_proxy import proxy_if_available as tutor_proxy
+        result = await tutor_proxy(request, path[len("/api/tutor/"):])
+        if result is not None:
+            return result
     
     return await call_next(request)
 
