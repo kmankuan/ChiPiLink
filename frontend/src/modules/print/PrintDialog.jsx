@@ -33,6 +33,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
   const [currentPage, setCurrentPage] = useState(0);
   const [printing, setPrinting] = useState(false);
   const [printed, setPrinted] = useState(false);
+  const printedRef = useRef(false); // Ref to avoid stale closure in setTimeout
   const [confirmPrint, setConfirmPrint] = useState(false); // Ask user to confirm print
   const [jobId, setJobId] = useState(null);
   const printRef = useRef(null);
@@ -66,11 +67,11 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         const allPrinted = (data.orders || []).every(o => o.printed_at);
         setPrinted(allPrinted && (data.orders || []).length > 0);
       } else {
-        setPrinted(false);
+        setPrinted(false); printedRef.current = false;
       }
     } catch (err) {
       console.error('Error fetching print data:', err);
-      setPrinted(false);
+      setPrinted(false); printedRef.current = false;
     } finally {
       setLoading(false);
     }
@@ -103,7 +104,9 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
 
   /** Called when user confirms they actually printed */
   const handleConfirmPrinted = () => {
+    if (printed || printedRef.current) return; // Prevent double-call
     setPrinted(true);
+    printedRef.current = true;
     setConfirmPrint(false);
     setCountdown(0);
     markJobComplete();
@@ -211,7 +214,7 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         // Hard fallback: if window still open after 30s, close and ask
         setTimeout(() => {
           if (!printWindow.closed) printWindow.close();
-          if (!confirmPrint && !printed) askPrintConfirmation();
+          if (!printedRef.current && !confirmPrint) askPrintConfirmation();
         }, 30000);
       }, 800);
     } catch (err) {
