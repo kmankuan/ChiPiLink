@@ -140,9 +140,8 @@ export default function LiveRefPanel() {
         setSession(prev => prev ? { ...prev, score: data.score, sets_won: data.sets_won, current_set: data.current_set, server: data.server, status: data.status } : prev);
         if (data.emotions?.length > 0) {
           const emoSide = side === leftSide ? 'left' : 'right';
-          setEmotion({ ...data.emotions[0], side: emoSide });
+          // Only sync to TV display, don't show on referee panel
           syncDisplay({ last_emotion: data.emotions[0].type, last_emotion_side: emoSide });
-          setTimeout(() => setEmotion(null), 3000);
         }
         // Full sync only if set changed or match ended
         if (data.current_set !== session?.current_set || data.status === 'finished') {

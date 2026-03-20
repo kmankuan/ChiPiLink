@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Radio, Trophy, Star } from 'lucide-react';
 // EmotionOverlay removed — stickers now shown inline beside player photos
-import { AblyChatProvider } from '@/modules/ably/AblyProvider';
+import { AblyChatProvider, useAblyChannel } from '@/modules/ably/AblyProvider';
 import LiveChat from '@/modules/ably/LiveChat';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -73,10 +73,7 @@ export default function SportTV() {
   const [rankings, setRankings] = useState([]);
   const [timer, setTimer] = useState('0:00');
   const [tvSettings, setTvSettings] = useState({});
-  const [wsConnected, setWsConnected] = useState(false);
-  const wsRef = useRef(null);
-  const reconnectTimeoutRef = useRef(null);
-  const reconnectAttemptsRef = useRef(0);
+  // Ably handles real-time sync (no WebSocket needed)
   const prevEmoRef = useRef(null);
   const prevCardRef = useRef(null);
   const prevCallRef = useRef(null);
@@ -135,73 +132,21 @@ export default function SportTV() {
     findLive();
     fetch(`${API}/api/sport/rankings?limit=10`).then(r=>r.ok?r.json():[]).then(setRankings).catch(()=>{});
     fetch(`${API}/api/sport/settings`).then(r=>r.ok?r.json():null).then(s=>setTvSettings(s?.tv||{})).catch(()=>{});
-    // Adjust polling interval based on WebSocket status
-    const iv = setInterval(findLive, wsConnected ? 1500 : 800);
+    // Fallback polling every 2s (Ably handles real-time)
+    const iv = setInterval(findLive, 2000);
     return () => clearInterval(iv);
-  }, [findLive, wsConnected]);
+  }, [findLive]);
 
   useEffect(() => {
     const iv = setInterval(()=>{ if(state?.timers?.match_start) setTimer(formatTimer(state.timers.match_start)); }, 1000);
     return ()=>clearInterval(iv);
   }, [state?.timers?.match_start]);
 
-  const connectWebSocket = useCallback(() => {
-    if (!session?.session_id || wsRef.current) return;
-    
-    try {
-      const ws = new WebSocket(`${API.replace('http','ws')}/api/sport/ws/live/${session.session_id}`);
-      wsRef.current = ws;
-      
-      ws.onopen = () => {
-        setWsConnected(true);
-        reconnectAttemptsRef.current = 0;
-        if (reconnectTimeoutRef.current) {
-          clearTimeout(reconnectTimeoutRef.current);
-          reconnectTimeoutRef.current = null;
-        }
-      };
-      
-      ws.onmessage = () => findLive();
-      
-      ws.onclose = ws.onerror = () => {
-        setWsConnected(false);
-        wsRef.current = null;
-        
-        // Exponential backoff reconnection
-        const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
-        reconnectAttemptsRef.current++;
-        
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (session?.session_id) connectWebSocket();
-        }, delay);
-      };
-    } catch {}
-  }, [session?.session_id, findLive]);
-
-  useEffect(() => {
-    if (!session?.session_id) {
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-        setWsConnected(false);
-      }
-      return;
-    }
-    
-    connectWebSocket();
-    
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
-      setWsConnected(false);
-    };
-  }, [connectWebSocket]);
+  // Ably real-time: instant updates when referee scores
+  useAblyChannel(
+    session?.session_id ? `sport:live:${session.session_id}` : null,
+    useCallback(() => { findLive(); }, [findLive])
+  );
 
   const cfg = tvSettings;
   const colorA = cfg.accent_a || '#ef4444';
