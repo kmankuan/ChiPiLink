@@ -146,8 +146,12 @@ class TextbookOrderService(BaseService):
         logger.info(f"[get_or_create_order] Found student: {student.get('full_name')}, user_id={student.get('user_id')}")
         
         if student.get("user_id") != user_id:
-            logger.warning(f"[get_or_create_order] Access denied - student user_id={student.get('user_id')}, request user_id={user_id}")
-            raise ValueError("Access denied")
+            # Check if user is an approved linked user
+            linked = student.get("linked_users", [])
+            is_linked = any(lu.get("user_id") == user_id and lu.get("status") == "approved" for lu in linked)
+            if not is_linked:
+                logger.warning(f"[get_or_create_order] Access denied - student user_id={student.get('user_id')}, request user_id={user_id}")
+                raise ValueError("Access denied")
         
         # Check if student has approved enrollment for current year
         current_year = self.get_current_year()
@@ -225,6 +229,19 @@ class TextbookOrderService(BaseService):
             "monday_item_id": None,
             "monday_subitems": []
         }
+        
+        # Auto-share with linked users of this student
+        linked = student.get("linked_users", [])
+        shared_with = []
+        for lu in linked:
+            if lu.get("status") == "approved" and lu.get("user_id") != user_id:
+                shared_with.append({"user_id": lu["user_id"], "role": "editor", "added_at": datetime.now(timezone.utc).isoformat()})
+        # Also share with primary owner if different from current user
+        primary_uid = student.get("user_id", "")
+        if primary_uid and primary_uid != user_id and not any(s["user_id"] == primary_uid for s in shared_with):
+            shared_with.append({"user_id": primary_uid, "role": "editor", "added_at": datetime.now(timezone.utc).isoformat()})
+        if shared_with:
+            order_data["shared_with"] = shared_with
         
         return await self.order_repo.create(order_data)
     

@@ -72,8 +72,14 @@ class StudentRecordRepository(BaseRepository):
         return await self.find_one({"student_id": student_id})
     
     async def get_by_user(self, user_id: str, include_inactive: bool = False) -> List[Dict]:
-        """Get all student records for a user (excludes archived)"""
-        query = {"user_id": user_id, "$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}
+        """Get all student records for a user — includes students they're linked to"""
+        query = {
+            "$or": [
+                {"user_id": user_id},
+                {"linked_users": {"$elemMatch": {"user_id": user_id, "status": "approved"}}},
+            ],
+            "$and": [{"$or": [{"archived": {"$ne": True}}, {"archived": {"$exists": False}}]}]
+        }
         if not include_inactive:
             query["is_active"] = True
         return await self.find_many(

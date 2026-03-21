@@ -38,6 +38,9 @@ router.include_router(school_year_router)
 router.include_router(bulk_import_router)
 router.include_router(merge_router)
 
+from .student_links import router as student_links_router
+router.include_router(student_links_router)
+
 # Shared store infrastructure routes
 router.include_router(inventory_import_router)
 router.include_router(form_config_router)
