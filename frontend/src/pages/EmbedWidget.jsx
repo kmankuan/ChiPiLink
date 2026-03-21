@@ -1031,7 +1031,7 @@ function WidgetHeader({ user, hideUrl, onClose, onLogout }) {
       <div className="flex items-center gap-1">
         {user && (
           <span className="text-[10px] text-muted-foreground mr-1 truncate max-w-[120px]">
-            {user.display_name || user.nombre || user.email?.split('@')[0]}
+            {user.display_name || user.nombre || user.name || user.email?.split('@')[0]}
           </span>
         )}
         {user && onLogout && (

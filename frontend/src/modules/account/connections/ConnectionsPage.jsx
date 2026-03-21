@@ -487,12 +487,12 @@ export default function MisConexiones({ token }) {
                       <Avatar>
                         <AvatarImage src={selectedUser.avatar} />
                         <AvatarFallback>
-                          {selectedUser.nombre?.charAt(0) || '?'}
+                          {(selectedUser.nombre || selectedUser.name || '')?.charAt(0) || '?'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <p className="font-medium">
-                          {selectedUser.nombre} {selectedUser.apellido}
+                          {(selectedUser.nombre || selectedUser.name)} {selectedUser.apellido}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {selectedUser.email}

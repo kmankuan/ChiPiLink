@@ -256,7 +256,7 @@ export default function RapidPinPublicPage() {
     }
     
     try {
-      const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
+      const userName = user?.nombre || user?.name || user?.email?.split('@')[0] || 'Usuario';
       const response = await fetch(
         `${API_BASE}/api/sport/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}&user_name=${encodeURIComponent(userName)}`,
         { method: 'POST' }
@@ -288,7 +288,7 @@ export default function RapidPinPublicPage() {
     
     setSubmittingComment(true);
     try {
-      const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
+      const userName = user?.nombre || user?.name || user?.email?.split('@')[0] || 'Usuario';
       const response = await fetch(
         `${API_BASE}/api/sport/rapidpin/challenge/${selectedChallengeForComments.queue_id}/comment?user_id=${currentPlayerId}&content=${encodeURIComponent(newComment)}&user_name=${encodeURIComponent(userName)}`,
         { method: 'POST' }

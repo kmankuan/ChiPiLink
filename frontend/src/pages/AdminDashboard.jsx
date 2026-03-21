@@ -634,7 +634,7 @@ export default function AdminDashboard() {
                 <Button variant="ghost" className="h-9 px-3 gap-2">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline max-w-[100px] truncate">
-                    {user?.nombre?.split(' ')[0] || 'Admin'}
+                    {(user?.nombre || user?.name || '')?.split(' ')[0] || 'Admin'}
                   </span>
                 </Button>
               </DropdownMenuTrigger>

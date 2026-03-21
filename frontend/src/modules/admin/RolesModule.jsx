@@ -865,7 +865,7 @@ export default function RolesModule() {
           <DialogHeader>
             <DialogTitle>{t('roles.assignRole')}</DialogTitle>
             <DialogDescription>
-              {t('roles.assignRoleDesc')} {selectedUserForRole?.nombre || selectedUserForRole?.email}
+              {t('roles.assignRoleDesc')} {selectedUserForRole?.nombre || selectedUserForRole?.name || selectedUserForRole?.email}
             </DialogDescription>
           </DialogHeader>
           

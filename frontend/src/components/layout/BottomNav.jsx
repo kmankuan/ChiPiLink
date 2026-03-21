@@ -131,7 +131,7 @@ export default function BottomNav() {
                     isProfile || isAdminPage ? 'bg-[#C8102E]/10' : ''
                   }`}>
                     <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#C8102E] to-[#8b1a2a] flex items-center justify-center text-white text-[9px] font-bold">
-                      {(user?.nombre || 'U')[0].toUpperCase()}
+                      {(user?.nombre || user?.name || 'U')[0].toUpperCase()}
                     </div>
                   </div>
                   <span className={`text-[9px] leading-tight tracking-tight ${
@@ -141,7 +141,7 @@ export default function BottomNav() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="top" className="w-52 mb-2 rounded-xl shadow-lg" style={{ background: '#FBF7F0', border: '1px solid rgba(139,115,85,0.15)' }}>
                 <div className="px-3 py-2 border-b" style={{ borderColor: 'rgba(139,115,85,0.1)' }}>
-                  <p className="text-sm font-bold truncate" style={{ color: '#2d2217' }}>{user?.nombre || 'User'}</p>
+                  <p className="text-sm font-bold truncate" style={{ color: '#2d2217' }}>{user?.nombre || user?.name || 'User'}</p>
                   <p className="text-[10px] truncate" style={{ color: '#8b7355' }}>{user?.email}</p>
                 </div>
                 <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2"><User className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>

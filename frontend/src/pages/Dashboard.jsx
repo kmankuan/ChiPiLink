@@ -355,7 +355,7 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">
-            Bienvenido, {user?.nombre || 'Usuario'}
+            Bienvenido, {user?.nombre || user?.name || 'Usuario'}
           </h1>
           <p className="text-muted-foreground">
             Gestione los estudiantes y realice pedidos de books

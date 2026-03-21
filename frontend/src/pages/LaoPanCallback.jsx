@@ -51,7 +51,7 @@ export default function LaoPanCallback() {
               window.close();
               return;
             }
-            toast.success(`Welcome, ${result?.nombre || ''}!`);
+            toast.success(`Welcome, ${result?.nombre || result?.name || ''}!`);
             navigate('/');
             return;
           } catch {}

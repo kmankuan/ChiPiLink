@@ -93,7 +93,7 @@ export default function UserProfile({ token, user }) {
         },
         body: JSON.stringify({
           user_type_id: userTypeId,
-          display_name: user?.nombre || '',
+          display_name: user?.nombre || user?.name || '',
           language: lang
         })
       });
@@ -199,7 +199,7 @@ export default function UserProfile({ token, user }) {
             <Avatar className="h-24 w-24">
               <AvatarImage src={profile.avatar_url} />
               <AvatarFallback className="text-2xl" style={{ backgroundColor: userTypeInfo.color || '#6366f1' }}>
-                {(profile.display_name || user?.nombre || 'U')[0].toUpperCase()}
+                {(profile.display_name || user?.nombre || user?.name || 'U')[0].toUpperCase()}
               </AvatarFallback>
             </Avatar>
             
