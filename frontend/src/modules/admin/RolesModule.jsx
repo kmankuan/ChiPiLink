@@ -108,7 +108,7 @@ export default function RolesModule() {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const response = await fetch(`${API}/api/users-v2/all?limit=100`, {
+      const response = await fetch(`${API}/api/auth-v2/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
