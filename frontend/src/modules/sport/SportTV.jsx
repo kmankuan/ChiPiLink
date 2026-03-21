@@ -216,17 +216,17 @@ export default function SportTV() {
               {ref?.photo_url ? (
                 <img src={ref.photo_url} className="w-9 h-9 rounded-full object-cover border-2 border-white/20" alt="" />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/30 text-sm font-bold">{(ref?.nickname||'?')[0]}</div>
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/30 text-xl font-bold">{(ref?.nickname||'?')[0]}</div>
               )}
-              <span className="text-white/60 text-base font-bold">⚖️ {ref?.nickname}</span>
+              <span className="text-white/60 text-xl font-bold">⚖️ {ref?.nickname}</span>
             </div>
             
             <div className="flex items-center gap-4">
-              <span className="text-white/30 text-base">Set {state.current_set} · Bo{totalSetsToWin * 2 - 1}</span>
+              <span className="text-white/30 text-xl">Set {state.current_set} · Bo{totalSetsToWin * 2 - 1}</span>
               <span className="text-white font-mono text-3xl font-bold" style={{textShadow:'0 0 20px rgba(255,255,255,0.1)'}}>{timer}</span>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-white/50 text-base font-bold">LIVE</span>
+                <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-white/50 text-xl font-bold">LIVE</span>
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function SportTV() {
                 const aWon = set.winner === (swapped?'b':'a');
                 const winnerColor = aWon ? colorA : colorB;
                 return (
-                  <div key={i} className="px-4 py-2 rounded-full text-lg font-bold transition-all" 
+                  <div key={i} className="px-6 py-3 rounded-full text-2xl font-bold transition-all" 
                     style={{
                       background: `${winnerColor}20`,
                       border: `2px solid ${winnerColor}40`, 
@@ -252,7 +252,7 @@ export default function SportTV() {
                 );
               })}
               {state.current_set > 1 && (
-                <div className="px-4 py-2 rounded-full text-lg font-bold bg-white/10 border-2 border-white/20 text-white animate-pulse">
+                <div className="px-6 py-3 rounded-full text-2xl font-bold bg-white/10 border-2 border-white/20 text-white animate-pulse">
                   R{state.current_set}: <strong>playing</strong>
                 </div>
               )}
@@ -292,7 +292,7 @@ export default function SportTV() {
                 {/* Stars below name */}
                 <div className="flex gap-1 mt-2">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
-                    <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
+                    <Star key={i} className={`h-7 w-7 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
                       style={i < (sw[ls]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
@@ -300,10 +300,10 @@ export default function SportTV() {
                 {/* Score BELOW stars */}
                 <div className="mt-3 flex items-center gap-2">
                   <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorA}50`}}>{sc[ls]}</span>
-                  {state.server === ls && <span className="text-yellow-400 text-xl">🏓</span>}
+                  {state.server === ls && <span className="text-yellow-400 text-3xl">🏓</span>}
                 </div>
                 
-                <p className="text-white/20 text-sm mt-2">ELO {lp?.elo}</p>
+                <p className="text-white/20 text-lg mt-2">ELO {lp?.elo}</p>
               </div>
 
               {/* LEFT STICKER ZONE — Per-point stickers */}
@@ -315,7 +315,7 @@ export default function SportTV() {
                 ) : streakL >= 3 ? (
                   <div className="text-center">
                     <span className="text-[5rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorA}40)`}}>🔥</span>
-                    <p className="text-lg font-black mt-1" style={{color:colorA}}>{streakL}x COMBO</p>
+                    <p className="text-2xl font-black mt-1" style={{color:colorA}}>{streakL}x COMBO</p>
                   </div>
                 ) : streakL >= 2 ? (
                   <div className="text-center">
@@ -373,7 +373,7 @@ export default function SportTV() {
                           }}>
                           <div className="flex h-full">
                             {/* Left half - first point */}
-                            <div className="flex-1 flex items-center justify-center text-xs"
+                            <div className="flex-1 flex items-center justify-center text-sm"
                               style={{
                                 background: hasPt1 ? (isCombo ? `linear-gradient(45deg, ${pt1Color}, ${pt1Color}dd)` : pt1Color) : 'rgba(255,255,255,0.02)',
                                 border: !hasPt1 ? '1px solid rgba(255,255,255,0.04)' : 'none'
@@ -381,7 +381,7 @@ export default function SportTV() {
                               {hasPt1 ? getPointEmoji(pt1, pairIndex * 2) : '·'}
                             </div>
                             {/* Right half - second point */}
-                            <div className="flex-1 flex items-center justify-center text-xs"
+                            <div className="flex-1 flex items-center justify-center text-sm"
                               style={{
                                 background: hasPt2 ? (isCombo ? `linear-gradient(45deg, ${pt2Color}dd, ${pt2Color})` : pt2Color) : 'rgba(255,255,255,0.02)',
                                 border: !hasPt2 ? '1px solid rgba(255,255,255,0.04)' : 'none'
@@ -395,7 +395,7 @@ export default function SportTV() {
                   })()}
                 </div>
                 
-                <span className="text-white/10 text-xs font-black mt-2">VS</span>
+                <span className="text-white/10 text-lg font-black mt-2">VS</span>
                 
                 {/* CENTER ZONE for set celebrations */}
                 {(emotion && emotionSide === 'center') && (
@@ -415,7 +415,7 @@ export default function SportTV() {
                 ) : streakR >= 3 ? (
                   <div className="text-center">
                     <span className="text-[5rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorB}40)`}}>🔥</span>
-                    <p className="text-lg font-black mt-1" style={{color:colorB}}>{streakR}x COMBO</p>
+                    <p className="text-2xl font-black mt-1" style={{color:colorA}}>{streakL}x COMBO</p>
                   </div>
                 ) : streakR >= 2 ? (
                   <div className="text-center">
@@ -454,18 +454,18 @@ export default function SportTV() {
                 {/* Stars below name */}
                 <div className="flex gap-1 mt-2">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
-                    <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
+                    <Star key={i} className={`h-7 w-7 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
                       style={i < (sw[rs]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
                 
                 {/* Score BELOW stars */}
                 <div className="mt-3 flex items-center gap-2">
-                  {state.server === rs && <span className="text-yellow-400 text-xl">🏓</span>}
+                  {state.server === rs && <span className="text-yellow-400 text-3xl">🏓</span>}
                   <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorB}50`}}>{sc[rs]}</span>
                 </div>
                 
-                <p className="text-white/20 text-sm mt-2">ELO {rp?.elo}</p>
+                <p className="text-white/20 text-lg mt-2">ELO {rp?.elo}</p>
               </div>
             </div>
           </div>
