@@ -42,7 +42,7 @@ class AuditLogService:
             "actor_nombre": actor_info.get("name") if actor_info else None,
             "target_type": target_type,
             "target_id": target_id,
-            "target_nombre": target_nombre,
+            "target_name": target_name,
             "details": details or {},
             "ip_address": ip_address,
             "user_agent": user_agent,
