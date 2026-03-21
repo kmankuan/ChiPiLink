@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Trophy, Zap, Plus, Users, Award, ChevronRight, Radio, Medal, Scale } from 'lucide-react';
+import { usePermissions } from '@/hooks/usePermissions';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -19,7 +20,9 @@ export default function SportDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { hasPermission } = usePermissions();
   const isAdmin = user?.is_admin;
+  const canReferee = isAdmin || hasPermission('sport.referee');
   const [live, setLive] = useState([]);
   const [matches, setMatches] = useState([]);
   const [players, setPlayers] = useState([]);
@@ -70,7 +73,7 @@ export default function SportDashboard() {
               onClick={() => navigate('/sport/live/new')}>
               <Zap className="h-4 w-4" /> Referee
             </Button>
-            {isAdmin && (
+            {canReferee && (
               <Button className="h-14 rounded-xl text-white font-bold text-xs flex-col gap-1" style={{ background: '#7c3aed' }}
                 onClick={() => navigate('/sport/live/new?stream=1')}>
                 <Radio className="h-4 w-4" /> Stream
@@ -118,7 +121,7 @@ export default function SportDashboard() {
           <Button variant="outline" size="sm" className="flex-1 rounded-full text-xs" onClick={() => navigate('/sport/players')}>
             <Users className="h-3.5 w-3.5 mr-1" /> {t('sport.players')}
           </Button>
-          {isAdmin && (
+          {canReferee && (
             <Button variant="outline" size="sm" className="flex-1 rounded-full text-xs border-purple-200 text-purple-700" onClick={() => navigate('/sport/tournament/new')}>
               <Award className="h-3.5 w-3.5 mr-1" /> Tournament
             </Button>
