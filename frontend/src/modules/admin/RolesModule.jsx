@@ -112,7 +112,7 @@ export default function RolesModule() {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setUsers(data.users || []);
+      setUsers(Array.isArray(data) ? data : data.users || []);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
