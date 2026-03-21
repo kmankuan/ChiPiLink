@@ -210,275 +210,158 @@ export default function SportTV() {
       <div className="flex-1 flex min-h-0">
         {/* GAME AREA */}
         <div className="flex-1 flex flex-col">
-          {/* Header — referee photo + name + timer */}
+          {/* Header — referee + timer */}
           <div className="flex items-center justify-between px-8 py-3">
             <div className="flex items-center gap-3">
-              {ref?.photo_url ? (
-                <img src={ref.photo_url} className="w-9 h-9 rounded-full object-cover border-2 border-white/20" alt="" />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/30 text-sm font-bold">{(ref?.nickname||'?')[0]}</div>
-              )}
-              <span className="text-white/60 text-base font-bold">⚖️ {ref?.nickname}</span>
+              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-white/50 text-base font-bold">LIVE</span>
+              <span className="text-white/30 text-base">Round {state.current_set}</span>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <span className="text-white/30 text-base">Set {state.current_set} · Bo{totalSetsToWin * 2 - 1}</span>
-              <span className="text-white font-mono text-3xl font-bold" style={{textShadow:'0 0 20px rgba(255,255,255,0.1)'}}>{timer}</span>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-white/50 text-base font-bold">LIVE</span>
+            <span className="text-white font-mono text-3xl font-bold" style={{textShadow:'0 0 20px rgba(255,255,255,0.1)'}}>{timer}</span>
+            <div className="flex items-center gap-3">
+              {ref?.photo_url ? (
+                <img src={ref.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20" alt="" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/30 text-sm font-bold">{(ref?.nickname||'?')[0]}</div>
+              )}
+              <div>
+                <span className="text-white/60 text-sm font-bold">⚖️ {ref?.nickname}</span>
+                <span className="text-white/20 text-xs block">Referee</span>
               </div>
             </div>
           </div>
 
-          {/* Set History Ribbon — moved above main area, bigger */}
-          {state.sets?.length > 0 && (
-            <div className="flex items-center justify-center gap-4 py-3 px-8 bg-black/20">
-              {state.sets.map((set,i) => {
-                const aScore = swapped ? set.score_b : set.score_a;
-                const bScore = swapped ? set.score_a : set.score_b;
-                const aWon = set.winner === (swapped?'b':'a');
-                const winnerColor = aWon ? colorA : colorB;
-                return (
-                  <div key={i} className="px-4 py-2 rounded-full text-lg font-bold transition-all" 
-                    style={{
-                      background: `${winnerColor}20`,
-                      border: `2px solid ${winnerColor}40`, 
-                      color: winnerColor,
-                      boxShadow: `0 0 15px ${winnerColor}20`
-                    }}>
-                    R{i+1}: <strong>{aScore}-{bScore}</strong>
-                  </div>
-                );
-              })}
-              {state.current_set > 1 && (
-                <div className="px-4 py-2 rounded-full text-lg font-bold bg-white/10 border-2 border-white/20 text-white animate-pulse">
-                  R{state.current_set}: <strong>playing</strong>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* MAIN — Players + Sticker Zones + Battle Bar */}
+          {/* MAIN — Players + Sticker Zones + Totem Bar */}
           <div className="flex-1 flex items-center justify-center px-6">
-            <div className="flex items-center w-full max-w-7xl">
+            <div className="flex items-center gap-0 w-full max-w-6xl">
 
-              {/* LEFT PLAYER — Hexagonal photo */}
-              <div className="flex flex-col items-center" style={{width: '200px'}}>
+              {/* LEFT PLAYER */}
+              <div className="flex flex-col items-center" style={{width: '180px'}}>
                 {(lp?.photo_url || lp?.photo_thumb || lp?.photo_base64) ? (
-                  <img src={lp.photo_url || lp.photo_thumb || lp.photo_base64} 
-                    className="w-[140px] h-[140px] object-cover" 
-                    style={{
-                      clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-                      border: `4px solid ${colorA}`,
-                      boxShadow: `0 0 30px ${colorA}40`
-                    }} 
-                    alt="" />
+                  <img src={lp.photo_url || lp.photo_thumb || lp.photo_base64} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorA}`,boxShadow:`0 0 25px ${colorA}30`}} alt="" />
                 ) : (
-                  <div className="w-[140px] h-[140px] bg-white/5 flex items-center justify-center text-6xl font-bold" 
-                    style={{
-                      clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-                      border: `4px solid ${colorA}`,
-                      color: colorA,
-                      boxShadow: `0 0 30px ${colorA}40`
-                    }}>
-                    {(lp?.nickname||'?')[0]}
-                  </div>
+                  <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorA}`,color:colorA}}>{(lp?.nickname||'?')[0]}</div>
                 )}
-                
-                {/* Player name BELOW photo */}
-                <p className="text-2xl font-black mt-4" style={{color:colorA}}>{lp?.nickname}</p>
-                
-                {/* Stars below name */}
+                <p className="text-2xl font-black mt-2" style={{color:colorA}}>{lp?.nickname}</p>
+                <p className="text-white/20 text-xs">ELO {lp?.elo}</p>
                 <div className="flex gap-1 mt-2">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
                     <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[ls]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
                       style={i < (sw[ls]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
-                
-                {/* Score BELOW stars */}
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-1">
                   <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorA}50`}}>{sc[ls]}</span>
-                  {state.server === ls && <span className="text-yellow-400 text-xl">🏓</span>}
+                  {state.server === ls && <span className="text-yellow-400 text-lg">🏓</span>}
                 </div>
-                
-                <p className="text-white/20 text-sm mt-2">ELO {lp?.elo}</p>
               </div>
 
-              {/* LEFT STICKER ZONE — Per-point stickers */}
-              <div className="flex-1 flex items-center justify-center min-h-[200px] px-4">
+              {/* LEFT STICKER ZONE — big celebration area */}
+              <div className="flex-1 flex items-center justify-center min-h-[200px]">
                 {(emotion && emotionSide === 'left') ? (
                   <div className="text-center animate-bounce">
-                    <span className="text-[6rem] leading-none" style={{filter:`drop-shadow(0 0 30px ${colorA}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
-                  </div>
-                ) : streakL >= 3 ? (
-                  <div className="text-center">
-                    <span className="text-[5rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorA}40)`}}>🔥</span>
-                    <p className="text-lg font-black mt-1" style={{color:colorA}}>{streakL}x COMBO</p>
+                    <span className="text-[7rem] leading-none" style={{filter:`drop-shadow(0 0 30px ${colorA}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
                   </div>
                 ) : streakL >= 2 ? (
                   <div className="text-center">
-                    <span className="text-[4rem] leading-none" style={{filter:`drop-shadow(0 0 15px ${colorA}30)`}}>⚡</span>
-                    <p className="text-base font-black mt-1" style={{color:colorA}}>streak</p>
+                    <span className="text-[6rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorA}40)`}}>{streakL >= 5 ? '🐉' : streakL >= 3 ? '🔥' : '⚡'}</span>
+                    <p className="text-lg font-black mt-1" style={{color:colorA}}>{streakL}x COMBO</p>
                   </div>
                 ) : null}
               </div>
 
-              {/* CENTER — Battle Bar with 2-point blocks, bottom to top */}
-              <div className="flex flex-col items-center shrink-0" style={{width: '120px'}}>
-                {/* Center icon/trophy */}
-                <div className="w-14 h-14 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center mb-3 shrink-0">
+              {/* CENTER — Totem Faces Battle Bar + Trophy on top */}
+              <div className="flex flex-col items-center shrink-0" style={{width: '110px'}}>
+                <div className="w-14 h-14 rounded-full bg-black/60 border-2 border-white/10 flex items-center justify-center mb-2 shrink-0">
                   {centerIcon ? (
                     <img src={centerIcon} className="w-10 h-10 rounded-full object-contain" alt="" />
                   ) : (
                     <span className="text-2xl">🏓</span>
                   )}
                 </div>
-                
-                {/* Battle bar with 2-point paired blocks */}
-                <div className="flex flex-col-reverse items-center gap-1 w-full rounded-xl overflow-hidden bg-white/[0.02] p-2" style={{height: '320px'}}>
-                  {(() => {
-                    // Group points into pairs for 2-point blocks
-                    const pairs = [];
-                    for (let i = 0; i < currentSetPoints.length; i += 2) {
-                      pairs.push([currentSetPoints[i], currentSetPoints[i+1] || null]);
-                    }
-                    
-                    // Add empty pairs to fill the battle bar
-                    const totalPairs = Math.ceil(Math.max(max, currentSetPoints.length + 1) / 2);
-                    while (pairs.length < totalPairs) {
-                      pairs.push([null, null]);
-                    }
-                    
-                    return pairs.map((pair, pairIndex) => {
-                      const [pt1, pt2] = pair;
-                      const hasPt1 = !!pt1;
-                      const hasPt2 = !!pt2;
-                      const pt1Left = pt1?.scored_by === ls;
-                      const pt2Left = pt2?.scored_by === ls;
-                      const pt1Color = hasPt1 ? (pt1Left ? colorA : colorB) : 'transparent';
-                      const pt2Color = hasPt2 ? (pt2Left ? colorA : colorB) : 'transparent';
-                      
-                      // Check if both points are same color (combo effect)
-                      const isCombo = hasPt1 && hasPt2 && pt1?.scored_by === pt2?.scored_by;
-                      const isLatestPair = pairIndex === Math.floor(currentSetPoints.length / 2);
-                      
-                      return (
-                        <div key={pairIndex} className="w-full rounded-lg overflow-hidden transition-all duration-300" 
-                          style={{
-                            height: '24px',
-                            transform: isLatestPair && (hasPt1 || hasPt2) ? 'scale(1.05)' : 'scale(1)',
-                            boxShadow: isLatestPair && (hasPt1 || hasPt2) ? `0 0 10px ${pt1Color || pt2Color}60` : 'none'
-                          }}>
-                          <div className="flex h-full">
-                            {/* Left half - first point */}
-                            <div className="flex-1 flex items-center justify-center text-xs"
-                              style={{
-                                background: hasPt1 ? (isCombo ? `linear-gradient(45deg, ${pt1Color}, ${pt1Color}dd)` : pt1Color) : 'rgba(255,255,255,0.02)',
-                                border: !hasPt1 ? '1px solid rgba(255,255,255,0.04)' : 'none'
-                              }}>
-                              {hasPt1 ? getPointEmoji(pt1, pairIndex * 2) : '·'}
-                            </div>
-                            {/* Right half - second point */}
-                            <div className="flex-1 flex items-center justify-center text-xs"
-                              style={{
-                                background: hasPt2 ? (isCombo ? `linear-gradient(45deg, ${pt2Color}dd, ${pt2Color})` : pt2Color) : 'rgba(255,255,255,0.02)',
-                                border: !hasPt2 ? '1px solid rgba(255,255,255,0.04)' : 'none'
-                              }}>
-                              {hasPt2 ? getPointEmoji(pt2, pairIndex * 2 + 1) : '·'}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    });
-                  })()}
+                <div className="flex flex-col-reverse items-center gap-[3px] w-full rounded-xl overflow-hidden bg-white/[0.02] px-1 py-2" style={{height: '300px'}}>
+                  {Array.from({length: totalSlots}).map((_, i) => {
+                    const pt = currentSetPoints[i];
+                    const scorer = pt?.scored_by;
+                    const isLeft = scorer === ls;
+                    const isFilled = !!scorer;
+                    const isLatest = i === currentSetPoints.length - 1 && isFilled;
+                    const fillColor = isLeft ? colorA : (scorer ? colorB : 'transparent');
+                    const emoji = getPointEmoji(pt, i);
+                    return (
+                      <div key={i} className="w-full flex items-center justify-center transition-all duration-300"
+                        style={{
+                          flex: 1, borderRadius: '8px',
+                          background: isFilled ? `linear-gradient(180deg, ${fillColor}, ${fillColor}cc)` : 'rgba(255,255,255,0.02)',
+                          border: isFilled ? 'none' : '1px solid rgba(255,255,255,0.04)',
+                          boxShadow: isLatest ? `0 0 14px ${fillColor}80, inset 0 1px 0 rgba(255,255,255,0.15)` : isFilled ? `inset 0 2px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.3)` : 'none',
+                          transform: isLatest ? 'scale(1.08)' : 'scale(1)',
+                          opacity: isFilled ? 1 : 0.3,
+                          fontSize: isFilled ? '16px' : '10px',
+                        }}
+                      >{emoji}</div>
+                    );
+                  })}
                 </div>
-                
                 <span className="text-white/10 text-xs font-black mt-2">VS</span>
-                
-                {/* CENTER ZONE for set celebrations */}
-                {(emotion && emotionSide === 'center') && (
-                  <div className="mt-4 text-center animate-bounce">
-                    <span className="text-[4rem]">🏆</span>
-                    <p className="text-xl font-black text-yellow-400">Congratulations!</p>
-                  </div>
-                )}
               </div>
 
-              {/* RIGHT STICKER ZONE — Per-point stickers */}
-              <div className="flex-1 flex items-center justify-center min-h-[200px] px-4">
+              {/* RIGHT STICKER ZONE — big celebration area */}
+              <div className="flex-1 flex items-center justify-center min-h-[200px]">
                 {(emotion && emotionSide === 'right') ? (
                   <div className="text-center animate-bounce">
-                    <span className="text-[6rem] leading-none" style={{filter:`drop-shadow(0 0 30px ${colorB}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
-                  </div>
-                ) : streakR >= 3 ? (
-                  <div className="text-center">
-                    <span className="text-[5rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorB}40)`}}>🔥</span>
-                    <p className="text-lg font-black mt-1" style={{color:colorB}}>{streakR}x COMBO</p>
+                    <span className="text-[7rem] leading-none" style={{filter:`drop-shadow(0 0 30px ${colorB}60)`}}>{EMOTION_EMOJI[emotion.type] || '✨'}</span>
                   </div>
                 ) : streakR >= 2 ? (
                   <div className="text-center">
-                    <span className="text-[4rem] leading-none" style={{filter:`drop-shadow(0 0 15px ${colorB}30)`}}>⚡</span>
-                    <p className="text-base font-black mt-1" style={{color:colorB}}>streak</p>
+                    <span className="text-[6rem] leading-none" style={{filter:`drop-shadow(0 0 20px ${colorB}40)`}}>{streakR >= 5 ? '🐉' : streakR >= 3 ? '🔥' : '⚡'}</span>
+                    <p className="text-lg font-black mt-1" style={{color:colorB}}>{streakR}x COMBO</p>
                   </div>
                 ) : null}
               </div>
 
-              {/* RIGHT PLAYER — Hexagonal photo */}
-              <div className="flex flex-col items-center" style={{width: '200px'}}>
+              {/* RIGHT PLAYER */}
+              <div className="flex flex-col items-center" style={{width: '180px'}}>
                 {(rp?.photo_url || rp?.photo_thumb || rp?.photo_base64) ? (
-                  <img src={rp.photo_url || rp.photo_thumb || rp.photo_base64} 
-                    className="w-[140px] h-[140px] object-cover" 
-                    style={{
-                      clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-                      border: `4px solid ${colorB}`,
-                      boxShadow: `0 0 30px ${colorB}40`
-                    }} 
-                    alt="" />
+                  <img src={rp.photo_url || rp.photo_thumb || rp.photo_base64} className="w-28 h-28 rounded-full object-cover" style={{border:`4px solid ${colorB}`,boxShadow:`0 0 25px ${colorB}30`}} alt="" />
                 ) : (
-                  <div className="w-[140px] h-[140px] bg-white/5 flex items-center justify-center text-6xl font-bold" 
-                    style={{
-                      clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-                      border: `4px solid ${colorB}`,
-                      color: colorB,
-                      boxShadow: `0 0 30px ${colorB}40`
-                    }}>
-                    {(rp?.nickname||'?')[0]}
-                  </div>
+                  <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center text-5xl" style={{border:`4px solid ${colorB}`,color:colorB}}>{(rp?.nickname||'?')[0]}</div>
                 )}
-                
-                {/* Player name BELOW photo */}
-                <p className="text-2xl font-black mt-4" style={{color:colorB}}>{rp?.nickname}</p>
-                
-                {/* Stars below name */}
+                <p className="text-2xl font-black mt-2" style={{color:colorB}}>{rp?.nickname}</p>
+                <p className="text-white/20 text-xs">ELO {rp?.elo}</p>
                 <div className="flex gap-1 mt-2">
                   {Array.from({length: totalSetsToWin}).map((_,i) => (
                     <Star key={i} className={`h-5 w-5 transition-all ${i < (sw[rs]||0) ? 'text-yellow-400 fill-yellow-400' : 'text-white/10'}`}
                       style={i < (sw[rs]||0) ? {filter:'drop-shadow(0 0 6px rgba(234,179,8,0.5))'} : {}} />
                   ))}
                 </div>
-                
-                {/* Score BELOW stars */}
-                <div className="mt-3 flex items-center gap-2">
-                  {state.server === rs && <span className="text-yellow-400 text-xl">🏓</span>}
+                <div className="mt-2 flex items-center gap-1">
+                  {state.server === rs && <span className="text-yellow-400 text-lg">🏓</span>}
                   <span className="text-[10rem] font-black text-white leading-none" style={{textShadow:`0 0 30px ${colorB}50`}}>{sc[rs]}</span>
                 </div>
-                
-                <p className="text-white/20 text-sm mt-2">ELO {rp?.elo}</p>
               </div>
             </div>
           </div>
 
-          {/* Match finished celebration */}
-          {state.status === 'finished' && (
-            <div className="flex flex-col items-center px-8 py-4">
-              <div className="text-center animate-bounce">
+          {/* Set scores + Match finished */}
+          <div className="flex flex-col items-center px-8 pb-2">
+            {state.sets?.length > 0 && (
+              <div className="flex items-center gap-3 mb-2">
+                {state.sets.map((set,i) => {
+                  const aScore = swapped ? set.score_b : set.score_a;
+                  const bScore = swapped ? set.score_a : set.score_b;
+                  const aWon = set.winner === (swapped?'b':'a');
+                  return <div key={i} className="px-3 py-1 rounded-lg text-sm font-mono" style={{background:aWon?`${colorA}15`:`${colorB}15`, border:`1px solid ${aWon?colorA:colorB}30`, color:aWon?colorA:colorB}}>R{i+1}: <strong>{aScore}-{bScore}</strong></div>;
+                })}
+              </div>
+            )}
+            {state.status === 'finished' && (
+              <div className="text-center mt-2 animate-bounce">
                 <span className="text-6xl">🏆</span>
                 <p className="text-4xl font-black text-yellow-400 mt-2">{state.winner===ls?lp?.nickname:rp?.nickname} WINS!</p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Footer */}
           <div className="px-8 py-2 bg-black/20 flex items-center justify-between">
