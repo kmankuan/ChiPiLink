@@ -294,8 +294,9 @@ export default function RolesModule() {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      u.nombre?.toLowerCase().includes(term) ||
-      u.email?.toLowerCase().includes(term)
+      (u.nombre || u.name || '').toLowerCase().includes(term) ||
+      (u.email || '').toLowerCase().includes(term) ||
+      (u.last_name || '').toLowerCase().includes(term)
     );
   });
 
