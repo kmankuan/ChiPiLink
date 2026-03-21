@@ -13,8 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Undo2, X, Radio, Eye, ArrowLeftRight, Save, Plus, Trophy, Zap, Settings, Tv, Square, AlertTriangle } from 'lucide-react';
-import PointFlow from './components/PointFlow';
-import BattlePath from './components/BattlePath';
 import EmotionOverlay from './components/EmotionOverlay';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
@@ -280,15 +278,7 @@ export default function LiveRefPanel() {
 
       {/* Battle Path + Set scores + Point Flow */}
       <div className="px-3 py-1 space-y-1">
-        {/* Battle Path — compact mode */}
-        <BattlePath 
-          scoreA={s.score?.a || 0} scoreB={s.score?.b || 0} maxScore={s.settings?.points_to_win || 11}
-          playerA={s.player_a} playerB={s.player_b} server={s.server}
-          streakA={_getStreak(s.points, 'a')} streakB={_getStreak(s.points, 'b')}
-          winner={s.status === 'finished' ? s.winner : null} swapped={swapped}
-          mode="compact"
-        />
-        {/* Set scores */}
+        {/* Set scores — compact inline */}
         {(s.sets?.length > 0) && (
           <div className="flex items-center justify-center gap-1 text-[9px]">
             {s.sets.map((set, i) => (
@@ -301,8 +291,6 @@ export default function LiveRefPanel() {
             </span>
           </div>
         )}
-        {/* Point Flow */}
-        <PointFlow points={s.all_points || s.points || []} playerA={left?.nickname} playerB={right?.nickname} swapped={swapped} />
       </div>
 
       {/* Bottom Controls */}
