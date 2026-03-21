@@ -59,17 +59,20 @@ AVAILABLE_PERMISSIONS = {
         "config": "Configurar Unatienda",
     },
     
-    # PinpanClub
-    "pinpanclub": {
-        "access": "Acceder a PinpanClub",
+    # Sport (Table Tennis)
+    "sport": {
+        "access": "Acceder a Sport",
+        "referee": "Arbitrar partidos en vivo",
         "view_rankings": "Ver rankings",
         "create_match": "Registrar partidos",
         "validate_match": "Validar partidos",
+        "start_live": "Iniciar partidos en vivo",
         "create_league": "Crear ligas",
         "manage_leagues": "Gestionar ligas",
         "manage_players": "Gestionar jugadores",
         "manage_seasons": "Gestionar temporadas",
-        "admin_panel": "Panel de administration PinpanClub",
+        "manage_tournaments": "Gestionar torneos",
+        "admin_panel": "Panel de administración Sport",
     },
     
     # Memberships
@@ -130,7 +133,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "users.*",
         "roles.view",
         "unatienda.*",
-        "pinpanclub.*",
+        "sport.*",
         "memberships.*",
         "integrations.*",
         "customers.*",
@@ -150,11 +153,11 @@ DEFAULT_ROLE_PERMISSIONS = {
         "unatienda.manage_orders",
         "unatienda.manage_students",
         "unatienda.manage_vinculaciones",
-        "pinpanclub.access",
-        "pinpanclub.view_rankings",
-        "pinpanclub.create_match",
-        "pinpanclub.validate_match",
-        "pinpanclub.manage_players",
+        "sport.access",
+        "sport.view_rankings",
+        "sport.create_match",
+        "sport.validate_match",
+        "sport.manage_players",
         "customers.view",
         "customers.edit",
         "tickets.*",
@@ -164,9 +167,9 @@ DEFAULT_ROLE_PERMISSIONS = {
     DefaultRoles.USER: [
         "unatienda.access",
         "unatienda.view_public_catalog",
-        "pinpanclub.access",
-        "pinpanclub.view_rankings",
-        "pinpanclub.create_match",
+        "sport.access",
+        "sport.view_rankings",
+        "sport.create_match",
         "community.feed_view",
     ],
 }
