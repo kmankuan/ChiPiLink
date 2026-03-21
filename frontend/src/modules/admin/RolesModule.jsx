@@ -161,7 +161,7 @@ export default function RolesModule() {
     if (role) {
       setEditingRole(role);
       setFormData({
-        nombre: role.nombre,
+        nombre: role.nombre || role.name,
         descripcion: role.description || '',
         color: role.color || '#6366f1',
         nivel: role.nivel || 20,
@@ -193,13 +193,14 @@ export default function RolesModule() {
         : `${API}/api/roles`;
       const method = editingRole ? 'PUT' : 'POST';
       
+      const payload = { ...formData, name: formData.nombre };
       const response = await fetch(url, {
         method,
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       
       const data = await response.json();
@@ -378,7 +379,7 @@ export default function RolesModule() {
                           {getRoleIcon(role.icono, "h-5 w-5")}
                         </div>
                         <div>
-                          <h4 className="font-semibold">{role.nombre}</h4>
+                          <h4 className="font-semibold">{role.nombre || role.name}</h4>
                           <p className="text-xs text-muted-foreground">
                             Level {role.nivel} • {role.users_count || role.usuarios_count} users
                           </p>
@@ -417,7 +418,7 @@ export default function RolesModule() {
                           {getRoleIcon(selectedRole.icono, "h-6 w-6")}
                         </div>
                         <div>
-                          <CardTitle>{selectedRole.nombre}</CardTitle>
+                          <CardTitle>{selectedRole.nombre || selectedRole.name}</CardTitle>
                           <CardDescription>{selectedRole.description}</CardDescription>
                         </div>
                       </div>
@@ -548,7 +549,7 @@ export default function RolesModule() {
                               variant="outline"
                             >
                               {getRoleIcon(userRole.icono, "h-3 w-3 mr-1")}
-                              {userRole.nombre}
+                              {userRole.nombre || userRole.name}
                             </Badge>
                           )}
                           <Button 
@@ -887,7 +888,7 @@ export default function RolesModule() {
                       {getRoleIcon(role.icono, "h-5 w-5")}
                     </div>
                     <div>
-                      <h4 className="font-semibold">{role.nombre}</h4>
+                      <h4 className="font-semibold">{role.nombre || role.name}</h4>
                       <p className="text-xs text-muted-foreground">{role.description}</p>
                     </div>
                   </div>
