@@ -345,7 +345,7 @@ async def _execute_single_step(page, step: dict, creds: dict):
 
 
 async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, session_id: str):
-    """Execute a saved playbook automatically. If a step fails, ask admin."""
+    """Execute a saved playbook automatically. After login steps, ask admin what to read."""
     from .school_reader import school_reader
     
     for i, step in enumerate(steps):
@@ -368,7 +368,6 @@ async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, 
             else:
                 await _execute_single_step(page, step, creds)
         except Exception as e:
-            # Playbook step failed — ask admin
             screenshot = await page.screenshot(type="jpeg", quality=50)
             await db[C_SESSIONS].update_one(
                 {"session_id": session_id},
@@ -386,7 +385,30 @@ async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, 
             )
             return await db[C_SESSIONS].find_one({"session_id": session_id}, {"_id": 0})
     
-    await db[C_SESSIONS].update_one({"session_id": session_id}, {"$set": {"status": "completed"}})
+    # All login steps done but NO extract step in playbook — ask admin what to read
+    screenshot = await page.screenshot(type="jpeg", quality=50)
+    screenshot_b64 = base64.b64encode(screenshot).decode()
+    page_text = await page.evaluate("() => document.body.innerText.substring(0, 500)")
+    
+    await db[C_SESSIONS].update_one(
+        {"session_id": session_id},
+        {"$set": {
+            "status": "waiting_admin",
+            "current_step": len(steps),
+            "screenshot": screenshot_b64,
+            "page_text": page_text,
+            "question": {
+                "text": "Login successful! I'm inside the school platform. What should I do now?",
+                "options": [
+                    {"action": "extract", "label": "Extract data from THIS page", "placeholder": "What to extract (homework, grades, messages, weekly planner...)"},
+                    {"action": "click_text", "label": "Navigate to a section first", "placeholder": "Text of link to click (e.g., Tareas, Calificaciones)"},
+                    {"action": "navigate", "label": "Go to specific URL", "placeholder": "https://..."},
+                    {"action": "done", "label": "Done, stop scanning", "placeholder": ""},
+                ],
+            },
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
     return await db[C_SESSIONS].find_one({"session_id": session_id}, {"_id": 0})
 
 
