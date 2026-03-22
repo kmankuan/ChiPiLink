@@ -67,8 +67,13 @@ async def start_scan(student_id: str, data: dict = {}, admin: dict = Depends(get
     }
     await db[C_SESSIONS].insert_one(session)
     
-    # Auto-execute first step: navigate to URL
-    return await _execute_next_step(session_id, student, creds, playbook)
+    # Run first step in BACKGROUND (don't block HTTP response)
+    import asyncio
+    asyncio.create_task(_background_execute(session["session_id"], session))
+    
+    # Return immediately
+    session.pop("_id", None)
+    return {"session_id": session_id, "status": "started", "message": "Navigating... poll for updates."}
 
 
 @router.get("/session/{session_id}")
@@ -126,12 +131,12 @@ async def answer_question(session_id: str, data: dict, admin: dict = Depends(get
             upsert=True
         )
     
-    # Execute the answer
-    student = await db[C_STUDENTS].find_one({"student_id": session["student_id"]}, {"_id": 0})
-    creds = student.get("school_credentials", {}) if student else {}
-    playbook = await db[C_PLAYBOOKS].find_one({"domain": session.get("domain", "")}, {"_id": 0})
+    # Run execution in BACKGROUND (don't block the HTTP response)
+    import asyncio
+    asyncio.create_task(_background_execute(session_id, session))
     
-    return await _execute_next_step(session_id, student, creds, playbook)
+    # Return immediately — frontend will poll for result
+    return {"session_id": session_id, "status": "executing", "message": "Processing... poll for updates."}
 
 
 @router.post("/session/{session_id}/stop")
@@ -383,3 +388,22 @@ async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, 
     
     await db[C_SESSIONS].update_one({"session_id": session_id}, {"$set": {"status": "completed"}})
     return await db[C_SESSIONS].find_one({"session_id": session_id}, {"_id": 0})
+
+
+async def _background_execute(session_id: str, session: dict):
+    """Background task: execute the step, take screenshot, update session."""
+    try:
+        student = await db[C_STUDENTS].find_one({"student_id": session["student_id"]}, {"_id": 0})
+        creds = student.get("school_credentials", {}) if student else {}
+        playbook = await db[C_PLAYBOOKS].find_one({"domain": session.get("domain", "")}, {"_id": 0})
+        result = await _execute_next_step(session_id, student, creds, playbook)
+        logger.info(f"Background execute done for {session_id}: {result.get('status', '?') if isinstance(result, dict) else '?'}")
+    except Exception as e:
+        logger.error(f"Background execute failed for {session_id}: {e}")
+        await db[C_SESSIONS].update_one(
+            {"session_id": session_id},
+            {"$set": {"status": "waiting_admin", "question": {"text": f"Error: {str(e)[:200]}", "options": [
+                {"action": "navigate", "label": "Try different URL", "placeholder": "https://..."},
+                {"action": "done", "label": "Stop", "placeholder": ""},
+            ]}, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
