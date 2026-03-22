@@ -101,6 +101,27 @@ Write in a clear, actionable format. Use bullet points.""",
         "push_to_monday": True,
     },
     
+    # External automation tools
+    "automations": {
+        "zerowork": {
+            "enabled": False,
+            "api_key": "",
+            "webhook_url": "",
+            "taskbot_id": "",
+            "instructions": "1. Create a Zerowork TaskBot\n2. Login with credentials\n3. Extract page text\n4. POST to ChiPi ingest API",
+            "ingest_endpoint": "/api/tutor/school-feed/ingest",
+            "test_status": None,
+        },
+        "activepieces": {
+            "enabled": False,
+            "instance_url": "",
+            "api_key": "",
+            "flow_id": "",
+            "instructions": "1. Schedule trigger (6AM Mon-Fri)\n2. GET /api/tutor/students\n3. Trigger Zerowork per student\n4. Check results\n5. Notify if urgent",
+            "test_status": None,
+        },
+    },
+    
     # Platform-specific configs (admin can add new platforms)
     "platforms": {
         "imereb": {
@@ -152,7 +173,7 @@ async def update_config(data: dict, admin: dict = Depends(get_admin_user)):
     # Merge with existing
     existing = await db[C_CONFIG].find_one({"_id": "school_feed_config"}) or DEFAULT_CONFIG
     
-    for key in ["ai_instructions", "monday_board", "auto_scan", "platforms"]:
+    for key in ["ai_instructions", "monday_board", "auto_scan", "platforms", "automations"]:
         if key in data:
             if isinstance(data[key], dict) and isinstance(existing.get(key), dict):
                 existing[key].update(data[key])

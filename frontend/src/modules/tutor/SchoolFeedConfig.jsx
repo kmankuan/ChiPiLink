@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Settings, Brain, LayoutDashboard, Globe, Clock, Save, Loader2, ChevronLeft, RefreshCw, Play, Zap } from 'lucide-react';
+import { Settings, Brain, LayoutDashboard, Globe, Clock, Save, Loader2, ChevronLeft, RefreshCw, Play, Zap, Bug } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -21,6 +21,8 @@ export default function SchoolFeedConfig() {
   const [saving, setSaving] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [debugJobs, setDebugJobs] = useState([]);
+  const [debugItems, setDebugItems] = useState([]);
 
   useEffect(() => {
     fetch(`${API}/api/tutor/school-feed-config`, { headers: getHeaders() })
@@ -95,11 +97,13 @@ export default function SchoolFeedConfig() {
       </div>
 
       <Tabs defaultValue="ai" className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-6 w-full">
           <TabsTrigger value="ai" className="text-xs gap-1"><Brain className="h-3.5 w-3.5" /> AI</TabsTrigger>
           <TabsTrigger value="monday" className="text-xs gap-1"><LayoutDashboard className="h-3.5 w-3.5" /> Monday</TabsTrigger>
           <TabsTrigger value="platforms" className="text-xs gap-1"><Globe className="h-3.5 w-3.5" /> Platforms</TabsTrigger>
           <TabsTrigger value="schedule" className="text-xs gap-1"><Clock className="h-3.5 w-3.5" /> Schedule</TabsTrigger>
+          <TabsTrigger value="automations" className="text-xs gap-1"><Zap className="h-3.5 w-3.5" /> Tools</TabsTrigger>
+          <TabsTrigger value="debug" className="text-xs gap-1"><Bug className="h-3.5 w-3.5" /> Debug</TabsTrigger>
         </TabsList>
 
         {/* AI Instructions */}
@@ -253,6 +257,147 @@ export default function SchoolFeedConfig() {
                 {scanning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
                 Run Scan Now (All Students)
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Automations Tab */}
+        <TabsContent value="automations">
+          <div className="space-y-4">
+            {/* Zerowork */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-purple-600" /> Zerowork
+                  {config.automations?.zerowork?.enabled && <Badge className="bg-green-100 text-green-700 text-[9px]">Active</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">Enable Zerowork</Label>
+                  <Switch checked={config.automations?.zerowork?.enabled || false} onCheckedChange={v => update('automations.zerowork.enabled', v)} />
+                </div>
+                <div>
+                  <Label className="text-xs">API Key</Label>
+                  <Input className="h-8 text-xs font-mono" type="password" value={config.automations?.zerowork?.api_key || ''} onChange={e => update('automations.zerowork.api_key', e.target.value)} placeholder="zw_..." />
+                </div>
+                <div>
+                  <Label className="text-xs">TaskBot ID</Label>
+                  <Input className="h-8 text-xs font-mono" value={config.automations?.zerowork?.taskbot_id || ''} onChange={e => update('automations.zerowork.taskbot_id', e.target.value)} placeholder="Bot ID from Zerowork dashboard" />
+                </div>
+                <div>
+                  <Label className="text-xs">Webhook URL (for Zerowork to call back)</Label>
+                  <Input className="h-8 text-xs font-mono bg-muted" readOnly value={`${window.location.origin}/api/tutor/school-feed/webhook`} />
+                  <p className="text-[9px] text-muted-foreground mt-1">Configure this URL in Zerowork's HTTP POST action</p>
+                </div>
+                <div className="bg-muted/50 rounded p-2">
+                  <Label className="text-[10px] font-bold">Setup Instructions</Label>
+                  <pre className="text-[10px] text-muted-foreground whitespace-pre-wrap mt-1">{config.automations?.zerowork?.instructions || ''}</pre>
+                </div>
+                <Button size="sm" variant="outline" className="w-full text-xs" onClick={async () => {
+                  const res = await fetch(`${API}/api/tutor/school-feed/test-connection/zerowork`, { method: 'POST', headers: getHeaders() });
+                  const r = await res.json();
+                  toast(r.success ? r.message : r.message, { type: r.success ? 'success' : 'error' });
+                }}>Test Zerowork Connection</Button>
+              </CardContent>
+            </Card>
+
+            {/* Activepieces */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-blue-600" /> Activepieces
+                  {config.automations?.activepieces?.enabled && <Badge className="bg-green-100 text-green-700 text-[9px]">Active</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">Enable Activepieces</Label>
+                  <Switch checked={config.automations?.activepieces?.enabled || false} onCheckedChange={v => update('automations.activepieces.enabled', v)} />
+                </div>
+                <div>
+                  <Label className="text-xs">Instance URL</Label>
+                  <Input className="h-8 text-xs" value={config.automations?.activepieces?.instance_url || ''} onChange={e => update('automations.activepieces.instance_url', e.target.value)} placeholder="https://your-activepieces.com" />
+                </div>
+                <div>
+                  <Label className="text-xs">API Key</Label>
+                  <Input className="h-8 text-xs font-mono" type="password" value={config.automations?.activepieces?.api_key || ''} onChange={e => update('automations.activepieces.api_key', e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-xs">Flow ID</Label>
+                  <Input className="h-8 text-xs font-mono" value={config.automations?.activepieces?.flow_id || ''} onChange={e => update('automations.activepieces.flow_id', e.target.value)} placeholder="Flow ID for school scan" />
+                </div>
+                <div className="bg-muted/50 rounded p-2">
+                  <Label className="text-[10px] font-bold">Setup Instructions</Label>
+                  <pre className="text-[10px] text-muted-foreground whitespace-pre-wrap mt-1">{config.automations?.activepieces?.instructions || ''}</pre>
+                </div>
+                <Button size="sm" variant="outline" className="w-full text-xs" onClick={async () => {
+                  const res = await fetch(`${API}/api/tutor/school-feed/test-connection/activepieces`, { method: 'POST', headers: getHeaders() });
+                  const r = await res.json();
+                  toast(r.success ? r.message : r.message, { type: r.success ? 'success' : 'error' });
+                }}>Test Activepieces Connection</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Debug Tab */}
+        <TabsContent value="debug">
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm">Ingest Job History</CardTitle>
+                <Button size="sm" variant="outline" className="text-xs h-7" onClick={async () => {
+                  const res = await fetch(`${API}/api/tutor/school-feed/ingest/history?limit=20`, { headers: getHeaders() });
+                  if (res.ok) { const jobs = await res.json(); setDebugJobs(jobs); }
+                }}><RefreshCw className="h-3 w-3 mr-1" /> Load</Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {debugJobs.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-4">No jobs yet. Click Load to refresh.</p>
+              ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {debugJobs.map(job => (
+                    <div key={job.job_id} className={`p-2 rounded border text-xs ${job.status === 'completed' ? 'bg-green-50 border-green-200' : job.status === 'failed' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px]">{job.job_id}</span>
+                        <Badge variant="outline" className="text-[9px]">{job.status}</Badge>
+                      </div>
+                      <p className="mt-1">{job.student_name} · {job.source} · {job.platform}</p>
+                      <p className="text-muted-foreground text-[10px]">
+                        {job.items_found != null ? `${job.items_found} found, ${job.items_saved} saved` : ''}
+                        {job.error ? ` · Error: ${job.error}` : ''}
+                        {job.created_at ? ` · ${new Date(job.created_at).toLocaleString()}` : ''}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="mt-4">
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Feed Items</CardTitle></CardHeader>
+            <CardContent>
+              <Button size="sm" variant="outline" className="text-xs h-7 mb-2" onClick={async () => {
+                const res = await fetch(`${API}/api/tutor/school-feed/items?limit=20`, { headers: getHeaders() });
+                if (res.ok) { const items = await res.json(); setDebugItems(items); }
+              }}><RefreshCw className="h-3 w-3 mr-1" /> Load Items</Button>
+              {debugItems.length > 0 && (
+                <div className="space-y-1 max-h-60 overflow-y-auto">
+                  {debugItems.map((item, i) => (
+                    <div key={i} className="p-2 rounded bg-muted/30 text-xs">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[9px]">{item.type}</Badge>
+                        <span className="font-medium">{item.title}</span>
+                        <Badge variant="outline" className={`text-[9px] ${item.urgency === 'urgent' ? 'bg-red-100 text-red-700' : item.urgency === 'high' ? 'bg-amber-100 text-amber-700' : ''}`}>{item.urgency}</Badge>
+                      </div>
+                      <p className="text-muted-foreground text-[10px] mt-0.5">{item.content?.substring(0, 100)}...</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

@@ -264,3 +264,71 @@ async def _push_item_to_monday(item: dict, config: dict):
         logger.info(f"Pushed to Monday: {title}")
     except Exception as e:
         logger.warning(f"Monday push failed (non-critical): {e}")
+
+
+# ═══ Webhook endpoint for Zerowork/Activepieces ═══
+
+@router.post("/webhook")
+async def webhook_ingest(data: dict):
+    """
+    Public webhook for external tools (Zerowork, Activepieces).
+    Authenticates via api_key in the payload instead of JWT.
+    
+    Body: { "api_key": "...", "student_id": "...", "raw_text": "...", ... }
+    """
+    api_key = data.get("api_key", "")
+    if not api_key:
+        raise HTTPException(401, "api_key required")
+    
+    # Validate api_key against stored config
+    config = await db["tutor_school_feed_config"].find_one({"_id": "school_feed_config"}) or {}
+    zw_key = config.get("automations", {}).get("zerowork", {}).get("api_key", "")
+    ap_key = config.get("automations", {}).get("activepieces", {}).get("api_key", "")
+    
+    if api_key not in [zw_key, ap_key] or not api_key:
+        raise HTTPException(401, "Invalid api_key")
+    
+    # Process as admin user
+    fake_user = {"sub": "automation", "is_admin": True, "name": "Automation"}
+    return await ingest_school_data(data, fake_user)
+
+
+@router.post("/test-connection/{tool}")
+async def test_tool_connection(tool: str, admin: dict = Depends(get_admin_user)):
+    """Test connection to Zerowork or Activepieces."""
+    config = await db["tutor_school_feed_config"].find_one({"_id": "school_feed_config"}) or {}
+    automations = config.get("automations", {})
+    
+    if tool == "zerowork":
+        zw = automations.get("zerowork", {})
+        if not zw.get("api_key"):
+            return {"success": False, "message": "Zerowork API key not configured"}
+        # Test: try to reach Zerowork API
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10) as client:
+                r = await client.get("https://api.zerowork.io/v1/taskbots", headers={"Authorization": f"Bearer {zw['api_key']}"})
+                if r.status_code == 200:
+                    bots = r.json()
+                    return {"success": True, "message": f"Connected! {len(bots)} TaskBots found", "taskbots": bots}
+                else:
+                    return {"success": False, "message": f"HTTP {r.status_code}: {r.text[:100]}"}
+        except Exception as e:
+            return {"success": False, "message": f"Connection failed: {str(e)[:100]}"}
+    
+    elif tool == "activepieces":
+        ap = automations.get("activepieces", {})
+        if not ap.get("instance_url") or not ap.get("api_key"):
+            return {"success": False, "message": "Activepieces URL or API key not configured"}
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10) as client:
+                r = await client.get(f"{ap['instance_url'].rstrip('/')}/v1/flows", headers={"Authorization": f"Bearer {ap['api_key']}"})
+                if r.status_code == 200:
+                    return {"success": True, "message": "Connected to Activepieces!"}
+                else:
+                    return {"success": False, "message": f"HTTP {r.status_code}"}
+        except Exception as e:
+            return {"success": False, "message": f"Connection failed: {str(e)[:100]}"}
+    
+    return {"success": False, "message": f"Unknown tool: {tool}"}
