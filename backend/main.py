@@ -274,6 +274,7 @@ from modules.tutor import router as tutor_router, router_phase2 as tutor_router2
 from modules.tutor.school_feed_config import router as school_feed_config_router
 from modules.tutor.monday_board_setup import router as monday_board_setup_router
 from modules.tutor.school_feed_ingest import router as school_feed_ingest_router
+from modules.tutor.interactive_scan import router as interactive_scan_router
 api_router.include_router(tutor_router)
 api_router.include_router(tutor_router2)
 api_router.include_router(tutor_router_parent)
@@ -281,6 +282,8 @@ api_router.include_router(school_feed_config_router)
 api_router.include_router(monday_board_setup_router)
 
 api_router.include_router(school_feed_ingest_router)
+api_router.include_router(interactive_scan_router)
+from modules.tutor.interactive_scan import router as interactive_scan_router
 
 # Include main router in app
 app.include_router(api_router)
@@ -344,7 +347,7 @@ async def service_proxy_middleware(request, call_next):
         result = await sport_proxy(request, path[len("/api/sport/"):])
         if result is not None:
             return result
-    elif path.startswith("/api/tutor/") and not path.startswith("/api/tutor/school-feed"):
+    elif path.startswith("/api/tutor/") and not path.startswith("/api/tutor/school-feed") and not path.startswith("/api/tutor/interactive-scan"):
         from modules.tutor_proxy import proxy_if_available as tutor_proxy
         result = await tutor_proxy(request, path[len("/api/tutor/"):])
         if result is not None:

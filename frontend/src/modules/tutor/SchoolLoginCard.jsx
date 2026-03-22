@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { School, Key, Globe, Loader2, Eye, EyeOff, CheckCircle, XCircle, BookOpen } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
+import InteractiveScan from './InteractiveScan';
 
 const API = RESOLVED_API_URL;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}`, 'Content-Type': 'application/json' });
@@ -142,6 +143,9 @@ export default function SchoolLoginCard({ student, onUpdate }) {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Plan B: AI Interactive Scan */}
+      <InteractiveScan studentId={student.student_id} studentName={student.first_name || student.name || ""} />
 
       {/* Test result dialog with screenshot */}
       <Dialog open={!!testResult} onOpenChange={() => setTestResult(null)}>
