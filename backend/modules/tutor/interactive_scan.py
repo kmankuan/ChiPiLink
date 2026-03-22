@@ -201,7 +201,23 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
                 await page.close()
                 return result
             
-            # No playbook — ask admin what to do
+            # Check if page has a login form — auto-offer login action
+            page_text_lower = (page_text or "").lower()
+            has_login_form = any(w in page_text_lower for w in ["usuario", "contraseña", "password", "username", "iniciar sesión", "login", "ingresar"])
+            
+            login_option = {"action": "login", "label": "🔐 Login with saved credentials (auto-fill username + password)", "placeholder": ""}
+            
+            base_options = [
+                {"action": "click_text", "label": "Click a button/link (type the text)", "placeholder": "e.g., Iniciar Sesión"},
+                {"action": "click_selector", "label": "Click a CSS selector", "placeholder": "e.g., .btn-login, #loginBtn"},
+                {"action": "type_text", "label": "Type in a field", "placeholder": "field_selector|text_to_type"},
+                {"action": "navigate", "label": "Go to a different URL", "placeholder": "https://..."},
+                {"action": "extract", "label": "Extract data from this page", "placeholder": "What to extract (e.g., homework, grades)"},
+                {"action": "done", "label": "I'm done, stop scanning", "placeholder": ""},
+            ]
+            
+            options = [login_option] + base_options if has_login_form else base_options
+            
             await db[C_SESSIONS].update_one(
                 {"session_id": session_id},
                 {"$set": {
@@ -210,15 +226,8 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
                     "screenshot": screenshot_b64,
                     "page_text": page_text[:500],
                     "question": {
-                        "text": f"I've loaded {url}. What should I do next? I see the page below.",
-                        "options": [
-                            {"action": "click_text", "label": "Click a button/link (type the text)", "placeholder": "e.g., Iniciar Sesión"},
-                            {"action": "click_selector", "label": "Click a CSS selector", "placeholder": "e.g., .btn-login, #loginBtn"},
-                            {"action": "type_text", "label": "Type in a field", "placeholder": "field_selector|text_to_type"},
-                            {"action": "navigate", "label": "Go to a different URL", "placeholder": "https://..."},
-                            {"action": "extract", "label": "Extract data from this page", "placeholder": "What to extract (e.g., homework, grades)"},
-                            {"action": "done", "label": "I'm done, stop scanning", "placeholder": ""},
-                        ],
+                        "text": f"I've loaded {url}." + (" I see a login form — want me to login?" if has_login_form else " What should I do next?"),
+                        "options": options,
                     },
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 }}
@@ -272,11 +281,24 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
             session["items"] = items
             return session
         
-        # Take screenshot and ask what's next
+        # Take screenshot and ask what's next — detect login form
         await page.wait_for_timeout(2000)
         screenshot = await page.screenshot(type="jpeg", quality=50)
         screenshot_b64 = base64.b64encode(screenshot).decode()
         page_text = await page.evaluate("() => document.body.innerText.substring(0, 500)")
+        
+        page_text_lower = (page_text or "").lower()
+        has_login_form = any(w in page_text_lower for w in ["usuario", "contraseña", "password", "username", "iniciar sesión", "login", "ingresar"])
+        
+        login_option = {"action": "login", "label": "🔐 Login with saved credentials", "placeholder": ""}
+        base_options = [
+            {"action": "click_text", "label": "Click a button/link", "placeholder": "Text to click"},
+            {"action": "click_selector", "label": "Click CSS selector", "placeholder": ".class or #id"},
+            {"action": "navigate", "label": "Go to URL", "placeholder": "https://..."},
+            {"action": "extract", "label": "Extract data from this page", "placeholder": "What to extract"},
+            {"action": "done", "label": "Done scanning", "placeholder": ""},
+        ]
+        options = [login_option] + base_options if has_login_form else base_options
         
         await db[C_SESSIONS].update_one(
             {"session_id": session_id},
@@ -286,14 +308,8 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
                 "screenshot": screenshot_b64,
                 "page_text": page_text[:500],
                 "question": {
-                    "text": f"Step {step_num + 1} done. What should I do next?",
-                    "options": [
-                        {"action": "click_text", "label": "Click a button/link", "placeholder": "Text to click"},
-                        {"action": "click_selector", "label": "Click CSS selector", "placeholder": ".class or #id"},
-                        {"action": "navigate", "label": "Go to URL", "placeholder": "https://..."},
-                        {"action": "extract", "label": "Extract data from this page", "placeholder": "What to extract"},
-                        {"action": "done", "label": "Done scanning", "placeholder": ""},
-                    ],
+                    "text": (f"Step {step_num + 1} done." + (" I see a login form — want me to login with saved credentials?" if has_login_form else " What should I do next?")),
+                    "options": options,
                 },
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }}
