@@ -36,7 +36,7 @@ async def get_product_purchasers(book_id: str, admin: dict = Depends(get_admin_u
         {"items.book_id": book_id},
         {"_id": 0, "order_id": 1, "student_name": 1, "parent_name": 1,
          "user_name": 1, "user_email": 1, "grade": 1, "items": 1, "status": 1, "paid_date": 1}
-    ).to_list(500)
+    ).to_list(2000)
 
     purchasers = []
     total_qty = 0
@@ -72,7 +72,7 @@ async def get_purchased_summary(admin: dict = Depends(get_admin_user)):
             "order_count": {"$sum": 1},
         }},
     ]
-    results = await db.store_textbook_orders.aggregate(pipeline).to_list(500)
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(2000)
     summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
     return summary
 
@@ -89,7 +89,7 @@ async def get_presale_orders(book_id: str, admin: dict = Depends(get_admin_user)
         {"_id": 0, "order_id": 1, "student_name": 1, "parent_name": 1,
          "user_name": 1, "user_email": 1, "grade": 1, "items": 1, "status": 1,
          "is_presale": 1, "created_at": 1}
-    ).to_list(500)
+    ).to_list(2000)
 
     presale_list = []
     total_qty = 0
@@ -175,7 +175,7 @@ async def get_presale_summary(admin: dict = Depends(get_admin_user)):
             "order_count": {"$sum": 1},
         }},
     ]
-    results = await db.store_textbook_orders.aggregate(pipeline).to_list(500)
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(2000)
     summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
     return summary
 
