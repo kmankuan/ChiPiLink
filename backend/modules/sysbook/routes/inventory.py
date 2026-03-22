@@ -72,7 +72,7 @@ async def get_purchased_summary(admin: dict = Depends(get_admin_user)):
             "order_count": {"$sum": 1},
         }},
     ]
-    results = await db.store_textbook_orders.aggregate(pipeline).to_list(5000)
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(500)
     summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
     return summary
 
@@ -175,7 +175,7 @@ async def get_presale_summary(admin: dict = Depends(get_admin_user)):
             "order_count": {"$sum": 1},
         }},
     ]
-    results = await db.store_textbook_orders.aggregate(pipeline).to_list(5000)
+    results = await db.store_textbook_orders.aggregate(pipeline).to_list(500)
     summary = {r["_id"]: {"qty": r["total_qty"], "orders": r["order_count"]} for r in results if r["_id"]}
     return summary
 

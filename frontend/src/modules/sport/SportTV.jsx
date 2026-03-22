@@ -133,7 +133,7 @@ export default function SportTV() {
     fetch(`${API}/api/sport/rankings?limit=10`).then(r=>r.ok?r.json():[]).then(setRankings).catch(()=>{});
     fetch(`${API}/api/sport/settings`).then(r=>r.ok?r.json():null).then(s=>setTvSettings(s?.tv||{})).catch(()=>{});
     // Fast polling as reliable backup — ensures 100% sync even if Ably drops
-    const iv = setInterval(findLive, 1000);
+    const iv = setInterval(findLive, 3000);
     return () => clearInterval(iv);
   }, [findLive]);
 

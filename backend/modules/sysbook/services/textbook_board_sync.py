@@ -32,7 +32,11 @@ class TextbookBoardSync:
                     pass
 
         # Fetch from Monday.com
-        items = await monday_client.get_board_items(TEXTBOOKS_BOARD_ID, limit=500)
+        try:
+            items = await monday_client.get_board_items(TEXTBOOKS_BOARD_ID, limit=500)
+        except Exception as e:
+            logger.error(f"Monday.com sync fetch failed: {e}")
+            return {"synced": 0, "error": str(e)}
         code_map = {}
         for item in items:
             item_id = str(item.get("id", ""))

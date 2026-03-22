@@ -273,12 +273,14 @@ api_router.include_router(dev_info_router)
 from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent
 from modules.tutor.school_feed_config import router as school_feed_config_router
 from modules.tutor.monday_board_setup import router as monday_board_setup_router
+from modules.tutor.school_feed_ingest import router as school_feed_ingest_router
 api_router.include_router(tutor_router)
 api_router.include_router(tutor_router2)
 api_router.include_router(tutor_router_parent)
 api_router.include_router(school_feed_config_router)
 api_router.include_router(monday_board_setup_router)
 
+api_router.include_router(school_feed_ingest_router)
 
 # Include main router in app
 app.include_router(api_router)
@@ -333,17 +335,16 @@ _init_monitor()
 # Sport & Tutor proxy middleware — offloads to separate ports when available
 @app.middleware("http")
 async def service_proxy_middleware(request, call_next):
-    """If Sport Engine (8004) or Tutor Engine (8003) is running, proxy there.
-    Otherwise, fall through to direct routes."""
+    """Proxy sport/tutor to separate ports when available. Fast skip for other paths."""
     path = request.url.path
     
+    # Fast path — only check sport and tutor prefixes
     if path.startswith("/api/sport/"):
         from modules.sport_proxy import proxy_if_available as sport_proxy
         result = await sport_proxy(request, path[len("/api/sport/"):])
         if result is not None:
             return result
-    
-    elif path.startswith("/api/tutor/"):
+    elif path.startswith("/api/tutor/") and not path.startswith("/api/tutor/school-feed"):
         from modules.tutor_proxy import proxy_if_available as tutor_proxy
         result = await tutor_proxy(request, path[len("/api/tutor/"):])
         if result is not None:

@@ -49,7 +49,11 @@ class PreSaleImportService:
     async def fetch_importable_items(self, board_id: str) -> List[Dict]:
         """Fetch items from Monday.com board that are marked for import via the trigger column.
         Includes subitems inline to avoid N+1 API calls."""
-        items = await monday_client.get_board_items(board_id, limit=500, include_subitems=True)
+        try:
+            items = await monday_client.get_board_items(board_id, limit=500, include_subitems=True)
+        except Exception as e:
+            logger.error(f"Monday.com fetch failed: {e}")
+            return []
         importable = []
         for item in items:
             cols = {c["id"]: c for c in item.get("column_values", [])}
@@ -215,7 +219,11 @@ class PreSaleImportService:
         # Use subitems from inline data (included in get_board_items), fallback to separate API call
         subitems = item.get("subitems") or []
         if not subitems:
-            subitems = await monday_client.get_subitems(monday_item_id)
+            try:
+                subitems = await monday_client.get_subitems(monday_item_id)
+            except Exception as e:
+                logger.warning(f"Monday.com get_subitems failed: {e}")
+                subitems = []
         items = []
         total = 0.0
 

@@ -385,6 +385,26 @@ async def create_indexes():
             _safe_index(orders, [("estado", 1), ("created_at", -1)]),
             _safe_index(db.oauth_states, "state", unique=True),
             _safe_index(db.oauth_states, "created_at", expireAfterSeconds=600),
+            # Sport indexes
+            _safe_index(db.sport_players, "player_id", unique=True),
+            _safe_index(db.sport_players, "active"),
+            _safe_index(db.sport_players, "elo"),
+            _safe_index(db.sport_matches, "match_id", unique=True),
+            _safe_index(db.sport_matches, [("status", 1), ("created_at", -1)]),
+            _safe_index(db.sport_leagues, "league_id", unique=True),
+            _safe_index(db.sport_live_sessions, "session_id", unique=True),
+            _safe_index(db.sport_live_sessions, "status"),
+            _safe_index(db.sport_tournaments, "tournament_id", unique=True),
+            # Tutor indexes
+            _safe_index(db.tutor_students, "student_id", unique=True),
+            _safe_index(db.tutor_students, "status"),
+            _safe_index(db.tutor_school_feed, "student_id"),
+            _safe_index(db.tutor_school_feed, [("student_id", 1), ("created_at", -1)]),
+            # RBAC indexes
+            _safe_index(db.rbac_roles, "role_id", unique=True),
+            # Shared orders (for multi-user student linking)
+            _safe_index(orders, "shared_with.user_id"),
+            _safe_index(students, "linked_users.user_id"),
         )
         logger.info("Database indexes ensured")
     except Exception as e:
