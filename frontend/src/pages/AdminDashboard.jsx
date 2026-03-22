@@ -256,8 +256,10 @@ export default function AdminDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarSearch, setSidebarSearch] = useState('');
 
-  // ─── Backend-driven menu ───
-  const [dynamicMenu, setDynamicMenu] = useState(null);
+  // ─── Backend-driven menu (cached for instant load) ───
+  const [dynamicMenu, setDynamicMenu] = useState(() => {
+    try { const c = localStorage.getItem('admin_menu_cache'); return c ? JSON.parse(c) : null; } catch { return null; }
+  });
   const [activeModuleTab, setActiveModuleTab] = useState(() => localStorage.getItem('admin_active_module') || 'main');
 
   useEffect(() => {
@@ -265,7 +267,12 @@ export default function AdminDashboard() {
     if (!token) return;
     fetch(`${RESOLVED_API_URL}/api/admin/menu`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.modules || data?.groups) setDynamicMenu(data); })
+      .then(data => {
+        if (data?.modules || data?.groups) {
+          setDynamicMenu(data);
+          try { localStorage.setItem('admin_menu_cache', JSON.stringify(data)); } catch {}
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -302,12 +309,12 @@ export default function AdminDashboard() {
 
   // Merge backend menu with static fallback — now supports v2 modules
   const effectiveNavGroups = useMemo(() => {
-    if (!dynamicMenu) return navGroups;
+    if (!dynamicMenu) return [];
 
     // v2 format: modules → groups → items
     if (dynamicMenu.modules) {
       const currentMod = dynamicMenu.modules.find(m => m.id === activeModuleTab) || dynamicMenu.modules[0];
-      if (!currentMod) return navGroups;
+      if (!currentMod) return [];
 
       return (currentMod.groups || [])
         .sort((a, b) => (a.order || 0) - (b.order || 0))
