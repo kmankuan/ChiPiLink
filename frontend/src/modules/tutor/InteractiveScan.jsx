@@ -114,10 +114,40 @@ export default function InteractiveScan({ studentId, studentName }) {
               ))}
             </div>
 
-            {selectedAction && selectedAction !== 'done' && selectedAction !== 'skip' && (
+            {selectedAction && selectedAction !== 'done' && selectedAction !== 'skip' && selectedAction !== 'screenshot_guide' && (
               <Input className="h-8 text-xs" value={answerValue} onChange={e => setAnswerValue(e.target.value)}
                 placeholder={(session.question.options || []).find(o => o.action === selectedAction)?.placeholder || 'Enter value...'} 
                 onKeyDown={e => { if (e.key === 'Enter') submitAnswer(); }} />
+            )}
+
+            {selectedAction === 'screenshot_guide' && (
+              <div className="space-y-2">
+                <p className="text-[10px] text-muted-foreground">Upload a screenshot with annotations (circles, arrows) showing what to do:</p>
+                <input type="file" accept="image/*" className="text-xs" onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = async (ev) => {
+                    setLoading(true);
+                    try {
+                      const res = await fetch(`${API}/api/tutor/interactive-scan/session/${session.session_id}/guide-screenshot`, {
+                        method: 'POST', headers: getHeaders(),
+                        body: JSON.stringify({ screenshot_base64: ev.target.result, instruction: answerValue || 'Follow the annotations' }),
+                      });
+                      if (res.ok) {
+                        const r = await res.json();
+                        toast.success(`AI detected ${r.steps_detected} steps from your screenshot`);
+                        // Refresh session
+                        const s = await fetch(`${API}/api/tutor/interactive-scan/session/${session.session_id}`, { headers: getHeaders() });
+                        if (s.ok) setSession(await s.json());
+                      }
+                    } catch { toast.error('Upload failed'); }
+                    setLoading(false);
+                  };
+                  reader.readAsDataURL(file);
+                }} />
+                <Input className="h-8 text-xs" value={answerValue} onChange={e => setAnswerValue(e.target.value)} placeholder="Optional: describe what to do (e.g., click the red circled button)" />
+              </div>
             )}
 
             <Button size="sm" className="w-full text-xs h-8 bg-purple-600 hover:bg-purple-700 gap-1" onClick={submitAnswer} disabled={!selectedAction || loading}>

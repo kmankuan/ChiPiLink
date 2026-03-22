@@ -185,38 +185,73 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
         page = await browser.new_page()
         url = session.get("url", "")
         
-        # Step 0: Navigate
+        # Step 0: Navigate + AUTO-LOGIN (no asking)
         if step_num == 0:
-            await page.goto(url, timeout=30000, wait_until="networkidle")
-            await page.wait_for_timeout(2000)
-            screenshot = await page.screenshot(type="jpeg", quality=50)
-            screenshot_b64 = base64.b64encode(screenshot).decode()
-            page_text = await page.evaluate("() => document.body.innerText.substring(0, 500)")
+            await page.goto(url, timeout=60000, wait_until="domcontentloaded")
+            await page.wait_for_timeout(3000)
             
-            # Check if playbook has steps
+            # Check if playbook has steps → run them
             pb_steps = (playbook or {}).get("steps", [])
             if pb_steps:
-                # Try to execute playbook automatically
                 result = await _auto_execute_playbook(page, pb_steps, creds, student, session_id)
                 await page.close()
                 return result
             
-            # Check if page has a login form — auto-offer login action
+            # AUTO-PILOT: Try to login automatically without asking
+            username = creds.get("username", "")
+            password = creds.get("password", "")
+            
+            if username and password:
+                try:
+                    success, _ = await school_reader._smart_login(page, url, username, password)
+                    if success:
+                        # Save login steps to playbook
+                        domain = session.get("domain", "")
+                        await db[C_PLAYBOOKS].update_one(
+                            {"domain": domain},
+                            {"$set": {"steps": [{"action": "login", "value": "", "source": "auto"}], "updated_at": datetime.now(timezone.utc).isoformat()},
+                             "$setOnInsert": {"playbook_id": f"pb_{uuid.uuid4().hex[:8]}", "domain": domain, "created_at": datetime.now(timezone.utc).isoformat()}},
+                            upsert=True
+                        )
+                        
+                        # Take screenshot of logged-in dashboard
+                        await page.wait_for_timeout(3000)
+                        screenshot = await page.screenshot(type="jpeg", quality=50)
+                        screenshot_b64 = base64.b64encode(screenshot).decode()
+                        page_text = await page.evaluate("() => document.body.innerText.substring(0, 500)")
+                        
+                        await db[C_SESSIONS].update_one(
+                            {"session_id": session_id},
+                            {"$set": {
+                                "status": "waiting_admin",
+                                "current_step": 1,
+                                "screenshot": screenshot_b64,
+                                "page_text": page_text[:500],
+                                "steps": [{"action": "login", "value": "auto", "source": "auto", "timestamp": datetime.now(timezone.utc).isoformat()}],
+                                "question": {
+                                    "text": "✅ Logged in successfully! I'm inside the platform. What should I read?",
+                                    "options": [
+                                        {"action": "extract", "label": "📋 Read ALL content from this page", "placeholder": "homework, grades, messages, weekly planner"},
+                                        {"action": "click_text", "label": "📚 Go to a specific section first", "placeholder": "e.g., Tareas, Calificaciones, Agenda"},
+                                        {"action": "login", "label": "🔐 Re-login (if login failed)", "placeholder": ""},
+                                        {"action": "screenshot_guide", "label": "📸 Upload screenshot with instructions", "placeholder": ""},
+                                        {"action": "done", "label": "Done, stop scanning", "placeholder": ""},
+                                    ],
+                                },
+                                "updated_at": datetime.now(timezone.utc).isoformat(),
+                            }}
+                        )
+                        await page.close()
+                        return await db[C_SESSIONS].find_one({"session_id": session_id}, {"_id": 0})
+                except Exception as e:
+                    logger.warning(f"Auto-login failed: {e}")
+            
+            # Auto-login failed or no credentials — ask admin
+            screenshot = await page.screenshot(type="jpeg", quality=50)
+            screenshot_b64 = base64.b64encode(screenshot).decode()
+            page_text = await page.evaluate("() => document.body.innerText.substring(0, 500)")
             page_text_lower = (page_text or "").lower()
-            has_login_form = any(w in page_text_lower for w in ["usuario", "contraseña", "password", "username", "iniciar sesión", "login", "ingresar"])
-            
-            login_option = {"action": "login", "label": "🔐 Login with saved credentials (auto-fill username + password)", "placeholder": ""}
-            
-            base_options = [
-                {"action": "click_text", "label": "Click a button/link (type the text)", "placeholder": "e.g., Iniciar Sesión"},
-                {"action": "click_selector", "label": "Click a CSS selector", "placeholder": "e.g., .btn-login, #loginBtn"},
-                {"action": "type_text", "label": "Type in a field", "placeholder": "field_selector|text_to_type"},
-                {"action": "navigate", "label": "Go to a different URL", "placeholder": "https://..."},
-                {"action": "extract", "label": "Extract data from this page", "placeholder": "What to extract (e.g., homework, grades)"},
-                {"action": "done", "label": "I'm done, stop scanning", "placeholder": ""},
-            ]
-            
-            options = [login_option] + base_options if has_login_form else base_options
+            has_login = any(w in page_text_lower for w in ["usuario", "contraseña", "password", "username", "login", "ingresar"])
             
             await db[C_SESSIONS].update_one(
                 {"session_id": session_id},
@@ -226,8 +261,13 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
                     "screenshot": screenshot_b64,
                     "page_text": page_text[:500],
                     "question": {
-                        "text": f"I've loaded {url}." + (" I see a login form — want me to login?" if has_login_form else " What should I do next?"),
-                        "options": options,
+                        "text": "I couldn't auto-login." + (" I see a login form." if has_login else "") + " What should I do?",
+                        "options": ([{"action": "login", "label": "🔐 Login with saved credentials", "placeholder": ""}] if has_login else []) + [
+                            {"action": "click_text", "label": "Click a button/link", "placeholder": "e.g., Iniciar Sesión"},
+                            {"action": "screenshot_guide", "label": "📸 Upload screenshot with instructions", "placeholder": ""},
+                            {"action": "navigate", "label": "Go to different URL", "placeholder": "https://..."},
+                            {"action": "done", "label": "Stop", "placeholder": ""},
+                        ],
                     },
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 }}
@@ -241,7 +281,7 @@ async def _execute_next_step(session_id: str, student: dict, creds: dict, playbo
             await page.close()
             raise HTTPException(400, "No step to execute")
         
-        await page.goto(url, timeout=30000)
+        await page.goto(url, timeout=60000)
         await page.wait_for_timeout(2000)
         
         # Replay all previous steps to get to current state
@@ -352,12 +392,15 @@ async def _execute_single_step(page, step: dict, creds: dict):
             text = text.replace("{username}", creds.get("username", "")).replace("{password}", creds.get("password", ""))
             await page.fill(selector, text)
     elif action == "navigate":
-        await page.goto(value, timeout=30000)
+        await page.goto(value, timeout=60000)
         await page.wait_for_timeout(2000)
     elif action == "login":
         # Smart login using stored credentials
         from .school_reader import school_reader
         await school_reader._smart_login(page, page.url, creds.get("username", ""), creds.get("password", ""))
+    elif action == "screenshot_guide":
+        # Admin uploaded an annotated screenshot — AI will analyze it in the answer endpoint
+        pass  # Handled by the answer endpoint which sends to AI vision
 
 
 async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, session_id: str):
@@ -445,3 +488,60 @@ async def _background_execute(session_id: str, session: dict):
                 {"action": "done", "label": "Stop", "placeholder": ""},
             ]}, "updated_at": datetime.now(timezone.utc).isoformat()}}
         )
+
+
+@router.post("/session/{session_id}/guide-screenshot")
+async def upload_guide_screenshot(session_id: str, data: dict, admin: dict = Depends(get_admin_user)):
+    """Admin uploads an annotated screenshot to guide the AI.
+    AI uses vision to understand what the admin wants.
+    
+    Body: { "screenshot_base64": "data:image/...", "instruction": "Click the red circled button" }
+    """
+    screenshot_b64 = data.get("screenshot_base64", "")
+    instruction = data.get("instruction", "Follow the annotations in this screenshot")
+    
+    if not screenshot_b64:
+        raise HTTPException(400, "screenshot_base64 required")
+    
+    session = await db[C_SESSIONS].find_one({"session_id": session_id})
+    if not session:
+        raise HTTPException(404, "Session not found")
+    
+    # Use AI vision to analyze the annotated screenshot
+    from .services import _ai_chat
+    
+    ai_response = await _ai_chat(
+        "You are a browser automation assistant. The admin sent an annotated screenshot showing what to do on a school website. Analyze the screenshot and provide step-by-step browser actions.",
+        f"""The admin sent this instruction: "{instruction}"
+
+    Based on the screenshot, provide the EXACT actions to take as a numbered list:
+    1. ACTION: click_text | VALUE: [exact text to click]
+    2. ACTION: type_text | VALUE: [selector]|[text]
+    3. ACTION: navigate | VALUE: [url]
+
+    Only include actions visible in the screenshot. Be specific with button text and field names."""
+    )
+    
+    # Parse AI response into steps
+    steps = []
+    for line in ai_response.split("\n"):
+        line = line.strip()
+        if "ACTION:" in line and "VALUE:" in line:
+            parts = line.split("VALUE:")
+            action_part = parts[0].split("ACTION:")[-1].strip().strip("|").strip()
+            value_part = parts[-1].strip() if len(parts) > 1 else ""
+            if action_part and value_part:
+                steps.append({"action": action_part, "value": value_part})
+    
+    # Save guide screenshot and parsed steps
+    await db[C_SESSIONS].update_one(
+        {"session_id": session_id},
+        {"$set": {
+            "guide_screenshot": screenshot_b64[:50000],  # Limit size
+            "guide_instruction": instruction,
+            "guide_steps": steps,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+    
+    return {"steps_detected": len(steps), "steps": steps, "message": "AI analyzed your screenshot. Review the steps and confirm to execute."}

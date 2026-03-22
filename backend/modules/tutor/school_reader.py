@@ -73,7 +73,7 @@ class SchoolReader:
         """Intelligent login that handles direct forms, modals, and various platforms.
         Returns (success: bool, screenshot_base64: str)."""
         
-        await page.goto(url, timeout=30000, wait_until="networkidle")
+        await page.goto(url, timeout=60000, wait_until="domcontentloaded")
         await page.wait_for_timeout(2000)
         
         # Strategy 1: Direct visible login form
@@ -254,7 +254,7 @@ class SchoolReader:
             login_url = platform_config.get("login_url", "")
             selectors = platform_config.get("selectors", {})
             
-            await page.goto(login_url, timeout=30000)
+            await page.goto(login_url, timeout=60000)
             await page.wait_for_timeout(2000)
             
             # Login
@@ -306,7 +306,7 @@ class SchoolReader:
         page = await browser.new_page()
         
         try:
-            await page.goto(url, timeout=30000, wait_until="networkidle")
+            await page.goto(url, timeout=60000, wait_until="domcontentloaded")
             await page.wait_for_timeout(2000)
             
             # Take screenshot
@@ -358,7 +358,7 @@ class SchoolReader:
                 results["errors"].append("Missing iMereb credentials")
                 return results
             
-            await page.goto("https://www.imereb.com/login", timeout=30000)
+            await page.goto("https://www.imereb.com/login", timeout=60000)
             await page.wait_for_timeout(2000)
             
             # Fill login form
@@ -431,7 +431,7 @@ class SchoolReader:
                 results["errors"].append("Missing Smart Academy credentials")
                 return results
             
-            await page.goto("https://apps.smartacademy.edu.pa/isae/login1.asp", timeout=30000)
+            await page.goto("https://apps.smartacademy.edu.pa/isae/login1.asp", timeout=60000)
             await page.wait_for_timeout(2000)
             
             # Login
