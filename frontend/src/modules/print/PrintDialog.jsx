@@ -40,10 +40,13 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
 
   useEffect(() => {
     if (open && orderIds?.length > 0) {
-      fetchPrintData();
-      setCurrentPage(0);
+      // Reset all transient state when dialog opens for a new print job
+      setPrinted(false);
+      printedRef.current = false; // CRITICAL: reset ref or 2nd+ prints are frozen
       setConfirmPrint(false);
-      // Don't reset printed — will be set from fetched data below
+      setCountdown(0);
+      setCurrentPage(0);
+      fetchPrintData(); // will re-set printed=true if already printed in DB
     }
   }, [open, orderIds]);
 
@@ -65,7 +68,9 @@ export default function PrintDialog({ open, onOpenChange, orderIds, token, onPri
         setJobId(data.job_id || null);
         // Show printed badge if ALL orders were already printed
         const allPrinted = (data.orders || []).every(o => o.printed_at);
-        setPrinted(allPrinted && (data.orders || []).length > 0);
+        const isPrinted = allPrinted && (data.orders || []).length > 0;
+        setPrinted(isPrinted);
+        printedRef.current = isPrinted; // Keep ref in sync with fetched state
       } else {
         setPrinted(false); printedRef.current = false;
       }
