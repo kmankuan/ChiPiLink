@@ -435,6 +435,7 @@ async def _auto_execute_playbook(page, steps: list, creds: dict, student: dict, 
                     "current_step": i,
                     "screenshot": base64.b64encode(screenshot).decode(),
                     "question": {"text": f"Playbook step {i+1} failed: {str(e)[:100]}. What should I do?", "options": [
+                        {"action": "login", "label": "🔐 Login with saved credentials", "placeholder": ""},
                         {"action": "click_text", "label": "Click text", "placeholder": ""},
                         {"action": "skip", "label": "Skip this step", "placeholder": ""},
                         {"action": "done", "label": "Stop", "placeholder": ""},

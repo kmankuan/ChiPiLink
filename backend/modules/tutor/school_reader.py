@@ -105,9 +105,44 @@ class SchoolReader:
                 'input[id*="user"]', 'input[id*="email"]',
                 'input[id*="login"]', 'input[id*="Usuario"]',
                 'input[id*="txtUsuario"]', 'input[name="txtUsuario"]',
-                '.modal input[type="text"]', '.modal input[type="email"]',
+                '.modal input[type="text"]', '.modal input[type="email"]', 'input:near(:text("Usuario"))', 'input:near(:text("User"))',
                 'dialog input[type="text"]', 'dialog input[type="email"]',
             ])
+        
+        if not user_input:
+            # Strategy 3: Fill ALL visible text inputs in order (first=username, second=password)
+            all_inputs = page.locator('input:visible').all()
+            visible_inputs = []
+            for inp in await page.locator('input:visible').all():
+                input_type = await inp.get_attribute('type') or 'text'
+                if input_type in ('text', 'email', 'tel', 'password', ''):
+                    visible_inputs.append((inp, input_type))
+            
+            if len(visible_inputs) >= 2:
+                # First non-password input = username, first password input = password
+                user_filled = False
+                for inp, itype in visible_inputs:
+                    if itype != 'password' and not user_filled:
+                        await inp.fill(username)
+                        user_filled = True
+                    elif itype == 'password':
+                        await inp.fill(password)
+                
+                # Find submit button
+                submit_btn = await self._find_element(page, [
+                    'button:has-text("Ingresar")', 'button:has-text("Entrar")',
+                    'button:has-text("Login")', 'button:has-text("Iniciar")',
+                    'button[type="submit"]', 'input[type="submit"]',
+                    '.btn-primary', '.btn-login',
+                ])
+                if submit_btn:
+                    await submit_btn.click()
+                    await page.wait_for_timeout(4000)
+                
+                screenshot = await page.screenshot(type="jpeg", quality=50)
+                screenshot_b64 = base64.b64encode(screenshot).decode()
+                login_form_gone = not await self._find_input(page, ['input[type="password"]:visible'])
+                return (login_form_gone, screenshot_b64)
         
         if not user_input:
             screenshot = await page.screenshot(type="jpeg", quality=50)
