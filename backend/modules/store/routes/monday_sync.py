@@ -149,24 +149,12 @@ async def sync_order_statuses(
 
 @router.get("/boards")
 async def list_boards(admin: dict = Depends(get_admin_user)):
-    """List all accessible boards from Monday.com."""
-    if not MONDAY_API_KEY:
-        raise HTTPException(status_code=400, detail="Monday.com API key not configured")
-
-    query = '''query { boards(limit: 100) { id name items_count } }'''
-
+    """List all accessible boards from Monday.com (via Integration Hub)."""
+    from modules.integrations.monday.core_client import monday_client
     try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.post(
-                "https://api.monday.com/v2",
-                json={"query": query},
-                headers={"Authorization": str(MONDAY_API_KEY), "Content-Type": "application/json"},
-                timeout=15.0,
-            )
-            data = resp.json()
-            boards = data.get("data", {}).get("boards", [])
-            return {"boards": boards}
-    except httpx.RequestError as e:
+        boards = await monday_client.get_boards()
+        return {"boards": [{"id": b["id"], "name": b["name"], "items_count": b.get("items_count", 0)} for b in boards]}
+    except Exception as e:
         raise HTTPException(status_code=502, detail=f"Monday.com API error: {e}")
 
 
@@ -174,71 +162,34 @@ async def list_boards(admin: dict = Depends(get_admin_user)):
 
 @router.get("/boards/{board_id}/columns")
 async def get_board_columns(board_id: str, admin: dict = Depends(get_admin_user)):
-    """Fetch columns, groups, and subitem columns from a Monday.com board."""
-    if not MONDAY_API_KEY:
-        raise HTTPException(status_code=400, detail="Monday.com API key not configured")
-
-    query = f'''query {{
-        boards(ids: [{board_id}]) {{
-            columns {{ id title type settings_str }}
-            groups {{ id title }}
-        }}
-    }}'''
-
+    """Fetch columns, groups, and subitem columns from a Monday.com board (via Integration Hub)."""
+    from modules.integrations.monday.core_client import monday_client
     try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.post(
-                "https://api.monday.com/v2",
-                json={"query": query},
-                headers={"Authorization": str(MONDAY_API_KEY), "Content-Type": "application/json"},
-                timeout=15.0,
-            )
-            data = resp.json()
-            boards = data.get("data", {}).get("boards", [])
-            if not boards:
-                raise HTTPException(status_code=404, detail="Board not found")
+        columns = await monday_client.get_board_columns(board_id)
+        groups = await monday_client.get_board_groups(board_id)
 
-            board = boards[0]
-            columns = board.get("columns", [])
-            groups = board.get("groups", [])
+        # Find subitems column to discover subitems board and its columns
+        subitems_col = next((c for c in columns if c["type"] == "subtasks"), None)
+        subitem_columns = []
 
-            # Find the subitems column to get the subitems board ID
-            subitems_col = next((c for c in columns if c["type"] == "subtasks"), None)
-            subitem_columns = []
-
-            if subitems_col:
+        if subitems_col:
+            try:
                 settings = json.loads(subitems_col.get("settings_str", "{}"))
                 subitems_board_id = settings.get("boardIds", [None])[0]
-
                 if subitems_board_id:
-                    sub_query = f'''query {{
-                        boards(ids: [{subitems_board_id}]) {{
-                            columns {{ id title type }}
-                        }}
-                    }}'''
-                    sub_resp = await client.post(
-                        "https://api.monday.com/v2",
-                        json={"query": sub_query},
-                        headers={"Authorization": str(MONDAY_API_KEY), "Content-Type": "application/json"},
-                        timeout=10.0,
-                    )
-                    sub_data = sub_resp.json()
-                    sub_boards = sub_data.get("data", {}).get("boards", [])
-                    if sub_boards:
-                        subitem_columns = sub_boards[0].get("columns", [])
+                    subitem_columns = await monday_client.get_board_columns(str(subitems_board_id))
+            except Exception as se:
+                logger.warning(f"Could not load subitem columns: {se}")
 
-            # Filter out system columns
-            skip = {"name", "subitems", "board_relation", "subtasks"}
-            filtered = [c for c in columns if c["type"] not in skip]
-            sub_filtered = [c for c in subitem_columns if c["type"] not in skip]
+        # Filter out system columns
+        skip = {"name", "subitems", "board_relation", "subtasks"}
+        filtered = [c for c in columns if c["type"] not in skip]
+        sub_filtered = [c for c in subitem_columns if c["type"] not in skip]
 
-            return {
-                "columns": filtered,
-                "groups": groups,
-                "subitem_columns": sub_filtered,
-            }
-
-    except httpx.RequestError as e:
+        return {"columns": filtered, "groups": groups, "subitem_columns": sub_filtered}
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(status_code=502, detail=f"Monday.com API error: {e}")
 
 
