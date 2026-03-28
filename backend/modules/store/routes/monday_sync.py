@@ -216,36 +216,105 @@ async def save_full_config(config: dict, admin: dict = Depends(get_admin_user)):
 
 @router.post("/sync-all")
 async def sync_all_orders(admin: dict = Depends(get_admin_user)):
-    """Push all unsynced orders to Monday.com."""
+    """Push all unsynced orders to Monday.com orders board (with subitems per book)."""
     from core.database import db as database
     from ..integrations.monday_textbook_adapter import textbook_monday_adapter
+    from datetime import datetime, timezone
 
     try:
-        # Find orders without monday_item_id that are not cancelled/draft
-        # Also exclude orders that have monday_item_ids (from pre-sale import)
+        # Find orders that have NOT yet been synced to Monday.com orders board
         orders = await database.store_textbook_orders.find(
-            {"$or": [{"monday_item_id": None}, {"monday_item_id": {"$exists": False}}],
-             "$and": [{"$or": [{"monday_item_ids": {"$exists": False}}, {"monday_item_ids": {"$size": 0}}, {"monday_item_ids": None}]}],
-             "status": {"$nin": ["cancelled", "draft", "awaiting_link"]}},
+            {
+                "$and": [
+                    # No monday_item_id set
+                    {"$or": [
+                        {"monday_item_id": None},
+                        {"monday_item_id": {"$exists": False}},
+                    ]},
+                    # No monday_item_ids array (or empty)
+                    {"$or": [
+                        {"monday_item_ids": {"$exists": False}},
+                        {"monday_item_ids": {"$size": 0}},
+                        {"monday_item_ids": None},
+                    ]},
+                ],
+                "status": {"$nin": ["cancelled", "draft", "awaiting_link"]},
+            },
             {"_id": 0}
-        ).to_list(100)
+        ).to_list(200)
 
         synced = 0
         failed = 0
+        errors = []
+
         for order in orders:
             try:
-                result = await textbook_monday_adapter.push_order(order)
-                if result and result.get("monday_item_id"):
+                order_id = order.get("order_id", "")
+                # Build selected_items from ordered items (status == "ordered" or quantity > 0)
+                all_items = order.get("items", [])
+                selected_items = [
+                    i for i in all_items
+                    if i.get("status") == "ordered" or i.get("quantity_ordered", 0) > 0
+                ]
+                if not selected_items:
+                    logger.warning(f"[sync-all] Order {order_id} has no ordered items, skipping")
+                    failed += 1
+                    continue
+
+                # Use stored user info from the order document
+                user_name = order.get("user_name", "")
+                user_email = order.get("user_email", "")
+                submission_total = order.get("total_amount", 0)
+
+                # Call the correct adapter method
+                result = await textbook_monday_adapter.sync_order_to_monday(
+                    order=order,
+                    selected_items=selected_items,
+                    user_name=user_name,
+                    user_email=user_email,
+                    submission_total=submission_total,
+                )
+
+                mid = result.get("item_id")
+                msubs = result.get("subitems", [])
+
+                if mid:
+                    # Persist Monday.com item ID back to the order
+                    update = {
+                        "monday_item_id": mid,
+                        "monday_item_ids": [mid],
+                        "monday_synced_at": datetime.now(timezone.utc).isoformat(),
+                    }
+                    if msubs:
+                        subitem_map = {s["book_id"]: s["monday_subitem_id"] for s in msubs}
+                        for item in all_items:
+                            if item.get("book_id") in subitem_map:
+                                item["monday_subitem_id"] = subitem_map[item["book_id"]]
+                        update["items"] = all_items
+                    await database.store_textbook_orders.update_one(
+                        {"order_id": order_id}, {"$set": update}
+                    )
+                    logger.info(f"[sync-all] Order {order_id} → Monday item {mid}, {len(msubs)} subitems")
                     synced += 1
                 else:
                     failed += 1
-            except Exception as e:
-                logger.error(f"Sync error for {order.get('order_id')}: {e}")
-                failed += 1
+                    errors.append(f"{order_id}: no item_id returned")
 
-        return {"synced": synced, "failed": failed, "total": len(orders)}
+            except Exception as e:
+                logger.error(f"[sync-all] Error syncing order {order.get('order_id')}: {e}")
+                failed += 1
+                errors.append(f"{order.get('order_id', '?')}: {str(e)[:100]}")
+
+        return {
+            "synced": synced,
+            "failed": failed,
+            "total": len(orders),
+            "errors": errors[:10],  # Return first 10 errors for debugging
+        }
     except Exception as e:
-        logger.error(f"Sync all error: {e}")
+        logger.error(f"[sync-all] Fatal error: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return {"error": str(e), "synced": 0, "failed": 0}
 
 
@@ -559,4 +628,56 @@ async def get_all_monday_configs(admin: dict = Depends(get_admin_user)):
     return {
         "store_configs": store_configs,
         "global_configs": global_configs,
+    }
+
+
+
+# ========== SYNC STATUS DIAGNOSTIC (Admin) ==========
+
+@router.get("/sync-status")
+async def get_sync_status(admin: dict = Depends(get_admin_user)):
+    """Diagnostic: check board configuration and count unsynced orders."""
+    from core.database import db as database
+
+    # Check orders board config
+    orders_cfg = await monday_config_service.get_config()
+    board_configured = bool(orders_cfg.get("board_id"))
+    subitems_enabled = orders_cfg.get("subitems_enabled", False)
+
+    # Count unsynced orders
+    unsynced_count = await database.store_textbook_orders.count_documents({
+        "$and": [
+            {"$or": [
+                {"monday_item_id": None},
+                {"monday_item_id": {"$exists": False}},
+            ]},
+            {"$or": [
+                {"monday_item_ids": {"$exists": False}},
+                {"monday_item_ids": {"$size": 0}},
+                {"monday_item_ids": None},
+            ]},
+        ],
+        "status": {"$nin": ["cancelled", "draft", "awaiting_link"]},
+    })
+
+    # Count already synced
+    synced_count = await database.store_textbook_orders.count_documents({
+        "monday_item_id": {"$ne": None, "$exists": True},
+    })
+
+    total_orders = await database.store_textbook_orders.count_documents({})
+
+    return {
+        "board_configured": board_configured,
+        "board_id": orders_cfg.get("board_id"),
+        "group_id": orders_cfg.get("group_id"),
+        "subitems_enabled": subitems_enabled,
+        "columns_mapped": len([v for v in orders_cfg.get("column_mapping", {}).values() if v]),
+        "subitem_columns_mapped": len([v for v in orders_cfg.get("subitem_column_mapping", {}).values() if v]),
+        "orders": {
+            "total": total_orders,
+            "synced": synced_count,
+            "unsynced": unsynced_count,
+        },
+        "ready_to_sync": board_configured and unsynced_count > 0,
     }

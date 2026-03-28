@@ -239,6 +239,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
   const [syncing, setSyncing] = useState(false);
   const [boards, setBoards] = useState(allBoards || []);
   const [loadingBoards, setLoadingBoards] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
 
   // Orders board
   const [ordersBoard, setOrdersBoard] = useState('');
@@ -260,7 +261,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
   const [textbooksSubitemColumns, setTextbooksSubitemColumns] = useState([]);
   const [textbooksSubitemMapping, setTextbooksSubitemMapping] = useState({});
 
-  useEffect(() => { loadConfig(); loadBoards(); }, []);
+  useEffect(() => { loadConfig(); loadBoards(); loadSyncStatus(); }, []);
   useEffect(() => { if (ordersBoard) loadBoardDetails(ordersBoard, 'orders'); }, [ordersBoard]);
   useEffect(() => { if (textbooksBoard) loadBoardDetails(textbooksBoard, 'textbooks'); }, [textbooksBoard]);
 
@@ -271,6 +272,13 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
       if (res.ok) setBoards((await res.json()).boards || []);
     } catch (e) { console.error('Error loading boards:', e); }
     finally { setLoadingBoards(false); }
+  };
+
+  const loadSyncStatus = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/sync-status`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setSyncStatus(await res.json());
+    } catch (e) { console.error('Error loading sync status:', e); }
   };
 
   const loadBoardDetails = async (boardId, target) => {
@@ -325,7 +333,8 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
         body: JSON.stringify(config),
       });
       if (!res.ok) throw new Error('Error saving');
-      toast.success(t('monday.mondayConfigSaved'));
+      toast.success(t('monday.mondayConfigSaved', 'Configuration saved'));
+      await loadSyncStatus();
     } catch (e) { toast.error(e.message); }
     finally { setSaving(false); }
   };
@@ -335,7 +344,14 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
     try {
       const res = await fetch(`${API}/api/store/monday/sync-all`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      data.error ? toast.error(data.error) : toast.success(`Synced: ${data.synced || 0}, Failed: ${data.failed || 0}`);
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        const msg = `Synced: ${data.synced || 0} orders, Failed: ${data.failed || 0}`;
+        data.synced > 0 ? toast.success(msg) : toast.warning(msg);
+        if (data.errors?.length) console.error('Sync errors:', data.errors);
+        await loadSyncStatus();
+      }
     } catch (e) { toast.error(e.message); }
     finally { setSyncing(false); }
   };
@@ -344,6 +360,34 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   return (
     <div className="space-y-4">
+      {/* Sync Status Banner */}
+      {syncStatus && (
+        <div className={`rounded-lg border px-4 py-3 text-sm flex flex-wrap items-center gap-3 ${
+          !syncStatus.board_configured
+            ? 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+            : syncStatus.orders.unsynced > 0
+            ? 'border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-700 dark:bg-blue-950/30 dark:text-blue-300'
+            : 'border-green-300 bg-green-50 text-green-800 dark:border-green-700 dark:bg-green-950/30 dark:text-green-300'
+        }`} data-testid="sync-status-banner">
+          {!syncStatus.board_configured ? (
+            <>
+              <span className="font-semibold">Orders board not configured.</span>
+              <span>Select and save an Orders Board below — new orders will start syncing automatically.</span>
+            </>
+          ) : syncStatus.orders.unsynced > 0 ? (
+            <>
+              <span className="font-semibold">{syncStatus.orders.unsynced} unsynced order{syncStatus.orders.unsynced !== 1 ? 's' : ''}.</span>
+              <span>{syncStatus.orders.synced} already synced. Click "Sync All Orders Now" to push them to Monday.</span>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold">All orders synced.</span>
+              <span>{syncStatus.orders.synced} order{syncStatus.orders.synced !== 1 ? 's' : ''} in Monday.com · board configured</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Workflow diagram */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="pt-4 pb-3">
