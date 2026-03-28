@@ -20,6 +20,89 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/monday", tags=["Store - Monday.com Sync"])
 
 
+# ========== WORKSPACE MANAGEMENT ==========
+
+@router.get("/workspaces")
+async def get_workspaces(admin: dict = Depends(get_admin_user)):
+    """List all configured Monday.com workspaces and the active one."""
+    from modules.integrations.monday.config_manager import monday_config as cfg
+    from modules.integrations.monday.core_client import monday_client
+    data = await cfg.get_workspaces()
+    workspaces = data.get("workspaces", [])
+    active_id = data.get("active_workspace_id")
+    # Mask API keys for display
+    safe = []
+    for ws in workspaces:
+        key = ws.get("api_key", "")
+        safe.append({**ws, "api_key_masked": f"{key[:8]}...{key[-4:]}" if len(key) > 12 else "****"})
+    return {"workspaces": safe, "active_workspace_id": active_id}
+
+
+@router.post("/workspaces")
+async def add_workspace(body: dict, admin: dict = Depends(get_admin_user)):
+    """Add a new Monday.com workspace (API key)."""
+    from modules.integrations.monday.config_manager import monday_config as cfg
+    from modules.integrations.monday.core_client import monday_client
+    api_key = body.get("api_key", "").strip()
+    name = body.get("name", "Default")
+    if not api_key:
+        raise HTTPException(status_code=400, detail="api_key is required")
+    # Validate key before saving
+    try:
+        client = httpx.AsyncClient(timeout=15.0)
+        resp = await client.post(
+            "https://api.monday.com/v2",
+            json={"query": "query { me { name email } }"},
+            headers={"Authorization": api_key, "Content-Type": "application/json"},
+        )
+        await client.aclose()
+        data = resp.json()
+        if "errors" in data or not data.get("data", {}).get("me"):
+            raise HTTPException(status_code=400, detail="Invalid Monday.com API key")
+        me = data["data"]["me"]
+        ws_name = name if name != "Default" else me.get("name", "Default")
+        result = await cfg.add_workspace(api_key, ws_name)
+        return {"success": True, "workspace_id": result["workspace_id"], "workspace_name": ws_name,
+                "user_email": me.get("email", "")}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Monday.com API error: {e}")
+
+
+@router.post("/workspaces/{workspace_id}/activate")
+async def activate_workspace(workspace_id: str, admin: dict = Depends(get_admin_user)):
+    """Set a workspace as the active one for all Monday.com calls."""
+    from modules.integrations.monday.config_manager import monday_config as cfg
+    success = await cfg.set_active_workspace(workspace_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+    return {"success": True, "active_workspace_id": workspace_id}
+
+
+@router.delete("/workspaces/{workspace_id}")
+async def delete_workspace(workspace_id: str, admin: dict = Depends(get_admin_user)):
+    """Remove a Monday.com workspace."""
+    from modules.integrations.monday.config_manager import monday_config as cfg
+    await cfg.remove_workspace(workspace_id)
+    return {"success": True}
+
+
+@router.get("/test-connection")
+async def test_connection(admin: dict = Depends(get_admin_user)):
+    """Test the active Monday.com connection (via Integration Hub)."""
+    from modules.integrations.monday.core_client import monday_client
+    result = await monday_client.test_connection()
+    if result.get("connected"):
+        # Also load boards for the connection info
+        try:
+            boards = await monday_client.get_boards()
+            result["boards"] = [{"id": b["id"], "name": b["name"]} for b in boards[:50]]
+        except Exception:
+            result["boards"] = []
+    return result
+
+
 # ========== WEBHOOK ENDPOINT ==========
 
 @router.post("/webhooks/subitem-status")
