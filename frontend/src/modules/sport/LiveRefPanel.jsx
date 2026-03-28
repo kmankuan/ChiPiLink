@@ -72,7 +72,10 @@ export default function LiveRefPanel() {
   const [showChangeRef, setShowChangeRef] = useState(false); // Referee change dialog
   const [newRefName, setNewRefName] = useState('');
   const [changingRef, setChangingRef] = useState(false);
-  const [manualSet, setManualSet] = useState({ score_a: 0, score_b: 0 });
+  const [showSetConfirm, setShowSetConfirm] = useState(false);
+  const [pendingSetSide, setPendingSetSide] = useState(null);
+  const [setConfirmScores, setSetConfirmScores] = useState({ a: 0, b: 0 });
+  const [confirmingSet, setConfirmingSet] = useState(false);
   const [endGameForm, setEndGameForm] = useState({ league_id: '', notes: '' });
   const [leagues, setLeagues] = useState([]);
   const [timer, setTimer] = useState('0:00');
@@ -119,6 +122,61 @@ export default function LiveRefPanel() {
 
   const syncDisplay = (data) => {
     fetch(`${API}/api/sport/live/${sessionId}/display`, { method: 'PUT', headers, body: JSON.stringify(data) }).catch(() => {});
+  };
+
+  // ── Set-win detection ─────────────────────────────────────────
+  const wouldWinSet = (side, sess = session) => {
+    if (!sess) return false;
+    const ptw = sess.settings?.points_to_win || 11;
+    const myNew = (sess.score?.[side] || 0) + 1;
+    const opp   = sess.score?.[side === 'a' ? 'b' : 'a'] || 0;
+    return myNew >= ptw && (myNew - opp) >= 2;
+  };
+
+  // Tap handler — intercepts set-winning point for confirmation dialog
+  const handleSideScore = (side) => {
+    if (isFinished) return;
+    if (showTechPanel) { setShowTechnique(side); return; }
+    if (wouldWinSet(side)) {
+      setPendingSetSide(side);
+      setSetConfirmScores({
+        a: side === 'a' ? (session.score?.a || 0) + 1 : (session.score?.a || 0),
+        b: side === 'b' ? (session.score?.b || 0) + 1 : (session.score?.b || 0),
+      });
+      setShowSetConfirm(true);
+      return;
+    }
+    scorePoint(side);
+  };
+
+  // Confirm set (with optional score correction)
+  const handleConfirmSet = async () => {
+    if (!pendingSetSide || confirmingSet) return;
+    setConfirmingSet(true);
+    const side    = pendingSetSide;
+    const oppSide = side === 'a' ? 'b' : 'a';
+    const proposed = {
+      a: side === 'a' ? (session.score?.a || 0) + 1 : (session.score?.a || 0),
+      b: side === 'b' ? (session.score?.b || 0) + 1 : (session.score?.b || 0),
+    };
+    const edited = setConfirmScores.a !== proposed.a || setConfirmScores.b !== proposed.b;
+    setShowSetConfirm(false);
+    setPendingSetSide(null);
+    try {
+      if (edited) {
+        const winner = setConfirmScores[side] > setConfirmScores[oppSide] ? side : oppSide;
+        const res = await fetch(`${API}/api/sport/live/${sessionId}/manual-set`, {
+          method: 'POST', headers,
+          body: JSON.stringify({ score_a: setConfirmScores.a, score_b: setConfirmScores.b, winner }),
+        });
+        if (res.ok) { toast.success('Set confirmed with corrected score'); fetchSession(); }
+        else toast.error('Failed to record set');
+      } else {
+        scorePoint(side);
+      }
+    } finally {
+      setConfirmingSet(false);
+    }
   };
 
   const scorePoint = async (side, technique = null) => {
@@ -261,14 +319,14 @@ export default function LiveRefPanel() {
 
       {/* Main Score Tap Areas */}
       <div className="flex-1 flex min-h-0">
-        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => !isFinished && (showTechPanel ? setShowTechnique(leftSide) : scorePoint(leftSide))} disabled={isFinished}>
+        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(leftSide)} disabled={isFinished} data-testid="score-left">
           {left?.photo_url && <img src={left.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
           <span className="text-white/50 text-base font-semibold">{left?.nickname || '?'}</span>
           <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[leftSide] || 0}</span>
           {s.server === leftSide && <span className="text-yellow-400 text-base">🏓</span>}
         </button>
         <div className="w-px bg-white/10 self-stretch" />
-        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => !isFinished && (showTechPanel ? setShowTechnique(rightSide) : scorePoint(rightSide))} disabled={isFinished}>
+        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(rightSide)} disabled={isFinished} data-testid="score-right">
           {right?.photo_url && <img src={right.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
           <span className="text-white/50 text-base font-semibold">{right?.nickname || '?'}</span>
           <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[rightSide] || 0}</span>
@@ -368,10 +426,107 @@ export default function LiveRefPanel() {
                 </button>
               ))}
             </div>
-            <Button variant="ghost" className="w-full mt-2 text-white/40 text-xs" onClick={() => scorePoint(showTechnique)}>Skip</Button>
+          <Button variant="ghost" className="w-full mt-2 text-white/40 text-xs" onClick={() => scorePoint(showTechnique)}>Skip</Button>
           </div>
         </div>
       )}
+
+      {/* ── Set Confirmation Dialog ── */}
+      <Dialog open={showSetConfirm} onOpenChange={(v) => { if (!v && !confirmingSet) { setShowSetConfirm(false); setPendingSetSide(null); } }}>
+        <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-sm" data-testid="set-confirm-dialog">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2 text-base">
+              <Trophy className="h-5 w-5 text-yellow-400" />
+              Set {s.current_set} — Confirm Final Score
+            </DialogTitle>
+            <p className="text-white/40 text-xs mt-0.5">Edit scores if needed, then confirm to close the set</p>
+          </DialogHeader>
+
+          {/* Editable scores */}
+          <div className="grid grid-cols-3 items-center gap-3 py-3">
+            {/* Left player */}
+            <div className="text-center space-y-1.5">
+              {left?.photo_url && <img src={left.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mx-auto" alt="" />}
+              <p className="text-white/60 text-xs font-semibold truncate">{left?.nickname || '?'}</p>
+              <Input
+                type="number"
+                min={0}
+                max={99}
+                value={setConfirmScores[leftSide]}
+                onChange={e => setSetConfirmScores(p => ({ ...p, [leftSide]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                className={`h-16 text-center text-3xl font-black bg-white/5 border-2 text-white ${
+                  pendingSetSide === leftSide ? 'border-yellow-400/60' : 'border-white/10'
+                }`}
+                data-testid="confirm-score-left"
+              />
+              {pendingSetSide === leftSide && (
+                <span className="text-[10px] text-yellow-400 font-bold uppercase tracking-wider">Set Winner</span>
+              )}
+            </div>
+
+            {/* VS divider */}
+            <div className="text-center">
+              <span className="text-white/20 text-xl font-black">—</span>
+            </div>
+
+            {/* Right player */}
+            <div className="text-center space-y-1.5">
+              {right?.photo_url && <img src={right.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mx-auto" alt="" />}
+              <p className="text-white/60 text-xs font-semibold truncate">{right?.nickname || '?'}</p>
+              <Input
+                type="number"
+                min={0}
+                max={99}
+                value={setConfirmScores[rightSide]}
+                onChange={e => setSetConfirmScores(p => ({ ...p, [rightSide]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                className={`h-16 text-center text-3xl font-black bg-white/5 border-2 text-white ${
+                  pendingSetSide === rightSide ? 'border-yellow-400/60' : 'border-white/10'
+                }`}
+                data-testid="confirm-score-right"
+              />
+              {pendingSetSide === rightSide && (
+                <span className="text-[10px] text-yellow-400 font-bold uppercase tracking-wider">Set Winner</span>
+              )}
+            </div>
+          </div>
+
+          {/* Sets so far */}
+          {s.sets?.length > 0 && (
+            <div className="flex items-center justify-center gap-1 pb-1">
+              <span className="text-white/30 text-[10px] mr-1">Previous:</span>
+              {s.sets.map((set, i) => (
+                <span key={i} className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${set.winner === leftSide ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                  {swapped ? `${set.score_b}-${set.score_a}` : `${set.score_a}-${set.score_b}`}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 pt-1">
+            <Button
+              variant="ghost"
+              className="text-white/40 border border-white/10"
+              onClick={() => { setShowSetConfirm(false); setPendingSetSide(null); }}
+              disabled={confirmingSet}
+              data-testid="set-confirm-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm gap-2"
+              onClick={handleConfirmSet}
+              disabled={confirmingSet}
+              data-testid="set-confirm-btn"
+            >
+              {confirmingSet ? (
+                <span className="animate-pulse">Confirming…</span>
+              ) : (
+                <><Trophy className="h-4 w-4" /> Confirm Set</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Manual Set Dialog */}
       <Dialog open={showManualSet} onOpenChange={setShowManualSet}>
