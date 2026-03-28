@@ -40,7 +40,6 @@ export default function StartLive() {
     if (!form.player_a_name || !form.player_b_name || !form.referee_name) { toast.error('Enter all names'); return; }
     setSubmitting(true);
     try {
-      // Don't send photos — backend looks them up from player records
       const { player_a_photo, player_b_photo, referee_photo, ...payload } = form;
       const res = await fetch(`${API}/api/sport/live`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -48,6 +47,17 @@ export default function StartLive() {
       });
       if (res.ok) {
         const session = await res.json();
+        // If photos were uploaded inline (player not yet in DB), push them to the session now
+        const photoUpdate = {};
+        if (player_a_photo) photoUpdate.player_a_photo = player_a_photo;
+        if (player_b_photo) photoUpdate.player_b_photo = player_b_photo;
+        if (Object.keys(photoUpdate).length > 0) {
+          await fetch(`${API}/api/sport/live/${session.session_id}/display`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify(photoUpdate),
+          }).catch(() => {});
+        }
         navigate(`/sport/live/${session.session_id}`);
       } else {
         const err = await res.json().catch(() => ({}));

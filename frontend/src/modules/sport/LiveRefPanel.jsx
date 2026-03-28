@@ -83,20 +83,25 @@ export default function LiveRefPanel() {
   const prevSetRef = useRef(0);
 
   const fetchSession = useCallback(async () => {
-    const r = await fetch(`${API}/api/sport/live/${sessionId}`);
-    if (r.ok) {
-      const data = await r.json();
-      setSession(data);
-      setSwapped(data.display?.swapped || false);
-      if (data.current_set !== prevSetRef.current && prevSetRef.current > 0 && data.settings?.auto_swap_sides) {
-        setSwapped(prev => !prev);
-        syncDisplay({ swapped: !swapped });
-        toast.info('Sides swapped');
+    try {
+      const r = await fetch(`${API}/api/sport/live/${sessionId}`);
+      if (r.ok) {
+        const data = await r.json();
+        setSession(data);
+        setSwapped(data.display?.swapped || false);
+        if (data.current_set !== prevSetRef.current && prevSetRef.current > 0 && data.settings?.auto_swap_sides) {
+          setSwapped(prev => !prev);
+          syncDisplay({ swapped: !swapped });
+          toast.info('Sides swapped');
+        }
+        prevSetRef.current = data.current_set;
+        if (data.status === 'finished') setShowEndGame(true);
       }
-      prevSetRef.current = data.current_set;
-      if (data.status === 'finished') setShowEndGame(true);
+    } catch (e) {
+      console.error('fetchSession error:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [sessionId]);
 
   useEffect(() => { fetchSession(); }, [fetchSession]);
