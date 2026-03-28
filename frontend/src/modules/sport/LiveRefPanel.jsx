@@ -76,6 +76,7 @@ export default function LiveRefPanel() {
   const [pendingSetSide, setPendingSetSide] = useState(null);
   const [setConfirmScores, setSetConfirmScores] = useState({ a: 0, b: 0 });
   const [confirmingSet, setConfirmingSet] = useState(false);
+  const [manualSet, setManualSet] = useState({ score_a: 0, score_b: 0 }); // restored — used by Manual Set Dialog
   const [endGameForm, setEndGameForm] = useState({ league_id: '', notes: '' });
   const [leagues, setLeagues] = useState([]);
   const [timer, setTimer] = useState('0:00');
