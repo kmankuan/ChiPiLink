@@ -294,84 +294,82 @@ export default function LiveRefPanel() {
     <div className="min-h-screen flex flex-col select-none" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)' }}>
       <EmotionOverlay emotion={emotion} settings={s} side={emotion?.side} playerPhoto={emotion?.side === 'left' ? left?.photo_url : right?.photo_url} />
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-black/30">
-        <button className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${s.display?.is_public !== false ? 'bg-green-600 text-white' : 'bg-white/10 text-white/40'}`}
-          onClick={() => syncDisplay({ is_public: s.display?.is_public === false })}>
-          <Radio className="h-4 w-4 inline mr-0.5" /> {s.display?.is_public !== false ? 'LIVE' : 'PRIV'}
-        </button>
-        <span className="text-white/30 text-sm font-mono">{timer} · Set {s.current_set} · Bo{(s.settings?.sets_to_win || 2) * 2 - 1}</span>
-        <div className="flex gap-1">
-          <button onClick={handleSwap} className="text-white/40 hover:text-white p-1"><ArrowLeftRight className="h-5 w-5" /></button>
-          <button onClick={() => setShowManualSet(true)} className="text-white/40 hover:text-white p-1"><Plus className="h-5 w-5" /></button>
-          <button onClick={() => setShowSettings(true)} className="text-white/40 hover:text-white p-1"><Settings className="h-5 w-5" /></button>
-          <button onClick={endMatch} className="text-red-400/60 hover:text-red-400 p-1"><X className="h-5 w-5" /></button>
-        </div>
-      </div>
-
-      {/* Set dots */}
-      <div className="flex justify-center gap-4 px-4 py-1">
-        <div className="flex gap-1">
-          {Array.from({ length: s.settings?.sets_to_win || 2 }).map((_, i) => (
-            <div key={`l${i}`} className={`w-4 h-4 rounded-full ${i < (s.sets_won?.[leftSide] || 0) ? 'bg-yellow-400' : 'bg-white/10'}`} />
-          ))}
-        </div>
-        <div className="flex gap-1">
-          {Array.from({ length: s.settings?.sets_to_win || 2 }).map((_, i) => (
-            <div key={`r${i}`} className={`w-4 h-4 rounded-full ${i < (s.sets_won?.[rightSide] || 0) ? 'bg-yellow-400' : 'bg-white/10'}`} />
-          ))}
-        </div>
-      </div>
-
-      {/* Main Score Tap Areas */}
-      <div className="flex-1 flex min-h-0">
-        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(leftSide)} disabled={isFinished} data-testid="score-left">
-          {left?.photo_url && <img src={left.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
-          <span className="text-white/50 text-base font-semibold">{left?.nickname || '?'}</span>
-          <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[leftSide] || 0}</span>
-          {s.server === leftSide && <span className="text-yellow-400 text-base">🏓</span>}
-        </button>
-        <div className="w-px bg-white/10 self-stretch" />
-        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(rightSide)} disabled={isFinished} data-testid="score-right">
-          {right?.photo_url && <img src={right.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
-          <span className="text-white/50 text-base font-semibold">{right?.nickname || '?'}</span>
-          <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[rightSide] || 0}</span>
-          {s.server === rightSide && <span className="text-yellow-400 text-base">🏓</span>}
-        </button>
-      </div>
-
-      {/* Battle Path + Set scores + Point Flow */}
-      <div className="px-3 py-1 space-y-1">
-        {/* Set scores — compact inline */}
-        {(s.sets?.length > 0) && (
-          <div className="flex items-center justify-center gap-1 text-sm">
-            {s.sets.map((set, i) => (
-              <span key={i} className={`px-1.5 py-0.5 rounded ${set.winner === leftSide ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                {swapped ? `${set.score_b}-${set.score_a}` : `${set.score_a}-${set.score_b}`}
-              </span>
-            ))}
-            <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 animate-pulse">
-              {s.score?.[leftSide] || 0}-{s.score?.[rightSide] || 0}*
-            </span>
+      {/* ══ COMBINED TOP BAR ══════════════════════════════════════
+          Row 1: status info (LIVE, timer, set/bo)
+          Row 2: all action buttons — large tap targets like a bottom nav
+      ═════════════════════════════════════════════════════════════ */}
+      <div className="bg-black/50 border-b border-white/5">
+        {/* Row 1 — Status strip */}
+        <div className="flex items-center justify-between px-3 py-1.5">
+          <button
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${s.display?.is_public !== false ? 'bg-green-600 text-white' : 'bg-white/10 text-white/40'}`}
+            onClick={() => syncDisplay({ is_public: s.display?.is_public === false })}>
+            <Radio className="h-3.5 w-3.5" /> {s.display?.is_public !== false ? 'LIVE' : 'PRIV'}
+          </button>
+          <span className="text-white/50 text-sm font-mono tracking-wide">{timer} · Set {s.current_set} · Bo{(s.settings?.sets_to_win || 2) * 2 - 1}</span>
+          {/* Set dots inline */}
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              {Array.from({ length: s.settings?.sets_to_win || 2 }).map((_, i) => (
+                <div key={`l${i}`} className={`w-3 h-3 rounded-full ${i < (s.sets_won?.[leftSide] || 0) ? 'bg-yellow-400' : 'bg-white/15'}`} />
+              ))}
+            </div>
+            <span className="text-white/20 text-xs">:</span>
+            <div className="flex gap-1">
+              {Array.from({ length: s.settings?.sets_to_win || 2 }).map((_, i) => (
+                <div key={`r${i}`} className={`w-3 h-3 rounded-full ${i < (s.sets_won?.[rightSide] || 0) ? 'bg-yellow-400' : 'bg-white/15'}`} />
+              ))}
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Bottom Controls */}
-      <div className="bg-black/40">
-        {/* Quick actions row */}
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
-          <Button variant="ghost" size="sm" className="text-white/50 h-9 text-sm" onClick={undoPoint}><Undo2 className="h-4 w-4 mr-1" /> Undo</Button>
-          <button className="text-yellow-400/50 text-base font-semibold" onClick={switchServer}>🏓 switch</button>
-          <Button variant="ghost" size="sm" className={`h-9 text-sm ${showTechPanel ? 'text-yellow-400' : 'text-white/50'}`} onClick={() => setShowTechPanel(!showTechPanel)}><Zap className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm" className={`h-9 text-sm ${showControls ? 'text-purple-400' : 'text-white/50'}`} onClick={() => setShowControls(!showControls)}>
-            <Tv className="h-4 w-4" />
-          </Button>
         </div>
 
-        {/* Expanded controls panel */}
+        {/* Row 2 — All action buttons (large) */}
+        <div className="grid border-t border-white/5" style={{ gridTemplateColumns: 'repeat(8, 1fr)' }}>
+          {/* Undo */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 text-white/50 hover:text-white" onClick={undoPoint} data-testid="btn-undo">
+            <Undo2 className="h-6 w-6" />
+            <span className="text-[9px]">Undo</span>
+          </button>
+          {/* Switch server */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 text-yellow-400/60 hover:text-yellow-400" onClick={switchServer} data-testid="btn-switch">
+            <span className="text-xl leading-none">🏓</span>
+            <span className="text-[9px]">Serve</span>
+          </button>
+          {/* Technique */}
+          <button className={`flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 ${showTechPanel ? 'text-yellow-400' : 'text-white/50 hover:text-white'}`} onClick={() => setShowTechPanel(!showTechPanel)} data-testid="btn-tech">
+            <Zap className="h-6 w-6" />
+            <span className="text-[9px]">Tech</span>
+          </button>
+          {/* Controls / TV */}
+          <button className={`flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 ${showControls ? 'text-purple-400' : 'text-white/50 hover:text-white'}`} onClick={() => setShowControls(!showControls)} data-testid="btn-controls">
+            <Tv className="h-6 w-6" />
+            <span className="text-[9px]">More</span>
+          </button>
+          {/* Swap sides */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 text-white/50 hover:text-white" onClick={handleSwap} data-testid="btn-swap">
+            <ArrowLeftRight className="h-6 w-6" />
+            <span className="text-[9px]">Swap</span>
+          </button>
+          {/* Add set */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 text-white/50 hover:text-white" onClick={() => setShowManualSet(true)} data-testid="btn-addset">
+            <Plus className="h-6 w-6" />
+            <span className="text-[9px]">Set</span>
+          </button>
+          {/* Settings */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-white/5 text-white/50 hover:text-white" onClick={() => setShowSettings(true)} data-testid="btn-settings">
+            <Settings className="h-6 w-6" />
+            <span className="text-[9px]">Config</span>
+          </button>
+          {/* End match */}
+          <button className="flex flex-col items-center justify-center py-3 gap-0.5 active:bg-red-500/10 text-red-400/60 hover:text-red-400" onClick={endMatch} data-testid="btn-end">
+            <X className="h-6 w-6" />
+            <span className="text-[9px]">End</span>
+          </button>
+        </div>
+
+        {/* Expanded controls panel (cards, effects, TV, match) */}
         {showControls && (
-          <div className="px-3 py-2 space-y-2 border-t border-white/5 animate-in slide-in-from-bottom">
+          <div className="px-3 py-2 space-y-2 border-t border-white/5 animate-in slide-in-from-top">
             {/* Cards & Calls */}
             <div>
               <p className="text-[8px] text-white/30 uppercase tracking-wider mb-1">Cards & Calls</p>
@@ -419,7 +417,36 @@ export default function LiveRefPanel() {
         )}
       </div>
 
-      {/* Technique picker */}
+      {/* Main Score Tap Areas */}
+      <div className="flex-1 flex min-h-0">
+        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(leftSide)} disabled={isFinished} data-testid="score-left">
+          {left?.photo_url && <img src={left.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
+          <span className="text-white/50 text-base font-semibold">{left?.nickname || '?'}</span>
+          <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[leftSide] || 0}</span>
+          {s.server === leftSide && <span className="text-yellow-400 text-base">🏓</span>}
+        </button>
+        <div className="w-px bg-white/10 self-stretch" />
+        <button className="flex-1 flex flex-col items-center justify-center active:bg-white/5" onClick={() => handleSideScore(rightSide)} disabled={isFinished} data-testid="score-right">
+          {right?.photo_url && <img src={right.photo_url} className="w-10 h-10 rounded-full object-cover border-2 border-white/20 mb-1" alt="" />}
+          <span className="text-white/50 text-base font-semibold">{right?.nickname || '?'}</span>
+          <span className="text-7xl font-black text-white" style={{ textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{s.score?.[rightSide] || 0}</span>
+          {s.server === rightSide && <span className="text-yellow-400 text-base">🏓</span>}
+        </button>
+      </div>
+
+      {/* Set history — compact inline below scores */}
+      {(s.sets?.length > 0) && (
+        <div className="flex items-center justify-center gap-1 py-1.5">
+          {s.sets.map((set, i) => (
+            <span key={i} className={`px-1.5 py-0.5 rounded text-xs font-bold ${set.winner === leftSide ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'}`}>
+              {swapped ? `${set.score_b}-${set.score_a}` : `${set.score_a}-${set.score_b}`}
+            </span>
+          ))}
+          <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-yellow-500/20 text-yellow-400 animate-pulse">
+            {s.score?.[leftSide] || 0}-{s.score?.[rightSide] || 0}*
+          </span>
+        </div>
+      )}
       {showTechnique && (
         <div className="fixed inset-0 z-40 flex items-end" onClick={() => setShowTechnique(null)}>
           <div className="w-full bg-[#1a1a2e] border-t border-white/10 p-3" onClick={e => e.stopPropagation()}>
