@@ -121,9 +121,20 @@ export default function LeagueDetail() {
   const openSettings = (tab = 'labels') => {
     setLabelDraft(league?.position_labels || []);
     setRulesDraft(league?.rules || { type: 'standard', consecutive_wins_required: 2, description: '' });
-    setPositionsDraft(league?.player_positions ? [...league.player_positions].sort((a, b) => a.position - b.position) : []);
+    
+    let initialPositions = league?.player_positions ? [...league.player_positions].sort((a, b) => a.position - b.position) : [];
+    if (tab === 'positions' && initialPositions.length === 0) {
+      initialPositions = [{ player_id: '', nickname: '', position: 1 }];
+    }
+    
+    setPositionsDraft(initialPositions);
     setSettingsTab(tab);
     setShowLabelSettings(true);
+    
+    // Scroll to top so the user actually sees the settings panel open
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
   };
 
   const handleGenerateDemo = async () => {
@@ -344,11 +355,36 @@ export default function LeagueDetail() {
 
             {/* Tab: Player Positions (for challenge leagues) */}
             {settingsTab === 'positions' && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-[10px] text-amber-600">
-                  Select players from the list below and set their initial ranked order. Position #1 = top rank (老大).
+                  Select players from the list below and set their initial ranked order. Position #1 = top rank.
                   Players must already exist in the Sport → Players list.
                 </p>
+
+                {/* Quick Add Unassigned Players */}
+                {allPlayers.filter(p => !positionsDraft.some(pd => pd.player_id === p.player_id)).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 p-2 bg-amber-100/50 rounded-lg border border-amber-200">
+                    <span className="text-[10px] font-medium text-amber-800 w-full mb-0.5">Quick Add to next position:</span>
+                    {allPlayers.filter(p => !positionsDraft.some(pd => pd.player_id === p.player_id)).map(p => (
+                      <button key={p.player_id}
+                        onClick={() => {
+                          // Find first empty slot if any, or append new
+                          const firstEmptyIdx = positionsDraft.findIndex(pd => !pd.player_id);
+                          if (firstEmptyIdx >= 0) {
+                            const next = [...positionsDraft];
+                            next[firstEmptyIdx] = { ...next[firstEmptyIdx], player_id: p.player_id, nickname: p.nickname };
+                            setPositionsDraft(next);
+                          } else {
+                            setPositionsDraft([...positionsDraft, { player_id: p.player_id, nickname: p.nickname, position: positionsDraft.length + 1 }]);
+                          }
+                        }}
+                        className="flex items-center text-[10px] bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-md hover:bg-amber-50 hover:border-amber-400 transition-colors">
+                        <Plus className="h-3 w-3 mr-0.5" /> {p.nickname}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <div className="space-y-1.5">
                   {positionsDraft.map((p, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -376,24 +412,24 @@ export default function LeagueDetail() {
                 {allPlayers.length === 0 && (
                   <p className="text-[10px] text-amber-500 italic">No players found. Add players first via Sport → Players tab.</p>
                 )}
-                <div className="flex gap-2 pt-1">
-                  <button onClick={addPosition} className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-900 font-medium">
-                    <Plus className="h-3.5 w-3.5" /> Add position slot
+                <div className="flex items-center pt-1 border-t border-amber-200 mt-2">
+                  <button onClick={addPosition} className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-900 font-medium py-1">
+                    <Plus className="h-3.5 w-3.5" /> Add empty slot
                   </button>
                   <div className="ml-auto">
                     <Button
                       size="sm"
-                      className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white gap-1"
+                      className="h-8 text-xs bg-amber-600 hover:bg-amber-700 text-white gap-1 px-4"
                       onClick={handleSavePositions}
-                      disabled={positionsDraft.some(p => !p.player_id)}
+                      disabled={positionsDraft.length === 0 || positionsDraft.some(p => !p.player_id)}
                       data-testid="save-positions-btn"
                     >
-                      <Save className="h-3 w-3" /> Save Order
+                      <Save className="h-3.5 w-3.5" /> Save Order
                     </Button>
                   </div>
                 </div>
                 {positionsDraft.some(p => !p.player_id) && (
-                  <p className="text-[10px] text-red-500">All positions must have a player selected before saving.</p>
+                  <p className="text-[10px] text-red-500 text-right">All positions must have a player selected.</p>
                 )}
               </div>
             )}
