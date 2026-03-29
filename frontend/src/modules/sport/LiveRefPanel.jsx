@@ -82,6 +82,7 @@ export default function LiveRefPanel() {
   const [timer, setTimer] = useState('0:00');
   const [loading, setLoading] = useState(true);
   const prevSetRef = useRef(0);
+  const swappedRef = useRef(false); // Ref to avoid stale-closure in fetchSession useCallback
 
   const fetchSession = useCallback(async () => {
     try {
@@ -89,11 +90,23 @@ export default function LiveRefPanel() {
       if (r.ok) {
         const data = await r.json();
         setSession(data);
-        setSwapped(data.display?.swapped || false);
-        if (data.current_set !== prevSetRef.current && prevSetRef.current > 0 && data.settings?.auto_swap_sides) {
-          setSwapped(prev => !prev);
-          syncDisplay({ swapped: !swapped });
+        const serverSwapped = data.display?.swapped || false;
+        const setChanged = data.current_set !== prevSetRef.current && prevSetRef.current > 0;
+        if (setChanged && data.settings?.auto_swap_sides) {
+          // Auto-swap: compute next state from ref (not stale closure)
+          const nextSwapped = !swappedRef.current;
+          swappedRef.current = nextSwapped;
+          setSwapped(nextSwapped);
+          // Persist to server — fire-and-forget but update before WebSocket races back
+          fetch(`${API}/api/sport/live/${sessionId}/display`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ swapped: nextSwapped }),
+          }).catch(() => {});
           toast.info('Sides swapped');
+        } else {
+          // Normal sync: take server value (e.g. manual swap from another device)
+          swappedRef.current = serverSwapped;
+          setSwapped(serverSwapped);
         }
         prevSetRef.current = data.current_set;
         if (data.status === 'finished') setShowEndGame(true);
@@ -103,7 +116,7 @@ export default function LiveRefPanel() {
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, token]);
 
   useEffect(() => { fetchSession(); }, [fetchSession]);
   useEffect(() => { fetch(`${API}/api/sport/leagues`).then(r => r.ok ? r.json() : []).then(setLeagues).catch(() => {}); }, []);
@@ -241,6 +254,7 @@ export default function LiveRefPanel() {
 
   const handleSwap = () => {
     const ns = !swapped;
+    swappedRef.current = ns; // keep ref in sync for fetchSession
     setSwapped(ns);
     syncDisplay({ swapped: ns });
   };
