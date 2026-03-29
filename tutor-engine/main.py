@@ -19,16 +19,24 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tutor-engine")
 
 # Database — same as main app
-_PROD_MONGO_URL = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=5&retryWrites=true&timeoutMS=10000&w=majority"
-_PROD_DB_NAME = "backend-cleanup-10-chipilink_prod"
+_PROD_ATLAS = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=10&retryWrites=true&timeoutMS=15000&w=majority"
+_atlas_db  = os.environ.get("ATLAS_DB_NAME", "backend-cleanup-10-chipilink_prod")
+_atlas_url = os.environ.get("ATLAS_MONGO_URL", "")
+_local_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+_is_local  = "localhost" in _local_url or "127.0.0.1" in _local_url
 
-_env_mongo = os.environ.get("MONGO_URL", "")
-if "localhost" in _env_mongo or "127.0.0.1" in _env_mongo:
-    MONGO_URL = _env_mongo
-    DB_NAME = os.environ.get("DB_NAME", "chipilink_prod")
+if _atlas_url:
+    MONGO_URL = _atlas_url
+    DB_NAME   = _atlas_db
+    logger.info(f"tutor-engine DB: ATLAS (explicit) — {DB_NAME}")
+elif not _is_local:
+    MONGO_URL = _PROD_ATLAS
+    DB_NAME   = _atlas_db
+    logger.info(f"tutor-engine DB: ATLAS (production) — {DB_NAME}")
 else:
-    MONGO_URL = _PROD_MONGO_URL
-    DB_NAME = _PROD_DB_NAME
+    MONGO_URL = _local_url
+    DB_NAME   = os.environ.get("DB_NAME", "chipilink_prod")
+    logger.info(f"tutor-engine DB: LOCAL — {DB_NAME}")
 
 client = AsyncIOMotorClient(
     MONGO_URL,

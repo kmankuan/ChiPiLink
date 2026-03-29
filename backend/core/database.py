@@ -17,12 +17,31 @@ load_dotenv(ROOT_DIR / '.env')
 
 _db_logger = logging.getLogger("core.database")
 
-# Use environment variables — Emergent deployment injects the correct values
-# Local dev: MONGO_URL=mongodb://localhost:27017 (from .env)
-# Production: MONGO_URL is injected by Emergent with the correct Atlas connection string
-mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-db_name = os.environ.get('DB_NAME', 'chipilink_prod')
-_db_logger.info(f"DB: connecting to db='{db_name}' local={('localhost' in mongo_url or '127.0.0.1' in mongo_url)}")
+# Database routing:
+# - MONGO_URL=localhost  → local/preview dev MongoDB (Emergent preview pods)
+# - MONGO_URL=other      → production non-local server; use Atlas for real data
+# - ATLAS_MONGO_URL set  → always use Atlas (explicit override)
+_local_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+_atlas_url = os.environ.get('ATLAS_MONGO_URL', '')
+_atlas_db  = os.environ.get('ATLAS_DB_NAME', 'backend-cleanup-10-chipilink_prod')
+
+_PROD_ATLAS = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=10&retryWrites=true&timeoutMS=15000&w=majority"
+_is_local   = 'localhost' in _local_url or '127.0.0.1' in _local_url
+
+if _atlas_url:
+    mongo_url = _atlas_url
+    db_name   = _atlas_db
+    _db_logger.info(f"DB: ATLAS (explicit) — {db_name}")
+elif not _is_local:
+    # Production server with non-local MONGO_URL → use Atlas
+    mongo_url = _PROD_ATLAS
+    db_name   = _atlas_db
+    _db_logger.info(f"DB: ATLAS (production) — {db_name}")
+else:
+    # Local/preview → use local MongoDB
+    mongo_url = _local_url
+    db_name   = os.environ.get('DB_NAME', 'chipilink_prod')
+    _db_logger.info(f"DB: LOCAL — {db_name}")
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
