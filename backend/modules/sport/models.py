@@ -66,9 +66,11 @@ class LeagueCreate(BaseModel):
     rating_system: str = "elo"  # simple_points | elo | performance
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+    position_labels: Optional[list] = None  # e.g. ["老大", "老二", "老三"]
 
 class LeagueUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     status: Optional[str] = None
     rating_system: Optional[str] = None
+    position_labels: Optional[list] = None  # custom rank titles per position

@@ -502,6 +502,21 @@ async def delete_league(league_id: str, admin: dict = Depends(get_admin_user)):
     return {"success": True}
 
 
+@router.put("/leagues/{league_id}")
+async def update_league(league_id: str, data: LeagueUpdate, admin: dict = Depends(get_admin_user)):
+    """Update league settings including custom position labels."""
+    from datetime import datetime, timezone
+    league = await services.get_league(league_id)
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    update = {k: v for k, v in data.dict(exclude_none=True).items()}
+    if not update:
+        return league
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await services.db[services.C_LEAGUES].update_one({"league_id": league_id}, {"$set": update})
+    return {**league, **update}
+
+
 @router.post("/leagues/{league_id}/generate-demo")
 async def generate_demo_matches(league_id: str, admin: dict = Depends(get_admin_user)):
     """
