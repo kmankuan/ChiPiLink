@@ -143,25 +143,24 @@ DEFAULT_MENU = {
             "groups": [
                 {
                     "id": "design", "order": 1, "collapsed_default": False,
-                    "label": {"en": "Design & Content", "es": "Diseño y Contenido", "zh": "设计与内容"},
+                    "label": {"en": "App Builder", "es": "Constructor", "zh": "应用构建"},
                     "items": [
-                        {"id": "ui-style", "label": {"en": "UI Style", "es": "Estilo UI", "zh": "界面风格"}, "icon": "paintbrush", "permission": "admin.site_config", "enabled": True, "order": 1},
-                        {"id": "badge-config", "label": {"en": "Badges", "es": "Badges", "zh": "徽章"}, "icon": "palette", "permission": "admin.site_config", "enabled": True, "order": 2},
-                        {"id": "landing", "label": {"en": "Landing Editor", "es": "Editor Landing", "zh": "首页编辑"}, "icon": "layout", "permission": "admin.site_config", "enabled": True, "order": 3},
-                        {"id": "showcase", "label": {"en": "Gallery", "es": "Galería", "zh": "展示"}, "icon": "image", "permission": "admin.site_config", "enabled": True, "order": 4},
-                        {"id": "ticker", "label": {"en": "Ticker", "es": "Ticker", "zh": "滚动消息"}, "icon": "radio", "permission": "admin.site_config", "enabled": True, "order": 5},
-                        {"id": "widget", "label": {"en": "Widgets", "es": "Widgets", "zh": "小部件"}, "icon": "puzzle", "permission": "admin.site_config", "enabled": True, "order": 6},
+                        {"id": "pages-manager", "label": {"en": "Pages Manager", "es": "Páginas", "zh": "页面管理"}, "icon": "layout", "permission": "admin.site_config", "enabled": True, "order": 1},
+                        {"id": "app-appearance", "label": {"en": "App Appearance", "es": "Apariencia", "zh": "应用外观"}, "icon": "paintbrush", "permission": "admin.site_config", "enabled": True, "order": 2},
+                        {"id": "widget", "label": {"en": "Widgets Config", "es": "Widgets", "zh": "小部件"}, "icon": "puzzle", "permission": "admin.site_config", "enabled": True, "order": 3},
+                        {"id": "badge-config", "label": {"en": "Badges", "es": "Badges", "zh": "徽章"}, "icon": "palette", "permission": "admin.site_config", "enabled": True, "order": 4},
+                        {"id": "showcase", "label": {"en": "Media Gallery", "es": "Galería", "zh": "展示"}, "icon": "image", "permission": "admin.site_config", "enabled": True, "order": 5},
+                        {"id": "ticker", "label": {"en": "News Ticker", "es": "Noticias", "zh": "滚动消息"}, "icon": "radio", "permission": "admin.site_config", "enabled": True, "order": 6},
                     ]
                 },
                 {
                     "id": "config", "order": 2, "collapsed_default": False,
                     "label": {"en": "System", "es": "Sistema", "zh": "系统"},
                     "items": [
-                        {"id": "site-config", "label": {"en": "Site Config", "es": "Config. Sitio", "zh": "站点配置"}, "icon": "settings", "permission": "admin.site_config", "enabled": True, "order": 1},
-                        {"id": "print-config", "label": {"en": "Print & Package", "es": "Impresión", "zh": "打印"}, "icon": "printer", "permission": "admin.site_config", "enabled": True, "order": 2},
-                        {"id": "privacy", "label": {"en": "Privacy", "es": "Privacidad", "zh": "隐私"}, "icon": "eye-off", "permission": "admin.site_config", "enabled": True, "order": 3},
-                        {"id": "auth-config", "label": {"en": "Authentication", "es": "Autenticación", "zh": "认证"}, "icon": "shield", "permission": "admin.site_config", "enabled": True, "order": 4},
-                        {"id": "translations", "label": {"en": "Translations", "es": "Traducciones", "zh": "翻译"}, "icon": "languages", "permission": "admin.site_config", "enabled": True, "order": 5},
+                        {"id": "print-config", "label": {"en": "Print & Package", "es": "Impresión", "zh": "打印"}, "icon": "printer", "permission": "admin.site_config", "enabled": True, "order": 1},
+                        {"id": "privacy", "label": {"en": "Privacy", "es": "Privacidad", "zh": "隐私"}, "icon": "eye-off", "permission": "admin.site_config", "enabled": True, "order": 2},
+                        {"id": "auth-config", "label": {"en": "Authentication", "es": "Autenticación", "zh": "认证"}, "icon": "shield", "permission": "admin.site_config", "enabled": True, "order": 3},
+                        {"id": "translations", "label": {"en": "Translations", "es": "Traducciones", "zh": "翻译"}, "icon": "languages", "permission": "admin.site_config", "enabled": True, "order": 4},
                     ]
                 },
                 {

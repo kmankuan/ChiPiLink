@@ -121,7 +121,8 @@ const SiteConfigModule = lazy(() => import('@/modules/admin/SiteConfigModule'));
 const AuthMethodsConfig = lazy(() => import('@/modules/admin/AuthMethodsConfig'));
 const UIStyleModule = lazy(() => import('@/modules/admin/UIStyleModule'));
 const PrivacyModule = lazy(() => import('@/modules/admin/PrivacyModule'));
-const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
+const PagesManager = lazy(() => import('@/modules/admin/pages/PagesManager'));
+const AppAppearanceManager = lazy(() => import('@/modules/admin/pages/AppAppearanceManager'));
 const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
 const SystemMonitorTab = lazy(() => import('@/modules/admin/SystemMonitorTab'));
 import AdminStatusBar from '@/modules/admin/AdminStatusBar';
@@ -550,8 +551,10 @@ export default function AdminDashboard() {
           </div>
         );
       // Content
-      case 'landing':
-        return <LandingPageEditor />;
+      case 'pages-manager':
+        return <PagesManager />;
+      case 'app-appearance':
+        return <AppAppearanceManager />;
       case 'showcase':
         return <ShowcaseAdminModule />;
       case 'layouts':
