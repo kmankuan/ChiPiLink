@@ -625,7 +625,7 @@ export default function LiveRefPanel() {
               </div>
               <p className="text-white/30 text-xs mt-1">Time: {timer}</p>
             </div>
-            {leagues.length > 0 && (<div><Label className="text-white/60 text-xs">League</Label><Select value={endGameForm.league_id} onValueChange={v=>setEndGameForm(p=>({...p,league_id:v}))}><SelectTrigger className="bg-white/5 border-white/10 text-white h-9"><SelectValue placeholder="No league" /></SelectTrigger><SelectContent><SelectItem value="">None</SelectItem>{leagues.filter(l=>l.status==='active').map(l=><SelectItem key={l.league_id} value={l.league_id}>{l.name}</SelectItem>)}</SelectContent></Select></div>)}
+            {leagues.length > 0 && (<div><Label className="text-white/60 text-xs">League</Label><Select value={endGameForm.league_id || 'none'} onValueChange={v=>setEndGameForm(p=>({...p,league_id:v==='none'?'':v}))}><SelectTrigger className="bg-white/5 border-white/10 text-white h-9"><SelectValue placeholder="No league" /></SelectTrigger><SelectContent><SelectItem value="none">None</SelectItem>{leagues.filter(l=>l.status==='active').map(l=><SelectItem key={l.league_id} value={l.league_id}>{l.name}</SelectItem>)}</SelectContent></Select></div>)}
           </div>
           <DialogFooter className="gap-2"><Button variant="ghost" className="text-white/50" onClick={()=>navigate('/sport')}>Close</Button><Button className="bg-yellow-500 text-black" onClick={()=>{toast.success('Saved');navigate('/sport');}}><Save className="h-4 w-4 mr-1" /> Save</Button></DialogFooter>
         </DialogContent>
