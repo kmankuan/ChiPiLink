@@ -69,7 +69,12 @@ import {
   BarChart,
   FileImage,
   Link2,
-  Upload
+  Upload,
+  Rss,
+  Trophy,
+  Swords,
+  Zap,
+  Table
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
@@ -88,7 +93,14 @@ const BLOCK_ICONS = {
   banner: Image,
   testimonials: MessageSquare,
   spacer: Minus,
-  divider: Minus
+  divider: Minus,
+  pinpanclub_feed: Rss,
+  sport_league_leaderboard: Trophy, 
+  sport_recent_matches: Swords,
+  sport_quick_actions: Zap, 
+  sport_live_matches: Rss,
+  sport_nav_row: Minus, 
+  sport_top_players: Table
 };
 
 // Color classes for block types
@@ -106,7 +118,7 @@ const BLOCK_COLORS = {
   divider: 'bg-gray-50 border-gray-200'
 };
 
-export default function LandingPageEditor() {
+export default function LandingPageEditor({ pageId = 'landing' }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -153,7 +165,7 @@ export default function LandingPageEditor() {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [pageRes, templatesRes, configRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/api/admin/landing-page`, { headers }),
+        axios.get(`${BACKEND_URL}/api/admin/pages/${pageId}`, { headers }),
         axios.get(`${BACKEND_URL}/api/admin/block-templates`, { headers }),
         axios.get(`${BACKEND_URL}/api/admin/site-config`, { headers })
       ]);
@@ -193,7 +205,7 @@ export default function LandingPageEditor() {
     try {
       const token = localStorage.getItem('auth_token');
       const res = await axios.post(
-        `${BACKEND_URL}/api/admin/landing-page/blocks?tipo=${tipo}`,
+        `${BACKEND_URL}/api/admin/pages/${pageId}/blocks?tipo=${tipo}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -213,7 +225,7 @@ export default function LandingPageEditor() {
       setSaving(true);
       const token = localStorage.getItem('auth_token');
       
-      let url = `${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}`;
+      let url = `${BACKEND_URL}/api/admin/pages/${pageId}/blocks/${bloqueId}`;
       const params = new URLSearchParams();
       if (activo !== null) params.append('active', activo);
       if (params.toString()) url += `?${params.toString()}`;
@@ -243,7 +255,7 @@ export default function LandingPageEditor() {
 
     try {
       const token = localStorage.getItem('auth_token');
-      await axios.delete(`${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}`, {
+      await axios.delete(`${BACKEND_URL}/api/admin/pages/${pageId}/blocks/${bloqueId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -265,7 +277,7 @@ export default function LandingPageEditor() {
     try {
       const token = localStorage.getItem('auth_token');
       await axios.put(
-        `${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}/publish?publicado=${!currentPublicado}`,
+        `${BACKEND_URL}/api/admin/pages/${pageId}/blocks/${bloqueId}/publish?publicado=${!currentPublicado}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -295,7 +307,7 @@ export default function LandingPageEditor() {
     try {
       const token = localStorage.getItem('auth_token');
       await axios.put(
-        `${BACKEND_URL}/api/admin/landing-page/blocks/reorder`,
+        `${BACKEND_URL}/api/admin/pages/${pageId}/blocks/reorder`,
         { orders },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -326,7 +338,7 @@ export default function LandingPageEditor() {
     try {
       const token = localStorage.getItem('auth_token');
       await axios.put(
-        `${BACKEND_URL}/api/admin/landing-page/publish?publicada=${!isPublished}`,
+        `${BACKEND_URL}/api/admin/pages/${pageId}/publish?publicada=${!isPublished}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1405,9 +1417,70 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
         );
 
       default:
+        // Generic Editor for any unmapped block type
         return (
-          <div className="text-muted-foreground text-center py-8">
-            Editor no disponible para este tipo de bloque
+          <div className="space-y-4">
+            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                ⚙️ Editor Automático: Este bloque usa una configuración genérica.
+              </p>
+            </div>
+            {Object.keys(config).map((key) => {
+              const val = config[key];
+              const valType = typeof val;
+
+              if (valType === 'boolean') {
+                return (
+                  <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
+                    <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
+                    <Switch checked={val} onCheckedChange={(v) => handleChange(key, v)} />
+                  </div>
+                );
+              }
+              if (valType === 'object' && val !== null && !Array.isArray(val) && (val.en !== undefined || val.es !== undefined || val.zh !== undefined)) {
+                // Looks like multilingual string
+                return (
+                  <div key={key} className="p-3 border rounded-lg">
+                    <MultilingualInput
+                      label={key.replace(/_/g, ' ')}
+                      value={val}
+                      onChange={(v) => handleChange(key, v)}
+                    />
+                  </div>
+                );
+              }
+              if (valType === 'string' || valType === 'number') {
+                return (
+                  <div key={key} className="p-3 border rounded-lg space-y-2">
+                    <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
+                    <Input 
+                      type={valType === 'number' ? 'number' : 'text'}
+                      value={val} 
+                      onChange={(e) => handleChange(key, valType === 'number' ? Number(e.target.value) : e.target.value)} 
+                    />
+                  </div>
+                );
+              }
+              
+              // Fallback for complex objects (arrays, deep visibility configs)
+              return (
+                <div key={key} className="p-3 border rounded-lg space-y-2">
+                  <Label className="capitalize">{key.replace(/_/g, ' ')} (JSON)</Label>
+                  <Textarea 
+                    value={JSON.stringify(val, null, 2)} 
+                    onChange={(e) => {
+                      try {
+                        handleChange(key, JSON.parse(e.target.value));
+                      } catch (err) {
+                        // ignore invalid JSON while typing
+                      }
+                    }}
+                    className="font-mono text-xs"
+                    rows={4}
+                  />
+                </div>
+              );
+            })}
           </div>
         );
     }

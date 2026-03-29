@@ -195,8 +195,8 @@ async def update_block(
 ):
     """Update block configuration"""
     update_doc = {"bloques.$.config": config}
-    if activo is not None:
-        update_doc["bloques.$.active"] = activo
+    if active is not None:
+        update_doc["bloques.$.active"] = active
     if publicado is not None:
         update_doc["bloques.$.publicado"] = publicado
     update_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
@@ -254,4 +254,92 @@ async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admi
         {"$set": {"publicada": publicada, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
     )
+    return {"success": True, "publicada": publicada}
+# Add this to the bottom of routes.py
+@router.get("/public/pages/{page_id}")
+async def get_public_page(page_id: str):
+    """Get page blocks (public) - only returns published blocks"""
+    page = await db.core_pages.find_one({"page_id": page_id}, {"_id": 0})
+    if not page:
+        return {
+            "page_id": page_id,
+            "titulo": f"Page: {page_id}",
+            "bloques": [],
+            "publicada": True
+        }
+    
+    if page.get("bloques"):
+        page["bloques"] = [
+            b for b in page["bloques"] 
+            if b.get("active", True) and b.get("publicado", True)
+        ]
+    return page
+
+@router.get("/admin/pages/{page_id}")
+async def get_admin_page(page_id: str, admin: dict = Depends(get_admin_user)):
+    page = await db.core_pages.find_one({"page_id": page_id}, {"_id": 0})
+    if not page:
+        return {
+            "page_id": page_id,
+            "titulo": f"Page: {page_id}",
+            "bloques": [],
+            "publicada": True
+        }
+    return page
+
+@router.post("/admin/pages/{page_id}/blocks")
+async def add_page_block(page_id: str, tipo: str, orden: Optional[int] = None, admin: dict = Depends(get_admin_user)):
+    if tipo not in BLOCK_TEMPLATES:
+        raise HTTPException(status_code=400, detail=f"Tipo '{tipo}' invalid")
+    template = BLOCK_TEMPLATES[tipo]
+    page = await db.core_pages.find_one({"page_id": page_id})
+    if page and page.get("bloques"):
+        if orden is None:
+            orden = max(b.get("orden", 0) for b in page["bloques"]) + 1
+    else:
+        orden = 0
+    new_block = BloquePagina(tipo=tipo, orden=orden, config=template["config_default"].copy()).model_dump()
+    if page:
+        await db.core_pages.update_one({"page_id": page_id}, {"$push": {"bloques": new_block}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}})
+    else:
+        await db.core_pages.insert_one({"page_id": page_id, "titulo": page_id.replace("_", " ").title(), "bloques": [new_block], "publicada": True, "updated_at": datetime.now(timezone.utc).isoformat()})
+    return {"success": True, "block": new_block}
+
+@router.put("/admin/pages/{page_id}/blocks/reorder")
+async def reorder_page_blocks(page_id: str, request: ReorderBlocksRequest, admin: dict = Depends(get_admin_user)):
+    for item in request.orders:
+        await db.core_pages.update_one({"page_id": page_id, "bloques.bloque_id": item.bloque_id}, {"$set": {"bloques.$.orden": item.orden}})
+    await db.core_pages.update_one({"page_id": page_id}, {"$set": {"updated_at": datetime.now(timezone.utc).isoformat()}})
+    return {"success": True}
+
+@router.put("/admin/pages/{page_id}/blocks/{bloque_id}")
+async def update_page_block(page_id: str, bloque_id: str, config: dict, active: Optional[bool] = None, publicado: Optional[bool] = None, admin: dict = Depends(get_admin_user)):
+    update_doc = {"bloques.$.config": config}
+    if active is not None:
+        update_doc["bloques.$.active"] = active
+    if publicado is not None:
+        update_doc["bloques.$.publicado"] = publicado
+    update_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+    result = await db.core_pages.update_one({"page_id": page_id, "bloques.bloque_id": bloque_id}, {"$set": update_doc})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Block not found")
+    return {"success": True}
+
+@router.put("/admin/pages/{page_id}/blocks/{bloque_id}/publish")
+async def toggle_page_block_publish(page_id: str, bloque_id: str, publicado: bool, admin: dict = Depends(get_admin_user)):
+    result = await db.core_pages.update_one({"page_id": page_id, "bloques.bloque_id": bloque_id}, {"$set": {"bloques.$.publicado": publicado, "updated_at": datetime.now(timezone.utc).isoformat()}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Block not found")
+    return {"success": True, "publicado": publicado}
+
+@router.delete("/admin/pages/{page_id}/blocks/{bloque_id}")
+async def delete_page_block(page_id: str, bloque_id: str, admin: dict = Depends(get_admin_user)):
+    result = await db.core_pages.update_one({"page_id": page_id}, {"$pull": {"bloques": {"bloque_id": bloque_id}}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Block not found")
+    return {"success": True}
+
+@router.put("/admin/pages/{page_id}/publish")
+async def toggle_publish_page(page_id: str, publicada: bool, admin: dict = Depends(get_admin_user)):
+    await db.core_pages.update_one({"page_id": page_id}, {"$set": {"publicada": publicada, "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
     return {"success": True, "publicada": publicada}

@@ -58,7 +58,7 @@ const BLOCK_COLORS = {
   pinpanclub_feed: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400'
 };
 
-export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
+export function AddBlockDialog({ open, onOpenChange, onBlockAdded, pageId = 'landing' }) {
   const { t } = useTranslation();
   const [templates, setTemplates] = useState({});
   const [loading, setLoading] = useState(true);
@@ -102,7 +102,7 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
       setAdding(tipo);
       const token = localStorage.getItem('auth_token');
       const response = await axios.post(
-        `${BACKEND_URL}/api/admin/landing-page/blocks?tipo=${tipo}`,
+        `${BACKEND_URL}/api/admin/pages/${pageId}/blocks?tipo=${tipo}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -44,6 +44,7 @@ import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
 import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
+import PageEditor from '@/pages/PageEditor';
 import PaymentStatus from '@/pages/PaymentStatus';
 
 // PinpanClub Module — DEPRECATED (replaced by Sport module)
@@ -121,6 +122,14 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 // import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
 
 // Bulk Import Page
+      <Route 
+        path="/admin/pages/:pageId" 
+        element={
+          <ProtectedRoute adminOnly>
+            <PageEditor />
+          </ProtectedRoute>
+        } 
+      />
 import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
 import HelpGuide from '@/pages/HelpGuide';
 

@@ -203,6 +203,69 @@ BLOCK_TEMPLATES = {
             "margen": "40px"
         }
     },
+    "sport_league_leaderboard": {
+        "name": "Sport - League Leaderboard",
+        "description": "Rankings for a specific league",
+        "config_default": {
+            "title": {"en": "League Rankings", "es": "Ranking de Liga", "zh": "联赛排名"},
+            "league_id": "",
+            "limit": 10,
+            "show_elo": True,
+            "show_points": True,
+            "theme": "default"
+        }
+    },
+    "sport_recent_matches": {
+        "name": "Sport - Recent Matches",
+        "description": "Recent sport matches list",
+        "config_default": {
+            "title": {"en": "Recent Matches", "es": "Partidos Recientes", "zh": "最近比赛"},
+            "limit": 5,
+            "league_filter": "",
+            "show_scores": True
+        }
+    },
+    "sport_quick_actions": {
+        "name": "Sport - Quick Actions",
+        "description": "Record match, referee buttons",
+        "config_default": {
+            "show_record_match": True,
+            "show_referee": True,
+            "show_stream": True,
+            "visibility": {
+                "public": False,
+                "registered": True,
+                "admin": True
+            }
+        }
+    },
+    "sport_live_matches": {
+        "name": "Sport - Live Matches",
+        "description": "Currently active matches",
+        "config_default": {
+            "title": {"en": "Live Now", "es": "En Vivo", "zh": "正在直播"},
+            "hide_when_empty": True
+        }
+    },
+    "sport_nav_row": {
+        "name": "Sport - Navigation Row",
+        "description": "Quick links to rankings, leagues, players",
+        "config_default": {
+            "show_rankings": True,
+            "show_leagues": True,
+            "show_players": True,
+            "show_tournaments": True,
+            "show_fame": True
+        }
+    },
+    "sport_top_players": {
+        "name": "Sport - Top Players",
+        "description": "Global ELO Top Players list",
+        "config_default": {
+            "title": {"en": "Global Rankings", "es": "Ranking Global", "zh": "全球排名"},
+            "limit": 5
+        }
+    },
     "pinpanclub_feed": {
         "name": "PinPanClub Activity Feed",
         "description": "Actividades en vivo del club de ping pong",
