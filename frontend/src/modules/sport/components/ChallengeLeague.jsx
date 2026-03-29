@@ -34,7 +34,7 @@ function ChallengeStatusBadge({ status, consec, required }) {
   return null;
 }
 
-export default function ChallengeLeague({ league, onLeagueUpdate }) {
+export default function ChallengeLeague({ league, onLeagueUpdate, onOpenSettings }) {
   const token = localStorage.getItem('auth_token');
   const leagueId = league.league_id;
   const rules = league.rules || {};
@@ -150,7 +150,21 @@ export default function ChallengeLeague({ league, onLeagueUpdate }) {
         </CardHeader>
         <CardContent className="p-0">
           {positions.length === 0 ? (
-            <p className="text-center py-6 text-muted-foreground text-sm px-3">No players assigned yet. Use the ⚙️ settings to add players.</p>
+            <div className="flex flex-col items-center gap-3 py-8 px-4 text-center">
+              <p className="text-sm text-muted-foreground">No players assigned yet.</p>
+              {token && onOpenSettings ? (
+                <Button
+                  size="sm"
+                  className="gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
+                  onClick={() => onOpenSettings('positions')}
+                  data-testid="add-players-direct-btn"
+                >
+                  <Plus className="h-4 w-4" /> Add Players to Rankings
+                </Button>
+              ) : (
+                <p className="text-xs text-muted-foreground">Ask an admin to add players via the ⚙️ settings button (top right).</p>
+              )}
+            </div>
           ) : (
             <div className="divide-y">
               {positions.map((p, i) => {

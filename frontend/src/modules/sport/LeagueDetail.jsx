@@ -234,9 +234,10 @@ export default function LeagueDetail() {
             {token && (
               <>
                 <button onClick={() => openSettings('labels')} title="League settings"
-                  className={`p-1.5 rounded-full transition-colors ${showLabelSettings ? 'bg-yellow-500/30 text-yellow-300' : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/20'}`}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${showLabelSettings ? 'bg-yellow-500/30 text-yellow-200' : 'bg-white/15 text-white/80 hover:bg-white/25 hover:text-white'}`}
                   data-testid="settings-btn">
-                  <Settings2 className="h-4 w-4" />
+                  <Settings2 className="h-3.5 w-3.5" />
+                  <span>Setup</span>
                 </button>
                 {!isChallenge && (
                   <button onClick={handleGenerateDemo} disabled={generatingDemo} title="Generate demo data"
@@ -403,7 +404,7 @@ export default function LeagueDetail() {
       <div className="max-w-lg mx-auto px-4 py-4">
         {/* Challenge Mode — completely different UI */}
         {isChallenge ? (
-          <ChallengeLeague league={league} onLeagueUpdate={loadData} />
+          <ChallengeLeague league={league} onLeagueUpdate={loadData} onOpenSettings={token ? openSettings : null} />
         ) : (
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="w-full mb-3">
