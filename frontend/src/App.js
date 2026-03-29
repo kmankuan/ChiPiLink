@@ -122,14 +122,6 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 // import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
 
 // Bulk Import Page
-      <Route 
-        path="/admin/pages/:pageId" 
-        element={
-          <ProtectedRoute adminOnly>
-            <PageEditor />
-          </ProtectedRoute>
-        } 
-      />
 import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
 import HelpGuide from '@/pages/HelpGuide';
 
@@ -378,6 +370,14 @@ function AppRouter() {
         element={
           <ProtectedRoute adminOnly>
             <AdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/pages/:pageId" 
+        element={
+          <ProtectedRoute adminOnly>
+            <PageEditor />
           </ProtectedRoute>
         } 
       />
