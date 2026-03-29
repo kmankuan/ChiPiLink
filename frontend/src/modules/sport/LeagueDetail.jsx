@@ -85,6 +85,7 @@ export default function LeagueDetail() {
   const [league, setLeague] = useState(null);
   const [standings, setStandings] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [allPlayers, setAllPlayers] = useState([]); // all sport players for position picker
   const [tab, setTab] = useState('standings');
   const [generatingDemo, setGeneratingDemo] = useState(false);
   const [showLabelSettings, setShowLabelSettings] = useState(false);
@@ -102,10 +103,12 @@ export default function LeagueDetail() {
       fetch(`${API}/api/sport/leagues/${leagueId}`).then(r => r.ok ? r.json() : null),
       fetch(`${API}/api/sport/leagues/${leagueId}/standings`).then(r => r.ok ? r.json() : []),
       fetch(`${API}/api/sport/matches?league_id=${leagueId}&limit=50`).then(r => r.ok ? r.json() : []),
-    ]).then(([l, s, m]) => {
+      fetch(`${API}/api/sport/players?limit=100`).then(r => r.ok ? r.json() : []),
+    ]).then(([l, s, m, p]) => {
       setLeague(l);
       setStandings(s);
       setMatches(m);
+      setAllPlayers(Array.isArray(p) ? p : []);
       setLabelDraft(l?.position_labels || []);
       setRulesDraft(l?.rules || { type: 'standard', consecutive_wins_required: 2, description: '' });
       setPositionsDraft(l?.player_positions ? [...l.player_positions].sort((a, b) => a.position - b.position) : []);
@@ -190,15 +193,18 @@ export default function LeagueDetail() {
 
   const addPosition = () => {
     const nextPos = positionsDraft.length + 1;
-    setPositionsDraft([...positionsDraft, { player_id: `pos_${nextPos}`, nickname: '', position: nextPos }]);
+    setPositionsDraft([...positionsDraft, { player_id: '', nickname: '', position: nextPos }]);
   };
   const removePosition = (i) => {
     const next = positionsDraft.filter((_, j) => j !== i).map((p, j) => ({ ...p, position: j + 1 }));
     setPositionsDraft(next);
   };
-  const updatePositionNick = (i, nick) => {
+  // When admin picks a player from the dropdown, store the real player_id + nickname
+  const setPositionPlayer = (i, player_id) => {
+    const player = allPlayers.find(p => p.player_id === player_id);
+    if (!player) return;
     const next = [...positionsDraft];
-    next[i] = { ...next[i], nickname: nick, player_id: next[i].player_id.startsWith('pos_') ? `pos_${nick.replace(/\s/g,'_').toLowerCase()}` : next[i].player_id };
+    next[i] = { ...next[i], player_id: player.player_id, nickname: player.nickname };
     setPositionsDraft(next);
   };
 
@@ -338,26 +344,56 @@ export default function LeagueDetail() {
             {/* Tab: Player Positions (for challenge leagues) */}
             {settingsTab === 'positions' && (
               <div className="space-y-2">
-                <p className="text-[10px] text-amber-600">Set the initial ranked order of players. Position #1 is the top rank.</p>
+                <p className="text-[10px] text-amber-600">
+                  Select players from the list below and set their initial ranked order. Position #1 = top rank (老大).
+                  Players must already exist in the Sport → Players list.
+                </p>
                 <div className="space-y-1.5">
                   {positionsDraft.map((p, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className="text-xs text-amber-700 w-6 shrink-0 font-bold">#{i + 1}</span>
-                      {posLabels[i] && <span className="text-xs text-amber-600 font-medium min-w-[40px]">{posLabels[i]}</span>}
-                      <Input value={p.nickname} onChange={e => updatePositionNick(i, e.target.value)}
-                        placeholder={`Player name`} className="h-8 text-sm flex-1 border-amber-300" data-testid={`pos-input-${i}`} />
-                      <button onClick={() => removePosition(i)} className="text-amber-400 hover:text-red-500"><X className="h-4 w-4" /></button>
+                      {posLabels[i] && <span className="text-xs text-amber-600 font-semibold min-w-[40px]">{posLabels[i]}</span>}
+                      <select
+                        value={p.player_id || ''}
+                        onChange={e => setPositionPlayer(i, e.target.value)}
+                        className="flex-1 border border-amber-300 rounded h-8 text-sm px-2 bg-white"
+                        data-testid={`pos-select-${i}`}
+                      >
+                        <option value="">— pick a player —</option>
+                        {allPlayers.map(pl => (
+                          <option key={pl.player_id} value={pl.player_id}>
+                            {pl.nickname}{pl.elo ? ` (ELO ${pl.elo})` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <button onClick={() => removePosition(i)} className="text-amber-400 hover:text-red-500 shrink-0">
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
+                {allPlayers.length === 0 && (
+                  <p className="text-[10px] text-amber-500 italic">No players found. Add players first via Sport → Players tab.</p>
+                )}
                 <div className="flex gap-2 pt-1">
-                  <button onClick={addPosition} className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-900 font-medium"><Plus className="h-3.5 w-3.5" /> Add player</button>
+                  <button onClick={addPosition} className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-900 font-medium">
+                    <Plus className="h-3.5 w-3.5" /> Add position slot
+                  </button>
                   <div className="ml-auto">
-                    <Button size="sm" className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white gap-1" onClick={handleSavePositions} data-testid="save-positions-btn">
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white gap-1"
+                      onClick={handleSavePositions}
+                      disabled={positionsDraft.some(p => !p.player_id)}
+                      data-testid="save-positions-btn"
+                    >
                       <Save className="h-3 w-3" /> Save Order
                     </Button>
                   </div>
                 </div>
+                {positionsDraft.some(p => !p.player_id) && (
+                  <p className="text-[10px] text-red-500">All positions must have a player selected before saving.</p>
+                )}
               </div>
             )}
           </div>
