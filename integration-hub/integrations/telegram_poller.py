@@ -64,6 +64,8 @@ class TelegramPoller:
             # Reload config for interval changes
             config = await self.db.community_config.find_one({"type": "telegram"}, {"_id": 0}) or config
             poll_interval = config.get("poll_interval", interval)
+            if poll_interval < 10:
+                poll_interval = 10
             await asyncio.sleep(poll_interval)
 
     async def _sync_once(self, config: Dict) -> Dict:

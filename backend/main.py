@@ -505,18 +505,24 @@ async def startup_event():
         from core.service_manager import service_manager
 
         if os.path.exists("/app/tutor-engine/main.py"):
-            service_manager.register(
-                "tutor-engine",
-                ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
-                "/app/tutor-engine", 8003
-            )
+            if os.path.exists("/etc/supervisor/conf.d/tutor-engine.conf"):
+                logger.info("[service-manager] tutor-engine is managed by supervisor, skipping manual start")
+            else:
+                service_manager.register(
+                    "tutor-engine",
+                    ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
+                    "/app/tutor-engine", 8003
+                )
 
         if os.path.exists("/app/sport-engine/main.py"):
-            service_manager.register(
-                "sport-engine",
-                ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
-                "/app/sport-engine", 8004
-            )
+            if os.path.exists("/etc/supervisor/conf.d/sport-engine.conf"):
+                logger.info("[service-manager] sport-engine is managed by supervisor, skipping manual start")
+            else:
+                service_manager.register(
+                    "sport-engine",
+                    ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
+                    "/app/sport-engine", 8004
+                )
 
         service_manager.start_all()
         await service_manager.start_monitoring()

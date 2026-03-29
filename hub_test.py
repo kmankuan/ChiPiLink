@@ -9,7 +9,7 @@ import json
 def test_main_app_health():
     """Test main app health"""
     try:
-        response = requests.get("https://playwright-login-1.preview.emergentagent.com/api/health", timeout=10)
+        response = requests.get("https://sport-scoring-hub.preview.emergentagent.com/api/health", timeout=10)
         success = response.status_code == 200
         print(f"{'✅' if success else '❌'} Main App Health: HTTP {response.status_code}")
         if success:
@@ -78,7 +78,7 @@ def test_admin_login():
     """Test admin login"""
     try:
         response = requests.post(
-            "https://playwright-login-1.preview.emergentagent.com/api/auth-v2/login",
+            "https://sport-scoring-hub.preview.emergentagent.com/api/auth-v2/login",
             json={"email": "teck@koh.one", "password": "Acdb##0897"},
             headers={'Content-Type': 'application/json'},
             timeout=10
