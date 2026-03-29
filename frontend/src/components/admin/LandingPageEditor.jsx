@@ -100,7 +100,8 @@ const BLOCK_ICONS = {
   sport_quick_actions: Zap, 
   sport_live_matches: Rss,
   sport_nav_row: Minus, 
-  sport_top_players: Table
+  sport_top_players: Table,
+  admin_stats: BarChart3
 };
 
 // Color classes for block types

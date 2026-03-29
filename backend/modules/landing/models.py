@@ -266,6 +266,14 @@ BLOCK_TEMPLATES = {
             "limit": 5
         }
     },
+    "admin_stats": {
+        "name": "Admin - System Health & Stats",
+        "description": "Overview of system status",
+        "config_default": {
+            "title": {"en": "System Health", "es": "Salud del Sistema"},
+            "refresh_interval": 30
+        }
+    },
     "pinpanclub_feed": {
         "name": "PinPanClub Activity Feed",
         "description": "Actividades en vivo del club de ping pong",

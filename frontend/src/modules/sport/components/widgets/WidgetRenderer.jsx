@@ -7,6 +7,7 @@ const SportQuickActionsWidget = lazy(() => import('./SportQuickActionsWidget'));
 const SportLiveMatchesWidget = lazy(() => import('./SportLiveMatchesWidget'));
 const SportNavRowWidget = lazy(() => import('./SportNavRowWidget'));
 const SportTopPlayersWidget = lazy(() => import('./SportTopPlayersWidget'));
+const AdminStatsWidget = lazy(() => import('@/components/admin/widgets/AdminStatsWidget'));
 
 export default function WidgetRenderer({ block }) {
   if (!block || !block.tipo) return null;
@@ -31,13 +32,14 @@ export default function WidgetRenderer({ block }) {
         {block.tipo === 'sport_live_matches' && <SportLiveMatchesWidget config={block.config} />}
         {block.tipo === 'sport_nav_row' && <SportNavRowWidget config={block.config} />}
         {block.tipo === 'sport_top_players' && <SportTopPlayersWidget config={block.config} />}
+        {block.tipo === 'admin_stats' && <AdminStatsWidget config={block.config} />}
         
         {/* If standard Landing Page widgets (hero, features, text, etc) are needed here, 
             they can be imported and added to the switch statement */}
             
         {![
           'sport_league_leaderboard', 'sport_recent_matches', 'sport_quick_actions',
-          'sport_live_matches', 'sport_nav_row', 'sport_top_players'
+          'sport_live_matches', 'sport_nav_row', 'sport_top_players', 'admin_stats'
         ].includes(block.tipo) && <Fallback />}
       </Suspense>
     </div>

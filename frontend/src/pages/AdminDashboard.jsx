@@ -67,7 +67,9 @@ import {
   ClipboardList,
   Truck,
   AlertTriangle,
-  Printer
+  Printer,
+  Pin,
+  PinOff
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -78,6 +80,8 @@ const HubDashboardModule = lazy(() => import('@/modules/admin/HubDashboardModule
 
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
+const AdminHomeDashboard = lazy(() => import('@/components/admin/AdminHomeDashboard'));
+import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
 const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule'));
 const TextbookOrdersAdminTab = lazy(() => import('@/modules/admin/store/TextbookOrdersAdminTab'));
 const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
@@ -256,6 +260,21 @@ export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarSearch, setSidebarSearch] = useState('');
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [pinnedItems, setPinnedItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('admin_pinned_items') || '[]'); } catch { return []; }
+  });
+
+  const togglePin = (itemId, e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setPinnedItems(prev => {
+      const isPinned = prev.includes(itemId);
+      const next = isPinned ? prev.filter(id => id !== itemId) : [...prev, itemId];
+      localStorage.setItem('admin_pinned_items', JSON.stringify(next));
+      return next;
+    });
+  };
 
   // ─── Backend-driven menu (cached for instant load) ───
   const [dynamicMenu, setDynamicMenu] = useState(() => {
@@ -476,7 +495,7 @@ export default function AdminDashboard() {
   const renderModule = () => {
     switch (activeModule) {
       case 'dashboard':
-        return <DashboardModule />;
+        return <AdminHomeDashboard />;
       case 'unatienda':
         return <UnatiendaModule />;
       case 'orders':
@@ -593,6 +612,19 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <AdminCommandPalette 
+        open={commandOpen} 
+        setOpen={setCommandOpen} 
+        menuData={dynamicMenu} 
+        iconMap={ICON_MAP}
+        onNavigate={(itemId, moduleId) => {
+          if (moduleId && moduleId !== activeModuleTab) {
+            setActiveModuleTab(moduleId);
+          }
+          setActiveModule(itemId);
+        }} 
+      />
+
       {/* Admin Header - Full Width */}
       <header className="sticky top-0 z-50 w-full bg-card border-b">
         <div className="flex h-14 items-center justify-between px-4">
@@ -723,6 +755,62 @@ export default function AdminDashboard() {
           )}
           <ScrollArea className="flex-1 py-2">
             <nav className="px-2 space-y-0.5">
+              {/* Pinned Favorites Section */}
+              {pinnedItems.length > 0 && !sidebarSearch.trim() && (
+                <div className="mb-2 border-b pb-2">
+                  {!collapsed && (
+                    <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-600/80 flex items-center gap-1.5">
+                      <Pin className="h-3 w-3" /> Favorites
+                    </div>
+                  )}
+                  {pinnedItems.map(itemId => {
+                    // Find item in all modules
+                    let item = null;
+                    if (dynamicMenu?.modules) {
+                      dynamicMenu.modules.forEach(m => m.groups?.forEach(g => g.items?.forEach(i => { if (i.id === itemId) item = i; })));
+                    }
+                    if (!item) return null;
+                    const Icon = ICON_MAP[item.icon] || Settings;
+                    const isActive = activeModule === item.id;
+                    return (
+                      <div key={`pin-${item.id}`} className="relative group/item flex items-center mb-0.5">
+                        <Button
+                          variant={isActive ? "secondary" : "ghost"}
+                          className={cn(
+                            "w-full justify-start gap-3 h-9",
+                            collapsed && "justify-center px-2",
+                            isActive ? "bg-amber-50 text-amber-900" : "hover:bg-amber-50/50"
+                          )}
+                          onClick={() => {
+                            if (item.path) navigate(item.path);
+                            else {
+                              // Switch to the correct module tab if needed
+                              if (dynamicMenu?.modules) {
+                                const mod = dynamicMenu.modules.find(m => m.groups?.some(g => g.items?.some(i => i.id === item.id)));
+                                if (mod && mod.id !== activeModuleTab) setActiveModuleTab(mod.id);
+                              }
+                              setActiveModule(item.id);
+                            }
+                          }}
+                        >
+                          <Icon className={cn("h-4 w-4 flex-shrink-0", isActive && "text-amber-600")} />
+                          {!collapsed && <span className="text-sm truncate pr-4">{item.label?.en || item.label}</span>}
+                        </Button>
+                        {!collapsed && (
+                          <button
+                            onClick={(e) => togglePin(item.id, e)}
+                            className="absolute right-2 p-1 rounded hover:bg-muted text-amber-600 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                            title="Unpin from Favorites"
+                          >
+                            <PinOff className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               {displayNavGroups.map((group) => (
                 <div key={group.group} className="mb-1">
                   {!collapsed && (
@@ -739,25 +827,39 @@ export default function AdminDashboard() {
                   {(collapsed || sidebarSearch.trim() || openGroups[group.group] !== false) && group.items.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeModule === item.id;
+                    const isPinned = pinnedItems.includes(item.id);
                     return (
-                      <Button
-                        key={item.id}
-                        variant={isActive ? "secondary" : "ghost"}
-                        className={cn(
-                          "w-full justify-start gap-3 h-9",
-                          collapsed && "justify-center px-2"
+                      <div key={item.id} className="relative group/item flex items-center">
+                        <Button
+                          variant={isActive ? "secondary" : "ghost"}
+                          className={cn(
+                            "w-full justify-start gap-3 h-9",
+                            collapsed && "justify-center px-2"
+                          )}
+                          onClick={() => {
+                            if (item.path) {
+                              navigate(item.path);
+                            } else {
+                              setActiveModule(item.id);
+                            }
+                          }}
+                        >
+                          <Icon className="h-4 w-4 flex-shrink-0" />
+                          {!collapsed && <span className="text-sm">{item.label}</span>}
+                        </Button>
+                        {!collapsed && (
+                          <button
+                            onClick={(e) => togglePin(item.id, e)}
+                            className={cn(
+                              "absolute right-2 p-1 rounded hover:bg-muted opacity-0 group-hover/item:opacity-100 transition-opacity",
+                              isPinned && "opacity-100 text-primary"
+                            )}
+                            title={isPinned ? "Unpin from Favorites" : "Pin to Favorites"}
+                          >
+                            {isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+                          </button>
                         )}
-                        onClick={() => {
-                          if (item.path) {
-                            navigate(item.path);
-                          } else {
-                            setActiveModule(item.id);
-                          }
-                        }}
-                      >
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {!collapsed && <span className="text-sm">{item.label}</span>}
-                      </Button>
+                      </div>
                     );
                   })}
                 </div>
@@ -837,8 +939,29 @@ export default function AdminDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto pb-7">
-          <div className="p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto min-w-0">
+        <main className="flex-1 overflow-auto pb-7 relative">
+          
+          {/* Smart Breadcrumb Header */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 hidden lg:block">
+            <div className="px-6 h-12 flex items-center gap-2 text-sm text-muted-foreground max-w-7xl mx-auto">
+              <span className="font-medium text-foreground">ChiPi Admin</span>
+              <ChevronRight className="h-4 w-4" />
+              <span>{modulesTabs.find(m => m.id === activeModuleTab)?.label || 'Module'}</span>
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-medium text-primary">{currentNavItem?.label || 'Dashboard'}</span>
+              
+              <div className="ml-auto text-xs flex items-center gap-1 border rounded-md px-2 py-1 bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+                onClick={() => setCommandOpen(true)}
+                title="Global Search"
+              >
+                <Search className="h-3 w-3" />
+                <span className="hidden xl:inline">Search everywhere</span>
+                <kbd className="ml-2 font-mono text-[10px] font-bold opacity-70 border bg-background px-1 rounded">⌘K</kbd>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-3 sm:p-4 lg:p-6 lg:pt-0 max-w-7xl mx-auto min-w-0">
             {/* Page Header - Desktop only */}
             <div className="hidden lg:block mb-6">
               <div className="flex items-center justify-between">
