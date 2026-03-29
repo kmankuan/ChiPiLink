@@ -7,10 +7,18 @@ import subprocess
 import asyncio
 import os
 import signal
+import socket
 import logging
 from typing import Dict, Optional
 
 logger = logging.getLogger("service_manager")
+
+
+def _port_in_use(port: int) -> bool:
+    """Return True if something is already listening on the given port."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        return s.connect_ex(("127.0.0.1", port)) == 0
 
 
 class ServiceProcess:
@@ -22,9 +30,17 @@ class ServiceProcess:
         self.process: Optional[subprocess.Popen] = None
         self.restart_count = 0
         self.max_restarts = 5
+        self.managed_externally = False  # True when supervisor already owns this port
 
     def start(self):
-        """Start the service as a subprocess."""
+        """Start the service as a subprocess — skipped if port already in use (supervisor-managed)."""
+        # Guard: if port is already bound, another manager (supervisor) owns this service
+        if _port_in_use(self.port):
+            if not self.managed_externally:
+                logger.info(f"[{self.name}] Port {self.port} already in use — managed externally (skipping)")
+                self.managed_externally = True
+            return True  # treat as running
+
         if self.process and self.process.poll() is None:
             logger.info(f"[{self.name}] Already running (pid {self.process.pid})")
             return True
@@ -47,6 +63,9 @@ class ServiceProcess:
             return False
 
     def is_alive(self):
+        # If externally managed, consider it alive as long as the port is bound
+        if self.managed_externally:
+            return _port_in_use(self.port)
         if not self.process:
             return False
         return self.process.poll() is None
