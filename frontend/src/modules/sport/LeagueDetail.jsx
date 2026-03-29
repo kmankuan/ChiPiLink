@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Trophy, Grid3x3, List } from 'lucide-react';
+import { ArrowLeft, Trophy, Grid3x3, List, RefreshCw, Sparkles } from 'lucide-react';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
 const API = RESOLVED_API_URL;
@@ -83,14 +83,41 @@ export default function LeagueDetail() {
   const [standings, setStandings] = useState([]);
   const [matches, setMatches] = useState([]);
   const [tab, setTab] = useState('standings');
+  const [generatingDemo, setGeneratingDemo] = useState(false);
+  const token = localStorage.getItem('auth_token');
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     Promise.all([
       fetch(`${API}/api/sport/leagues/${leagueId}`).then(r => r.ok ? r.json() : null),
       fetch(`${API}/api/sport/leagues/${leagueId}/standings`).then(r => r.ok ? r.json() : []),
       fetch(`${API}/api/sport/matches?league_id=${leagueId}&limit=50`).then(r => r.ok ? r.json() : []),
     ]).then(([l, s, m]) => { setLeague(l); setStandings(s); setMatches(m); }).catch(() => {});
   }, [leagueId]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleGenerateDemo = async () => {
+    if (!confirm('Generate demo round-robin matches for all existing players in this league?')) return;
+    setGeneratingDemo(true);
+    try {
+      const res = await fetch(`${API}/api/sport/leagues/${leagueId}/generate-demo`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        const msg = `Done! Validated: ${data.validated_existing}, Generated: ${data.generated_new} matches. ${data.total_players} players.`;
+        alert(msg);
+        loadData(); // Refresh standings, matrix, and matches
+      } else {
+        alert('Error generating demo data');
+      }
+    } catch (e) {
+      alert('Network error');
+    } finally {
+      setGeneratingDemo(false);
+    }
+  };
 
   if (!league) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#FBF7F0' }}><span className="text-muted-foreground">Loading...</span></div>;
 
@@ -107,6 +134,17 @@ export default function LeagueDetail() {
               <p className="text-[10px] text-white/50">{league.season} • {league.rating_system}</p>
             </div>
             <Badge className="ml-auto bg-green-500/20 text-green-300 text-[10px]">{league.status}</Badge>
+            {token && (
+              <button
+                onClick={handleGenerateDemo}
+                disabled={generatingDemo}
+                title="Generate demo round-robin data for all existing players"
+                className="ml-1 p-1.5 rounded-full bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-colors disabled:opacity-40"
+                data-testid="generate-demo-btn"
+              >
+                {generatingDemo ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              </button>
+            )}
           </div>
         </div>
       </div>

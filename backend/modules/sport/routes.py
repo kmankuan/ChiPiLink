@@ -502,6 +502,134 @@ async def delete_league(league_id: str, admin: dict = Depends(get_admin_user)):
     return {"success": True}
 
 
+@router.post("/leagues/{league_id}/generate-demo")
+async def generate_demo_matches(league_id: str, admin: dict = Depends(get_admin_user)):
+    """
+    Admin endpoint:
+    1. Validates ALL existing pending matches in this league.
+    2. Generates a full round-robin of validated matches between all participating players
+       (skipping pairs that already have a validated match).
+    Enough data to populate both Standings and Matrix views.
+    """
+    from datetime import datetime, timezone
+    import uuid, random
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    # --- Step 1: validate all pending matches in this league ---
+    pending = await services.db[services.C_MATCHES].find(
+        {"league_id": league_id, "status": {"$ne": "validated"}}, {"_id": 0}
+    ).to_list(200)
+    if pending:
+        await services.db[services.C_MATCHES].update_many(
+            {"league_id": league_id, "status": {"$ne": "validated"}},
+            {"$set": {"status": "validated", "validated_at": now, "validated_by": admin.get("user_id")}}
+        )
+
+    # --- Step 2: collect players already in this league's validated matches ---
+    existing = await services.db[services.C_MATCHES].find(
+        {"league_id": league_id, "status": "validated"}, {"_id": 0}
+    ).to_list(500)
+
+    # Build player registry from existing matches
+    player_registry: dict = {}
+    paired: set = set()  # frozensets of (pa_id, pb_id) already recorded
+    for m in existing:
+        for side in ("player_a", "player_b"):
+            p = m[side]
+            player_registry[p["player_id"]] = p["nickname"]
+        ids = tuple(sorted([m["player_a"]["player_id"], m["player_b"]["player_id"]]))
+        paired.add(ids)
+
+    players = list(player_registry.items())  # [(player_id, nickname), ...]
+
+    # Fetch ELO for each player
+    elo_map: dict = {}
+    for pid, _ in players:
+        doc = await services.db[services.C_PLAYERS].find_one({"player_id": pid}, {"_id": 0, "elo": 1})
+        elo_map[pid] = (doc or {}).get("elo", 1000)
+
+    # --- Step 3: generate missing round-robin pairs ---
+    generated = 0
+    score_options = [
+        (11, 0), (11, 3), (11, 5), (11, 6), (11, 7), (11, 8), (11, 9),
+        (12, 10), (13, 11), (14, 12),
+    ]
+
+    # Use first player as referee placeholder for generated matches
+    ref_id = players[0][0] if players else "sys"
+    ref_nick = players[0][1] if players else "System"
+
+    for i in range(len(players)):
+        for j in range(i + 1, len(players)):
+            pa_id, pa_nick = players[i]
+            pb_id, pb_nick = players[j]
+            key = tuple(sorted([pa_id, pb_id]))
+            if key in paired:
+                continue  # already have a match for this pair
+
+            # Weighted coin flip: higher ELO wins more often
+            elo_a = elo_map.get(pa_id, 1000)
+            elo_b = elo_map.get(pb_id, 1000)
+            prob_a = 1.0 / (1 + 10 ** ((elo_b - elo_a) / 400))
+            winner_is_a = random.random() < prob_a
+
+            winner_id = pa_id if winner_is_a else pb_id
+            sw, sl = random.choice(score_options)
+
+            elo_change_a, elo_change_b = services.calculate_elo(elo_a, elo_b, winner_is_a)
+
+            match_doc = {
+                "match_id": f"sm_{uuid.uuid4().hex[:10]}",
+                "player_a": {"player_id": pa_id, "nickname": pa_nick, "elo_before": elo_a, "elo_change": elo_change_a},
+                "player_b": {"player_id": pb_id, "nickname": pb_nick, "elo_before": elo_b, "elo_change": elo_change_b},
+                "referee": {"player_id": ref_id, "nickname": ref_nick},
+                "winner_id": winner_id,
+                "score_winner": sw,
+                "score_loser": sl,
+                "league_id": league_id,
+                "status": "validated",
+                "notes": "auto-generated demo",
+                "source": "demo",
+                "created_at": now,
+                "validated_at": now,
+                "validated_by": admin.get("user_id"),
+            }
+            await services.db[services.C_MATCHES].insert_one(match_doc)
+            match_doc.pop("_id", None)
+
+            # Update player ELO in player records
+            await services.db[services.C_PLAYERS].update_one(
+                {"player_id": pa_id},
+                {"$inc": {"elo": elo_change_a, "stats.matches_played": 1,
+                          "stats.wins": (1 if winner_is_a else 0),
+                          "stats.losses": (0 if winner_is_a else 1)}}
+            )
+            await services.db[services.C_PLAYERS].update_one(
+                {"player_id": pb_id},
+                {"$inc": {"elo": elo_change_b, "stats.matches_played": 1,
+                          "stats.wins": (0 if winner_is_a else 1),
+                          "stats.losses": (1 if winner_is_a else 0)}}
+            )
+            elo_map[pa_id] = elo_a + elo_change_a
+            elo_map[pb_id] = elo_b + elo_change_b
+            paired.add(key)
+            generated += 1
+
+    standings = await services.get_league_standings(league_id)
+    matrix = await services.get_league_matrix(league_id)
+
+    return {
+        "success": True,
+        "validated_existing": len(pending),
+        "generated_new": generated,
+        "total_players": len(players),
+        "total_validated_matches": len(existing) - len(pending) + len(pending) + generated,
+        "standings_count": len(standings),
+        "matrix_pairs": len(matrix.get("matrix", {})),
+    }
+
+
 # ═══ RANKINGS (global, across all leagues) ═══
 
 @router.get("/rankings")
