@@ -508,7 +508,235 @@ async def delete_league(league_id: str) -> bool:
     return True
 
 
-# ═══ ELO + RATING ENGINE ═══
+# ═══ CHALLENGE LEAGUE ENGINE ═══
+
+C_CHALLENGES = "sport_challenges"
+
+
+async def get_league_challenges(league_id: str, status: str = None) -> list:
+    """Return all challenges for a league, optionally filtered by status."""
+    query = {"league_id": league_id}
+    if status:
+        query["status"] = status
+    return await db[C_CHALLENGES].find(query, {"_id": 0}).sort("started_at", -1).to_list(200)
+
+
+async def start_challenge(league_id: str, challenger_name: str, challenged_name: str) -> dict:
+    """
+    Open a new challenge: a lower-ranked player challenges a higher-ranked one.
+    Validates that:
+      - Both players are in the league's player_positions list
+      - Challenger is ranked LOWER (higher position number) than challenged
+      - No active challenge already exists between these two players
+    """
+    import uuid
+    league = await get_league(league_id)
+    if not league:
+        raise ValueError("League not found")
+    if league.get("rules", {}).get("type") != "challenge":
+        raise ValueError("This league does not use challenge rules")
+
+    positions = league.get("player_positions", [])
+    if not positions:
+        raise ValueError("No player positions configured for this league")
+
+    # Find players in position list
+    challenger = next((p for p in positions if p["nickname"].lower() == challenger_name.lower()), None)
+    challenged = next((p for p in positions if p["nickname"].lower() == challenged_name.lower()), None)
+    if not challenger:
+        raise ValueError(f"Challenger '{challenger_name}' not found in league positions")
+    if not challenged:
+        raise ValueError(f"Challenged '{challenged_name}' not found in league positions")
+
+    if challenger["position"] <= challenged["position"]:
+        raise ValueError(
+            f"{challenger_name} (#{challenger['position']}) must have a LOWER rank than "
+            f"{challenged_name} (#{challenged['position']}) to issue a challenge"
+        )
+
+    # One active challenge per pair at a time
+    existing = await db[C_CHALLENGES].find_one({
+        "league_id": league_id,
+        "status": "active",
+        "$or": [
+            {"challenger_id": challenger["player_id"], "challenged_id": challenged["player_id"]},
+            {"challenger_id": challenged["player_id"], "challenged_id": challenger["player_id"]},
+        ]
+    }, {"_id": 0})
+    if existing:
+        raise ValueError("An active challenge already exists between these players")
+
+    wins_required = league.get("rules", {}).get("consecutive_wins_required", 2)
+    now = datetime.now(timezone.utc).isoformat()
+    challenge = {
+        "challenge_id": f"ch_{uuid.uuid4().hex[:10]}",
+        "league_id": league_id,
+        "challenger_id": challenger["player_id"],
+        "challenger_nickname": challenger["nickname"],
+        "challenger_position": challenger["position"],
+        "challenged_id": challenged["player_id"],
+        "challenged_nickname": challenged["nickname"],
+        "challenged_position": challenged["position"],
+        "consecutive_wins": 0,
+        "wins_required": wins_required,
+        "status": "active",   # active | won | failed
+        "match_ids": [],
+        "started_at": now,
+        "ended_at": None,
+        "outcome": None,
+    }
+    await db[C_CHALLENGES].insert_one(challenge)
+    challenge.pop("_id", None)
+    return challenge
+
+
+async def record_challenge_match(
+    challenge_id: str,
+    winner_name: str,
+    score_winner: int,
+    score_loser: int,
+    referee_name: str,
+    admin_id: str,
+) -> dict:
+    """
+    Record a match result for an active challenge.
+    State machine:
+      - Challenger wins → consecutive_wins++
+        → if consecutive_wins >= wins_required → challenge WON → swap positions
+      - Challenger loses → challenge FAILED (consecutive wins reset)
+    Returns the updated challenge doc.
+    """
+    challenge = await db[C_CHALLENGES].find_one({"challenge_id": challenge_id}, {"_id": 0})
+    if not challenge:
+        raise ValueError("Challenge not found")
+    if challenge["status"] != "active":
+        raise ValueError(f"Challenge is already {challenge['status']}")
+
+    league = await get_league(challenge["league_id"])
+    settings = await get_settings()
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Resolve winner
+    challenger_nick = challenge["challenger_nickname"]
+    challenged_nick = challenge["challenged_nickname"]
+    winner_name_lower = winner_name.strip().lower()
+    if winner_name_lower == challenger_nick.lower():
+        challenger_won = True
+    elif winner_name_lower == challenged_nick.lower():
+        challenger_won = False
+    else:
+        raise ValueError(f"Winner '{winner_name}' is neither {challenger_nick} nor {challenged_nick}")
+
+    # Fetch/resolve player objects for match recording
+    challenger_player = await db[C_PLAYERS].find_one({"player_id": challenge["challenger_id"]}, {"_id": 0})
+    challenged_player = await db[C_PLAYERS].find_one({"player_id": challenge["challenged_id"]}, {"_id": 0})
+    ref_player = await db[C_PLAYERS].find_one(
+        {"nickname": {"$regex": f"^{referee_name}$", "$options": "i"}}, {"_id": 0}
+    )
+    if not challenger_player or not challenged_player:
+        raise ValueError("Could not find player records")
+    if not ref_player:
+        # Use challenger as referee placeholder if not found
+        ref_player = challenger_player
+
+    # Calculate ELO
+    elo_a = challenger_player.get("elo", 1000)
+    elo_b = challenged_player.get("elo", 1000)
+    elo_change_a, elo_change_b = calculate_elo(elo_a, elo_b, challenger_won)
+
+    # Record the match in sport_matches
+    import uuid as _uuid
+    match_doc = {
+        "match_id": f"sm_{_uuid.uuid4().hex[:10]}",
+        "player_a": {"player_id": challenge["challenger_id"], "nickname": challenger_nick, "elo_before": elo_a, "elo_change": elo_change_a},
+        "player_b": {"player_id": challenge["challenged_id"], "nickname": challenged_nick, "elo_before": elo_b, "elo_change": elo_change_b},
+        "referee": {"player_id": ref_player["player_id"], "nickname": ref_player["nickname"]},
+        "winner_id": challenge["challenger_id"] if challenger_won else challenge["challenged_id"],
+        "score_winner": score_winner,
+        "score_loser": score_loser,
+        "league_id": challenge["league_id"],
+        "challenge_id": challenge_id,
+        "status": "validated",
+        "source": "challenge",
+        "created_at": now,
+        "validated_at": now,
+    }
+    await db[C_MATCHES].insert_one(match_doc)
+    match_doc.pop("_id", None)
+    await _update_player_stats(challenge["challenger_id"], challenger_won, elo_change_a)
+    await _update_player_stats(challenge["challenged_id"], not challenger_won, elo_change_b)
+
+    # Update challenge state
+    new_consec = (challenge["consecutive_wins"] + 1) if challenger_won else 0
+    match_ids = challenge.get("match_ids", []) + [match_doc["match_id"]]
+    wins_required = challenge["wins_required"]
+
+    if challenger_won and new_consec >= wins_required:
+        # CHALLENGE WON — swap positions
+        new_status = "won"
+        outcome = f"{challenger_nick} won {wins_required} consecutive matches and takes position #{challenge['challenged_position']}"
+        await _swap_positions(challenge["league_id"], challenge["challenger_id"], challenge["challenged_id"])
+        ended_at = now
+    elif not challenger_won:
+        # CHALLENGE FAILED
+        new_status = "failed"
+        outcome = f"Challenge failed — {challenged_nick} won, restarting challenge required"
+        ended_at = now
+    else:
+        new_status = "active"
+        outcome = None
+        ended_at = None
+
+    update = {
+        "consecutive_wins": new_consec,
+        "status": new_status,
+        "match_ids": match_ids,
+        "last_match_at": now,
+    }
+    if ended_at:
+        update["ended_at"] = ended_at
+        update["outcome"] = outcome
+
+    await db[C_CHALLENGES].update_one({"challenge_id": challenge_id}, {"$set": update})
+    result = {**challenge, **update}
+    result["last_match"] = match_doc
+    return result
+
+
+async def _swap_positions(league_id: str, winner_id: str, loser_id: str) -> None:
+    """Swap two players in the league's player_positions list."""
+    league = await get_league(league_id)
+    positions = league.get("player_positions", [])
+    winner_pos = next((p["position"] for p in positions if p["player_id"] == winner_id), None)
+    loser_pos = next((p["position"] for p in positions if p["player_id"] == loser_id), None)
+    if winner_pos is None or loser_pos is None:
+        return
+    for p in positions:
+        if p["player_id"] == winner_id:
+            p["position"] = loser_pos
+        elif p["player_id"] == loser_id:
+            p["position"] = winner_pos
+    positions.sort(key=lambda p: p["position"])
+    await db[C_LEAGUES].update_one(
+        {"league_id": league_id},
+        {"$set": {"player_positions": positions, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+
+
+async def cancel_challenge(challenge_id: str, admin_id: str) -> dict:
+    """Admin: cancel an active challenge without changing positions."""
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db[C_CHALLENGES].find_one_and_update(
+        {"challenge_id": challenge_id, "status": "active"},
+        {"$set": {"status": "cancelled", "ended_at": now, "outcome": "Cancelled by admin"}},
+        return_document=True,
+    )
+    if not result:
+        raise ValueError("Active challenge not found")
+    result.pop("_id", None)
+    return result
+
+
 
 def calculate_elo(elo_a: float, elo_b: float, winner_is_a: bool, k: int = 32) -> Tuple[int, int]:
     """Calculate ELO changes for both players."""

@@ -33,6 +33,7 @@ class MatchRecordRequest(BaseModel):
     score_winner: int = 11
     score_loser: int = 0
     league_id: Optional[str] = None
+    challenge_id: Optional[str] = None  # link match to an active challenge
     notes: Optional[str] = None
 
 
@@ -47,6 +48,7 @@ class LiveMatchCreate(BaseModel):
     player_b_photo: Optional[str] = None
     referee_photo: Optional[str] = None
     league_id: Optional[str] = None
+    challenge_id: Optional[str] = None  # link live match to challenge
     sets_to_win: int = 2  # best of 3 = 2, best of 5 = 3
     points_to_win: int = 11
     stream_url: Optional[str] = None  # Telegram/YouTube live link
@@ -59,6 +61,14 @@ class LivePointScore(BaseModel):
 
 # ═══ LEAGUES ═══
 
+class LeagueRules(BaseModel):
+    """Custom rule configuration for a league"""
+    type: str = "standard"  # "standard" | "challenge"
+    # Challenge mode settings
+    consecutive_wins_required: int = 2
+    description: Optional[str] = None  # human-readable rule description
+    allow_skip_positions: bool = False  # can challenger skip multiple positions?
+
 class LeagueCreate(BaseModel):
     name: str
     description: Optional[str] = None
@@ -67,6 +77,7 @@ class LeagueCreate(BaseModel):
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     position_labels: Optional[list] = None  # e.g. ["老大", "老二", "老三"]
+    rules: Optional[dict] = None  # LeagueRules as dict
 
 class LeagueUpdate(BaseModel):
     name: Optional[str] = None
@@ -74,3 +85,20 @@ class LeagueUpdate(BaseModel):
     status: Optional[str] = None
     rating_system: Optional[str] = None
     position_labels: Optional[list] = None  # custom rank titles per position
+    rules: Optional[dict] = None           # custom rule engine config
+    player_positions: Optional[list] = None  # ordered player list for challenge leagues
+
+
+# ═══ CHALLENGES ═══
+
+class ChallengeCreate(BaseModel):
+    """Start a position challenge in a challenge-type league"""
+    challenger_name: str   # player name of the challenger (lower position)
+    challenged_name: str   # player name of the challenged (higher position)
+
+class ChallengeMatchResult(BaseModel):
+    """Record a match result for an active challenge"""
+    winner_name: str
+    score_winner: int = 11
+    score_loser: int = 0
+    referee_name: str

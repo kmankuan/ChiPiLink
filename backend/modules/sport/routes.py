@@ -517,6 +517,48 @@ async def update_league(league_id: str, data: LeagueUpdate, admin: dict = Depend
     return {**league, **update}
 
 
+# ═══ CHALLENGE LEAGUE ROUTES ═══
+
+@router.get("/leagues/{league_id}/challenges")
+async def list_challenges(league_id: str, status: str = None):
+    """List all challenges for a league (optionally filter by status: active/won/failed/cancelled)."""
+    return await services.get_league_challenges(league_id, status)
+
+
+@router.post("/leagues/{league_id}/challenges")
+async def start_challenge(league_id: str, data: ChallengeCreate, admin: dict = Depends(get_admin_user)):
+    """Start a new position challenge between two players in a challenge league."""
+    try:
+        return await services.start_challenge(league_id, data.challenger_name, data.challenged_name)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/leagues/{league_id}/challenges/{challenge_id}/match")
+async def record_challenge_match(challenge_id: str, league_id: str, data: ChallengeMatchResult, admin: dict = Depends(get_admin_user)):
+    """Record a match result for an active challenge. Automatically handles position swap on success."""
+    try:
+        return await services.record_challenge_match(
+            challenge_id,
+            winner_name=data.winner_name,
+            score_winner=data.score_winner,
+            score_loser=data.score_loser,
+            referee_name=data.referee_name,
+            admin_id=admin.get("user_id"),
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/leagues/{league_id}/challenges/{challenge_id}")
+async def cancel_challenge(challenge_id: str, league_id: str, admin: dict = Depends(get_admin_user)):
+    """Admin: cancel an active challenge without changing positions."""
+    try:
+        return await services.cancel_challenge(challenge_id, admin.get("user_id"))
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
 @router.post("/leagues/{league_id}/generate-demo")
 async def generate_demo_matches(league_id: str, admin: dict = Depends(get_admin_user)):
     """
