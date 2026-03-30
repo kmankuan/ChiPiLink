@@ -135,6 +135,7 @@ const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule')
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
 const TelegramAdminModule = lazy(() => import('@/modules/admin/TelegramAdminModule'));
 const TelegramChannelHub = lazy(() => import('@/modules/community/TelegramChannelHub'));
+const TutorDashboard = lazy(() => import('@/modules/tutor/TutorDashboard'));
 const FormsManagerModule = lazy(() => import('@/modules/admin/FormsManagerModule'));
 const TranslationsPanel = lazy(() => import('@/modules/admin/TranslationsModule'));
 const DictionaryManagerModule = lazy(() => import('@/modules/admin/DictionaryManagerModule'));
@@ -312,7 +313,7 @@ export default function AdminDashboard() {
   // Module tabs (v2 menu format)
   const modulesTabs = useMemo(() => {
     if (!dynamicMenu?.modules) return [];
-    return dynamicMenu.modules
+    return [...dynamicMenu.modules]
       .sort((a, b) => (a.order || 0) - (b.order || 0))
       .map(mod => ({
         id: mod.id,
@@ -330,11 +331,14 @@ export default function AdminDashboard() {
     if (dynamicMenu?.modules) {
       const targetMod = dynamicMenu.modules.find(m => m.id === modId);
       if (targetMod && targetMod.groups && targetMod.groups.length > 0) {
-        // Find the first enabled item in the groups
-        for (const g of targetMod.groups.sort((a, b) => (a.order || 0) - (b.order || 0))) {
-          const firstItem = (g.items || [])
+        // Find the first enabled item in the groups safely
+        const sortedGroups = [...targetMod.groups].sort((a, b) => (a.order || 0) - (b.order || 0));
+        for (const g of sortedGroups) {
+          const sortedItems = [...(g.items || [])]
             .filter(item => item.enabled !== false)
-            .sort((a, b) => (a.order || 0) - (b.order || 0))[0];
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+          
+          const firstItem = sortedItems[0];
             
           if (firstItem) {
             // Check if user has permission
@@ -374,13 +378,13 @@ export default function AdminDashboard() {
       const currentMod = dynamicMenu.modules.find(m => m.id === activeModuleTab) || dynamicMenu.modules[0];
       if (!currentMod) return [];
 
-      return (currentMod.groups || [])
+      return [...(currentMod.groups || [])]
         .sort((a, b) => (a.order || 0) - (b.order || 0))
         .map(g => ({
           group: g.label?.[i18n.language] || g.label?.en || g.id,
           groupId: g.id,
           collapsed_default: g.collapsed_default,
-          items: (g.items || [])
+          items: [...(g.items || [])]
             .filter(item => item.enabled !== false)
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map(item => ({
@@ -398,13 +402,13 @@ export default function AdminDashboard() {
     }
 
     // v1 format fallback: flat groups
-    return dynamicMenu.groups
+    return [...(dynamicMenu.groups || [])]
       .sort((a, b) => (a.order || 0) - (b.order || 0))
       .map(g => ({
         group: g.label?.[i18n.language] || g.label?.en || g.id,
         groupId: g.id,
         collapsed_default: g.collapsed_default,
-        items: (g.items || [])
+        items: [...(g.items || [])]
           .filter(item => item.enabled !== false)
           .sort((a, b) => (a.order || 0) - (b.order || 0))
           .map(item => ({
@@ -593,6 +597,8 @@ export default function AdminDashboard() {
         return <SportDashboardEmbed />; // DEPRECATED: redirected to Sport module
       case 'roles':
         return <RolesModule />;
+      case 'tutor':
+        return <TutorDashboard />;
       case 'community':
       case 'telegram-channel':
       case 'telegram':

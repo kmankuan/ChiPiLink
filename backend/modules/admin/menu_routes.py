@@ -98,7 +98,7 @@ DEFAULT_MENU = {
                     "id": "sport-main", "order": 1, "collapsed_default": False,
                     "label": {"en": "Table Tennis", "es": "Tenis de Mesa", "zh": "乒乓球"},
                     "items": [
-                        {"id": "sport", "label": {"en": "Dashboard", "es": "Panel", "zh": "仪表板"}, "icon": "trophy", "permission": "sport.admin_panel", "enabled": True, "order": 1, "path": "/sport", "is_external": True},
+                        {"id": "sport", "label": {"en": "Dashboard", "es": "Panel", "zh": "仪表板"}, "icon": "trophy", "permission": "sport.admin_panel", "enabled": True, "order": 1},
                     ]
                 },
             ]
@@ -112,7 +112,7 @@ DEFAULT_MENU = {
                     "id": "tutor-main", "order": 1, "collapsed_default": False,
                     "label": {"en": "Tutoring", "es": "Tutoría", "zh": "辅导"},
                     "items": [
-                        {"id": "tutor-dashboard", "label": {"en": "Students", "es": "Estudiantes", "zh": "学生"}, "icon": "users", "permission": "admin.dashboard", "enabled": True, "order": 1, "path": "/tutor", "is_external": True},
+                        {"id": "tutor", "label": {"en": "Students", "es": "Estudiantes", "zh": "学生"}, "icon": "users", "permission": "admin.dashboard", "enabled": True, "order": 1},
                         {"id": "tutor-schedule", "label": {"en": "Schedule", "es": "Horario", "zh": "课程表"}, "icon": "calendar", "permission": "admin.dashboard", "enabled": True, "order": 2, "path": "/tutor/schedule", "is_external": True},
                         {"id": "tutor-board-mapper", "label": {"en": "Board Mapper", "es": "Mapeo Monday", "zh": "看板映射"}, "icon": "plug", "permission": "admin.site_config", "enabled": True, "order": 3},
                         {"id": "tutor-parent", "label": {"en": "Parent Portal", "es": "Portal Padres", "zh": "家长门户"}, "icon": "heart", "permission": "admin.dashboard", "enabled": True, "order": 4, "path": "/tutor/parent", "is_external": True},
