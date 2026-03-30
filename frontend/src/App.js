@@ -46,6 +46,7 @@ import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
 import PageEditor from '@/pages/PageEditor';
 import PaymentStatus from '@/pages/PaymentStatus';
+import TutorFlowBuilder from '@/modules/tutor/flow-builder/TutorFlowBuilder';
 
 // PinpanClub Module — DEPRECATED (replaced by Sport module)
 // TV routes now redirect to Sport TV
@@ -298,7 +299,7 @@ function AppRouter() {
       <Route path="/tutor/student/:studentId/chat" element={<AgentChat />} />
       <Route path="/tutor/student/:studentId/worksheets" element={<><Header /><WorksheetGenerator /></>} />
       <Route path="/tutor/board-mapper" element={<><Header /><BoardMapper /></>} />
-      <Route path="/tutor/school-feed-config" element={<><Header /><SchoolFeedConfig /></>} />
+      <Route path="/tutor/school-feed-config" element={<TutorFlowBuilder />} />
       <Route path="/tutor/schedule" element={<><Header /><ClubSchedule /></>} />
       <Route path="/tutor/parent" element={<><Header /><ParentPortal /></>} />
 
