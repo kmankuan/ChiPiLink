@@ -363,9 +363,11 @@ export default function LandingPageEditor({ pageId = 'landing' }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Editor de Landing Page</h2>
+          <h2 className="text-2xl font-serif font-bold">
+            {pageId === 'landing' ? 'Editor de Landing Page' : `Editing Page: ${pageId}`}
+          </h2>
           <p className="text-muted-foreground">
-            Personaliza la página de inicio con bloques editables
+            {pageId === 'landing' ? 'Personaliza la página de inicio con bloques editables' : 'Configure dynamic widgets and layout for this page'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -787,6 +789,33 @@ export default function LandingPageEditor({ pageId = 'landing' }) {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+// Reusable League Selector Component for Sport Widgets
+function LeagueSelector({ value, onChange }) {
+  const [leagues, setLeagues] = useState([]);
+  
+  useEffect(() => {
+    fetch(`${RESOLVED_API_URL}/api/sport/leagues`)
+      .then(r => r.ok ? r.json() : [])
+      .then(setLeagues)
+      .catch(() => {});
+  }, []);
+
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select a league..." />
+      </SelectTrigger>
+      <SelectContent>
+        {leagues.map(l => (
+          <SelectItem key={l.league_id} value={l.league_id}>
+            {l.name} {l.rules?.type === 'challenge' ? '(⚔️)' : ''}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -1429,6 +1458,19 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
             {Object.keys(config).map((key) => {
               const val = config[key];
               const valType = typeof val;
+
+              // Special hardcoded case for Sport League Leaderboard "league_id"
+              if (block.tipo === 'sport_league_leaderboard' && key === 'league_id') {
+                return (
+                  <div key={key} className="p-3 border rounded-lg space-y-2">
+                    <Label className="capitalize">League</Label>
+                    <LeagueSelector 
+                      value={val} 
+                      onChange={(newVal) => handleChange(key, newVal)} 
+                    />
+                  </div>
+                );
+              }
 
               if (valType === 'boolean') {
                 return (
