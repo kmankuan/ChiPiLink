@@ -325,6 +325,44 @@ export default function AdminDashboard() {
   const switchModule = (modId) => {
     setActiveModuleTab(modId);
     localStorage.setItem('admin_active_module', modId);
+    
+    // Automatically select the first item of the first group in the new module tab
+    if (dynamicMenu?.modules) {
+      const targetMod = dynamicMenu.modules.find(m => m.id === modId);
+      if (targetMod && targetMod.groups && targetMod.groups.length > 0) {
+        // Find the first enabled item in the groups
+        for (const g of targetMod.groups.sort((a, b) => (a.order || 0) - (b.order || 0))) {
+          const firstItem = (g.items || [])
+            .filter(item => item.enabled !== false)
+            .sort((a, b) => (a.order || 0) - (b.order || 0))[0];
+            
+          if (firstItem) {
+            // Check if user has permission
+            const userRole = role?.role_id || (isAdmin ? 'super_admin' : '');
+            let hasAccess = false;
+            
+            if (isAdmin) {
+              hasAccess = true;
+            } else if (!firstItem.admin_only) {
+              if (!firstItem.visible_roles || firstItem.visible_roles.length === 0 || firstItem.visible_roles.includes(userRole)) {
+                if (!firstItem.permission || hasPermission(firstItem.permission)) {
+                  hasAccess = true;
+                }
+              }
+            }
+            
+            if (hasAccess) {
+              if (firstItem.path) {
+                navigate(firstItem.path);
+              } else {
+                setActiveModule(firstItem.id);
+              }
+              break; // Stop after finding the first valid item
+            }
+          }
+        }
+      }
+    }
   };
 
   // Merge backend menu with static fallback — now supports v2 modules
@@ -422,6 +460,21 @@ export default function AdminDashboard() {
 
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
+
+  // Ensure activeModuleTab stays in sync with activeModule (if user navigates via direct link or back button)
+  useEffect(() => {
+    if (dynamicMenu?.modules) {
+      const foundMod = dynamicMenu.modules.find(m => 
+        m.groups?.some(g => 
+          g.items?.some(i => i.id === activeModule)
+        )
+      );
+      if (foundMod && foundMod.id !== activeModuleTab) {
+        setActiveModuleTab(foundMod.id);
+        localStorage.setItem('admin_active_module', foundMod.id);
+      }
+    }
+  }, [activeModule, dynamicMenu]);
 
   /**
    * SIMPLIFIED LOGIC:
