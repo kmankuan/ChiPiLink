@@ -49,7 +49,8 @@ export default function TutorFlowBuilder() {
   const navigate = useNavigate();
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const selectedNode = useMemo(() => nodes.find(n => n.id === selectedNodeId), [nodes, selectedNodeId]);
   const [running, setRunning] = useState(false);
   const [testResult, setTestResult] = useState(null);
 
@@ -69,7 +70,7 @@ export default function TutorFlowBuilder() {
   );
 
   const onNodeClick = (event, node) => {
-    setSelectedNode(node);
+    setSelectedNodeId(node.id);
   };
 
   const addNode = (type) => {
@@ -195,7 +196,7 @@ export default function TutorFlowBuilder() {
               <span className="font-semibold text-sm flex items-center gap-2">
                 <Settings2 className="h-4 w-4" /> Node Settings
               </span>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setSelectedNode(null)}>✕</Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setSelectedNodeId(null)}>✕</Button>
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               <NodeConfigPanel 
