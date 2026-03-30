@@ -229,3 +229,17 @@ async def reset_config(admin: dict = Depends(get_admin_user)):
     """Reset to defaults."""
     await db[C_CONFIG].replace_one({"_id": "school_feed_config"}, DEFAULT_CONFIG, upsert=True)
     return {"success": True, "message": "School feed config reset to defaults"}
+from pydantic import BaseModel
+
+class FlowPayload(BaseModel):
+    nodes: list
+    edges: list
+
+@router.post("/flow/test")
+async def test_run_flow(payload: FlowPayload, admin: dict = Depends(get_admin_user)):
+    from modules.tutor.flow_executor import execute_tutor_flow
+    result = await execute_tutor_flow(payload.nodes, payload.edges)
+    if not result.get("success"):
+        raise HTTPException(400, result.get("error", "Execution failed"))
+    return result
+

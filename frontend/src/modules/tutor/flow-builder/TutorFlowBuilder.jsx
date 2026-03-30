@@ -10,9 +10,12 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Save, Plus, ArrowLeft, Play, Settings2 } from 'lucide-react';
+import { Save, Plus, ArrowLeft, Play, Settings2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import RESOLVED_API_URL from '@/config/apiUrl';
+
+const API = RESOLVED_API_URL;
 
 // Custom Nodes
 import TriggerNode from './components/nodes/TriggerNode';
@@ -47,6 +50,8 @@ export default function TutorFlowBuilder() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [running, setRunning] = useState(false);
+  const [testResult, setTestResult] = useState(null);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -100,6 +105,30 @@ export default function TutorFlowBuilder() {
     toast.success('Flow saved successfully! (Mocked)');
   };
 
+  const runTest = async () => {
+    setRunning(true);
+    setTestResult(null);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch(`${API}/api/tutor/school-feed-config/flow/test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ nodes, edges })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Test run completed!');
+        setTestResult(data);
+      } else {
+        toast.error(`Test run failed: ${data.detail || 'Unknown error'}`);
+      }
+    } catch (e) {
+      toast.error('Network error during test run.');
+    } finally {
+      setRunning(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-muted/20">
       {/* Sidebar Tools */}
@@ -135,8 +164,9 @@ export default function TutorFlowBuilder() {
           <Button className="w-full gap-2 bg-primary" onClick={saveFlow}>
             <Save className="h-4 w-4" /> Save Workflow
           </Button>
-          <Button variant="outline" className="w-full gap-2">
-            <Play className="h-4 w-4" /> Test Run
+          <Button variant="outline" className="w-full gap-2" onClick={runTest} disabled={running}>
+            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 text-green-600" />}
+            Test Run
           </Button>
         </div>
       </div>
@@ -160,7 +190,7 @@ export default function TutorFlowBuilder() {
 
         {/* Configuration Panel (Slides in from right when node is selected) */}
         {selectedNode && (
-          <div className="absolute top-4 right-4 w-80 bg-background rounded-xl shadow-xl border overflow-hidden flex flex-col max-h-[90%]">
+          <div className="absolute top-4 right-4 w-80 bg-background rounded-xl shadow-xl border overflow-hidden flex flex-col max-h-[90%] z-20">
             <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
               <span className="font-semibold text-sm flex items-center gap-2">
                 <Settings2 className="h-4 w-4" /> Node Settings
@@ -173,6 +203,25 @@ export default function TutorFlowBuilder() {
                 onChange={(config) => updateNodeConfig(selectedNode.id, config)} 
               />
             </div>
+          </div>
+        )}
+
+        {/* Execution Result Log Overlay */}
+        {testResult && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-black text-green-400 p-4 rounded-xl shadow-2xl font-mono text-xs overflow-y-auto max-h-64 z-20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-bold text-white">Execution Log</span>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-white" onClick={() => setTestResult(null)}>✕</Button>
+            </div>
+            {testResult.log?.map((l, i) => (
+              <div key={i} className="py-0.5 opacity-90">&gt; {l}</div>
+            ))}
+            {testResult.context?.llm_output && (
+              <div className="mt-4 p-2 bg-green-900/30 rounded border border-green-800">
+                <div className="text-white font-bold mb-1">LLM Output:</div>
+                <div className="whitespace-pre-wrap">{testResult.context.llm_output}</div>
+              </div>
+            )}
           </div>
         )}
       </div>
