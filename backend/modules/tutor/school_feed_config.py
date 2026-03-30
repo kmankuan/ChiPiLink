@@ -234,11 +234,21 @@ from pydantic import BaseModel
 class FlowPayload(BaseModel):
     nodes: list
     edges: list
+    student: dict = None
 
 @router.post("/flow/test")
 async def test_run_flow(payload: FlowPayload, admin: dict = Depends(get_admin_user)):
     from modules.tutor.flow_executor import execute_tutor_flow
-    result = await execute_tutor_flow(payload.nodes, payload.edges)
+    result = await execute_tutor_flow(payload.nodes, payload.edges, student=payload.student)
+    if not result.get("success"):
+        raise HTTPException(400, result.get("error", "Execution failed"))
+    return result
+
+@router.post("/flow/orchestrate/{platform_tag}")
+async def orchestrate_flow(platform_tag: str, payload: FlowPayload, admin: dict = Depends(get_admin_user)):
+    """Trigger bulk orchestration for all students on a platform."""
+    from modules.tutor.flow_executor import orchestrate_platform_flow
+    result = await orchestrate_platform_flow({"nodes": payload.nodes, "edges": payload.edges}, platform_tag)
     if not result.get("success"):
         raise HTTPException(400, result.get("error", "Execution failed"))
     return result

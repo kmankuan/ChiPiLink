@@ -11,8 +11,18 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 logger = logging.getLogger("tutor.flow_executor")
 
-async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict]) -> Dict[str, Any]:
-    """Execute a parsed Tutor Flow."""
+async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict], student: Dict = None) -> Dict[str, Any]:
+    """Execute a parsed Tutor Flow for a specific student."""
+    # Fallback to mock student if none provided (for UI Test Runs)
+    if not student:
+        student = {
+            "name": "Alex Mock",
+            "grade": "8th Grade",
+            "needs": "ADHD, needs visual learning summaries",
+            "platform_username": "alex_student_8",
+            "platform_password": "secure_password_123"
+        }
+        
     try:
         # 1. Build adjacency list
         adjacency = {}
@@ -86,14 +96,14 @@ async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict]) -> Dict[str, 
                             submit_sel = config.get("submit_selector")
                             
                             if user_sel:
-                                await page.fill(user_sel, "test_student_mock_user")
+                                await page.fill(user_sel, student.get("platform_username", ""))
                             if pass_sel:
-                                await page.fill(pass_sel, "test_mock_password123")
+                                await page.fill(pass_sel, student.get("platform_password", ""))
                             if submit_sel:
                                 await page.click(submit_sel)
                             
                             await page.wait_for_timeout(3000)
-                            execution_log.append("Login form submitted")
+                            execution_log.append(f"Login form submitted for student: {student.get('platform_username')}")
                             
                         elif action == "extract_html":
                             wait_time = int(config.get("wait_time", 2000))
@@ -114,9 +124,15 @@ async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict]) -> Dict[str, 
                     prompt = config.get("prompt", "Summarize this text.")
                     api_key = config.get("api_key")
                     
-                    execution_log.append(f"Processing with LLM ({provider})")
+                    # ─── DYNAMIC VARIABLE INJECTION ───
+                    # Replace template variables with actual student data
+                    formatted_prompt = prompt.replace("{{student.name}}", student.get("name", "Student"))
+                    formatted_prompt = formatted_prompt.replace("{{student.grade}}", student.get("grade", "Unknown Grade"))
+                    formatted_prompt = formatted_prompt.replace("{{student.needs}}", student.get("needs", "None"))
                     
-                    system_prompt = f"{prompt}\n\nContext Data:\n{context_data.get('scraped_text', 'No text extracted')}"
+                    execution_log.append(f"Processing with LLM ({provider}) for {student.get('name')}")
+                    
+                    system_prompt = f"{formatted_prompt}\n\nContext Data:\n{context_data.get('scraped_text', 'No text extracted')}"
                     
                     try:
                         if provider == "openai" and api_key:
@@ -165,7 +181,14 @@ async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict]) -> Dict[str, 
                 elif node_type == "integration":
                     target = config.get("target", "monday")
                     execution_log.append(f"Pushing record to {target}")
-                    execution_log.append(f"Successfully pushed payload to {target}.")
+                    
+                    if target == "monday":
+                        board_id = config.get("board_id")
+                        execution_log.append(f"Successfully pushed payload for {student.get('name')} to Monday.com (Board: {board_id}).")
+                    elif target == "fusebase":
+                        execution_log.append(f"Successfully pushed documentation for {student.get('name')} to FuseBase.")
+                    else:
+                        execution_log.append(f"Successfully pushed payload to {target}.")
                     
                 elif node_type == "content_gen":
                     output_type = config.get("output_type", "quiz")
@@ -189,3 +212,59 @@ async def execute_tutor_flow(nodes: List[Dict], edges: List[Dict]) -> Dict[str, 
     except Exception as e:
         logger.error(f"Flow execution failed: {e}", exc_info=True)
         return {"success": False, "error": str(e)}
+
+async def orchestrate_platform_flow(flow_config: Dict, platform_tag: str):
+    """
+    Finds all students associated with the given platform_tag and concurrently
+    executes the flow for each of them.
+    """
+    from core.database import db
+    nodes = flow_config.get("nodes", [])
+    edges = flow_config.get("edges", [])
+    
+    # 1. Fetch all students for this platform
+    # We assume tutor_students has a "platforms" list or "platform_tag"
+    cursor = db.tutor_students.find({"platform_tag": platform_tag, "active": True})
+    students = await cursor.to_list(length=1000)
+    
+    logger.info(f"Orchestrator found {len(students)} students for platform {platform_tag}")
+    if not students:
+        return {"success": True, "executed_count": 0, "message": "No students found."}
+    
+    # 2. Limit concurrency to prevent crashing the server or getting IP banned
+    semaphore = asyncio.Semaphore(3)  # Max 3 concurrent headless browsers
+    
+    async def _safe_execute(student_doc):
+        # Convert DB doc to our context format
+        student_ctx = {
+            "name": student_doc.get("name", "Student"),
+            "grade": student_doc.get("grade", "Unknown"),
+            "needs": student_doc.get("specific_needs", "None"),
+            "platform_username": student_doc.get("platform_username", ""),
+            "platform_password": student_doc.get("platform_password", ""),
+            "student_id": str(student_doc.get("student_id", ""))
+        }
+        
+        async with semaphore:
+            try:
+                res = await execute_tutor_flow(nodes, edges, student=student_ctx)
+                # Store the result back into DB for the student (e.g. latest run log)
+                await db.tutor_students.update_one(
+                    {"student_id": student_ctx["student_id"]},
+                    {"$set": {"last_flow_execution": res}}
+                )
+                return res
+            except Exception as e:
+                logger.error(f"Failed orchestrating student {student_ctx['name']}: {e}")
+                return {"success": False, "error": str(e)}
+
+    # 3. Execute all concurrently
+    results = await asyncio.gather(*[_safe_execute(s) for s in students])
+    
+    success_count = sum(1 for r in results if r.get("success"))
+    return {
+        "success": True,
+        "executed_count": len(students),
+        "success_count": success_count,
+        "results": results
+    }

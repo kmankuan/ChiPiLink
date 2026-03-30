@@ -84,9 +84,15 @@ export default function NodeConfigPanel({ node, onChange }) {
     return (
       <div className="space-y-4">
         <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-          <p className="text-[10px] text-purple-800 leading-relaxed">
-            💡 <b>Guide:</b> Takes the scraped text and feeds it to an AI model. Write a prompt to find and format specific data (e.g. "Extract all homework into JSON").
+          <p className="text-[10px] text-purple-800 leading-relaxed mb-2">
+            💡 <b>Guide:</b> Takes the scraped text and feeds it to an AI model. 
           </p>
+          <div className="text-[10px] text-purple-900 bg-purple-100/50 p-2 rounded">
+            <strong>Dynamic Variables available:</strong><br/>
+            <code>{`{{student.name}}`}</code><br/>
+            <code>{`{{student.grade}}`}</code><br/>
+            <code>{`{{student.needs}}`}</code><br/>
+          </div>
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-bold">LLM Source / Provider</Label>
@@ -195,9 +201,21 @@ export default function NodeConfigPanel({ node, onChange }) {
       <div className="space-y-4">
         <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
           <p className="text-[10px] text-orange-800 leading-relaxed">
-            💡 <b>Guide:</b> The starting point of the automation. Defines when and how this flow runs.
+            💡 <b>Guide:</b> The starting point of the automation. Defines when and how this flow runs. Select the Target Platform so the orchestrator knows which students to execute this flow for.
           </p>
         </div>
+        
+        <div className="space-y-2">
+          <Label className="text-xs font-bold">Target Platform</Label>
+          <Input 
+            value={config.target_platform || ''} 
+            onChange={(e) => onChange({ target_platform: e.target.value })} 
+            className="text-xs h-8" 
+            placeholder="e.g. imereb, smart_academy" 
+          />
+          <p className="text-[9px] text-muted-foreground">Flow will run for all students tagged with this platform.</p>
+        </div>
+
         <div className="space-y-2">
           <Label className="text-xs font-bold">Trigger Type</Label>
           <Select value={config.type || 'manual'} onValueChange={(v) => onChange({ type: v })}>
