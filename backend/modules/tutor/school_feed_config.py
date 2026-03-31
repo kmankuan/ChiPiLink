@@ -173,7 +173,7 @@ async def update_config(data: dict, admin: dict = Depends(get_admin_user)):
     # Merge with existing
     existing = await db[C_CONFIG].find_one({"_id": "school_feed_config"}) or DEFAULT_CONFIG
     
-    for key in ["ai_instructions", "monday_board", "auto_scan", "platforms", "automations"]:
+    for key in ["ai_instructions", "monday_board", "auto_scan", "platforms", "automations", "fusebase"]:
         if key in data:
             if isinstance(data[key], dict) and isinstance(existing.get(key), dict):
                 existing[key].update(data[key])
