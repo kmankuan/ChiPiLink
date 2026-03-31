@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,13 +14,24 @@ import InteractiveScan from './InteractiveScan';
 const API = RESOLVED_API_URL;
 const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('auth_token')}`, 'Content-Type': 'application/json' });
 
-const PLATFORMS = [
-  { id: 'imereb', name: 'iMereb / BS Educativo', url: 'https://bseducativo.com/MrbRoot/mrbindex.aspx' },
-  { id: 'smart_academy', name: 'Smart Academy (ISAE)', url: 'https://apps.smartacademy.edu.pa/isae/login1.asp' },
-  { id: 'other', name: 'Other (custom URL)', url: '' },
-];
+// Dynamic platforms loaded from API
 
 export default function SchoolLoginCard({ student, onUpdate }) {
+  const [platforms, setPlatforms] = useState([]);
+  
+  useEffect(() => {
+    // Fetch platforms from config
+    fetch(`${API}/api/tutor/school-feed-config`, { headers: getHeaders() })
+      .then(r => r.ok ? r.json() : { platforms: {} })
+      .then(data => {
+        const list = Object.entries(data.platforms || {}).map(([id, p]) => ({
+          id, name: p.name, url: p.login_url
+        }));
+        setPlatforms([...list, { id: 'other', name: 'Other (custom URL)', url: '' }]);
+      })
+      .catch(() => setPlatforms([{ id: 'other', name: 'Other (custom URL)', url: '' }]));
+  }, []);
+
   const creds = student.school_credentials || {};
   const [platform, setPlatform] = useState(student.school_platform || '');
   const [url, setUrl] = useState(creds.url || '');
@@ -34,7 +45,7 @@ export default function SchoolLoginCard({ student, onUpdate }) {
 
   const handlePlatformChange = (pid) => {
     setPlatform(pid);
-    const p = PLATFORMS.find(x => x.id === pid);
+    const p = platforms.find(x => x.id === pid);
     if (p && p.url) setUrl(p.url);
   };
 
@@ -100,7 +111,7 @@ export default function SchoolLoginCard({ student, onUpdate }) {
             <Select value={platform || 'other'} onValueChange={handlePlatformChange}>
               <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
               <SelectContent>
-                {PLATFORMS.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                {platforms.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>

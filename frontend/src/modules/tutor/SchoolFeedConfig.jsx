@@ -18,6 +18,7 @@ export default function SchoolFeedConfig() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activePlatform, setActivePlatform] = useState('');
+  const [activeTab, setActiveTab] = useState('auth');
 
   useEffect(() => {
     fetchConfig();
@@ -160,26 +161,39 @@ export default function SchoolFeedConfig() {
         <div className="md:col-span-1 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Platforms</h3>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={addNewPlatform}><Plus className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" className="h-6 text-xs px-2 gap-1 text-primary" onClick={addNewPlatform}>
+              <Plus className="h-3.5 w-3.5" /> Add
+            </Button>
           </div>
           <div className="space-y-2">
             {Object.entries(config.platforms).map(([id, plat]) => (
               <button
                 key={id}
-                onClick={() => setActivePlatform(id)}
+                onClick={() => { setActivePlatform(id); setActiveTab('auth'); }}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activePlatform === id ? 'bg-primary text-primary-foreground font-medium shadow-sm' : 'hover:bg-muted bg-card border'}`}
               >
                 {plat.name}
               </button>
             ))}
+            {Object.keys(config.platforms).length === 0 && (
+              <div className="text-xs text-muted-foreground italic p-2 text-center border border-dashed rounded-lg">No platforms added</div>
+            )}
           </div>
 
-          <div className="pt-6">
+          <div className="pt-6 border-t mt-4">
             <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Global Settings</h3>
-            <Button variant="outline" className="w-full justify-start gap-2 mb-2" onClick={() => document.getElementById('tab-zero').click()}>
+            <Button 
+              variant={activeTab === 'zerowork' ? "secondary" : "outline"} 
+              className="w-full justify-start gap-2 mb-2" 
+              onClick={() => setActiveTab('zerowork')}
+            >
               <Zap className="h-4 w-4 text-orange-500" /> ZeroWork Engine
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-2 mb-2" onClick={() => document.getElementById('tab-dest').click()}>
+            <Button 
+              variant={activeTab === 'destinations' ? "secondary" : "outline"} 
+              className="w-full justify-start gap-2 mb-2" 
+              onClick={() => setActiveTab('destinations')}
+            >
               <Database className="h-4 w-4 text-blue-500" /> Destinations
             </Button>
           </div>
@@ -187,12 +201,10 @@ export default function SchoolFeedConfig() {
 
         {/* Main Content Area */}
         <div className="md:col-span-3">
-          <Tabs defaultValue="auth" className="w-full">
-            <TabsList className="grid grid-cols-4 mb-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-2 mb-4">
               <TabsTrigger value="auth">1. Authentication</TabsTrigger>
               <TabsTrigger value="sources">2. Data Sources</TabsTrigger>
-              <TabsTrigger value="zerowork" id="tab-zero" className="hidden">ZeroWork</TabsTrigger>
-              <TabsTrigger value="destinations" id="tab-dest" className="hidden">Destinations</TabsTrigger>
             </TabsList>
 
             {platform && (

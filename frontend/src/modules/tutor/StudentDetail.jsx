@@ -31,6 +31,8 @@ export default function StudentDetail() {
   const [rebuilding, setRebuilding] = useState(false);
   const [readingSchool, setReadingSchool] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({});
 
   const fetchAll = () => {
     Promise.all([
@@ -45,6 +47,42 @@ export default function StudentDetail() {
   const updateAgent = async (data) => {
     const r = await fetch(`${API}/api/tutor/students/${studentId}/agent`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(data) });
     if (r.ok) { const a = await r.json(); setAgent(a); toast.success('Agent updated'); }
+  };
+
+  const handleUpdateStudent = async () => {
+    try {
+      const res = await fetch(`${API}/api/tutor/students/${studentId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(editData),
+      });
+      if (res.ok) {
+        toast.success('Student profile updated');
+        setEditMode(false);
+        fetchAll();
+      } else {
+        toast.error('Failed to update student profile');
+      }
+    } catch (e) {
+      toast.error('Network error');
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    const newStatus = student.status === 'active' ? 'inactive' : 'active';
+    try {
+      const res = await fetch(`${API}/api/tutor/students/${studentId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        toast.success(`Student profile marked as ${newStatus}`);
+        fetchAll();
+      }
+    } catch (e) {
+      toast.error('Network error');
+    }
   };
 
   const rebuildPrompt = async () => {
@@ -243,18 +281,67 @@ export default function StudentDetail() {
 
           {/* Info Tab */}
           <TabsContent value="info" className="space-y-3">
-            <Card><CardContent className="p-3 space-y-2 text-xs">
-              <div className="grid grid-cols-2 gap-2">
-                <div><Label className="text-[10px]">Name</Label><p className="font-medium">{student.name}</p></div>
-                <div><Label className="text-[10px]">Grade</Label><p className="font-medium">{student.grade || '—'}</p></div>
-                <div><Label className="text-[10px]">School</Label><p className="font-medium">{student.school || '—'}</p></div>
-                <div><Label className="text-[10px]">Platform</Label><p className="font-medium">{student.school_platform || '—'}</p></div>
-                <div><Label className="text-[10px]">Parent</Label><p className="font-medium">{student.parent?.name || '—'} ({student.parent?.language})</p></div>
-                <div><Label className="text-[10px]">Membership</Label><p className="font-medium">{student.membership_type}</p></div>
-                <div><Label className="text-[10px]">Monday Board</Label><p className="font-medium font-mono">{student.monday_board_id || '—'}</p></div>
-                <div><Label className="text-[10px]">Status</Label><Badge className="bg-green-100 text-green-700 text-[9px]">{student.status}</Badge></div>
-              </div>
-            </CardContent></Card>
+            <Card>
+              <CardContent className="p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-sm">Profile Details</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => {
+                      if (editMode) {
+                        handleUpdateStudent();
+                      } else {
+                        setEditData({
+                          name: student.name || '',
+                          grade: student.grade || '',
+                          school: student.school || '',
+                          school_platform: student.school_platform || ''
+                        });
+                        setEditMode(true);
+                      }
+                    }}>
+                      {editMode ? 'Save' : 'Edit Profile'}
+                    </Button>
+                    <Button 
+                      variant={student.status === 'active' ? 'destructive' : 'outline'} 
+                      size="sm" 
+                      className="h-7 text-xs"
+                      onClick={handleToggleStatus}
+                    >
+                      {student.status === 'active' ? 'Deactivate' : 'Reactivate'}
+                    </Button>
+                  </div>
+                </div>
+
+                {editMode ? (
+                  <div className="space-y-3 pt-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Student Name</Label>
+                      <Input value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="h-8 text-xs" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Grade</Label>
+                        <Input value={editData.grade} onChange={e => setEditData({...editData, grade: e.target.value})} className="h-8 text-xs" />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">School Name</Label>
+                        <Input value={editData.school} onChange={e => setEditData({...editData, school: e.target.value})} className="h-8 text-xs" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div><Label className="text-[10px] text-muted-foreground">Name</Label><p className="font-medium text-sm">{student.name}</p></div>
+                    <div><Label className="text-[10px] text-muted-foreground">Grade</Label><p className="font-medium text-sm">{student.grade || '—'}</p></div>
+                    <div><Label className="text-[10px] text-muted-foreground">School</Label><p className="font-medium text-sm">{student.school || '—'}</p></div>
+                    <div><Label className="text-[10px] text-muted-foreground">Platform ID</Label><p className="font-medium text-sm">{student.school_platform || '—'}</p></div>
+                    <div><Label className="text-[10px] text-muted-foreground">Parent</Label><p className="font-medium text-sm">{student.parent?.name || '—'} ({student.parent?.language})</p></div>
+                    <div><Label className="text-[10px] text-muted-foreground">Status</Label><div><Badge variant={student.status === 'active' ? 'default' : 'secondary'} className="text-[10px] mt-0.5">{student.status}</Badge></div></div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
             <SchoolLoginCard student={student} onUpdate={fetchAll} />
           </TabsContent>
         </Tabs>
