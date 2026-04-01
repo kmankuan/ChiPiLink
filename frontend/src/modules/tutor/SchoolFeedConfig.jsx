@@ -266,24 +266,114 @@ export default function SchoolFeedConfig() {
                           <div className="grid grid-cols-2 gap-4 pr-8">
                             <div className="space-y-2">
                               <Label className="text-xs">Section Name</Label>
-                              <Input value={section.name} onChange={(e) => updateSection(idx, 'name', e.target.value)} placeholder="e.g. Grades, Homework" />
+                              <Input value={section.name} onChange={(e) => updateSection(idx, 'name', e.target.value)} placeholder="e.g. Weekly Schedule PDF" />
                             </div>
                             <div className="space-y-2">
-                              <Label className="text-xs">Navigation URL or Click Selector</Label>
-                              <Input value={section.nav || ''} onChange={(e) => updateSection(idx, 'nav', e.target.value)} placeholder="e.g. a[href*='grades'] or https://.../grades" />
-                              <p className="text-[10px] text-muted-foreground">Leave empty to read the homepage after login.</p>
+                              <Label className="text-xs">Navigation Strategy</Label>
+                              <select 
+                                className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                                value={section.nav_strategy || 'url'}
+                                onChange={(e) => updateSection(idx, 'nav_strategy', e.target.value)}
+                              >
+                                <option value="url">Direct URL Navigation</option>
+                                <option value="click">Click CSS Element</option>
+                                <option value="download_pdf">Click & Download PDF</option>
+                                <option value="macro">Complex Macro (Sequence)</option>
+                              </select>
                             </div>
                           </div>
+
                           <div className="space-y-2">
-                            <Label className="text-xs font-semibold flex items-center gap-1"><Bot className="h-3 w-3 text-purple-500" /> AI Instruction for this page</Label>
-                            <Textarea 
-                              value={section.prompt} 
-                              onChange={(e) => updateSection(idx, 'prompt', e.target.value)}
-                              rows={2}
-                              className="text-sm bg-purple-50/50 border-purple-100"
-                              placeholder="Tell the AI what specifically to extract from this page..."
-                            />
-                            <p className="text-[10px] text-purple-700">Dynamic variables supported: <code>{`{{student.name}}`}</code>, <code>{`{{student.grade}}`}</code></p>
+                            <Label className="text-xs">
+                              {section.nav_strategy === 'url' ? 'Direct URL (Leave empty for current page)' : 
+                               section.nav_strategy === 'macro' ? 'Macro Steps (one per line. e.g. CLICK .tab-weekly)' : 
+                               'CSS Selector to Click'}
+                            </Label>
+                            {section.nav_strategy === 'macro' ? (
+                              <Textarea 
+                                value={section.nav || ''} 
+                                onChange={(e) => updateSection(idx, 'nav', e.target.value)} 
+                                placeholder="GOTO https://...\nCLICK button.tab-weekly\nWAIT 2000\nEXTRACT_PDF a.download"
+                                className="font-mono text-xs h-24"
+                              />
+                            ) : (
+                              <Input 
+                                value={section.nav || ''} 
+                                onChange={(e) => updateSection(idx, 'nav', e.target.value)} 
+                                placeholder={section.nav_strategy === 'url' ? "https://..." : ".btn-download"} 
+                                className="h-9"
+                              />
+                            )}
+                          </div>
+
+                          <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg">
+                            <Label className="text-xs font-bold text-blue-900 mb-2 block">State Memory Engine</Label>
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1 space-y-1">
+                                <Label className="text-[10px] text-blue-800">Deduplication Strategy</Label>
+                                <select 
+                                  className="w-full h-8 rounded-md border border-blue-200 bg-white px-2 py-1 text-xs"
+                                  value={section.memory_strategy || 'hash_all'}
+                                  onChange={(e) => updateSection(idx, 'memory_strategy', e.target.value)}
+                                >
+                                  <option value="hash_all">Hash & Ignore Seen Content</option>
+                                  <option value="hash_links">Track Downloaded PDF Links</option>
+                                  <option value="always_process">Always Process (No Memory)</option>
+                                </select>
+                              </div>
+                              <div className="flex-1 space-y-1">
+                                <Label className="text-[10px] text-blue-800">Lookback Window</Label>
+                                <select 
+                                  className="w-full h-8 rounded-md border border-blue-200 bg-white px-2 py-1 text-xs"
+                                  value={section.sync_window || '7d'}
+                                  onChange={(e) => updateSection(idx, 'sync_window', e.target.value)}
+                                >
+                                  <option value="24h">Last 24 Hours</option>
+                                  <option value="7d">Last 7 Days</option>
+                                  <option value="30d">Last 30 Days</option>
+                                  <option value="all">All Time</option>
+                                </select>
+                              </div>
+                            </div>
+                            <p className="text-[9px] text-blue-700 mt-2">
+                              {section.memory_strategy === 'hash_links' 
+                                ? "The scraper will skip downloading PDFs if their URL link has been processed before." 
+                                : "The scraper will hash the extracted text/HTML. If it matches a hash seen previously, it will be skipped."}
+                            </p>
+                          </div>
+
+                          <div className="space-y-2 pt-2 border-t">
+                            <Label className="text-xs font-semibold flex items-center gap-1"><Bot className="h-3 w-3 text-purple-500" /> AI Analysis Engine</Label>
+                            <div className="flex gap-2 mb-2">
+                              <select 
+                                className="w-48 h-8 rounded-md border border-purple-200 bg-white px-2 py-1 text-xs"
+                                value={section.ai_driver || 'emergent'}
+                                onChange={(e) => updateSection(idx, 'ai_driver', e.target.value)}
+                              >
+                                <option value="emergent">Native Emergent LLM</option>
+                                <option value="tinycommand">TinyCommand AI Webhook</option>
+                              </select>
+                              {section.ai_driver === 'tinycommand' && (
+                                <Input 
+                                  value={section.tinycommand_url || ''} 
+                                  onChange={(e) => updateSection(idx, 'tinycommand_url', e.target.value)} 
+                                  placeholder="TinyCommand Webhook URL" 
+                                  className="h-8 text-xs flex-1"
+                                />
+                              )}
+                            </div>
+                            {section.ai_driver !== 'tinycommand' && (
+                              <>
+                                <Textarea 
+                                  value={section.prompt} 
+                                  onChange={(e) => updateSection(idx, 'prompt', e.target.value)}
+                                  rows={3}
+                                  className="text-sm bg-purple-50/50 border-purple-100"
+                                  placeholder="Tell the AI what specifically to extract from this page..."
+                                />
+                                <p className="text-[10px] text-purple-700">Dynamic variables supported: <code>{`{{student.name}}`}</code>, <code>{`{{student.grade}}`}</code></p>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
