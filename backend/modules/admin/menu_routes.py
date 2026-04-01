@@ -98,8 +98,14 @@ DEFAULT_MENU = {
                     "id": "sport-main", "order": 1, "collapsed_default": False,
                     "label": {"en": "Table Tennis", "es": "Tenis de Mesa", "zh": "乒乓球"},
                     "items": [
-                        {"id": "sport", "label": {"en": "Dashboard", "es": "Panel", "zh": "仪表板"}, "icon": "trophy", "permission": "sport.admin_panel", "enabled": True, "order": 1},
-                        {"id": "sport-tv", "label": {"en": "Sport TV", "es": "TV en Vivo", "zh": "体育电视"}, "icon": "tv", "permission": "sport.admin_panel", "enabled": True, "order": 2, "path": "/sport/tv", "is_external": True},
+                        {"id": "sport", "label": {"en": "Dashboard", "es": "Panel", "zh": "仪表板"}, "icon": "layout-dashboard", "permission": "sport.admin_panel", "enabled": True, "order": 1, "path": "/sport", "is_external": True},
+                        {"id": "sport-players", "label": {"en": "Players", "es": "Jugadores", "zh": "球员"}, "icon": "users", "permission": "sport.admin_panel", "enabled": True, "order": 2, "path": "/sport/players", "is_external": True},
+                        {"id": "sport-leagues", "label": {"en": "Leagues", "es": "Ligas", "zh": "联赛"}, "icon": "medal", "permission": "sport.admin_panel", "enabled": True, "order": 3, "path": "/sport/leagues", "is_external": True},
+                        {"id": "sport-tournaments", "label": {"en": "Tournaments", "es": "Torneos", "zh": "锦标赛"}, "icon": "award", "permission": "sport.admin_panel", "enabled": True, "order": 4, "path": "/sport/tournament/new", "is_external": True},
+                        {"id": "sport-rankings", "label": {"en": "Rankings", "es": "Clasificaciones", "zh": "排名"}, "icon": "bar-chart-2", "permission": "sport.admin_panel", "enabled": True, "order": 5, "path": "/sport/rankings", "is_external": True},
+                        {"id": "sport-fame", "label": {"en": "Hall of Fame", "es": "Salón de la Fama", "zh": "名人堂"}, "icon": "star", "permission": "sport.admin_panel", "enabled": True, "order": 6, "path": "/sport/hall-of-fame", "is_external": True},
+                        {"id": "sport-tv", "label": {"en": "Sport TV", "es": "TV en Vivo", "zh": "体育电视"}, "icon": "tv", "permission": "sport.admin_panel", "enabled": True, "order": 7, "path": "/sport/tv", "is_external": True},
+                        {"id": "sport-settings", "label": {"en": "Settings", "es": "Configuración", "zh": "设置"}, "icon": "settings", "permission": "admin.site_config", "admin_only": True, "enabled": True, "order": 8, "path": "/sport/admin", "is_external": True},
                     ]
                 },
             ]
