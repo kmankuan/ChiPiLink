@@ -85,7 +85,6 @@ import StudentDetail from '@/modules/tutor/StudentDetail';
 import CreateStudent from '@/modules/tutor/CreateStudent';
 import AgentChat from '@/modules/tutor/AgentChat';
 import BoardMapper from '@/modules/tutor/BoardMapper';
-import SchoolFeedConfig from '@/modules/tutor/SchoolFeedConfig';
 import ClubSchedule from '@/modules/tutor/ClubSchedule';
 import WorksheetGenerator from '@/modules/tutor/WorksheetGenerator';
 import ParentPortal from '@/modules/tutor/ParentPortal';

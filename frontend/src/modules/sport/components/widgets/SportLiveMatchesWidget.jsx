@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import RESOLVED_API_URL from '@/config/apiUrl';
 
+import { Tv } from 'lucide-react';
+
 const API = RESOLVED_API_URL;
 
 export default function SportLiveMatchesWidget({ config }) {
@@ -30,9 +32,14 @@ export default function SportLiveMatchesWidget({ config }) {
   return (
     <Card className="border-red-200 bg-red-50/30">
       <CardContent className="p-3">
-        <h3 className="text-sm font-bold text-red-700 flex items-center gap-2 mb-2">
-          <Radio className="h-4 w-4 animate-pulse" /> {title}
-        </h3>
+        <div className="flex items-center justify-between mb-2 border-b border-red-100 pb-2">
+          <h3 className="text-sm font-bold text-red-700 flex items-center gap-2">
+            <Radio className="h-4 w-4 animate-pulse" /> {title}
+          </h3>
+          <button onClick={() => navigate('/sport/tv')} className="text-[10px] bg-red-100 text-red-800 px-2 py-1 rounded font-bold flex items-center gap-1 hover:bg-red-200 transition-colors shadow-sm">
+             <Tv className="h-3 w-3" /> Watch TV
+          </button>
+        </div>
         
         {live.length === 0 ? (
           <p className="text-xs text-red-600/70 text-center py-2">No live matches</p>

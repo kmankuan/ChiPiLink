@@ -599,9 +599,6 @@ export default function LiveRefPanel() {
         </DialogContent>
       </Dialog>
 
-      {/* End Game Dialog */}
-      <Dialog open={showEndGame} onOpenChange={setShowEndGame}>
-
       {/* Change Referee Dialog */}
       <Dialog open={showChangeRef} onOpenChange={setShowChangeRef}>
         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-xs">
@@ -628,6 +625,9 @@ export default function LiveRefPanel() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* End Game Dialog */}
+      <Dialog open={showEndGame} onOpenChange={setShowEndGame}>
         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-sm">
           <DialogHeader><DialogTitle className="text-white flex items-center gap-2"><Trophy className="h-5 w-5 text-yellow-400" /> Match Complete</DialogTitle></DialogHeader>
           <div className="space-y-3">

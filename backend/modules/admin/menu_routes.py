@@ -99,6 +99,7 @@ DEFAULT_MENU = {
                     "label": {"en": "Table Tennis", "es": "Tenis de Mesa", "zh": "乒乓球"},
                     "items": [
                         {"id": "sport", "label": {"en": "Dashboard", "es": "Panel", "zh": "仪表板"}, "icon": "trophy", "permission": "sport.admin_panel", "enabled": True, "order": 1},
+                        {"id": "sport-tv", "label": {"en": "Sport TV", "es": "TV en Vivo", "zh": "体育电视"}, "icon": "tv", "permission": "sport.admin_panel", "enabled": True, "order": 2, "path": "/sport/tv", "is_external": True},
                     ]
                 },
             ]
