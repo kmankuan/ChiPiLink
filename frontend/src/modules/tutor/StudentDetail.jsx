@@ -1,7 +1,7 @@
 /**
  * Student Detail — Profile, agent config, knowledge sources, chat
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,15 +34,15 @@ export default function StudentDetail() {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
 
-  const fetchAll = () => {
+  const fetchAll = useCallback(() => {
     Promise.all([
       fetch(`${API}/api/tutor/students/${studentId}`, { headers: getHeaders() }).then(r => r.ok ? r.json() : null),
       fetch(`${API}/api/tutor/students/${studentId}/agent`, { headers: getHeaders() }).then(r => r.ok ? r.json() : null),
       fetch(`${API}/api/tutor/students/${studentId}/knowledge`, { headers: getHeaders() }).then(r => r.ok ? r.json() : []),
     ]).then(([s, a, k]) => { setStudent(s); setAgent(a); setKnowledge(k); }).catch(() => {}).finally(() => setLoading(false));
-  };
+  }, [studentId]);
 
-  useEffect(() => { fetchAll(); }, [studentId]);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const updateAgent = async (data) => {
     const r = await fetch(`${API}/api/tutor/students/${studentId}/agent`, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(data) });
