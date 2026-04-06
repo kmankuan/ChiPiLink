@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class ChiPiLinkIntegrationHubTester:
-    def __init__(self, main_app_url="https://sport-scoring-hub.preview.emergentagent.com", hub_url="http://localhost:8002"):
+    def __init__(self, main_app_url="https://admin-ui-unify.preview.emergentagent.com", hub_url="http://localhost:8002"):
         self.main_app_url = main_app_url
         self.hub_url = hub_url
         self.token = None

@@ -41,7 +41,7 @@
     "Hub connections test: GET http://localhost:8002/api/debug/connections shows mongodb=connected, integration status checks working",
     "Hub env check: GET http://localhost:8002/api/debug/env confirms MONGO_URL=set and DB_NAME=set",
     "Hub test API: POST http://localhost:8002/api/debug/test-api successfully calls main app health endpoint",
-    "Main app admin login: POST https://sport-scoring-hub.preview.emergentagent.com/api/auth-v2/login works with teck@koh.one / Acdb##0897",
+    "Main app admin login: POST https://admin-ui-unify.preview.emergentagent.com/api/auth-v2/login works with teck@koh.one / Acdb##0897",
     "Shared database verification: Both services accessing chipi_link database correctly",
     "Integration Hub supervisor process running stable on port 8002",
     "All hub endpoints properly prefixed with /api/ for Kubernetes routing",
