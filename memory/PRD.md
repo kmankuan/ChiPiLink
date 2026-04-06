@@ -36,3 +36,15 @@ All extractions follow the Tutor Engine pattern:
 - Super Admin: teck@koh.one / Acdb##0897
 - Moderator: moderator@chipilink.com / ChiPi@Mod2026
 - Regular User: user@chipilink.com / ChiPi@User2026
+
+## Known Deployment Notes
+- Production site: https://chipilink.me (uses Atlas MongoDB `backend-cleanup-10-chipilink_prod`)
+- Preview: https://admin-ui-unify.preview.emergentagent.com (uses local MongoDB `chipilink_prod`)
+- `.env` files MUST be tracked in git for Emergent deployment (fixed: removed duplicate `*.env` gitignore entries added by prev agent)
+- database.py routes to Atlas automatically when MONGO_URL is non-localhost (intentional for production)
+
+## Backlog
+- CS-Cart Multi-Vendor Integration (P1) — not started
+- Parent Portal real student progress data replacing mocked charts (P1)
+- Tutor Engine TinyCommand orchestration final wiring (P1)
+- Commerce Engine proxy re-enable for multi-container networking (P2)
