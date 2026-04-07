@@ -19,29 +19,28 @@ _db_logger = logging.getLogger("core.database")
 
 # Database routing:
 # - MONGO_URL=localhost  → local/preview dev MongoDB (Emergent preview pods)
-# - MONGO_URL=other      → production non-local server; use Atlas for real data
-# - ATLAS_MONGO_URL set  → always use Atlas (explicit override)
+# - MONGO_URL=other + ATLAS_MONGO_URL set → use Atlas for production data
+# - ATLAS_MONGO_URL read from backend/.env or Emergent secrets
 _local_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 _atlas_url = os.environ.get('ATLAS_MONGO_URL', '')
-_atlas_db  = os.environ.get('ATLAS_DB_NAME', 'backend-cleanup-10-chipilink_prod')
+_atlas_db  = os.environ.get('ATLAS_DB_NAME', os.environ.get('DB_NAME', 'chipilink_prod'))
+_is_local  = 'localhost' in _local_url or '127.0.0.1' in _local_url
 
-_PROD_ATLAS = "mongodb+srv://backend-cleanup-10:d6do7vklqs2c73catqeg@customer-apps.o0opyp.mongodb.net/?appName=order-items-feature&maxPoolSize=10&retryWrites=true&timeoutMS=15000&w=majority"
-_is_local   = 'localhost' in _local_url or '127.0.0.1' in _local_url
-
-if _atlas_url:
-    mongo_url = _atlas_url
-    db_name   = _atlas_db
-    _db_logger.info(f"DB: ATLAS (explicit) — {db_name}")
-elif not _is_local:
-    # Production server with non-local MONGO_URL → use Atlas
-    mongo_url = _PROD_ATLAS
-    db_name   = _atlas_db
-    _db_logger.info(f"DB: ATLAS (production) — {db_name}")
-else:
-    # Local/preview → use local MongoDB
+if _is_local:
+    # Local/preview environment → use local MongoDB
     mongo_url = _local_url
     db_name   = os.environ.get('DB_NAME', 'chipilink_prod')
     _db_logger.info(f"DB: LOCAL — {db_name}")
+elif _atlas_url:
+    # Production with Atlas URL configured
+    mongo_url = _atlas_url
+    db_name   = _atlas_db
+    _db_logger.info(f"DB: ATLAS — {db_name}")
+else:
+    # Production without explicit Atlas URL — use MONGO_URL as-is
+    mongo_url = _local_url
+    db_name   = os.environ.get('DB_NAME', 'chipilink_prod')
+    _db_logger.info(f"DB: MONGO_URL — {db_name}")
 
 # MongoDB connection — with Atlas-optimized settings
 client = AsyncIOMotorClient(
