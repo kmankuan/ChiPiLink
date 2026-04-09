@@ -4,7 +4,7 @@ ChiPi Link - Main Application Entry Point
 Modular Monolith Architecture
 All modules are organized for future microservices separation.
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -357,6 +357,79 @@ async def service_proxy_middleware(request, call_next):
 
 # ============== LIFECYCLE EVENTS ==============
 
+async def _auto_rebuild_frontend_if_needed():
+    """
+    Detect and auto-fix a stale or broken frontend bundle.
+    Runs once per deployment in the background - does not block startup.
+    """
+    import re
+    import subprocess
+    build_index = "/app/frontend/build/index.html"
+    
+    # Known broken bundle hashes → always rebuild if found
+    BROKEN_HASHES = {"d7b710c3"}
+    
+    needs_rebuild = False
+    reason = ""
+    
+    if not os.path.exists(build_index):
+        needs_rebuild = True
+        reason = "index.html missing"
+    else:
+        with open(build_index) as f:
+            html = f.read()
+        m = re.search(r'main\.([a-f0-9]+)\.js', html)
+        if not m:
+            needs_rebuild = True
+            reason = "no main bundle in index.html"
+        else:
+            bundle_hash = m.group(1)
+            bundle_path = f"/app/frontend/build/static/js/main.{bundle_hash}.js"
+            if bundle_hash in BROKEN_HASHES:
+                needs_rebuild = True
+                reason = f"broken bundle detected ({bundle_hash})"
+            elif not os.path.exists(bundle_path):
+                needs_rebuild = True
+                reason = f"bundle file missing ({bundle_hash})"
+    
+    if not needs_rebuild:
+        logger.info(f"[frontend] Build is up-to-date, no rebuild needed")
+        return
+    
+    logger.info(f"[frontend] Auto-rebuild triggered: {reason}")
+    
+    # Determine backend URL for the build
+    frontend_url = os.environ.get("REACT_APP_BACKEND_URL") or os.environ.get("FRONTEND_URL", "")
+    build_env = {**os.environ, "CI": "false"}
+    if frontend_url:
+        build_env["REACT_APP_BACKEND_URL"] = frontend_url
+    
+    try:
+        result = subprocess.run(
+            ["yarn", "build"],
+            cwd="/app/frontend",
+            env=build_env,
+            capture_output=True,
+            text=True,
+            timeout=180
+        )
+        if result.returncode == 0:
+            logger.info("[frontend] Build successful — new bundle deployed")
+            # Switch frontend server to serve the new static build
+            try:
+                subprocess.run(["supervisorctl", "stop", "frontend"], capture_output=True, timeout=10)
+                subprocess.run(["supervisorctl", "start", "frontend-build"], capture_output=True, timeout=10)
+                logger.info("[frontend] Switched from dev-server to production build server")
+            except Exception as sw_err:
+                logger.warning(f"[frontend] Supervisor switch failed (non-blocking): {sw_err}")
+        else:
+            logger.error(f"[frontend] Build FAILED (exit {result.returncode}): {result.stderr[-500:]}")
+    except subprocess.TimeoutExpired:
+        logger.error("[frontend] Build timed out after 180s")
+    except Exception as e:
+        logger.error(f"[frontend] Build error: {e}")
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup - fast path for health check readiness"""
@@ -483,6 +556,15 @@ async def startup_event():
             logger.warning(f"Banner auto-sync init failed (non-blocking): {e}")
 
         logger.info("All modules loaded successfully")
+
+        # ── Frontend Self-Healing Rebuild ──────────────────────────────────────
+        # If the deployed frontend bundle is stale/broken, rebuild it automatically.
+        # The broken production bundle (d7b710c3) has ClubSchedule as an undefined
+        # variable — this causes a blank page. Detect and fix it automatically.
+        try:
+            await _auto_rebuild_frontend_if_needed()
+        except Exception as e:
+            logger.warning(f"Frontend auto-rebuild check failed (non-blocking): {e}")
 
         # Bootstrap Integration Hub (creates supervisor config if needed)
         try:
@@ -640,6 +722,37 @@ async def admin_check():
         return {"admin_exists": False, "db_name": db.name, "collection": AuthCollections.USERS}
     except Exception as e:
         return {"error": str(e), "db_name": db.name}
+
+
+@app.post("/api/admin/rebuild-frontend")
+async def rebuild_frontend_endpoint(current_user=Depends(get_admin_user)):
+    """Admin endpoint: manually trigger a frontend rebuild and switch to production server."""
+    import asyncio
+    asyncio.create_task(_auto_rebuild_frontend_if_needed())
+    return {"status": "rebuild_triggered", "message": "Frontend rebuild started in background (~60s). Check /api/health/frontend-status for progress."}
+
+
+@app.get("/api/health/frontend-status")
+async def frontend_status():
+    """Check current frontend bundle status (no auth required)."""
+    import re
+    build_index = "/app/frontend/build/index.html"
+    if not os.path.exists(build_index):
+        return {"status": "no_build", "bundle": None}
+    with open(build_index) as f:
+        html = f.read()
+    m = re.search(r'main\.([a-f0-9]+)\.js', html)
+    bundle_hash = m.group(1) if m else "unknown"
+    BROKEN = {"d7b710c3"}
+    bundle_path = f"/app/frontend/build/static/js/main.{bundle_hash}.js"
+    return {
+        "status": "broken" if bundle_hash in BROKEN else "ok",
+        "bundle_hash": bundle_hash,
+        "bundle_exists": os.path.exists(bundle_path),
+        "needs_rebuild": bundle_hash in BROKEN,
+    }
+
+
 
 @app.get("/")
 async def root():
