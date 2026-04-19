@@ -280,22 +280,35 @@ from modules.dev_info import router as dev_info_router
 api_router.include_router(dev_info_router)
 
 # ChiPi Tutor — Proxy to Tutor Engine (port 8003)
-# Tutor Module — Direct routes (always works) + proxy to port 8003 when available
-# Tutor Module — Direct routes (fallback) + proxy to port 8003 when available
-from modules.tutor import router as tutor_router, router_phase2 as tutor_router2, router_parent as tutor_router_parent
-from modules.tutor.school_feed_config import router as school_feed_config_router
-from modules.tutor.monday_board_setup import router as monday_board_setup_router
-from modules.tutor.school_feed_ingest import router as school_feed_ingest_router
-from modules.tutor.interactive_scan import router as interactive_scan_router
-api_router.include_router(tutor_router)
-api_router.include_router(tutor_router2)
-api_router.include_router(tutor_router_parent)
-api_router.include_router(school_feed_config_router)
-api_router.include_router(monday_board_setup_router)
+# Tutor Module — REMOVED (deprecated; frontend no longer ships tutor UI).
+# A catch-all below responds 410 Gone for any lingering /api/tutor/* clients
+# (stale mobile caches, old bookmarks, third-party integrations) so they can
+# detect the deprecation cleanly instead of receiving 404 or 500.
+from fastapi import APIRouter as _TutorGoneRouter
+tutor_gone_router = _TutorGoneRouter(prefix="/tutor")
 
-api_router.include_router(school_feed_ingest_router)
-api_router.include_router(interactive_scan_router)
-from modules.tutor.interactive_scan import router as interactive_scan_router
+
+@tutor_gone_router.api_route(
+    "/{_rest:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
+    include_in_schema=False,
+)
+async def tutor_deprecated(_rest: str):
+    """ChiPi Tutor module has been retired. Clients should stop calling /api/tutor/*."""
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=410,
+        content={
+            "error": "gone",
+            "code": "TUTOR_MODULE_DEPRECATED",
+            "message": "The ChiPi Tutor module has been retired and is no longer available.",
+            "deprecated_path": f"/api/tutor/{_rest}",
+        },
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+api_router.include_router(tutor_gone_router)
 
 # Include main router in app
 app.include_router(api_router)
@@ -347,24 +360,19 @@ async def track_requests_middleware(request, call_next):
 # Initialize monitor after app is defined
 _init_monitor()
 
-# Sport & Tutor proxy middleware — offloads to separate ports when available
+# Sport proxy middleware — offloads to separate port when available
 @app.middleware("http")
 async def service_proxy_middleware(request, call_next):
-    """Proxy sport/tutor to separate ports when available. Fast skip for other paths."""
+    """Proxy sport to separate port when available. Fast skip for other paths."""
     path = request.url.path
-    
-    # Fast path — only check sport and tutor prefixes
+
+    # Fast path — only check sport prefix
     if path.startswith("/api/sport/"):
         from modules.sport_proxy import proxy_if_available as sport_proxy
         result = await sport_proxy(request, path[len("/api/sport/"):])
         if result is not None:
             return result
-    elif path.startswith("/api/tutor/") and not path.startswith("/api/tutor/school-feed") and not path.startswith("/api/tutor/interactive-scan"):
-        from modules.tutor_proxy import proxy_if_available as tutor_proxy
-        result = await tutor_proxy(request, path[len("/api/tutor/"):])
-        if result is not None:
-            return result
-    
+
     return await call_next(request)
 
 # ============== LIFECYCLE EVENTS ==============
@@ -633,16 +641,6 @@ async def startup_event():
 
             from core.service_manager import service_manager
 
-            if uvicorn_bin and os.path.exists("/app/tutor-engine/main.py"):
-                if os.path.exists("/etc/supervisor/conf.d/tutor-engine.conf"):
-                    logger.info("[service-manager] tutor-engine is managed by supervisor, skipping manual start")
-                else:
-                    service_manager.register(
-                        "tutor-engine",
-                        [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
-                        "/app/tutor-engine", 8003
-                    )
-
             if uvicorn_bin and os.path.exists("/app/sport-engine/main.py"):
                 if os.path.exists("/etc/supervisor/conf.d/sport-engine.conf"):
                     logger.info("[service-manager] sport-engine is managed by supervisor, skipping manual start")
@@ -669,21 +667,16 @@ async def startup_event():
                 else:
                     logger.warning(f"[service-manager] {name} FAILED to start on port {status['port']}")
 
-        # Check engines and enable proxies (skipped in production — direct routes only)
+        # Check sport engine and enable proxy (skipped in production — direct routes only)
         if not IS_PRODUCTION:
             from modules.sport_proxy import check_engine as check_sport
-            from modules.tutor_proxy import check_engine as check_tutor
             await asyncio.sleep(2)
             if await check_sport():
                 logger.info("[proxy] Sport Engine on port 8004 — proxying enabled ✓")
             else:
                 logger.info("[proxy] Sport Engine not available — using direct routes")
-            if await check_tutor():
-                logger.info("[proxy] Tutor Engine on port 8003 — proxying enabled ✓")
-            else:
-                logger.info("[proxy] Tutor Engine not available — using direct routes")
         else:
-            logger.info("[proxy] Production mode — using in-process direct routes for sport/tutor")
+            logger.info("[proxy] Production mode — using in-process direct routes for sport")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
