@@ -4,7 +4,7 @@ ChiPi Link - Main Application Entry Point
 Modular Monolith Architecture
 All modules are organized for future microservices separation.
 """
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -16,6 +16,18 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# ============== DEPLOYMENT MODE ==============
+# Explicit flag for production deployment containers.
+# When DEPLOYMENT_MODE=production:
+#   - Skip `yarn build` auto-rebuild (frontend is served as static assets by the platform)
+#   - Skip Integration Hub supervisor bootstrap (no supervisor in prod)
+#   - Skip starting tutor/sport side-engines as subprocesses (use in-process direct routes)
+# Preview/dev containers leave this unset (or ="preview") to enable the full dev workflow.
+DEPLOYMENT_MODE = os.environ.get("DEPLOYMENT_MODE", "preview").lower()
+IS_PRODUCTION = DEPLOYMENT_MODE == "production"
+if IS_PRODUCTION:
+    logger.info("[startup] DEPLOYMENT_MODE=production — dev-only subprocess tasks will be skipped")
 
 # Create uploads directory
 UPLOAD_DIR = "/app/uploads"
@@ -372,9 +384,12 @@ async def _auto_rebuild_frontend_if_needed():
     import subprocess
 
     # Skip in production deployment — frontend is served by the platform as static assets.
-    # Detection: no yarn binary available, or no frontend source tree present.
+    if IS_PRODUCTION:
+        logger.info("[frontend] DEPLOYMENT_MODE=production — skipping auto-rebuild")
+        return
+    # Secondary guards (in case flag is unset in unusual environments)
     if shutil.which("yarn") is None:
-        logger.info("[frontend] yarn not found — skipping auto-rebuild (production deployment)")
+        logger.info("[frontend] yarn not found — skipping auto-rebuild")
         return
     if not os.path.exists("/app/frontend/package.json"):
         logger.info("[frontend] /app/frontend not present — skipping auto-rebuild")
@@ -589,7 +604,9 @@ async def startup_event():
             import shutil
             import subprocess
             bootstrap_script = "/app/integration-hub/bootstrap.sh"
-            if os.path.exists(bootstrap_script) and shutil.which("supervisorctl"):
+            if IS_PRODUCTION:
+                logger.info("[hub-bootstrap] Skipped (DEPLOYMENT_MODE=production)")
+            elif os.path.exists(bootstrap_script) and shutil.which("supervisorctl"):
                 result = subprocess.run(
                     ["bash", bootstrap_script],
                     capture_output=True, text=True, timeout=15
@@ -600,67 +617,73 @@ async def startup_event():
                 if result.returncode != 0 and result.stderr:
                     logger.warning(f"Hub bootstrap stderr: {result.stderr.strip()}")
             else:
-                logger.info("[hub-bootstrap] Skipped (supervisor not available — production deployment)")
+                logger.info("[hub-bootstrap] Skipped (supervisor not available)")
         except Exception as e:
             logger.warning(f"Integration Hub bootstrap skipped: {e}")
 
         # Start separated services via Process Manager (reliable, no supervisor dependency)
-        # Skip entirely if uvicorn binary is unavailable in a predictable location — in that
-        # case proxy falls back to direct in-process routes (the engines' modules are already
-        # mounted into the main app).
+        # Skip entirely in production — proxy falls back to direct in-process routes.
         import shutil
-        uvicorn_bin = shutil.which("uvicorn") or (
-            "/root/.venv/bin/uvicorn" if os.path.exists("/root/.venv/bin/uvicorn") else None
-        )
-
-        from core.service_manager import service_manager
-
-        if uvicorn_bin and os.path.exists("/app/tutor-engine/main.py"):
-            if os.path.exists("/etc/supervisor/conf.d/tutor-engine.conf"):
-                logger.info("[service-manager] tutor-engine is managed by supervisor, skipping manual start")
-            else:
-                service_manager.register(
-                    "tutor-engine",
-                    [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
-                    "/app/tutor-engine", 8003
-                )
-
-        if uvicorn_bin and os.path.exists("/app/sport-engine/main.py"):
-            if os.path.exists("/etc/supervisor/conf.d/sport-engine.conf"):
-                logger.info("[service-manager] sport-engine is managed by supervisor, skipping manual start")
-            else:
-                service_manager.register(
-                    "sport-engine",
-                    [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
-                    "/app/sport-engine", 8004
-                )
-
-        if not uvicorn_bin:
-            logger.info("[service-manager] uvicorn binary not found — side-engines will use in-process direct routes (production mode)")
-
-        service_manager.start_all()
-        await service_manager.start_monitoring()
-
-        # Wait and verify services
-        await asyncio.sleep(3)
-        for name, status in service_manager.status().items():
-            if status["running"]:
-                logger.info(f"[service-manager] {name} RUNNING on port {status['port']} (pid {status['pid']})")
-            else:
-                logger.warning(f"[service-manager] {name} FAILED to start on port {status['port']}")
-
-        # Check engines and enable proxies
-        from modules.sport_proxy import check_engine as check_sport
-        from modules.tutor_proxy import check_engine as check_tutor
-        await asyncio.sleep(2)
-        if await check_sport():
-            logger.info("[proxy] Sport Engine on port 8004 — proxying enabled ✓")
+        if IS_PRODUCTION:
+            logger.info("[service-manager] Skipped (DEPLOYMENT_MODE=production) — using in-process direct routes")
         else:
-            logger.info("[proxy] Sport Engine not available — using direct routes")
-        if await check_tutor():
-            logger.info("[proxy] Tutor Engine on port 8003 — proxying enabled ✓")
+            uvicorn_bin = shutil.which("uvicorn") or (
+                "/root/.venv/bin/uvicorn" if os.path.exists("/root/.venv/bin/uvicorn") else None
+            )
+
+            from core.service_manager import service_manager
+
+            if uvicorn_bin and os.path.exists("/app/tutor-engine/main.py"):
+                if os.path.exists("/etc/supervisor/conf.d/tutor-engine.conf"):
+                    logger.info("[service-manager] tutor-engine is managed by supervisor, skipping manual start")
+                else:
+                    service_manager.register(
+                        "tutor-engine",
+                        [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
+                        "/app/tutor-engine", 8003
+                    )
+
+            if uvicorn_bin and os.path.exists("/app/sport-engine/main.py"):
+                if os.path.exists("/etc/supervisor/conf.d/sport-engine.conf"):
+                    logger.info("[service-manager] sport-engine is managed by supervisor, skipping manual start")
+                else:
+                    service_manager.register(
+                        "sport-engine",
+                        [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
+                        "/app/sport-engine", 8004
+                    )
+
+            if not uvicorn_bin:
+                logger.info("[service-manager] uvicorn binary not found — side-engines will use in-process direct routes")
+
+            service_manager.start_all()
+            await service_manager.start_monitoring()
+
+        # Wait and verify services (only if service_manager was engaged)
+        if not IS_PRODUCTION:
+            await asyncio.sleep(3)
+            from core.service_manager import service_manager
+            for name, status in service_manager.status().items():
+                if status["running"]:
+                    logger.info(f"[service-manager] {name} RUNNING on port {status['port']} (pid {status['pid']})")
+                else:
+                    logger.warning(f"[service-manager] {name} FAILED to start on port {status['port']}")
+
+        # Check engines and enable proxies (skipped in production — direct routes only)
+        if not IS_PRODUCTION:
+            from modules.sport_proxy import check_engine as check_sport
+            from modules.tutor_proxy import check_engine as check_tutor
+            await asyncio.sleep(2)
+            if await check_sport():
+                logger.info("[proxy] Sport Engine on port 8004 — proxying enabled ✓")
+            else:
+                logger.info("[proxy] Sport Engine not available — using direct routes")
+            if await check_tutor():
+                logger.info("[proxy] Tutor Engine on port 8003 — proxying enabled ✓")
+            else:
+                logger.info("[proxy] Tutor Engine not available — using direct routes")
         else:
-            logger.info("[proxy] Tutor Engine not available — using direct routes")
+            logger.info("[proxy] Production mode — using in-process direct routes for sport/tutor")
 
 
     # Self-check: verify the server can actually respond to HTTP requests
@@ -727,6 +750,22 @@ async def health_check():
         "db": db_name,
         "mongo_target": _murl_safe,
     }
+
+@app.post("/api/_client-errors")
+async def report_client_error(request: Request):
+    """
+    Receive ErrorBoundary crash reports from the frontend via sendBeacon.
+    Logs are lightweight (no DB write) to avoid amplifying outages.
+    """
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+    message = (payload.get("message") or "")[:500]
+    url = (payload.get("url") or "")[:500]
+    ua = (payload.get("userAgent") or "")[:300]
+    logger.warning(f"[client-error] {message} | url={url} | ua={ua[:100]}")
+    return {"ok": True}
 
 @app.get("/api/health/admin-check")
 async def admin_check():

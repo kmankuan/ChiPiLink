@@ -51,3 +51,8 @@ All extractions follow the Tutor Engine pattern:
 
 ## Stability Fixes Applied
 - 2026-04-19: Removed `ClubSchedule` feature entirely (component file deleted, imports removed from `App.js`, route `/tutor/schedule` removed, nav button removed from `TutorDashboard.jsx`, menu item removed from `backend/modules/admin/menu_routes.py`). This resolves the recurring "White Screen of Death — ClubSchedule is not defined" error in production bundles. Production must be redeployed to pick up the clean bundle.
+- 2026-04-19: Hardened startup for production deployment. Introduced explicit `DEPLOYMENT_MODE` env var (`preview` / `production`). In production mode `main.py` skips: `yarn build` auto-rebuild, Integration Hub supervisor bootstrap, and tutor/sport side-engine subprocess spawning. Fixes deployment timeouts caused by missing `/root/.venv/bin/uvicorn` and missing `yarn`/`supervisorctl` binaries in the production container. Added `24e15873` to known-broken bundle hashes.
+- 2026-04-19: Added global React `ErrorBoundary` (`/app/frontend/src/components/ErrorBoundary.jsx`) wrapping `<App/>` in `index.js`. Catches any render-phase crash and shows a branded fallback with "Reload app / Hard reload (clear cache) / Go to home" buttons instead of a blank white screen. Errors are POSTed via `sendBeacon` to new backend endpoint `POST /api/_client-errors` for visibility in backend logs.
+
+## Environment Variables (new)
+- `DEPLOYMENT_MODE` (backend): `"preview"` (default — full dev workflow) or `"production"` (skips subprocess-heavy startup tasks)
