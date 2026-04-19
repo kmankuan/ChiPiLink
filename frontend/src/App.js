@@ -46,7 +46,6 @@ import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
 import PageEditor from '@/pages/PageEditor';
 import PaymentStatus from '@/pages/PaymentStatus';
-import SchoolFeedConfig from '@/modules/tutor/SchoolFeedConfig';
 
 // PinpanClub Module — DEPRECATED (replaced by Sport module)
 // TV routes now redirect to Sport TV
@@ -79,14 +78,7 @@ import SportAdmin from '@/modules/sport/SportAdmin';
 import PlayerProfile from '@/modules/sport/PlayerProfile';
 import HallOfFame from '@/modules/sport/HallOfFame';
 
-// Tutor Module
-import TutorDashboard from '@/modules/tutor/TutorDashboard';
-import StudentDetail from '@/modules/tutor/StudentDetail';
-import CreateStudent from '@/modules/tutor/CreateStudent';
-import AgentChat from '@/modules/tutor/AgentChat';
-import BoardMapper from '@/modules/tutor/BoardMapper';
-import WorksheetGenerator from '@/modules/tutor/WorksheetGenerator';
-import ParentPortal from '@/modules/tutor/ParentPortal';
+// Tutor Module — REMOVED (deprecated, caused recurring bundle crashes)
 
 
 // Rapid Pin Module — DEPRECATED
@@ -290,15 +282,8 @@ function AppRouter() {
       <Route path="/sport/player/:playerId" element={<><Header /><PlayerProfile /></>} />
       <Route path="/sport/hall-of-fame" element={<><Header /><HallOfFame /></>} />
 
-      {/* Tutor Module */}
-      <Route path="/tutor" element={<><Header /><TutorDashboard /></>} />
-      <Route path="/tutor/student/new" element={<><Header /><CreateStudent /></>} />
-      <Route path="/tutor/student/:studentId" element={<><Header /><StudentDetail /></>} />
-      <Route path="/tutor/student/:studentId/chat" element={<AgentChat />} />
-      <Route path="/tutor/student/:studentId/worksheets" element={<><Header /><WorksheetGenerator /></>} />
-      <Route path="/tutor/board-mapper" element={<><Header /><BoardMapper /></>} />
-      <Route path="/tutor/school-feed-config" element={<SchoolFeedConfig />} />
-      <Route path="/tutor/parent" element={<><Header /><ParentPortal /></>} />
+      {/* Tutor Module — REMOVED (deprecated) */}
+      <Route path="/tutor/*" element={<Navigate to="/" replace />} />
 
       
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}

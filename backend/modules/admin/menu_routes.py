@@ -111,22 +111,6 @@ DEFAULT_MENU = {
             ]
         },
         {
-            "id": "tutor", "order": 4,
-            "label": {"en": "Tutor", "es": "Tutor", "zh": "辅导"},
-            "icon": "graduation-cap", "color": "#7c3aed",
-            "groups": [
-                {
-                    "id": "tutor-main", "order": 1, "collapsed_default": False,
-                    "label": {"en": "Tutoring", "es": "Tutoría", "zh": "辅导"},
-                    "items": [
-                        {"id": "tutor", "label": {"en": "Students", "es": "Estudiantes", "zh": "学生"}, "icon": "users", "permission": "admin.dashboard", "enabled": True, "order": 1},
-                        {"id": "tutor-board-mapper", "label": {"en": "Board Mapper", "es": "Mapeo Monday", "zh": "看板映射"}, "icon": "plug", "permission": "admin.site_config", "enabled": True, "order": 3},
-                        {"id": "tutor-parent", "label": {"en": "Parent Portal", "es": "Portal Padres", "zh": "家长门户"}, "icon": "heart", "permission": "admin.dashboard", "enabled": True, "order": 4, "path": "/tutor/parent", "is_external": True},
-                    ]
-                },
-            ]
-        },
-        {
             "id": "integrations", "order": 5,
             "label": {"en": "Integrations", "es": "Integraciones", "zh": "集成"},
             "icon": "plug", "color": "#0891b2",

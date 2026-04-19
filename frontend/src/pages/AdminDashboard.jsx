@@ -135,7 +135,6 @@ const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule')
 const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
 const TelegramAdminModule = lazy(() => import('@/modules/admin/TelegramAdminModule'));
 const TelegramChannelHub = lazy(() => import('@/modules/community/TelegramChannelHub'));
-const TutorDashboard = lazy(() => import('@/modules/tutor/TutorDashboard'));
 const FormsManagerModule = lazy(() => import('@/modules/admin/FormsManagerModule'));
 const TranslationsPanel = lazy(() => import('@/modules/admin/TranslationsModule'));
 const DictionaryManagerModule = lazy(() => import('@/modules/admin/DictionaryManagerModule'));
@@ -597,8 +596,6 @@ export default function AdminDashboard() {
         return <SportDashboardEmbed />; // DEPRECATED: redirected to Sport module
       case 'roles':
         return <RolesModule />;
-      case 'tutor':
-        return <TutorDashboard />;
       case 'community':
       case 'telegram-channel':
       case 'telegram':
