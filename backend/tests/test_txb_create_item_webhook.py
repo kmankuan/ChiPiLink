@@ -27,7 +27,7 @@ class TestTxbCreateItemWebhookEndpoints:
         """Get auth token for authenticated requests"""
         login_resp = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_resp.status_code == 200, f"Login failed: {login_resp.text}"
         self.token = login_resp.json().get("token")
@@ -231,7 +231,7 @@ class TestSyncDashboardStillWorks:
     def setup(self):
         login_resp = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_resp.status_code == 200
         self.token = login_resp.json().get("token")

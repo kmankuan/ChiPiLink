@@ -25,7 +25,7 @@ def admin_token():
     """Get admin token (admin@chipi.co)"""
     response = requests.post(
         f"{BASE_URL}/api/auth-v2/login",
-        json={"email": "admin@chipi.co", "password": "admin"}
+        json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
     )
     if response.status_code == 200:
         data = response.json()

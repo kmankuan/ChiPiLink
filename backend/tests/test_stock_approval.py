@@ -18,7 +18,7 @@ class TestStockApprovalFeature:
         """Get auth token for admin user"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()

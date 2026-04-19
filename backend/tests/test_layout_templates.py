@@ -20,7 +20,7 @@ class TestLayoutTemplatesAPI:
         # Login as admin
         login_response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@libreria.com",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if login_response.status_code == 200:
             self.token = login_response.json().get('token')

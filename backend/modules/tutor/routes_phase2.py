@@ -3,6 +3,7 @@ ChiPi Tutor — Phase 2 Routes
 Worksheets, schedule, sessions, school feed
 """
 from fastapi import APIRouter, HTTPException, Depends
+from typing import Optional
 from core.auth import get_current_user, get_admin_user
 from . import services_phase2 as svc2
 import logging
@@ -90,8 +91,9 @@ async def student_sessions(student_id: str, user: dict = Depends(get_current_use
 # ═══ SCHOOL READER ═══
 
 @router.post("/students/{student_id}/read-school")
-async def read_school(student_id: str, data: dict = {}, user: dict = Depends(get_current_user)):
+async def read_school(student_id: str, data: Optional[dict] = None, user: dict = Depends(get_current_user)):
     """Trigger school platform read for a student. Optionally pass credentials."""
+    data = data or {}
     from .school_reader import school_reader
     try:
         result = await school_reader.read_platform(student_id, data.get("credentials"))
@@ -101,8 +103,9 @@ async def read_school(student_id: str, data: dict = {}, user: dict = Depends(get
 
 
 @router.post("/students/{student_id}/test-school-login")
-async def test_school_login(student_id: str, data: dict = {}, user: dict = Depends(get_current_user)):
+async def test_school_login(student_id: str, data: Optional[dict] = None, user: dict = Depends(get_current_user)):
     """Test school platform login without extracting content. Returns success/fail + screenshot."""
+    data = data or {}
     from .school_reader import school_reader
     try:
         result = await school_reader.test_login(student_id, data.get("credentials"))

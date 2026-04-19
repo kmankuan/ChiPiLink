@@ -45,7 +45,7 @@ def extract_gid(url: str) -> str:
 def calculate_hash(data: dict) -> str:
     """Calculate hash of data for change detection"""
     sorted_str = str(sorted(data.items()))
-    return hashlib.md5(sorted_str.encode()).hexdigest()
+    return hashlib.sha256(sorted_str.encode()).hexdigest()
 
 
 async def fetch_sheet_data(sheet_id: str, gid: str = "0") -> List[List[str]]:

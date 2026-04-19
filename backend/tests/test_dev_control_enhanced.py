@@ -19,7 +19,7 @@ def auth_token():
     """Login and get admin auth token"""
     response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
         "email": "teck@koh.one",
-        "password": "admin"
+        "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
     })
     assert response.status_code == 200, f"Login failed: {response.text}"
     data = response.json()

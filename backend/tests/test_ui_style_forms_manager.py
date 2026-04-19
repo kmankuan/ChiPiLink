@@ -21,7 +21,7 @@ class TestAdminAuth:
         """Test admin login with valid credentials"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@libreria.com",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         print(f"Admin login response status: {response.status_code}")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
@@ -49,7 +49,7 @@ def auth_token():
     """Get authentication token for admin"""
     response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
         "email": "admin@libreria.com",
-        "password": "admin"
+        "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
     })
     if response.status_code != 200:
         pytest.skip(f"Authentication failed: {response.status_code} - {response.text}")

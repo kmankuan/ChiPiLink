@@ -81,7 +81,7 @@ class TestShowcaseAdminEndpoints:
         """Get auth token before each test using teck@koh.one admin account"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if login_response.status_code == 200:
             self.token = login_response.json().get("token")
@@ -358,7 +358,7 @@ class TestCleanup:
         """Get auth token using teck@koh.one admin account"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if login_response.status_code == 200:
             self.token = login_response.json().get("token")

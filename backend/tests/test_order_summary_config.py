@@ -20,7 +20,7 @@ class TestOrderSummaryConfig:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Admin login failed: {response.text}"
         data = response.json()
@@ -200,7 +200,7 @@ class TestAdminLogin:
         """Test: Admin login with correct credentials"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         
         assert response.status_code == 200, f"Admin login failed: {response.text}"

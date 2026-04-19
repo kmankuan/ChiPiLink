@@ -82,7 +82,7 @@ class TestTelegramFeedAdminAPIs:
         """Login as admin and get token"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if login_res.status_code != 200:
             pytest.skip(f"Admin login failed: {login_res.status_code}")
@@ -262,7 +262,7 @@ class TestTelegramFeedContainerConfig:
         """Login as admin"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if login_res.status_code != 200:
             pytest.skip(f"Admin login failed: {login_res.status_code}")
@@ -363,7 +363,7 @@ class TestCleanupTestContainers:
         """Delete all containers with TEST_ prefix"""
         login_res = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if login_res.status_code != 200:
             pytest.skip("Admin login failed")

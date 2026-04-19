@@ -18,7 +18,7 @@ class TestInventoryBulkOperations:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             return response.json().get("token")
@@ -162,7 +162,7 @@ class TestInventoryArchiveUnarchiveFlow:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             return response.json().get("token")
@@ -243,7 +243,7 @@ class TestInventoryCreateAndDeleteFlow:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             return response.json().get("token")

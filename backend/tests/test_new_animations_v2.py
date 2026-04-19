@@ -28,7 +28,7 @@ class TestNewAnimationTypes:
         # Login first
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_response.status_code == 200, f"Login failed: {login_response.status_code}"
         token = login_response.json().get("token")
@@ -63,7 +63,7 @@ class TestNewAnimationTypes:
         """Test that new animation types have correct labels"""
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         
@@ -92,7 +92,7 @@ class TestNewAnimationTypes:
         # Login
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         
@@ -145,7 +145,7 @@ class TestNewAnimationTypes:
         # Login
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         
@@ -197,7 +197,7 @@ class TestNewAnimationTypes:
         # Login
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         
@@ -262,7 +262,7 @@ class TestLayoutIconsWithNewAnimations:
         # Login
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         
@@ -302,7 +302,7 @@ class TestExistingIconStatusesPresent:
         # Login
         login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         token = login_response.json().get("token")
         

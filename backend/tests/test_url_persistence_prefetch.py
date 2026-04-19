@@ -42,7 +42,7 @@ class TestAdminAuth:
         """Admin should be able to login with valid credentials"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200
         data = response.json()

@@ -17,7 +17,7 @@ class TestGmailPolling:
         """Login and get auth token"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200, f"Login failed: {login_response.text}"
         self.token = login_response.json().get("token")
@@ -103,7 +103,7 @@ class TestPendingTopupsE2E:
         """Login and get auth token"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200
         self.token = login_response.json().get("token")
@@ -228,7 +228,7 @@ class TestMondayConfigEndpoints:
         """Login and get auth token"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200
         self.token = login_response.json().get("token")
@@ -265,7 +265,7 @@ class TestGmailEndpoints:
         """Login and get auth token"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "password": "admin"}
+            json={"email": "teck@koh.one", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200
         self.token = login_response.json().get("token")

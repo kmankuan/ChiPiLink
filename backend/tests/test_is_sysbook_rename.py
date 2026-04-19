@@ -17,7 +17,7 @@ class TestIsSysbookRename:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Auth failed: {response.text}"
         return response.json().get("token")
@@ -197,7 +197,7 @@ class TestPrivateCatalogEndpoints:
         """Get admin authentication token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Auth failed: {response.text}"
         return response.json().get("token")
@@ -260,7 +260,7 @@ class TestSysbookProductCount:
     def admin_token(self):
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         return response.json().get("token")
     

@@ -19,7 +19,7 @@ class TestLinkStudentFlow:
         """Setup: Get auth token"""
         login_resp = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_resp.status_code == 200, f"Login failed: {login_resp.text}"
         self.token = login_resp.json().get("token")

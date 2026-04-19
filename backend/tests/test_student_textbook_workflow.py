@@ -21,7 +21,7 @@ class TestTextbookAccessEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -73,7 +73,7 @@ class TestPrivateCatalogEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -153,7 +153,7 @@ class TestTextbookOrderEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -208,7 +208,7 @@ class TestWalletTopupsEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -246,7 +246,7 @@ class TestCRMChatEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -274,7 +274,7 @@ class TestStoreInventoryWithInventorySource:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -334,7 +334,7 @@ class TestSysbookInventoryEndpoints:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")
@@ -372,7 +372,7 @@ class TestTextbookOrderSubmission:
         """Get admin token for testing"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json().get("token")

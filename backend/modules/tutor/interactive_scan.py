@@ -29,8 +29,9 @@ C_STUDENTS = "tutor_students"
 
 
 @router.post("/start/{student_id}")
-async def start_scan(student_id: str, data: dict = {}, admin: dict = Depends(get_admin_user)):
+async def start_scan(student_id: str, data: dict = None, admin: dict = Depends(get_admin_user)):
     """Start an interactive AI scan session for a student."""
+    data = data or {}
     student = await db[C_STUDENTS].find_one({"student_id": student_id, "status": "active"}, {"_id": 0})
     if not student:
         raise HTTPException(404, "Student not found")

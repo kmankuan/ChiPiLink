@@ -1,169 +1,162 @@
 <analysis>**original_problem_statement**: 
-Continue from existing codebase. Start by extracting the Sport module to a standalone service on port 8004. Then extract Commerce to 8005. Complete pending tasks: Tournament double elimination bracket view, Player photo upload UI in admin, AI Tutor Parent Portal, Ably Chat auto-translation, and old PinPanClub files cleanup. 
-*Note: The scope expanded heavily into fixing the Admin Menu (making it backend-driven with tabs), fixing Role creation bugs, resolving Print counter double-increments, improving Sport TV layouts, and building an Interactive AI Scan (Playwright) for the Tutor module.*
+The initial goal was to fix a critical frontend blank page crash (White Screen of Death) caused by a stale bundle containing an undefined  reference. After resolving deployment and build issues by implementing an auto-rebuild script in the backend startup, the user provided a comprehensive **Code Quality Report** with Critical and Important recommendations spanning both the frontend and backend. The agent was actively working on resolving these code quality issues.
+PRODUCT REQUIREMENTS: Resolve all security, performance, and stability issues listed in the Code Quality Report while maintaining the application's core functionality.
 
-**User's preferred language**: English (Note: INSTRUCT next agent to respond in English, though the user often refers to Spanish UI elements like Iniciar sesión or nombre).
+**User's preferred language**: Spanish (You MUST automatically detect the user's primary language from their messages inside the <trajectory> tag and INSTRUCT next agent to respond in the user's preferred language only) -> **INSTRUCT NEXT AGENT TO RESPOND IN SPANISH**.
 
 **what currently exists?** 
-A modular monolith FastAPI + React super-app. The Main App runs on port 8001 handling Auth, Admin, Store, and Sysbook directly. The Integration Hub (8002), Tutor Engine (8003), and Sport Engine (8004) run as child processes (spawned by ) and requests are proxied via middleware. Features include an AI Tutor with Playwright-based school platform scraping, Table Tennis live scoring with Ably WebSockets, E-commerce/Textbook ordering, and a dynamic backend-driven Admin UI.
+A modular monolith FastAPI + React super-app. Features include a Universal Page Engine, unified v2 Admin UI, Tutor AI Engine, and a self-healing auto-rebuild mechanism on the backend to fix stale frontend bundles during container startup.
 
 **Last working item**:
-- Last item agent was working: Fixing the  Strategy 3 inside  (Tutor Module) to properly auto-detect and fill login modals (specifically for iMereb) that lack standard input  attributes. Also added a 🔐 Login with saved credentials fallback option to the Interactive Scan playbook UI.
-- Status: USER VERIFICATION PENDING (Code is fixed and tested locally; awaiting deployment to production for the user to verify the modal auto-fill).
-- Agent Testing Done: Y
-- Which testing method agent to use? manual testing by curl / screenshot tool (to test Playwright interactive scan flow on the specific student modal).
-- User Testing Done: N
+    - Last item agent was working: Fixing issues highlighted in the user's Code Quality Report. The agent successfully addressed critical backend circular imports (created ), mutable default arguments, hardcoded test secrets, MD5 cryptography usage, insecure frontend  origins, and several missing hook dependencies (, ).
+    - Status: IN PROGRESS
+    - Agent Testing Done: Y
+    - Which testing method agent to use? Both (Frontend testing agent for UI regressions after React hook changes / pytest for backend tests)
+    - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-Issue 1: CS-Cart Multi-Vendor Integration Requirements (P0)
-Issue 2: Verify Tutor AI Interactive Scan Login on Production (P1)
-
-Issues Detail:
-- Issue 1:
-  - Attempted fixes: User asked My current app can be integrated into CS-Card multi-vendor?. Agent paused to ask for clarification (Sync products? Sync orders? Use as storefront?) but user redirected focus to the Tutor login bug.
-  - Next debug checklist: Ask user for exact integration goals for CS-Cart via REST API.
-  - Why fix this issue and what will be achieved with the fix? Expands the e-commerce capabilities of the platform.
-  - Status: BLOCKED (Needs user input)
-  - Is recurring issue? N
-  - Should Test frontend/backend/both after fix? both
-  - Blocked on other issue: User requirements pending.
-- Issue 2:
-  - Attempted fixes: Added Strategy 3 to  to find all visible inputs when standard selectors fail. Cleared the bad Playbook step.
-  - Next debug checklist: Use  on the production Student Detail -> Info -> Interactive Scan to verify the AI successfully bypasses the Usuario/Contraseña modal.
-  - Why fix this issue and what will be achieved with the fix? Allows the Playwright headless browser to automatically log into the school platform without manual admin guidance step-by-step.
-  - Status: USER VERIFICATION PENDING
-  - Is recurring issue? Y (Playwright selector brittleness)
-  - Should Test frontend/backend/both after fix? backend (via frontend UI)
-  - Blocked on other issue: None
+  Issue 1: Code Quality Report - Remaining Backend Refactoring (P0)
+  Issue 2: Code Quality Report - Remaining Frontend Refactoring (P0)
+  
+  Issues Detail:
+  - Issue 1: 
+     - Attempted fixes: Addressed circular imports, mutable defaults, MD5, and test secrets. Remaining items are untouched.
+     - Next debug checklist: 
+       1. Replace  with  module (Insecure Random in Production - 58 occurrences).
+       2. Review and validate Dynamic Imports (7 occurrences in , , ).
+       3. Refactor High Complexity Functions (, , , ).
+       4. Remove Wildcard Imports.
+     - Why fix this issue and what will be achieved with the fix? Resolves critical technical debt, improves maintainability, and eliminates security vulnerabilities.
+     - Status: IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? Backend
+     - Blocked on other issue: None
+  - Issue 2: 
+     - Attempted fixes: Fixed  origin and a few missing dependencies.
+     - Next debug checklist: 
+       1. Fix Insecure  Usage (171 occurrences) - migrate sensitive tokens to httpOnly cookies or secure storage.
+       2. Fix Array Index as Key (112 occurrences).
+       3. Fix remaining Missing Hook Dependencies.
+       4. Split Oversized Components (, , , , ).
+     - Why fix this issue and what will be achieved with the fix? Prevents XSS attacks, UI state bugs, and stale closures.
+     - Status: IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: None
 
 **In progress Task List**:
-Task 1: Commerce Engine Extraction (Port 8005)
+  Task 1: Tutor Engine Orchestration & TinyCommand Integration (P1)
+  Task 2: Replace Parent Portal mock data with real  data (P1)
 
-Task Detail:
-- Task 1:
-  - Where to resume:  is written but bypassed in . Wait for infrastructure (Docker/K8s) that allows isolated DB connections before re-enabling the proxy for Commerce.
-  - What will be achieved with this? Decouples store/sysbook load from the main API.
-  - Status: BLOCKED
-  - Should Test frontend/backend/both after fix? both
-  - Blocked on something: Production environment architecture (MongoDB connection sharing caused 500 errors when isolated locally without proper Docker networks).
+ Task Detail:
+  - Task 1: 
+     - Where to resume:  and 
+     - What will be achieved with this? Fully automated student data extraction pipeline
+     - Status: IN PROGRESS
+     - Should Test frontend/backend/both after fix? Backend
+     - Blocked on something: Code Quality Report fixes (P0)
+  - Task 2:
+     - Where to resume: 
+     - What will be achieved with this? Replaces mocked progress charts with real data points
+     - Status: NOT STARTED
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on something: Code Quality Report fixes (P0)
 
-**Upcoming and Future Tasks**:
-Upcoming Tasks:
-- CS-Cart Multi-Vendor Integration (P0)
-- Enhance Parent Portal with actual student progress charts (currently static/mocked data) (P1)
-Future Tasks:
-- Enable Commerce Engine proxy once deployment infrastructure supports multi-container networking securely (P2).
+**Upcoming and Future Tasks**
+    Upcoming Tasks:
+    - CS-Cart Multi-Vendor Integration (P2)
+    Future Tasks:
+    - Enable Commerce Engine proxy once deployment infrastructure supports multi-container networking securely (P3).
 
-**Completed work in this session**:
-- Extracted Sport (port 8004) and Tutor (port 8003) modules using  and proxy middleware.
-- : Double elimination bracket generation ().
--  & : Player photo upload with react-easy-crop and server-side Pillow resizing to prevent MongoDB 16MB document limit crashes.
-- Cleaned up all legacy PinPanClub files and routes.
--  & : Rebuilt Admin menu to be dynamically driven by MongoDB () with horizontal Module tabs and collapsible sidebar groups. Built .
-- Fixed Role creation bugs ( typo causing 500 errors,  vs  display mismatch).
-- Fixed User Search in roles ( bug replaced to handle direct array response).
-- : Fixed double-increment print counter bug caused by stale closures in  using .
-- : Added multi-user student linking (admin approves 2nd+ users) and shared order visibility.
-- : Applied Esports Tournament layout (hexagonal photos, bottom-to-top battle bar, massive scores). Fixed Ably realtime sync drops by moving  inside .
--  & : Built UI to manage AI prompts, Monday.com board mapping (Board ID: 18404777426), and ZeroWork/Activepieces webhook configurations.
-- : Built Plan B Playwright Interactive Scan with background task execution to prevent Cloudflare 520 (30s) timeouts, including screenshot upload guidance for Admins.
-- System Prompt overhauled to v3 to enforce strict One-Shot debug rules and prevent blind proxy deployments.
+**Completed work in this session**
+- Removed deployment blockers ( in , hardcoded MongoDB Atlas URLs, hardcoded OAuth secrets) (DONE)
+- Implemented self-healing auto-rebuild script in  on startup to fix the  stale bundle crash (DONE)
+- Extracted  to  to fix circular import (DONE)
+- Replaced mutable default arguments ( -> ) across backend routes (DONE)
+- Replaced MD5 hashing with SHA-256 in  and  (DONE)
+- Removed hardcoded admin credentials from 40+ pytest files (DONE)
+- Fixed insecure  wildcard origin in  (DONE)
+- Fixed empty catch blocks and missing hook dependencies in  and  (DONE)
 
-**Earlier issues found/mentioned but not fixed**:
-Issue 1:
-- Debug checklist: Review Parent Portal () progress charts to replace mocked data with real  data points.
-- Why to solve this issue and what will be achieved with this? Delivers actual value to parents viewing the portal.
-- Should Test frontend/backend/both after fix: frontend
-- Is recurring issue? N
+**Earlier issues found/mentioned but not fixed**
+   Issue 1:
+   - Debug checklist: None specifically missed; however, a large portion of the user's Code Quality Report still needs to be addressed. Check the All Pending/In progress Issue list.
 
-**Known issue recurrence from previous fork**:
-- Issue recurrence in previous fork: Bilingual field mismatch bugs ( vs ,  vs ).
-- Recurrence count: 3+
-- Status: RESOLVED (Documented in System Prompt v3 to ALWAYS use  fallback in frontend).
+**Known issue recurrence from previous fork**
+  - Issue recurrence in previous fork: Frontend Blank Page (Stale Bundle / React render crash)
+  - Recurrence count: 4
+  - Status: RESOLVED (Fixed via self-healing backend auto-rebuild mechanism that triggers yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.).
 
-**Code Architecture**:
-- : Entry point. Registers direct routes and proxy middlewares. Starts child processes via .
-- : Core configurations, , , .
-- : Domain-driven backend modules (, , , , , ).
-- , , : Standalone FastAPI entry points for microservices.
-- : React frontend.
-  - : Main views (AdminDashboard, etc.).
-  - : Domain-specific components (Sport, Tutor, Sysbook, Admin).
+**Code Architecture**
+- : Main entry point. Contains the new  frontend auto-rebuild logic.
+- : New module to prevent circular imports.
+- : Root React component.
 
-**Key Technical Concepts**: 
-FastAPI, React, MongoDB (Motor Async), Playwright (Headless browser automation for Tutor School Reader), Ably (Realtime WebSockets/Chat), Emergent LLM Integrations (GPT Vision/Text via ), JWT Auth (LaoPan OAuth + Admin email/pw).
+**Key Technical Concepts**
+FastAPI, React, MongoDB, Playwright Async Scraping, Emergent LLM Integrations, Auto-Rebuild Subprocess via FastAPI Startup Event, JWT Auth.
 
-**key DB schema**:
-- : , ,  (80x80 base64), .
-- : , , , , .
-- : , ,  (array of user IDs), .
-- : Stores AI extraction/summary prompts and Monday.com board configurations.
-- : Stores the dynamic layout of the Admin Dashboard sidebar and tabs.
+**key DB schema**
+  - : 
+  - : 
+  - : 
 
-**changes in tech stack**:
-- Added  (Python) for background school platform scraping.
-- Added  (Python) for server-side base64 image resizing/optimization.
-- Added  (Frontend) for Avatar uploads.
-- Added  (Frontend) for the Tutor Parent Portal.
+**changes in tech stack**
+  - None strictly new, but backend now uses  to trigger yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. on the frontend if a stale bundle is detected.
 
-**All files of reference**:
-- : Centralized server-side image resizing.
-- : Playwright logic (, text extraction).
-- : Background tasks for Playwright to avoid 520 timeouts.
-- : Tabbed dynamic admin menu layout.
-- : Reliable process manager for booting port 8003/8004 engines.
-- : Reusable camera/gallery crop component.
+**All files of reference**
+  1.  (Auto-rebuild logic and high complexity functions to refactor)
+  2.  (High complexity functions)
+  3. , ,  (Oversized components to refactor)
+  4.  (Created this session)
+  5.  and  (Fixed tracking)
 
 **Areas that need refactoring**: 
-- : Fully written but bypassed in . Code exists but architecture doesn't safely support separating the DB connection locally without a proper docker-compose network. Leave bypassed until deployment infrastructure scales.
+- **CRITICAL:** High complexity Python functions ( startup, , ).
+- **CRITICAL:** Oversized React components requiring splitting (, , , , ).
+- **CRITICAL:** Insecure  usage across the frontend.
 
-**key api endpoints**:
-- : Main scoring endpoint (syncs with Ably).
--  & : Fetch and update the dynamic admin layout.
-- : Triggers the Playwright background task.
-- : Handle multi-user student assignments.
-
-**Critical Info for New Agent**:
-- **Bilingual Mismatch Trap**: Always use fallbacks like  on the frontend. The backend returns English (), but legacy frontend forms send/expect Spanish ().
-- **Proxy Middleware Intercepts**:  and  are proxied to ports 8004 and 8003. If you add a new route to these modules, you MUST add it to the respective engine's  OR add an exception to the proxy middleware in .
-- **Background Tasks**: Playwright operations (Tutor School Reader) take >30s and will cause Cloudflare 520 errors if run synchronously. Always use  and return an executing status immediately.
-- **Base64 Images**: Do NOT store 5MB base64 images directly into active MongoDB documents (like ). Always use  to generate a  (~500 bytes) and store that.
-
-**documents and test reports created in this job**:
+**key api endpoints**
+- 
 - 
 
-**Last 10 User Messages and any pending HUMAN messages**:
-1. *User*: Indicated the Interactive Scan was stuck on executing due to timeouts. -> *Agent*: Moved Playwright to background tasks.
-2. *User*: Complained AI logged in but skipped asking what to extract (0 items found). -> *Agent*: Forced Playwright to pause and ask Admin after login.
-3. *User*: Wanted the AI to auto-detect the iMereb login modal and auto-fill it, or offer a button to click. -> *Agent*: Built Strategy 3 in  and added Login with saved credentials button.
-4. *User*: Asked about System Prompt weaknesses and requested an optimized version. -> *Agent*: Provided System Prompt v3 with strict One-Shot rules and deployment verifications.
-5. *User*: Asked to provide a screenshot upload option for the Admin to visually guide the AI (Plan B). -> *Agent*: Built Screenshot Upload UI and integrated Vision AI.
-6. *User*: Asked if extracted items go to Monday.com. -> *Agent*: Confirmed they push to board 18404777426.
-7. *User*: Complained about 30 credits used for a simple Yes/No question. -> *Agent*: Added rule 2.7 to the prompt to keep confirmation answers brief and cheap.
-8. *User*: Reported the auto-login modal failed on iMereb (only filled one field). -> *Agent*: Fixed  Strategy 3 to detect inputs without explicit  attributes based on visible text.
-9. *User*: Asked My current app can be integrated into CS-Card multi-vendor? -> *Agent*: Asked for clarification on integration goals (sync products? orders?).
-10. *User*: Told the agent to finish the  fix before starting CS-Cart. -> *Agent*: Verified the  code compiled, cleared the bad playbook, and marked ready for deployment.
-*Pending*: CS-Cart integration details.
+**Critical Info for New Agent**
+- **Language**: User explicitly requested the review findings to be applied in Spanish (Aquí están los hallazgos... Por favor aplica...). Respond and explain plans in Spanish.
+- **Code Quality Focus**: The priority is executing the remainder of the Code Quality Report. Do not start on CS-Cart or Tutor Orchestration until the codebase is clean.
+- **Auto-Rebuild**: The backend  now automatically triggers yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. if it detects a broken frontend hash. Do not remove this logic.
 
-**Project Health Check**:
-- Broken: None, awaiting production deployment to verify iMereb login modal fix.
-- Mocked: Parent Portal progress charts.
+**documents and test reports created in this job**
+  - None newly created.
 
-**3rd Party Integrations**:
-- Ably (Live scoring/Chat) — requires User API Key.
-- Monday.com (School Feed CRM) — requires User API Key.
-- LaoPan OAuth (Auth) — requires User API Key/Secret.
-- Emergent LLM Key (AI Tutor/Vision) — uses Emergent LLM Key.
-- ZeroWork / Activepieces (Automations) — External (Configured via Tutor Admin UI).
+**Last 10 User Messages and any pending HUMAN messages** 
+ - *User*: Requested fixing the blank page issue on the production URL. -> *Agent*: Debugged and found stale bundle caching, implemented backend self-healing auto-rebuild. (DONE)
+ - *User*: Provided a Code Quality Report with Critical and Important backend/frontend recommendations and requested applying them (Aquí están los hallazgos de la revisión de código). -> *Agent*: Fixed circular imports, MD5 crypto, mutable defaults, test secrets, insecure postMessage, and some missing hook dependencies. (IN PROGRESS - remaining items pending).
 
-**Testing status**:
-- Testing agent used after significant changes: YES (Front-end deep testing utilized).
-- Troubleshoot agent used after agent stuck in loop: NO.
-- Test files created: None explicitly added this session.
-- Known regressions: None currently active.
+**Project Health Check:**
+- Broken: Code quality issues (high complexity, insecure random, localstorage vulnerabilities, oversized components).
+- Mocked: Parent Portal charts.
 
-**Credentials to test flow**:
+**3rd Party Integrations**
+	 •	OpenAI/Anthropic (Tutor AI) — uses Emergent LLM Key ().
+	 •	Monday.com (CRM/Orders) — requires User API Key.
+	 •	Ably (Live scoring/Chat) — requires User API Key.
+	 •	LaoPan OAuth (Auth) — requires User API Key/Secret.
+
+**Testing status**
+  - Testing agent used after significant changes: NO (Self-tested via bash)
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: None
+  - Known regressions: None currently known, but massive refactoring runs high risk. Use testing agents proactively.
+
+**Credentials to test flow:**
 - Super Admin:  / 
 
-**What agent forgot to execute**:
-The user asked about integrating CS-Cart Multi-vendor. The agent asked clarifying questions, but the user immediately instructed the agent to pivot back to finishing the Playwright modal login fix. The CS-Cart integration was never addressed or scoped.</analysis>
+**What agent forgot to execute**
+- The agent successfully started the Code Quality Report but did not finish fixing: Insecure Random in Production (58 occurrences), Dynamic Imports validation, High Complexity Python functions, Insecure frontend  usage, Array Index as Key, and Oversized React components. These must be addressed immediately.
+
+**Debugging checklist for current issue**
+    Issue: Complete remaining items from the Code Quality Report.
+    Frontend files to check: , , , Wallet tabs, , , , .
+    Backend files to check: , , , , .</analysis>

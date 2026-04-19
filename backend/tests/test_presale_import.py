@@ -27,7 +27,7 @@ class TestPreSaleImportAPI:
         # Login as admin
         login_resp = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_resp.status_code == 200, f"Admin login failed: {login_resp.text}"
         data = login_resp.json()
@@ -126,7 +126,7 @@ class TestSuggestionBasedLinking:
         # Login as admin
         login_resp = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_resp.status_code == 200, f"Admin login failed: {login_resp.text}"
         data = login_resp.json()
@@ -257,7 +257,7 @@ class TestTextbookOrdersAwaitingLinkStatus:
         # Login as admin
         login_resp = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_resp.status_code == 200
         data = login_resp.json()

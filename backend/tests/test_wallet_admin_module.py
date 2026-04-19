@@ -16,9 +16,9 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
-# Test credentials
-ADMIN_EMAIL = "teck@koh.one"
-ADMIN_PASSWORD = "Acdb##0897"
+# Test credentials — use env vars to avoid hardcoding secrets in version control
+ADMIN_EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "teck@koh.one")
+ADMIN_PASSWORD = os.environ.get("TEST_ADMIN_PASSWORD", "Acdb##0897")
 TEST_USER_ID = "cli_6cc8b44b7ad5"  # juan.perez@test.com
 
 

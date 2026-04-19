@@ -8,7 +8,7 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://admin-ui-unify.preview.emergentagent.com"
+    BASE_URL = "https://quality-audit-23.preview.emergentagent.com"
 
 
 class TestCrmWebhookEndpoint:
@@ -118,7 +118,7 @@ class TestCrmNotificationsEndpoint:
         """Get admin token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             self.token = response.json().get("token")
@@ -160,7 +160,7 @@ class TestCrmMarkReadEndpoints:
         """Get admin token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             self.token = response.json().get("token")
@@ -214,7 +214,7 @@ class TestCrmWebhookRegistration:
         """Get admin token"""
         response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         if response.status_code == 200:
             self.token = response.json().get("token")

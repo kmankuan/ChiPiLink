@@ -22,7 +22,7 @@ class TestWalletTransactionBulkOperations:
         # Login as admin
         login_response = self.session.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200, f"Admin login failed: {login_response.text}"
         
@@ -226,7 +226,7 @@ class TestWalletTransactionDeleteIntegration:
         # Login as admin
         login_response = self.session.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200
         token = login_response.json().get('token')

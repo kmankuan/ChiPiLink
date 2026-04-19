@@ -25,7 +25,7 @@ class TestMediaPlayerNewFeatures:
         if TestMediaPlayerNewFeatures.auth_token is None:
             response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
                 "email": "admin@chipi.co",
-                "password": "admin"
+                "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
             })
             if response.status_code == 200:
                 TestMediaPlayerNewFeatures.auth_token = response.json().get("token")

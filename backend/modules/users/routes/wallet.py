@@ -30,18 +30,11 @@ DEFAULTS = {
     "transfer_received": "Transfer received",
 }
 
-async def _get_default_description(action: str) -> str:
-    """Get the admin-configurable default description for wallet transactions."""
-    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
-    if doc and doc.get("descriptions", {}).get(action):
-        return doc["descriptions"][action]
-    return DEFAULTS.get(action, "Wallet transaction")
-
-async def _get_all_descriptions() -> dict:
-    """Get all configurable descriptions with defaults."""
-    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
-    saved = doc.get("descriptions", {}) if doc else {}
-    return {k: saved.get(k, v) for k, v in DEFAULTS.items()}
+# Re-export from shared module to avoid circular imports
+from modules.users.services.wallet_descriptions import (
+    get_default_description as _get_default_description,
+    get_all_descriptions as _get_all_descriptions,
+)
 
 
 async def _monday_sync_tx(user_id: str, amount: float, action: str, description: str = "", reference: str = ""):

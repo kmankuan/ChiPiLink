@@ -71,7 +71,7 @@ class TTSService:
         if not text:
             return None
 
-        cache_key = hashlib.md5(
+        cache_key = hashlib.sha256(
             f"{provider}:{text}:{voice}:{voice_id}:{speed}:{model}:{stability}".encode()
         ).hexdigest()
         if cache_key in _audio_cache:

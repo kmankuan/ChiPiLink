@@ -828,7 +828,7 @@ export default function EmbedWidget() {
   }, [token]);
 
   const closeWidget = () => {
-    window.parent.postMessage({ type: 'chipi-widget-close' }, '*');
+    window.parent.postMessage({ type: 'chipi-widget-close' }, document.referrer || window.location.origin);
   };
 
   const handleLogout = useCallback(() => {

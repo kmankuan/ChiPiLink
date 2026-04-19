@@ -108,7 +108,7 @@ class TestWidgetAdminEndpoints:
         """Get admin auth token before each test"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@libreria.com", "password": "admin"}
+            json={"email": "admin@libreria.com", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if response.status_code != 200:
             pytest.skip("Could not authenticate - skipping admin tests")

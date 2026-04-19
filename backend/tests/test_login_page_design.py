@@ -24,7 +24,7 @@ class TestLoginPageDesignConfig:
         """Get admin token for authenticated requests"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if response.status_code == 200:
             self.token = response.json().get("token")
@@ -255,7 +255,7 @@ class TestLoginPageDesignCleanup:
         """Get admin token"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if response.status_code == 200:
             self.token = response.json().get("token")

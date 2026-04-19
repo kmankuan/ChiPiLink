@@ -20,7 +20,7 @@ class TestCrmTopicPresets:
         """Setup: Login as admin and get token"""
         login_resp = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_resp.status_code == 200, f"Admin login failed: {login_resp.text}"
         self.admin_token = login_resp.json()["token"]
@@ -136,7 +136,7 @@ class TestDraftOrderFilter:
         """Setup: Login as admin"""
         login_resp = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_resp.status_code == 200
         self.token = login_resp.json()["token"]

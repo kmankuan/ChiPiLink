@@ -107,7 +107,7 @@ export default function Unatienda() {
 
   // ---- Data Loading ----
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isAuthenticated && token) {

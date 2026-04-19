@@ -44,7 +44,8 @@ async def unregister(tid: str, player_id: str, user: dict = Depends(get_current_
     raise HTTPException(404, "Not found")
 
 @router.post("/{tid}/seed")
-async def seed(tid: str, data: dict = Body(default={}), user: dict = Depends(get_current_user)):
+async def seed(tid: str, data: dict = Body(default=None), user: dict = Depends(get_current_user)):
+    data = data or {}
     if not user.get("is_admin") and user.get("role") not in ["admin", "moderator"]: raise HTTPException(403)
     league_id = data.get("league_id")
     if league_id: return await ts.seed_from_league(tid, league_id)

@@ -136,8 +136,9 @@ async def approve_link(request_id: str, admin: dict = Depends(get_admin_user)):
 
 
 @router.post("/reject/{request_id}")
-async def reject_link(request_id: str, data: dict = {}, admin: dict = Depends(get_admin_user)):
+async def reject_link(request_id: str, data: dict = None, admin: dict = Depends(get_admin_user)):
     """Reject a link request (admin)."""
+    data = data or {}
     now = datetime.now(timezone.utc).isoformat()
     admin_id = admin.get("sub", admin.get("user_id", ""))
     

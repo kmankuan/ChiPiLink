@@ -18,7 +18,7 @@ class TestTextbookArchiveDeleteEndpoints:
         try:
             resp = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
                 "email": "admin@chipi.co",
-                "password": "admin"
+                "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
             }, timeout=10)
             if resp.status_code == 200:
                 data = resp.json()

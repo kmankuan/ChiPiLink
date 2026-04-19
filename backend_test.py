@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class ChiPiLinkAPITester:
-    def __init__(self, base_url="https://admin-ui-unify.preview.emergentagent.com"):
+    def __init__(self, base_url="https://quality-audit-23.preview.emergentagent.com"):
         self.base_url = base_url
         self.hub_url = "http://localhost:8002"
         self.token = None
@@ -2840,7 +2840,7 @@ class ChiPiLinkAPITester:
                 "yappy": {
                     "merchant_id": "BAQIJ-98619452",
                     "secret_key": "test_secret_key",
-                    "url_domain": "https://admin-ui-unify.preview.emergentagent.com",
+                    "url_domain": "https://quality-audit-23.preview.emergentagent.com",
                     "activo": True,
                     "ambiente": "produccion"
                 }
@@ -4217,7 +4217,7 @@ class ChiPiLinkAPITester:
             "orderId": "TEST123",
             "Hash": "test_hash_value",
             "status": "E",  # E=Ejecutado (successful)
-            "domain": "https://admin-ui-unify.preview.emergentagent.com"
+            "domain": "https://quality-audit-23.preview.emergentagent.com"
         }
         
         # Build query string for GET request
@@ -4465,7 +4465,7 @@ class ChiPiLinkAPITester:
                     "orderId": pedido_id,
                     "Hash": "test_hash_for_real_order",
                     "status": "E",  # Successful payment
-                    "domain": "https://admin-ui-unify.preview.emergentagent.com"
+                    "domain": "https://quality-audit-23.preview.emergentagent.com"
                 }
                 
                 query_string = "&".join([f"{k}={v}" for k, v in ipn_params.items()])

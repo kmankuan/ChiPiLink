@@ -170,7 +170,7 @@ class TestBackendAPIEndpoints:
         """Test admin login"""
         response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert response.status_code == 200, f"Admin login failed: {response.text}"
         data = response.json()
@@ -184,7 +184,7 @@ class TestBackendAPIEndpoints:
         # Login first
         login_response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_response.status_code == 200
         token = login_response.json()["token"]
@@ -214,7 +214,7 @@ class TestBackendAPIEndpoints:
         # Login first
         login_response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_response.status_code == 200
         token = login_response.json()["token"]
@@ -244,7 +244,7 @@ class TestBackendAPIEndpoints:
         # Login first
         login_response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
-            "password": "admin"
+            "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")
         })
         assert login_response.status_code == 200
         token = login_response.json()["token"]

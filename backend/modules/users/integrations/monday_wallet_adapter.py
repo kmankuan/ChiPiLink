@@ -368,7 +368,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
             action = "topup" if sub_event == add_label else "deduct"
 
             try:
-                from modules.users.routes.wallet import _get_default_description
+                from modules.users.services.wallet_descriptions import get_default_description as _get_default_description
                 if action == "topup":
                     desc = note or await _get_default_description("monday_topup")
                     tx = await wallet_service.deposit(
@@ -442,7 +442,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
             return {"status": "error", "detail": msg}
 
         try:
-            from modules.users.routes.wallet import _get_default_description
+            from modules.users.services.wallet_descriptions import get_default_description as _get_default_description
             if action == "topup":
                 desc = await _get_default_description("monday_topup")
                 tx = await wallet_service.deposit(

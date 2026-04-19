@@ -465,8 +465,9 @@ async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
 
 
 @router.post("/admin/{order_id}/cancel")
-async def admin_cancel_order(order_id: str, data: dict = {}, admin: dict = Depends(get_admin_user)):
+async def admin_cancel_order(order_id: str, data: dict = None, admin: dict = Depends(get_admin_user)):
     """Admin cancels ANY order — reverses stock/presale + refunds wallet if paid."""
+    data = data or {}
     from core.database import db
     from datetime import datetime, timezone
     

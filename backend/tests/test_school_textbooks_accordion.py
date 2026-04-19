@@ -21,7 +21,7 @@ class TestSchoolTextbooksAccordion:
         """Setup: Get admin token for authenticated requests"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@libreria.com", "password": "admin"}
+            json={"email": "admin@libreria.com", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200, f"Login failed: {login_response.text}"
         self.token = login_response.json().get("token")
@@ -182,7 +182,7 @@ class TestMyStudentsEndpoint:
         """Setup: Get admin token"""
         login_response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@libreria.com", "password": "admin"}
+            json={"email": "admin@libreria.com", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert login_response.status_code == 200
         self.token = login_response.json().get("token")

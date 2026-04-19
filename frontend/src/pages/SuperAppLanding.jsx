@@ -499,14 +499,14 @@ export default function SuperAppLanding() {
     fetchData();
     loadBlockConfig();
     fetchModuleStatuses();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchModuleStatuses = async () => {
     try {
       const { data } = await axios.get(`${API_URL}/api/public/module-status`);
       setModuleStatuses(data.statuses);
     } catch {
-      // Fall back to defaults
+      // Module status unavailable — using defaults
     }
   };
 
@@ -552,7 +552,7 @@ export default function SuperAppLanding() {
         });
       }
     } catch {
-      // Config doesn't exist yet, use defaults
+      // Block config unavailable — using defaults
     }
   };
 

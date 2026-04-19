@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://admin-ui-unify.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://quality-audit-23.preview.emergentagent.com')
 
 class TestIconStatusesPublic:
     """Public icon statuses endpoint tests"""
@@ -64,7 +64,7 @@ class TestIconStatusesAdmin:
         """Get admin auth token"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if response.status_code == 200:
             return response.json().get("token")
@@ -209,7 +209,7 @@ class TestLayoutIconsWithStatuses:
         """Get admin auth token"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            json={"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         if response.status_code == 200:
             return response.json().get("token")

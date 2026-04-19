@@ -18,7 +18,7 @@ def admin_token():
     """Get admin auth token"""
     response = requests.post(
         f"{BASE_URL}/api/auth-v2/login",
-        json={"email": "admin@libreria.com", "password": "admin"}
+        json={"email": "admin@libreria.com", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
     )
     if response.status_code == 200:
         data = response.json()
@@ -335,7 +335,7 @@ class TestAdminLogin:
         """POST /api/auth-v2/login - admin login should work with admin@libreria.com/admin"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "admin@libreria.com", "password": "admin"}
+            json={"email": "admin@libreria.com", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         

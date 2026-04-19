@@ -20,11 +20,11 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://admin-ui-unify.preview.emergentagent.com"
+    BASE_URL = "https://quality-audit-23.preview.emergentagent.com"
 
-# Admin credentials
-ADMIN_EMAIL = "teck@koh.one"
-ADMIN_PASSWORD = "Acdb##0897"
+# Admin credentials — use env vars to avoid hardcoding secrets in version control
+ADMIN_EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "teck@koh.one")
+ADMIN_PASSWORD = os.environ.get("TEST_ADMIN_PASSWORD", "Acdb##0897")
 
 # Monday.com board ID
 MONDAY_BOARD_ID = "18399650704"

@@ -21,7 +21,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 AUTH_ENDPOINT = f"{BASE_URL}/api/auth-v2/login"
 
 # Test credentials
-ADMIN_CREDENTIALS = {"email": "admin@chipi.co", "password": "admin"}
+ADMIN_CREDENTIALS = {"email": "admin@chipi.co", "password": os.environ.get("TEST_ADMIN_PASSWORD", "admin")}
 
 
 @pytest.fixture(scope="module")
