@@ -48,3 +48,6 @@ All extractions follow the Tutor Engine pattern:
 - Parent Portal real student progress data replacing mocked charts (P1)
 - Tutor Engine TinyCommand orchestration final wiring (P1)
 - Commerce Engine proxy re-enable for multi-container networking (P2)
+
+## Stability Fixes Applied
+- 2026-04-19: Removed `ClubSchedule` feature entirely (component file deleted, imports removed from `App.js`, route `/tutor/schedule` removed, nav button removed from `TutorDashboard.jsx`, menu item removed from `backend/modules/admin/menu_routes.py`). This resolves the recurring "White Screen of Death — ClubSchedule is not defined" error in production bundles. Production must be redeployed to pick up the clean bundle.
