@@ -107,6 +107,8 @@ class ServiceManager:
                     logger.warning(f"[{svc.name}] Crashed, restarting ({svc.restart_count + 1}/{svc.max_restarts})")
                     svc.start()
                     svc.restart_count += 1
+                    if svc.restart_count >= svc.max_restarts:
+                        logger.error(f"[{svc.name}] Max restart attempts ({svc.max_restarts}) reached — giving up. Using in-process fallback routes.")
             await asyncio.sleep(30)
 
     def stop_all(self):

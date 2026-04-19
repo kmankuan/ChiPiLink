@@ -361,17 +361,33 @@ async def _auto_rebuild_frontend_if_needed():
     """
     Detect and auto-fix a stale or broken frontend bundle.
     Runs once per deployment in the background - does not block startup.
+
+    Skipped entirely in production deployment containers where:
+      - yarn is not installed
+      - /app/frontend/build is served by the platform (not this process)
+      - supervisorctl does not exist
     """
     import re
+    import shutil
     import subprocess
+
+    # Skip in production deployment — frontend is served by the platform as static assets.
+    # Detection: no yarn binary available, or no frontend source tree present.
+    if shutil.which("yarn") is None:
+        logger.info("[frontend] yarn not found — skipping auto-rebuild (production deployment)")
+        return
+    if not os.path.exists("/app/frontend/package.json"):
+        logger.info("[frontend] /app/frontend not present — skipping auto-rebuild")
+        return
+
     build_index = "/app/frontend/build/index.html"
-    
+
     # Known broken bundle hashes → always rebuild if found
-    BROKEN_HASHES = {"d7b710c3"}
-    
+    BROKEN_HASHES = {"d7b710c3", "24e15873"}
+
     needs_rebuild = False
     reason = ""
-    
+
     if not os.path.exists(build_index):
         needs_rebuild = True
         reason = "index.html missing"
@@ -391,19 +407,19 @@ async def _auto_rebuild_frontend_if_needed():
             elif not os.path.exists(bundle_path):
                 needs_rebuild = True
                 reason = f"bundle file missing ({bundle_hash})"
-    
+
     if not needs_rebuild:
         logger.info(f"[frontend] Build is up-to-date, no rebuild needed")
         return
-    
+
     logger.info(f"[frontend] Auto-rebuild triggered: {reason}")
-    
+
     # Determine backend URL for the build
     frontend_url = os.environ.get("REACT_APP_BACKEND_URL") or os.environ.get("FRONTEND_URL", "")
     build_env = {**os.environ, "CI": "false"}
     if frontend_url:
         build_env["REACT_APP_BACKEND_URL"] = frontend_url
-    
+
     try:
         result = subprocess.run(
             ["yarn", "build"],
@@ -415,13 +431,14 @@ async def _auto_rebuild_frontend_if_needed():
         )
         if result.returncode == 0:
             logger.info("[frontend] Build successful — new bundle deployed")
-            # Switch frontend server to serve the new static build
-            try:
-                subprocess.run(["supervisorctl", "stop", "frontend"], capture_output=True, timeout=10)
-                subprocess.run(["supervisorctl", "start", "frontend-build"], capture_output=True, timeout=10)
-                logger.info("[frontend] Switched from dev-server to production build server")
-            except Exception as sw_err:
-                logger.warning(f"[frontend] Supervisor switch failed (non-blocking): {sw_err}")
+            # Switch frontend server to serve the new static build (preview container only)
+            if shutil.which("supervisorctl"):
+                try:
+                    subprocess.run(["supervisorctl", "stop", "frontend"], capture_output=True, timeout=10)
+                    subprocess.run(["supervisorctl", "start", "frontend-build"], capture_output=True, timeout=10)
+                    logger.info("[frontend] Switched from dev-server to production build server")
+                except Exception as sw_err:
+                    logger.warning(f"[frontend] Supervisor switch failed (non-blocking): {sw_err}")
         else:
             logger.error(f"[frontend] Build FAILED (exit {result.returncode}): {result.stderr[-500:]}")
     except subprocess.TimeoutExpired:
@@ -567,10 +584,12 @@ async def startup_event():
             logger.warning(f"Frontend auto-rebuild check failed (non-blocking): {e}")
 
         # Bootstrap Integration Hub (creates supervisor config if needed)
+        # Skip in production deployment — supervisor does not exist there.
         try:
+            import shutil
             import subprocess
             bootstrap_script = "/app/integration-hub/bootstrap.sh"
-            if os.path.exists(bootstrap_script):
+            if os.path.exists(bootstrap_script) and shutil.which("supervisorctl"):
                 result = subprocess.run(
                     ["bash", bootstrap_script],
                     capture_output=True, text=True, timeout=15
@@ -580,31 +599,44 @@ async def startup_event():
                         logger.info(line.strip())
                 if result.returncode != 0 and result.stderr:
                     logger.warning(f"Hub bootstrap stderr: {result.stderr.strip()}")
+            else:
+                logger.info("[hub-bootstrap] Skipped (supervisor not available — production deployment)")
         except Exception as e:
             logger.warning(f"Integration Hub bootstrap skipped: {e}")
 
         # Start separated services via Process Manager (reliable, no supervisor dependency)
+        # Skip entirely if uvicorn binary is unavailable in a predictable location — in that
+        # case proxy falls back to direct in-process routes (the engines' modules are already
+        # mounted into the main app).
+        import shutil
+        uvicorn_bin = shutil.which("uvicorn") or (
+            "/root/.venv/bin/uvicorn" if os.path.exists("/root/.venv/bin/uvicorn") else None
+        )
+
         from core.service_manager import service_manager
 
-        if os.path.exists("/app/tutor-engine/main.py"):
+        if uvicorn_bin and os.path.exists("/app/tutor-engine/main.py"):
             if os.path.exists("/etc/supervisor/conf.d/tutor-engine.conf"):
                 logger.info("[service-manager] tutor-engine is managed by supervisor, skipping manual start")
             else:
                 service_manager.register(
                     "tutor-engine",
-                    ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
+                    [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "1"],
                     "/app/tutor-engine", 8003
                 )
 
-        if os.path.exists("/app/sport-engine/main.py"):
+        if uvicorn_bin and os.path.exists("/app/sport-engine/main.py"):
             if os.path.exists("/etc/supervisor/conf.d/sport-engine.conf"):
                 logger.info("[service-manager] sport-engine is managed by supervisor, skipping manual start")
             else:
                 service_manager.register(
                     "sport-engine",
-                    ["/root/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
+                    [uvicorn_bin, "main:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "1"],
                     "/app/sport-engine", 8004
                 )
+
+        if not uvicorn_bin:
+            logger.info("[service-manager] uvicorn binary not found — side-engines will use in-process direct routes (production mode)")
 
         service_manager.start_all()
         await service_manager.start_monitoring()
