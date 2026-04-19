@@ -20,7 +20,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://quality-audit-23.preview.emergentagent.com"
+    BASE_URL = "https://deployment-blocker-11.preview.emergentagent.com"
 
 # Admin credentials — use env vars to avoid hardcoding secrets in version control
 ADMIN_EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "teck@koh.one")

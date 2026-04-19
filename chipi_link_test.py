@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class ChiPiLinkTester:
-    def __init__(self, base_url="https://quality-audit-23.preview.emergentagent.com"):
+    def __init__(self, base_url="https://deployment-blocker-11.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0

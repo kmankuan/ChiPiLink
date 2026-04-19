@@ -39,7 +39,7 @@ All extractions follow the Tutor Engine pattern:
 
 ## Known Deployment Notes
 - Production site: https://chipilink.me (uses Atlas MongoDB `backend-cleanup-10-chipilink_prod`)
-- Preview: https://quality-audit-23.preview.emergentagent.com (uses local MongoDB `chipilink_prod`)
+- Preview: https://deployment-blocker-11.preview.emergentagent.com (uses local MongoDB `chipilink_prod`)
 - `.env` files MUST be tracked in git for Emergent deployment (fixed: removed duplicate `*.env` gitignore entries added by prev agent)
 - database.py routes to Atlas automatically when MONGO_URL is non-localhost (intentional for production)
 

@@ -5,7 +5,7 @@ import sys
 import json
 
 class RefactoredEndpointsTester:
-    def __init__(self, base_url="https://quality-audit-23.preview.emergentagent.com"):
+    def __init__(self, base_url="https://deployment-blocker-11.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
