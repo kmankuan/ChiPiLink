@@ -1,8 +1,10 @@
+ably==3.1.1
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.3
 aiosignal==1.4.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
+anthropic==0.86.0
 anyio==4.12.1
 APScheduler==3.11.2
 attrs==25.4.0
@@ -17,6 +19,7 @@ click==8.3.1
 cryptography==46.0.5
 distro==1.9.0
 dnspython==2.8.0
+docstring_parser==0.17.0
 ecdsa==0.19.1
 email-validator==2.3.0
 emergentintegrations==0.1.0
@@ -35,15 +38,19 @@ google-auth-oauthlib==1.3.0
 google-genai==1.65.0
 google-generativeai==0.8.6
 googleapis-common-protos==1.72.0
+greenlet==3.3.2
 grpcio==1.78.0
 grpcio-status==1.71.2
 gspread==6.2.1
 h11==0.16.0
+h2==4.3.0
 hf-xet==1.3.2
+hpack==4.1.0
 httpcore==1.0.9
 httplib2==0.31.2
 httpx==0.28.1
 huggingface_hub==1.5.0
+hyperframe==6.1.0
 idna==3.11
 importlib_metadata==8.7.1
 iniconfig==2.3.0
@@ -61,6 +68,7 @@ MarkupSafe==3.0.3
 mccabe==0.7.0
 mdurl==0.1.2
 motor==3.3.1
+msgpack==1.1.2
 multidict==6.7.1
 mypy==1.19.1
 mypy_extensions==1.1.0
@@ -73,6 +81,7 @@ passlib==1.7.4
 pathspec==1.0.4
 pillow==12.1.1
 platformdirs==4.9.2
+playwright==1.58.0
 pluggy==1.6.0
 propcache==0.4.1
 proto-plus==1.27.1
@@ -84,6 +93,7 @@ pycodestyle==2.14.0
 pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5
+pyee==13.0.1
 pyflakes==3.4.0
 Pygments==2.19.2
 PyJWT==2.11.0
@@ -123,7 +133,6 @@ uritemplate==4.2.0
 urllib3==2.6.3
 uvicorn==0.25.0
 watchfiles==1.1.1
-websockets==16.0
+websockets==15.0.1
 yarl==1.23.0
 zipp==3.23.0
-playwright

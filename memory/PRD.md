@@ -50,6 +50,11 @@ All extractions follow the Tutor Engine pattern:
 - Commerce Engine proxy re-enable for multi-container networking (P2)
 
 ## Stability Fixes Applied
+- 2026-04-20: **Fixed production HTTP 520 root cause — missing `ably` package in `requirements.txt`.**
+  - Root cause: `/app/backend/modules/ably_integration/__init__.py` line 8 does `from ably import AblyRest` at module level. The `ably` package was installed in the sandbox venv but was never listed in `requirements.txt`, so production Kubernetes pods (which install only what's in requirements.txt) crashed with `ModuleNotFoundError: No module named 'ably'` during uvicorn startup.
+  - Symptom: deployed app logs showed `Starting FastAPI backend: uvicorn server:app ...` + `Waiting for backend to start...` then nothing. Uvicorn never bound to port 8001; Kubernetes readiness probes failed; Cloudflare returned HTTP 520 on chipilink.me/api/health and chipilink.me/admin/login.
+  - Fix: ran `pip freeze > /app/backend/requirements.txt` to pin `ably==3.1.1` (plus its transitive deps h2/hpack/hyperframe already installed). Verified in a clean venv that `DEPLOYMENT_MODE=production python -c "import server"` succeeds and `uvicorn server:app` serves both `/health` and `/api/health` with HTTP 200.
+  - User action required: click **Re-Deploy** on the Emergent platform to push the fixed requirements.txt to production.
 - 2026-04-19: **ChiPi Tutor module fully deleted (frontend + backend + subservice).**
   - Frontend: deleted `/app/frontend/src/modules/tutor/` (10 components + flow-builder), removed 8 imports + 7 routes from `App.js`, removed `TutorDashboard` lazy import from `AdminDashboard.jsx`, removed tutor tab from admin menu config.
   - Backend: deleted `/app/backend/modules/tutor/` (13 files) and `/app/backend/modules/tutor_proxy.py`. Removed all router includes + proxy middleware + service_manager wiring from `main.py`.
