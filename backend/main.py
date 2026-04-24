@@ -472,37 +472,45 @@ async def _auto_rebuild_frontend_if_needed():
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize application on startup - fast path for health check readiness"""
+    """Initialize application on startup - fast path for health check readiness.
+    
+    CRITICAL: Must return in <2 seconds so Kubernetes readiness probes pass even
+    when MongoDB is unreachable. All DB-dependent setup runs as background tasks
+    AFTER the server starts accepting connections.
+    """
     import asyncio
     import traceback
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {db.name}")
-    
-    # Phase 1: Database indexes (with timeout for Atlas)
-    try:
-        await asyncio.wait_for(create_indexes(), timeout=30)
-    except asyncio.TimeoutError:
-        logger.warning("Index creation timed out (30s), continuing...")
-    except Exception as e:
-        logger.warning(f"Index creation issue: {e}")
-    
-    # Phase 2: Seed essential data in parallel (with timeout for Atlas)
-    try:
-        await asyncio.wait_for(
-            asyncio.gather(
-                seed_admin_user(),
-                seed_site_config(),
-                seed_translations(),
-                seed_landing_page(),
-            ),
-            timeout=30
-        )
-    except asyncio.TimeoutError:
-        logger.warning("Seed operations timed out (30s), continuing...")
-    except Exception as e:
-        logger.warning(f"Seed operations issue: {e}")
 
-    logger.info("Core startup complete, scheduling deferred init...")
+    # Phase 1+2: DB indexes and seed operations run as background tasks.
+    # If MongoDB is slow/unreachable, they retry/timeout in the background without
+    # blocking /health from responding.
+    async def _db_bootstrap():
+        try:
+            await asyncio.wait_for(create_indexes(), timeout=30)
+        except asyncio.TimeoutError:
+            logger.warning("Index creation timed out (30s), continuing...")
+        except Exception as e:
+            logger.warning(f"Index creation issue: {e}")
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(
+                    seed_admin_user(),
+                    seed_site_config(),
+                    seed_translations(),
+                    seed_landing_page(),
+                ),
+                timeout=30
+            )
+        except asyncio.TimeoutError:
+            logger.warning("Seed operations timed out (30s), continuing...")
+        except Exception as e:
+            logger.warning(f"Seed operations issue: {e}")
+        logger.info("DB bootstrap complete")
+
+    asyncio.create_task(_db_bootstrap())
+    logger.info("Core startup complete (DB bootstrap + deferred init running in background)...")
 
     # Phase 3+4: Everything else runs as background tasks AFTER server starts accepting connections
     async def _deferred_init():

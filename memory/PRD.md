@@ -50,10 +50,17 @@ All extractions follow the Tutor Engine pattern:
 - Commerce Engine proxy re-enable for multi-container networking (P2)
 
 ## Stability Fixes Applied
-- 2026-04-20: **Fixed production HTTP 520 root cause — missing `ably` package in `requirements.txt`.**
+- 2026-04-24: **Non-blocking startup — fixes Kubernetes readiness probe timeout (round 2 of production HTTP 520).**
+  - Round 1 (2026-04-20) added `ably==3.1.1` to requirements.txt. That unblocked uvicorn's module-level imports but a follow-up deploy still returned 520 because the deploy logs showed `timeout waiting for container to be ready: context deadline exceeded` — the log fetcher couldn't attach to a running container, indicating CrashLoopBackOff.
+  - Round 2 root cause: with an unreachable/slow MongoDB Atlas cluster, the `startup_event` synchronously awaited `create_indexes()` (30s timeout) and seed operations (30s timeout), delaying `/health` from responding for up to ~70 seconds. Kubernetes readiness probes give up well before that → pod killed → CrashLoopBackOff → Cloudflare 520.
+  - Fix: in `backend/main.py`, wrapped the index + seed work in a `_db_bootstrap()` coroutine scheduled via `asyncio.create_task(...)`. Startup event now returns in <1s regardless of MongoDB state. `/health` and `/api/health` respond 200 immediately; DB bootstrap completes in the background.
+  - Also in `backend/core/database.py` reduced `serverSelectionTimeoutMS` from 10s→5s and `connectTimeoutMS` 10s→5s so downstream DB calls fail fast instead of hanging.
+  - Verified in a clean venv with a fake Atlas URL: HTTP 200 at t=2s (was 70s); background bootstrap finished at t=25s with the expected warnings. Sandbox login still passes.
+- 2026-04-20: **Fixed production HTTP 520 round 1 — missing `ably` package in `requirements.txt`.**
   - Root cause: `/app/backend/modules/ably_integration/__init__.py` line 8 does `from ably import AblyRest` at module level. The `ably` package was installed in the sandbox venv but was never listed in `requirements.txt`, so production Kubernetes pods (which install only what's in requirements.txt) crashed with `ModuleNotFoundError: No module named 'ably'` during uvicorn startup.
   - Symptom: deployed app logs showed `Starting FastAPI backend: uvicorn server:app ...` + `Waiting for backend to start...` then nothing. Uvicorn never bound to port 8001; Kubernetes readiness probes failed; Cloudflare returned HTTP 520 on chipilink.me/api/health and chipilink.me/admin/login.
   - Fix: ran `pip freeze > /app/backend/requirements.txt` to pin `ably==3.1.1` (plus its transitive deps h2/hpack/hyperframe already installed). Verified in a clean venv that `DEPLOYMENT_MODE=production python -c "import server"` succeeds and `uvicorn server:app` serves both `/health` and `/api/health` with HTTP 200.
+  - Added `backend/tests/test_deploy_imports.py` — a 2-test pytest guard (one does `import server`, one AST-scans all module-level imports and verifies each third-party package is listed in requirements.txt) so this class of bug is caught before deploy.
   - User action required: click **Re-Deploy** on the Emergent platform to push the fixed requirements.txt to production.
 - 2026-04-19: **ChiPi Tutor module fully deleted (frontend + backend + subservice).**
   - Frontend: deleted `/app/frontend/src/modules/tutor/` (10 components + flow-builder), removed 8 imports + 7 routes from `App.js`, removed `TutorDashboard` lazy import from `AdminDashboard.jsx`, removed tutor tab from admin menu config.

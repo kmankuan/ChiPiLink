@@ -42,15 +42,17 @@ else:
     db_name   = os.environ.get('DB_NAME', 'chipilink_prod')
     _db_logger.info(f"DB: MONGO_URL — {db_name}")
 
-# MongoDB connection — with Atlas-optimized settings
+# MongoDB connection — with Atlas-optimized settings.
+# serverSelectionTimeoutMS is kept short so a temporarily unreachable cluster
+# doesn't block the startup event past the Kubernetes readiness probe window.
 client = AsyncIOMotorClient(
     mongo_url,
     maxPoolSize=50,
     minPoolSize=5,
     maxIdleTimeMS=45000,
-    serverSelectionTimeoutMS=10000,
-    connectTimeoutMS=10000,
-    socketTimeoutMS=30000,
+    serverSelectionTimeoutMS=5000,
+    connectTimeoutMS=5000,
+    socketTimeoutMS=20000,
     retryWrites=True,
     retryReads=True,
 )
