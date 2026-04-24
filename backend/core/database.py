@@ -45,17 +45,54 @@ else:
 # MongoDB connection — with Atlas-optimized settings.
 # serverSelectionTimeoutMS is kept short so a temporarily unreachable cluster
 # doesn't block the startup event past the Kubernetes readiness probe window.
-client = AsyncIOMotorClient(
-    mongo_url,
-    maxPoolSize=50,
-    minPoolSize=5,
-    maxIdleTimeMS=45000,
-    serverSelectionTimeoutMS=5000,
-    connectTimeoutMS=5000,
-    socketTimeoutMS=20000,
-    retryWrites=True,
-    retryReads=True,
-)
+#
+# CRITICAL: `mongodb+srv://` URIs trigger a synchronous DNS SRV lookup inside
+# `AsyncIOMotorClient.__init__()`. In freshly-spawned Kubernetes pods DNS isn't
+# always ready on the first attempt — if the SRV query fails, the constructor
+# raises `ConfigurationError` and the entire module import crashes before
+# uvicorn can bind to port 8001. This manifests in production as HTTP 520
+# (CrashLoopBackOff so fast no logs are ever captured). Retry with backoff
+# tolerates the ~1–10s DNS warmup without ever blocking forever.
+def _build_mongo_client() -> AsyncIOMotorClient:
+    import time as _time
+    last_exc: Exception | None = None
+    # 4 attempts with 1s + 2s + 3s sleeps = ~6s max before fallback.
+    # Real Kubernetes DNS warmup typically completes in <3s.
+    for attempt in range(4):
+        try:
+            return AsyncIOMotorClient(
+                mongo_url,
+                maxPoolSize=50,
+                minPoolSize=5,
+                maxIdleTimeMS=45000,
+                serverSelectionTimeoutMS=5000,
+                connectTimeoutMS=5000,
+                socketTimeoutMS=20000,
+                retryWrites=True,
+                retryReads=True,
+            )
+        except Exception as exc:  # pymongo.errors.ConfigurationError, DNS, TLS, etc.
+            last_exc = exc
+            _db_logger.warning(
+                f"Mongo client init attempt {attempt + 1}/4 failed: {exc!r}"
+            )
+            if attempt < 3:
+                _time.sleep(attempt + 1)
+    # All retries exhausted. Fall back to a localhost client so the app can still
+    # boot and expose /health; DB-dependent calls will surface clear errors at
+    # request time instead of killing the process at import time.
+    _db_logger.error(
+        f"Mongo client init failed after 4 attempts ({last_exc!r}). "
+        "Falling back to localhost client so app can still serve /health."
+    )
+    return AsyncIOMotorClient(
+        "mongodb://127.0.0.1:27017",
+        serverSelectionTimeoutMS=2000,
+        connectTimeoutMS=2000,
+    )
+
+
+client = _build_mongo_client()
 db = client[db_name]
 
 # Import collection constants after db is defined
